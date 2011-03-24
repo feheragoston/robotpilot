@@ -36,7 +36,11 @@ bool Control::Init() {
 	gettimeofday(&initStart, NULL);
 	gettimeofday(&matchStart, NULL);
 
-	mPrimitives = new Primitives(mConfig);
+	if (mConfig->PrimitivesCan) {
+		mPrimitives = new PrimitivesCan(mConfig);
+	} else {
+		mPrimitives = new Primitives(mConfig);
+	}
 
 	if (mPrimitives->Init()) {
 		return true;

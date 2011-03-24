@@ -19,6 +19,7 @@ extern "C" {
 
 #include "Config.h"
 #include "Primitives/Primitives.h"
+#include "Primitives/PrimitivesCan.h"
 
 class Control {
 public:

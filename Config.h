@@ -10,6 +10,8 @@ public:
 	char BindIp[16];
 	char LuaFile[128];
 
+	bool PrimitivesCan;
+
 	Config();
 	virtual ~Config();
 
