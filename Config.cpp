@@ -75,6 +75,9 @@ bool Config::Parse(int argc, char *argv[]) {
 
 bool Config::isLua(char* name) {
 	int len = strlen(name);
+	if (len >= 128) {
+		return false;
+	}
 	if (!strcmp(&(name[len - 4]), ".lua")) {
 		return true;
 	}
