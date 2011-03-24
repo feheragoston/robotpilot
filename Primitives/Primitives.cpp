@@ -36,6 +36,7 @@ bool Primitives::Wait() {
 		gettimeofday(&lastWait, NULL);
 		return true;
 	}
+	//std::cout << "Primitives::Wait " << 50000 - timeDiff.tv_usec << std::endl;
 	usleep(50000 - timeDiff.tv_usec);
 	gettimeofday(&lastWait, NULL);
 	return true;
