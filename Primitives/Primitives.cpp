@@ -9,6 +9,10 @@
 
 Primitives::Primitives(Config* config) {
 	mConfig = config;
+
+	mStartButton = false;
+	mStopButton = false;
+	mRobotColor = false;
 }
 
 Primitives::~Primitives() {
@@ -40,4 +44,81 @@ bool Primitives::Wait() {
 	usleep(50000 - timeDiff.tv_usec);
 	gettimeofday(&lastWait, NULL);
 	return true;
+}
+
+bool Primitives::GetStartButton() {
+	return mStartButton;
+}
+
+bool Primitives::GetStopButton() {
+	return mStopButton;
+}
+
+bool Primitives::GetMyColor() {
+	return mRobotColor;
+}
+
+void Primitives::MotorSupply(bool powered) {
+}
+
+int Primitives::CalibrateDeadreckoning(bool simulate) {
+	return 1;
+}
+
+bool Primitives::SetSpeed(double v, double w) {
+	return true;
+}
+
+int Primitives::Go(double distance, double max_speed, double max_acc) {
+	return 1;
+}
+
+int Primitives::GoTo(double x, double y, double max_speed, double max_acc) {
+	return 1;
+}
+
+int Primitives::Turn(double angle, double max_speed, double max_acc) {
+	return 1;
+}
+
+int Primitives::MotionStop(double dec) {
+	return 1;
+}
+
+void Primitives::GetRobotPos(double* x, double* y, double* phi) {
+}
+
+void Primitives::GetOpponentPos(double * x, double* y) {
+}
+
+void Primitives::SetRobotPos(double x, double y, double phi) {
+}
+
+void Primitives::GetDistances(double distance[6]) {
+}
+
+int Primitives::SetGripperPos(double pos) {
+	return 1;
+}
+
+int Primitives::CalibrateConsole() {
+	return 1;
+}
+
+int Primitives::SetConsolePos(double pos, double max_speed, double max_acc) {
+	return 1;
+}
+
+void Primitives::ConsoleStop() {
+}
+
+double Primitives::GetConsolePos() {
+	return 0;
+}
+
+int Primitives::SetArmPos(bool left, double pos, double max_speed, double max_acc) {
+	return 1;
+}
+
+void Primitives::Magnet(bool left, int polarity) {
 }
