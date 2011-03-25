@@ -38,6 +38,8 @@ bool Control::Init() {
 
 	if (mConfig->PrimitivesCan) {
 		mPrimitives = new PrimitivesCan(mConfig);
+	} else if (mConfig->PrimitivesNet) {
+		mPrimitives = new PrimitivesNet(mConfig);
 	} else {
 		mPrimitives = new Primitives(mConfig);
 	}

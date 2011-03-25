@@ -2,10 +2,12 @@
 
 Config::Config() {
 	strcpy(CanIp, "");
+	strcpy(NetIp, "");
 	strcpy(BindIp, "");
 	strcpy(LuaFile, "");
 
 	PrimitivesCan = true;
+	PrimitivesNet = false;
 }
 
 bool Config::Parse(int argc, char *argv[]) {
@@ -15,29 +17,37 @@ bool Config::Parse(int argc, char *argv[]) {
 			case 'h': // help
 				std::cout << "Command line parameters:" << std::endl;
 				std::cout << "	-h	This message" << std::endl;
-				std::cout << "	-p	Disable CAN Mode" << std::endl;
-				std::cout << "	-c <ip_address>	CAN ip" << std::endl;
+				std::cout << "	-c [ip_address]	CAN Mode" << std::endl;
+				std::cout << "	-n [ip_address]	Net Mode" << std::endl;
 				std::cout << "	-l <lua/file.lua>	lua file to run" << std::endl;
 				std::cout << "	-b <ip_address>	Bind server on ip" << std::endl;
 				return false;
 				break;
-			case 'p':
-				PrimitivesCan = false;
-				break;
 			case 'c':
+				std::cout << "CAN Mode";
 				if (i + 1 < argc) {
 					if (isIp(argv[i + 1])) {
 						strcpy(CanIp, argv[i + 1]);
 						i++;
-						std::cout << "CAN ip: " << CanIp << std::endl;
-					} else {
-						std::cout << "Error: invalid CAN ip" << std::endl;
-						return false;
+						std::cout << ": " << CanIp;
 					}
-				} else {
-					std::cout << "Error: no CAN ip specified" << std::endl;
-					return false;
 				}
+				std::cout << std::endl;
+				PrimitivesCan = true;
+				PrimitivesNet = false;
+				break;
+			case 'n':
+				std::cout << "Net Mode";
+				if (i + 1 < argc) {
+					if (isIp(argv[i + 1])) {
+						strcpy(NetIp, argv[i + 1]);
+						i++;
+						std::cout << ": " << NetIp;
+					}
+				}
+				std::cout << std::endl;
+				PrimitivesNet = true;
+				PrimitivesCan = false;
 				break;
 			case 'l':
 				if (i + 1 < argc) {

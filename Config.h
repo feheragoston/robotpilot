@@ -7,10 +7,12 @@
 class Config {
 public:
 	char CanIp[16];
+	char NetIp[16];
 	char BindIp[16];
 	char LuaFile[128];
 
 	bool PrimitivesCan;
+	bool PrimitivesNet;
 
 	Config();
 	virtual ~Config();
