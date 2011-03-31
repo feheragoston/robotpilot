@@ -20,6 +20,13 @@ Control::Control(Config* config) {
 	lua_register(L, "ControlWait", LuaWait);
 	lua_register(L, "Print", LuaPrint);
 
+	lua_register(L, "Go", LuaGo);
+	lua_register(L, "GoTo", LuaGoTo);
+	lua_register(L, "Turn", LuaTurn);
+	lua_register(L, "MotionStop", LuaMotionStop);
+	lua_register(L, "GetRobotPos", LuaGetRobotPos);
+	lua_register(L, "GetOpponentPos", LuaGetOpponentPos);
+
 	matchStarted = false;
 	exitControl = false;
 }
@@ -150,4 +157,56 @@ int Control::LuaPrint(lua_State *L) {
 	}
 	std::cout << std::endl;
 	return 0;
+}
+
+int Control::LuaGo(lua_State *L) {
+	double distance = luaL_optnumber(L, 1, 1000);
+	double speed = luaL_optnumber(L, 2, 1000);
+	double acc = luaL_optnumber(L, 3, 500);
+	int i = mPrimitives->Go(distance, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaGoTo(lua_State *L) {
+	double x = lua_tonumber(L, 1);
+	double y = lua_tonumber(L, 2);
+	double speed = luaL_optnumber(L, 3, 1000);
+	double acc = luaL_optnumber(L, 4, 500);
+	int i = mPrimitives->GoTo(x, y, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaTurn(lua_State *L) {
+	double angle = luaL_optnumber(L, 1, 1.570796327);
+	double speed = luaL_optnumber(L, 2, 2);
+	double acc = luaL_optnumber(L, 3, 1);
+	int i = mPrimitives->Turn(angle, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaMotionStop(lua_State *L) {
+	double dec = luaL_optnumber(L, 1, 0);
+	int  i = mPrimitives->MotionStop(dec);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaGetRobotPos(lua_State *L) {
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	lua_pushnumber(L, x);
+	lua_pushnumber(L, y);
+	lua_pushnumber(L, phi);
+	return 3;
+}
+
+int Control::LuaGetOpponentPos(lua_State *L) {
+	double x, y;
+	mPrimitives->GetOpponentPos(&x, &y);
+	lua_pushnumber(L, x);
+	lua_pushnumber(L, y);
+	return 2;
 }

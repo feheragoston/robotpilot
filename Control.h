@@ -54,6 +54,13 @@ protected:
 	static int LuaWait(lua_State *L);
 	static int LuaPrint(lua_State *L);
 
+	static int LuaGo(lua_State *L);
+	static int LuaGoTo(lua_State *L);
+	static int LuaTurn(lua_State *L);
+	static int LuaMotionStop(lua_State *L);
+	static int LuaGetRobotPos(lua_State *L);
+	static int LuaGetOpponentPos(lua_State *L);
+
 };
 
 #endif /* CONTROL_H_ */
