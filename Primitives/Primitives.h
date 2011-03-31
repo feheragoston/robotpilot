@@ -25,9 +25,10 @@ public:
 
 	/**
 	 * varakozas a kovetkezo megszakitasig
+	 * @param useconds maximum varakozasi ido microsecundumban
 	 * @return false ha hiba tortent
 	 */
-	virtual bool Wait();
+	virtual bool Wait(long int useconds);
 
 	/**
 	 * Start gomb allapotanak lekerdezese
@@ -51,7 +52,7 @@ public:
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
 	 */
-	virtual void MotorSupply(bool powered);
+	virtual int MotorSupply(bool powered);
 
 	///////////////////////////////////////////////////////////////////////
 	// MOZGASOK, POZICIOK
@@ -70,7 +71,7 @@ public:
 	 * @param w [rad/s]
 	 * @return sebesseg beallitas sikeres
 	 */
-	virtual bool SetSpeed(double v, double w);
+	virtual int SetSpeed(double v, double w);
 
 	/**
 	 * egyenes haladas
@@ -188,7 +189,7 @@ public:
 	/**
 	 * Konzol mozgatas leallitasa
 	 */
-	virtual void ConsoleStop();
+	virtual int ConsoleStop();
 
 	/**
 	 * Konzol pozicio lekerdezese
@@ -215,7 +216,7 @@ public:
 	 * @param left bal/jobb magnes
 	 * @param polarity 1: vonzas, 0: kikapcsolt, -1: taszitas
 	 */
-	virtual void Magnet(bool left, int polarity);
+	virtual int Magnet(bool left, int polarity);
 
 protected:
 	/**

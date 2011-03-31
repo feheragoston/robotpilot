@@ -25,7 +25,7 @@ bool Primitives::Init() {
 	return true;
 }
 
-bool Primitives::Wait() {
+bool Primitives::Wait(long int useconds) {
 	struct timeval currentTime;
 	struct timeval timeDiff;
 	gettimeofday(&currentTime, NULL);
@@ -36,12 +36,12 @@ bool Primitives::Wait() {
 		std::cerr << "Eltelt ido tul sok: " << timeDiff.tv_sec << std::endl;
 		gettimeofday(&lastWait, NULL);
 		return true;
-	} else if (timeDiff.tv_usec > 50000) {
+	} else if (timeDiff.tv_usec > useconds) {
 		gettimeofday(&lastWait, NULL);
 		return true;
 	}
 	//std::cout << "Primitives::Wait " << 50000 - timeDiff.tv_usec << std::endl;
-	usleep(50000 - timeDiff.tv_usec);
+	usleep(useconds - timeDiff.tv_usec);
 	gettimeofday(&lastWait, NULL);
 	return true;
 }
@@ -58,15 +58,16 @@ bool Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
-void Primitives::MotorSupply(bool powered) {
+int Primitives::MotorSupply(bool powered) {
+	return 1;
 }
 
 int Primitives::CalibrateDeadreckoning(bool simulate) {
 	return 1;
 }
 
-bool Primitives::SetSpeed(double v, double w) {
-	return true;
+int Primitives::SetSpeed(double v, double w) {
+	return 1;
 }
 
 int Primitives::Go(double distance, double max_speed, double max_acc) {
@@ -109,7 +110,8 @@ int Primitives::SetConsolePos(double pos, double max_speed, double max_acc) {
 	return 1;
 }
 
-void Primitives::ConsoleStop() {
+int Primitives::ConsoleStop() {
+	return 1;
 }
 
 double Primitives::GetConsolePos() {
@@ -120,5 +122,6 @@ int Primitives::SetArmPos(bool left, double pos, double max_speed, double max_ac
 	return 1;
 }
 
-void Primitives::Magnet(bool left, int polarity) {
+int Primitives::Magnet(bool left, int polarity) {
+	return 1;
 }

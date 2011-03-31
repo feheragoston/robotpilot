@@ -30,7 +30,7 @@ public:
 
 	bool Init();
 
-	bool Wait();
+	bool Wait(long int useconds);
 
 	int Go(double distance, double max_speed, double max_acc);
 	int GoTo(double x, double y, double max_speed, double max_acc);

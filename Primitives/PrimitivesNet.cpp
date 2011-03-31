@@ -35,9 +35,9 @@ bool PrimitivesNet::Init() {
 	return true;
 }
 
-bool PrimitivesNet::Wait() {
+bool PrimitivesNet::Wait(long int useconds) {
 	char buffer[256];
-	int size = netConnection->Receive(buffer, 256, 50000);
+	int size = netConnection->Receive(buffer, 256, useconds);
 
 	if (size < 0) {
 		return false;

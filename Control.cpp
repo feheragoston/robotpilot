@@ -84,7 +84,7 @@ void Control::Run() {
 		std::string luaBuffer = "";
 
 		while (!exitControl) {
-			if (!mPrimitives->Wait()) {
+			if (!mPrimitives->Wait(50000)) {
 				return;
 			}
 			bool noread = true;
@@ -132,7 +132,8 @@ int Control::LuaExit(lua_State *L) {
 }
 
 int Control::LuaWait(lua_State *L) {
-	mPrimitives->Wait();
+	long int useconds = luaL_optinteger(L, 1, 50000);
+	mPrimitives->Wait(useconds);
 	return 0;
 }
 
