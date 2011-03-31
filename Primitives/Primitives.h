@@ -51,6 +51,7 @@ public:
 	/**
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
+	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
 	 */
 	virtual int MotorSupply(bool powered);
 
@@ -69,7 +70,7 @@ public:
 	 * sebessegertekek beallitasa
 	 * @param v [mm/s]
 	 * @param w [rad/s]
-	 * @return sebesseg beallitas sikeres
+	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
 	 */
 	virtual int SetSpeed(double v, double w);
 
@@ -188,6 +189,7 @@ public:
 
 	/**
 	 * Konzol mozgatas leallitasa
+	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
 	 */
 	virtual int ConsoleStop();
 
@@ -215,6 +217,7 @@ public:
 	 * Magnes polaritasanak valtoztatasa
 	 * @param left bal/jobb magnes
 	 * @param polarity 1: vonzas, 0: kikapcsolt, -1: taszitas
+	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
 	 */
 	virtual int Magnet(bool left, int polarity);
 
