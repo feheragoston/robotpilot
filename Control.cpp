@@ -20,6 +20,13 @@ Control::Control(Config* config) {
 	lua_register(L, "ControlWait", LuaWait);
 	lua_register(L, "Print", LuaPrint);
 
+	lua_register(L, "GetStartButton", LuaGetStartButton);
+	lua_register(L, "GetStopButton", LuaGetStopButton);
+	lua_register(L, "GetMyColor", LuaGetMyColor);
+	lua_register(L, "MotorSupply", LuaMotorSupply);
+
+	lua_register(L, "CalibrateDeadreckoning", LuaCalibrateDeadreckoning);
+	lua_register(L, "SetSpeed", LuaSetSpeed);
 	lua_register(L, "Go", LuaGo);
 	lua_register(L, "GoTo", LuaGoTo);
 	lua_register(L, "Turn", LuaTurn);
@@ -158,6 +165,46 @@ int Control::LuaPrint(lua_State *L) {
 	}
 	std::cout << std::endl;
 	return 0;
+}
+
+int Control::LuaGetStartButton(lua_State *L) {
+	bool b = mPrimitives->GetStartButton();
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+int Control::LuaGetStopButton(lua_State *L) {
+	bool b = mPrimitives->GetStopButton();
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+int Control::LuaGetMyColor(lua_State *L) {
+	bool b = mPrimitives->GetMyColor();
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+int Control::LuaMotorSupply(lua_State *L) {
+	bool powered = lua_toboolean(L, 1);
+	int i = mPrimitives->MotorSupply(powered);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaCalibrateDeadreckoning(lua_State *L) {
+	bool simulate = optbool(L, 1, false);
+	int i = mPrimitives->CalibrateDeadreckoning(simulate);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaSetSpeed(lua_State *L) {
+	double v = luaL_optnumber(L, 1, 0);
+	double w = luaL_optnumber(L, 2, 0);
+	int i = mPrimitives->SetSpeed(v, w);
+	lua_pushinteger(L, i);
+	return 1;
 }
 
 int Control::LuaGo(lua_State *L) {

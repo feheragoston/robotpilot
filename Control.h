@@ -54,6 +54,13 @@ protected:
 	static int LuaWait(lua_State *L);
 	static int LuaPrint(lua_State *L);
 
+	static int LuaGetStartButton(lua_State *L);
+	static int LuaGetStopButton(lua_State *L);
+	static int LuaGetMyColor(lua_State *L);
+	static int LuaMotorSupply(lua_State *L);
+
+	static int LuaCalibrateDeadreckoning(lua_State *L);
+	static int LuaSetSpeed(lua_State *L);
 	static int LuaGo(lua_State *L);
 	static int LuaGoTo(lua_State *L);
 	static int LuaTurn(lua_State *L);

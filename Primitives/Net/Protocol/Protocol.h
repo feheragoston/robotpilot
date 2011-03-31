@@ -10,10 +10,12 @@
 
 #define MSG_UNKNOWN 0
 #define MSG_REFRESHSTATUS 1
-#define MSG_GO 2
-#define MSG_GOTO 3
-#define MSG_TURN 4
-#define MSG_MOTIONSTOP 5
+#define MSG_CALIBRATEPOS 2
+#define MSG_SETSPEED 3
+#define MSG_GO 4
+#define MSG_GOTO 5
+#define MSG_TURN 6
+#define MSG_MOTIONSTOP 7
 
 typedef struct msgstatus {
 	int function;

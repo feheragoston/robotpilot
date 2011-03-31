@@ -10,7 +10,7 @@
 
 #include "Primitives.h"
 #include "Net/Net.h"
-#include "Net/Protocol.h"
+#include "Net/Protocol/Protocol.h"
 
 typedef struct {
 	bool inprogress;
@@ -32,6 +32,8 @@ public:
 
 	bool Wait(long int useconds);
 
+	int CalibrateDeadreckoning(bool simulate);
+	int SetSpeed(double v, double w);
 	int Go(double distance, double max_speed, double max_acc);
 	int GoTo(double x, double y, double max_speed, double max_acc);
 	int Turn(double angle, double max_speed, double max_acc);

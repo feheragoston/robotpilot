@@ -73,10 +73,32 @@ bool PrimitivesNet::Wait(long int useconds) {
 		if (data->b1) {
 			turn.finished = true;
 		}
+	} else if (*function == MSG_MOTIONSTOP && size == sizeof(msgb1)) {
+		msgb1* data = (msgb1*) buffer;
+		if (data->b1) {
+			motionStop.finished = true;
+		}
 	} else {
-		printf("Unknown function: %d\n", *function);
+		printf("Unknown or invalid function: %d size: %d\n", *function, size);
 	}
 	return true;
+}
+
+int PrimitivesNet::CalibrateDeadreckoning(bool simulate) {
+	msgb1 message;
+	message.function = MSG_CALIBRATEPOS;
+	message.b1 = simulate;
+	netConnection->Send(&message, sizeof(msgb1));
+	return 1;
+}
+
+int PrimitivesNet::SetSpeed(double v, double w) {
+	msgd2 message;
+	message.function = MSG_SETSPEED;
+	message.d1 = v;
+	message.d2 = w;
+	netConnection->Send(&message, sizeof(msgd2));
+	return 1;
 }
 
 int PrimitivesNet::Go(double distance, double max_speed, double max_acc) {
