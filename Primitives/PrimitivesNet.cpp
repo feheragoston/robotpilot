@@ -32,6 +32,9 @@ bool PrimitivesNet::Init() {
 		}
 	}
 	gettimeofday(&lastWait, NULL);
+	char buffer[256];
+	strcpy(buffer, "robot");
+	netConnection->Send(buffer, strlen(buffer));
 	return true;
 }
 

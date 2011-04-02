@@ -140,7 +140,10 @@ int Control::LuaExit(lua_State *L) {
 
 int Control::LuaWait(lua_State *L) {
 	long int useconds = luaL_optinteger(L, 1, 50000);
-	mPrimitives->Wait(useconds);
+	if (!mPrimitives->Wait(useconds)) {
+		exitControl = true;
+		return luaL_error(L, "Primitives->Wait failed, exiting\n");
+	}
 	return 0;
 }
 
