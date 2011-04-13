@@ -16,6 +16,8 @@
 #define MSG_GOTO 5
 #define MSG_TURN 6
 #define MSG_MOTIONSTOP 7
+#define MSG_GRIPPERMOVE 8
+#define MSG_CONSOLEMOVE 9
 
 typedef struct msgstatus {
 	int function;
