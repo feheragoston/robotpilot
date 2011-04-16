@@ -65,9 +65,6 @@ public:
 
 	bool Wait(long int useconds);
 
-	void EnterCritical(void);
-	void ExitCritical(void);
-
 	int Go(double distance, double max_speed, double max_acc);
 	int GoTo(double x, double y, double max_speed, double max_acc);
 	int Turn(double angle, double max_speed, double max_acc);
@@ -90,6 +87,9 @@ public:
 	void SetRobotPos(double x, double y, double phi);
 	void GetDistances(double distance[6]);
 
+
+	void EnterCritical(void);
+	void ExitCritical(void);
 
 	void evalMsg(UDPmsg* msg);
 	void signalNewMsg(void);
