@@ -146,13 +146,11 @@ PrimitivesCan::PrimitivesCan(){
 
 
 	//---------- SET_KEEP_ALIVE_MS() ELEJE ----------
-	gateway->SET_KEEP_ALIVE_MS(1000);
 	broadcast->SET_KEEP_ALIVE_MS(1000);
 	//---------- SET_KEEP_ALIVE_MS() VEGE ----------
 
 
 	//---------- SET_SEND_PERIOD_MS() ELEJE ----------
-	gateway->SET_SEND_PERIOD_MS(100);
 	broadcast->SET_SEND_PERIOD_MS(100);
 	//---------- SET_SEND_PERIOD_MS() VEGE ----------
 
@@ -1044,7 +1042,6 @@ void PrimitivesCan::signalNewMsg(void){
 
 void PrimitivesCan::KEEP_ALIVE_SEND(void){
 
-	gateway->KEEP_ALIVE();
 	broadcast->KEEP_ALIVE();
 
 }
