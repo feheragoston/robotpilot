@@ -43,8 +43,8 @@ public:
 
 private:
 
-	static const unsigned int	CMD_RESET_POS			= 0x06;		//length = 0
-	static const unsigned int	MSG_RESET_POS_REPLY		= 0x06;		//length = 0
+	static const unsigned int	CMD_RESET_POS			= 0x00;		//length = 0
+	static const unsigned int	MSG_RESET_POS_REPLY		= 0x00;		//length = 0
 
 	static const unsigned int	MSG_POS					= 0x0F;		//length = 12, data[0..11] = x, y, phi, mert float ertekek
 

@@ -59,21 +59,21 @@ public:
 
 private:
 
-	static const unsigned int	CMD_STOP				= 0x07;		//length = 4, data[0] = acc, mert float ertek
-	static const unsigned int	CMD_HARD_STOP			= 0x08;		//length = 0
-	static const unsigned int	MSG_STOP_REPLY			= 0x07;		//length = 0
+	static const unsigned int	CMD_STOP				= 0x00;		//length = 4, data[0] = acc, mert float ertek
+	static const unsigned int	CMD_HARD_STOP			= 0x01;		//length = 0
+	static const unsigned int	MSG_STOP_REPLY			= 0x00;		//length = 0
 
-	static const unsigned int	CMD_GO					= 0x09;		//length = 12, data[0..11] = distance, max_speed, max_acc, mert float ertekek
-	static const unsigned int	MSG_GO_REPLY			= 0x09;		//length = 0
+	static const unsigned int	CMD_GO					= 0x02;		//length = 12, data[0..11] = distance, max_speed, max_acc, mert float ertekek
+	static const unsigned int	MSG_GO_REPLY			= 0x02;		//length = 0
 
-	static const unsigned int	CMD_GOTO				= 0x0a;		//length = 16, data[0..15] = x, y, max_speed, max_acc, mert float ertekek
-	static const unsigned int	MSG_GOTO_REPLY			= 0x0a;		//length = 0
+	static const unsigned int	CMD_GOTO				= 0x03;		//length = 16, data[0..15] = x, y, max_speed, max_acc, mert float ertekek
+	static const unsigned int	MSG_GOTO_REPLY			= 0x03;		//length = 0
 
-	static const unsigned int	CMD_TURN				= 0x0b;		//length = 12, data[0..11] = angle, max_speed, max_acc, mert float ertekek
-	static const unsigned int	MSG_TURN_REPLY			= 0x0b;		//length = 0
+	static const unsigned int	CMD_TURN				= 0x04;		//length = 12, data[0..11] = angle, max_speed, max_acc, mert float ertekek
+	static const unsigned int	MSG_TURN_REPLY			= 0x04;		//length = 0
 
-	static const unsigned int	CMD_SET_SPEED			= 0x0c;		//length = 8, data[0..7] = v, w, mert float ertekek
-	static const unsigned int	MSG_SET_SPEED_REPLY		= 0x0c;		//length = 0
+	static const unsigned int	CMD_SET_SPEED			= 0x05;		//length = 8, data[0..7] = v, w, mert float ertekek
+	static const unsigned int	MSG_SET_SPEED_REPLY		= 0x05;		//length = 0
 	//----- function VEGE -----
 
 

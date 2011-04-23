@@ -89,6 +89,11 @@ PrimitivesCan::PrimitivesCan(){
 	//---------- valtozo VEGE ----------
 
 
+	//---------- mutex ELEJE ----------
+	pthread_mutex_init(&recieveMutex, NULL);
+	//---------- mutex VEGE ----------
+
+
 	//---------- node ELEJE ----------
 	gateway		= new node_Gateway();
 	broadcast	= new node_Broadcast();

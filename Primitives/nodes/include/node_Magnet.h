@@ -48,11 +48,11 @@ public:
 
 private:
 
-	static const unsigned int	CMD_SET_MAGNET0					= 0x03;	//length = 1, data[0] = polarity
-	static const unsigned int	MSG_SET_MAGNET0_REPLY			= 0x03;	//length = 0
+	static const unsigned int	CMD_SET_MAGNET0					= 0x00;	//length = 1, data[0] = polarity
+	static const unsigned int	MSG_SET_MAGNET0_REPLY			= 0x00;	//length = 0
 
-	static const unsigned int	CMD_SET_MAGNET1					= 0x04;
-	static const unsigned int	MSG_SET_MAGNET1_REPLY			= 0x04;
+	static const unsigned int	CMD_SET_MAGNET1					= 0x01;
+	static const unsigned int	MSG_SET_MAGNET1_REPLY			= 0x01;
 	//----- function VEGE -----
 
 

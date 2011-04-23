@@ -33,6 +33,8 @@ void UDPconn::init(const char* TargetHostIp){
 	if(strcmp(TargetHostIp, "") == 0)	strcpy(TargetHost, DefaultTargetHost);
 	else								strcpy(TargetHost, TargetHostIp);
 
+	pthread_mutex_init(&sendMutex, NULL);
+
 	init_socket();
 
 }
