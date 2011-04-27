@@ -31,7 +31,7 @@
 
 #define CONSOLE_ID					3
 #define DEADRECK_ID					4
-#define DRIVE_ID					5
+#define BDC_ID					5
 #define INPUT_ID					6
 #define MAGNET_ID					7
 #define SERVO_ID					8

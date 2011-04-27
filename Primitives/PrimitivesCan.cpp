@@ -124,7 +124,7 @@ PrimitivesCan::PrimitivesCan(){
 	//---------- add node ELEJE ----------
 	gateway->ADD_NODE_CANA(CONSOLE_ID);
 	gateway->ADD_NODE_CANA(DEADRECK_ID);
-	gateway->ADD_NODE_CANA(DRIVE_ID);
+	gateway->ADD_NODE_CANA(BDC_ID);
 	gateway->ADD_NODE_CANA(INPUT_ID);
 	gateway->ADD_NODE_CANA(MAGNET_ID);
 	gateway->ADD_NODE_CANA(SERVO_ID);

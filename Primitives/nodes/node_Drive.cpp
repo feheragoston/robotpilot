@@ -16,7 +16,7 @@ using namespace std;
 
 node_Drive::node_Drive(void){
 
-	id = DRIVE_ID;
+	id = BDC_ID;
 	strcpy(name, "node_Drive");
 
 
