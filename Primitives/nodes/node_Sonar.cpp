@@ -44,7 +44,7 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_POS:
+			case MSG_SONAR_POS:
 				pos_x	= *(float*)(&(msg->data[0]));
 				pos_y	= *(float*)(&(msg->data[4]));
 				break;

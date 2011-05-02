@@ -25,9 +25,9 @@ node_Deadreck::node_Deadreck(void){
 	pos_y = 0;
 	pos_phi = 0;
 
-	resetpos_inProgress = false;
+	reset_pos_inProgress = false;
 
-	resetpos_finished = false;
+	reset_pos_finished = false;
 	//----- valtozo init VEGE -----
 
 }
@@ -49,14 +49,17 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_RESET_POS_REPLY:
-				resetpos_inProgress = false;
-				resetpos_finished = true;
+			case MSG_DEADRECK_RESET_POS_REPLY:
+				pos_x	= 0;
+				pos_y	= 0;
+				pos_phi	= 0;
+				reset_pos_inProgress = false;
+				reset_pos_finished = true;
 				break;
 
-			case MSG_POS:
+			case MSG_DEADRECK_POS:
 				//csak akkor taroljuk el a fogadott poziciokat, ha nincs folyamatban reset_pos
-				if(!resetpos_inProgress){
+				if(!reset_pos_inProgress){
 					pos_x	= *(float*)(&(msg->data[0]));
 					pos_y	= *(float*)(&(msg->data[4]));
 					pos_phi	= *(float*)(&(msg->data[8]));
@@ -74,17 +77,17 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Deadreck::RESET_POS(void){
+void node_Deadreck::DEADRECK_RESET_POS(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_RESET_POS;
+	msg.function	= CMD_DEADRECK_RESET_POS;
 	msg.length		= 0;
 
 	UDPdriver::send(&msg);
 
-	resetpos_inProgress = true;
-	resetpos_finished = false;
+	reset_pos_inProgress = true;
+	reset_pos_finished = false;
 
 }

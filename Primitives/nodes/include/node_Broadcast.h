@@ -29,10 +29,7 @@ public:
 	node_Broadcast(void);
 	~node_Broadcast();
 
-	//----- mindegyik node-nak van ELEJE -----
-	void PING(void);		//node_Broadcast-nak nincs PING-je, felulirjuk
 	void PINGprocess(void);	//node_Broadcast-nak nincs PINGprocess-e, felulirjuk
-	//----- mindegyik node-nak van VEGE -----
 
 
 };

@@ -22,10 +22,10 @@ node_Servo::node_Servo(void){
 
 	//----- valtozo init ELEJE -----
 	for(unsigned int i=0 ; i<SERVO_COUNT ; i++)
-		setservo_inProgress[i] = false;
+		move_inProgress[i] = false;
 
 	for(unsigned int i=0 ; i<SERVO_COUNT ; i++)
-		setservo_finished[i] = false;
+		move_finished[i] = false;
 	//----- valtozo init VEGE -----
 
 }
@@ -38,6 +38,9 @@ node_Servo::~node_Servo(){
 
 void node_Servo::evalMsg(UDPmsg* msg){
 
+	unsigned char num;
+
+
 	//ha o a cimzett, csak akkor dolgozza fel
 	if(msg->node_id == id){
 
@@ -47,34 +50,10 @@ void node_Servo::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_SET_SERVO0_REPLY:
-				setservo_inProgress[0] = false;
-				setservo_finished[0] = true;
-				break;
-
-			case MSG_SET_SERVO1_REPLY:
-				setservo_inProgress[1] = false;
-				setservo_finished[1] = true;
-				break;
-
-			case MSG_SET_SERVO2_REPLY:
-				setservo_inProgress[2] = false;
-				setservo_finished[2] = true;
-				break;
-
-			case MSG_SET_SERVO3_REPLY:
-				setservo_inProgress[3] = false;
-				setservo_finished[3] = true;
-				break;
-
-			case MSG_SET_SERVO4_REPLY:
-				setservo_inProgress[4] = false;
-				setservo_finished[4] = true;
-				break;
-
-			case MSG_SET_SERVO5_REPLY:
-				setservo_inProgress[5] = false;
-				setservo_finished[5] = true;
+			case MSG_SERVO_SET_POS_REPLY:
+				num = (unsigned char)(msg->data[0]);
+				move_inProgress[num] = false;
+				move_finished[num] = true;
 				break;
 
 			default:
@@ -88,53 +67,24 @@ void node_Servo::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Servo::SET_SERVO(unsigned int num, double pos, double speed, double acc){
+void node_Servo::SERVO_SET_POS(unsigned int num, double pos, double speed, double acc){
 
 	float*	tmp;
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
+	msg.function	= CMD_SERVO_SET_POS;
 
-	switch(num){
-
-		case 0:
-			msg.function	= CMD_SET_SERVO0;
-			break;
-
-		case 1:
-			msg.function	= CMD_SET_SERVO1;
-			break;
-
-		case 2:
-			msg.function	= CMD_SET_SERVO2;
-			break;
-
-		case 3:
-			msg.function	= CMD_SET_SERVO3;
-			break;
-
-		case 4:
-			msg.function	= CMD_SET_SERVO4;
-			break;
-
-		case 5:
-			msg.function	= CMD_SET_SERVO5;
-			break;
-
-		default:	//nem lehet, rossz parameter
-			return;
-
-	}
-
-	msg.length		= 12;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)pos;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)speed;
-	tmp = (float*)(&(msg.data[8]));		*tmp = (float)acc;
+	msg.length		= 13;
+	msg.data[0] = num;
+	tmp = (float*)(&(msg.data[1]));		*tmp = (float)pos;
+	tmp = (float*)(&(msg.data[5]));		*tmp = (float)speed;
+	tmp = (float*)(&(msg.data[9]));		*tmp = (float)acc;
 
 	UDPdriver::send(&msg);
 
-	setservo_inProgress[num] = true;
-	setservo_finished[num] = false;
+	move_inProgress[num] = true;
+	move_finished[num] = false;
 
 }

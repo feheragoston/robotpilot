@@ -22,10 +22,10 @@ node_Magnet::node_Magnet(void){
 
 	//----- valtozo init ELEJE -----
 	for(unsigned int i=0 ; i<MAGNET_COUNT ; i++)
-		setmagnet_inProgress[i] = false;
+		set_polarity_inProgress[i] = false;
 
 	for(unsigned int i=0 ; i<MAGNET_COUNT ; i++)
-		setmagnet_finished[i] = false;
+		set_polarity_finished[i] = false;
 	//----- valtozo init VEGE -----
 
 }
@@ -38,6 +38,9 @@ node_Magnet::~node_Magnet(){
 
 void node_Magnet::evalMsg(UDPmsg* msg){
 
+	unsigned char num;
+
+
 	//ha o a cimzett, csak akkor dolgozza fel
 	if(msg->node_id == id){
 
@@ -47,14 +50,10 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_SET_MAGNET0_REPLY:
-				setmagnet_inProgress[0] = false;
-				setmagnet_finished[0] = true;
-				break;
-
-			case MSG_SET_MAGNET1_REPLY:
-				setmagnet_inProgress[1] = false;
-				setmagnet_finished[1] = true;
+			case MSG_MAGNET_SET_POLARITY_REPLY:
+				num = (unsigned char)(msg->data[0]);
+				set_polarity_inProgress[num] = false;
+				set_polarity_finished[num] = true;
 				break;
 
 			default:
@@ -68,51 +67,20 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Magnet::SET_MAGNET(unsigned int num, int polarity){
+void node_Magnet::MAGNET_SET_POLARITY(unsigned int num, char polarity){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-
-	switch(num){
-
-		case 0:
-			msg.function	= CMD_SET_MAGNET0;
-			break;
-
-		case 1:
-			msg.function	= CMD_SET_MAGNET1;
-			break;
-
-		default:	//nem lehet, rossz parameter
-			return;
-
-	}
+	msg.function	= CMD_MAGNET_SET_POLARITY;
 
 	msg.length		= 1;
-
-	switch(polarity){
-
-		case 1:
-			msg.data[0] = polarityPull;
-			break;
-
-		case 0:
-			msg.data[0] = polarityOff;
-			break;
-
-		case -1:
-			msg.data[0] = polarityPush;
-			break;
-
-		default:	//nem lehet, rossz parameter
-			return;
-
-	}
+	msg.data[0] = num;
+	msg.data[1] = polarity;
 
 	UDPdriver::send(&msg);
 
-	setmagnet_inProgress[num] = true;
-	setmagnet_finished[num] = false;
+	set_polarity_inProgress[num] = true;
+	set_polarity_finished[num] = false;
 
 }

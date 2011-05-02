@@ -29,19 +29,11 @@ public:
 	node_Sonar(void);
 	~node_Sonar();
 
-	//----- mindegyik node-nak van ELEJE -----
 	void evalMsg(UDPmsg* msg);
-	//----- mindegyik node-nak van VEGE -----
 
 
-	//----- function ELEJE -----
-private:
-	static const unsigned int	MSG_POS				= 0x0F;		//length = 8, data[0..7] = x, y, mert float ertekek
-
-public:
 	double pos_x;
 	double pos_y;
-	//----- function VEGE -----
 
 
 };

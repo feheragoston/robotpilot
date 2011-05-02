@@ -49,12 +49,12 @@ void node_Gateway::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Gateway::REMOVE_NODE(unsigned int node_id){
+void node_Gateway::GATEWAY_REMOVE_NODE(unsigned int node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_REMOVE_NODE;
+	msg.function	= CMD_GATEWAY_REMOVE_NODE;
 	msg.length		= 1;
 	msg.data[0]		= node_id;
 
@@ -63,12 +63,12 @@ void node_Gateway::REMOVE_NODE(unsigned int node_id){
 }
 
 
-void node_Gateway::ADD_NODE_CANA(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_NODE_CANA(unsigned int node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_ADD_NODE_CANA;
+	msg.function	= CMD_GATEWAY_ADD_NODE_CANA;
 	msg.length		= 1;
 	msg.data[0]		= node_id;
 
@@ -77,12 +77,12 @@ void node_Gateway::ADD_NODE_CANA(unsigned int node_id){
 }
 
 
-void node_Gateway::ADD_NODE_CANB(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_NODE_CANB(unsigned int node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_ADD_NODE_CANB;
+	msg.function	= CMD_GATEWAY_ADD_NODE_CANB;
 	msg.length		= 1;
 	msg.data[0]		= node_id;
 
@@ -91,12 +91,12 @@ void node_Gateway::ADD_NODE_CANB(unsigned int node_id){
 }
 
 
-void node_Gateway::ADD_BOOTLOADER_ID(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_BOOTLOADER_ID(unsigned int node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_ADD_BOOTLOADER_ID;
+	msg.function	= CMD_GATEWAY_ADD_BOOTLOADER_ID;
 	msg.length		= 1;
 	msg.data[0]		= node_id;
 

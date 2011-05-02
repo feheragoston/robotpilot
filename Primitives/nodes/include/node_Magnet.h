@@ -29,31 +29,13 @@ public:
 	node_Magnet(void);
 	~node_Magnet();
 
-	//----- mindegyik node-nak van ELEJE -----
 	void evalMsg(UDPmsg* msg);
-	//----- mindegyik node-nak van VEGE -----
+
+	void MAGNET_SET_POLARITY(unsigned int num, char polarity);
 
 
-	//----- function ELEJE -----
-public:
-
-	static const unsigned int	MAGNET_COUNT		= 2;
-
-	void SET_MAGNET(unsigned int num, int polarity);
-	bool setmagnet_inProgress[MAGNET_COUNT];
-	bool setmagnet_finished[MAGNET_COUNT];
-	static const unsigned char	polarityPull	= 0x01;	//01: pull	(vonz)
-	static const unsigned char	polarityOff		= 0x00;	//00: off	(kikapcsolt)
-	static const unsigned char	polarityPush	= 0xFF;	//FF: push	(taszit)
-
-private:
-
-	static const unsigned int	CMD_SET_MAGNET0					= 0x00;	//length = 1, data[0] = polarity
-	static const unsigned int	MSG_SET_MAGNET0_REPLY			= 0x00;	//length = 0
-
-	static const unsigned int	CMD_SET_MAGNET1					= 0x01;
-	static const unsigned int	MSG_SET_MAGNET1_REPLY			= 0x01;
-	//----- function VEGE -----
+	bool set_polarity_inProgress[MAGNET_COUNT];
+	bool set_polarity_finished[MAGNET_COUNT];
 
 
 };

@@ -27,13 +27,6 @@ node_Broadcast::~node_Broadcast(){
 }
 
 
-void node_Broadcast::PING(void){
-
-	cerr << "NO PING for\t" << name << "(" << id << ")" << endl;
-
-}
-
-
 void node_Broadcast::PINGprocess(void){
 
 	cerr << "NO PINGprocess for\t" << name << "(" << id << ")" << endl;

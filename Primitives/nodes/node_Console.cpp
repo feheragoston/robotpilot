@@ -24,11 +24,11 @@ node_Console::node_Console(void){
 	pos = 0;
 
 	stop_inProgress			= false;
-	setpos_inProgress		= false;
+	move_inProgress		= false;
 	calibrate_inProgress	= false;
 
 	stop_finished			= false;
-	setpos_finished			= false;
+	move_finished			= false;
 	calibrate_finished		= false;
 	//----- valtozo init VEGE -----
 
@@ -51,21 +51,21 @@ void node_Console::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_POS:
+			case MSG_CONSOLE_POS:
 				pos	= *(float*)(&(msg->data[0]));
 				break;
 
-			case MSG_STOP_REPLY:
+			case MSG_CONSOLE_STOP_REPLY:
 				stop_inProgress = false;
 				stop_finished = true;
 				break;
 
-			case MSG_SET_POS_REPLY:
-				setpos_inProgress = false;
-				setpos_finished = true;
+			case MSG_CONSOLE_SET_POS_REPLY:
+				move_inProgress = false;
+				move_finished = true;
 				break;
 
-			case MSG_CALIBRATE_REPLY:
+			case MSG_CONSOLE_CALIBRATE_REPLY:
 				calibrate_inProgress = false;
 				calibrate_finished = true;
 				break;
@@ -81,12 +81,12 @@ void node_Console::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Console::STOP(void){
+void node_Console::CONSOLE_STOP(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_STOP;
+	msg.function	= CMD_CONSOLE_STOP;
 	msg.length		= 0;
 
 	UDPdriver::send(&msg);
@@ -97,14 +97,14 @@ void node_Console::STOP(void){
 }
 
 
-void node_Console::SET_POS(double pos, double speed, double acc){
+void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 
 	float*	tmp;
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_SET_POS;
+	msg.function	= CMD_CONSOLE_SET_POS;
 	msg.length		= 12;
 	tmp = (float*)(&(msg.data[0]));		*tmp = (float)pos;
 	tmp = (float*)(&(msg.data[4]));		*tmp = (float)speed;
@@ -112,18 +112,18 @@ void node_Console::SET_POS(double pos, double speed, double acc){
 
 	UDPdriver::send(&msg);
 
-	setpos_inProgress = true;
-	setpos_finished = false;
+	move_inProgress = true;
+	move_finished = false;
 
 }
 
 
-void node_Console::CALIBRATE(void){
+void node_Console::CONSOLE_CALIBRATE(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
-	msg.function	= CMD_CALIBRATE;
+	msg.function	= CMD_CONSOLE_CALIBRATE;
 	msg.length		= 0;
 
 	UDPdriver::send(&msg);

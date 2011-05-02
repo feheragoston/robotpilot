@@ -29,11 +29,10 @@ void* recieveLoop(void* primitivescan_ptr){
 			pc->EnterCritical();
 
 			pc->evalMsg(&msg);
+			pc->signalNewMsg();
 
 			//EXIT CRITICAL
 			pc->ExitCritical();
-
-			pc->signalNewMsg();
 
 		}
 
@@ -64,18 +63,9 @@ void* sendLoop(void* primitivescan_ptr){
 }
 
 
-#ifdef	ROBOTPILOT
 PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
-#else
-PrimitivesCan::PrimitivesCan(){
-#endif
 
-	#ifdef	ROBOTPILOT
-		UDPconn::init(config->CanIp);
-	#else
-		UDPconn::init("");
-	#endif
-
+	UDPconn::init(config->CanIp);
 	UDPdriver::init();
 
 
@@ -100,12 +90,12 @@ PrimitivesCan::PrimitivesCan(){
 
 	console		= new node_Console();
 	deadreck	= new node_Deadreck();
-	drive		= new node_Drive();
+	bdc			= new node_BDC();
 	input		= new node_Input();
 	magnet		= new node_Magnet();
 	servo		= new node_Servo();
 	sonar		= new node_Sonar();
-	supply		= new node_Supply();
+	power		= new node_Power();
 	//---------- node VEGE ----------
 
 
@@ -122,37 +112,34 @@ PrimitivesCan::PrimitivesCan(){
 
 
 	//---------- add node ELEJE ----------
-	gateway->ADD_NODE_CANA(CONSOLE_ID);
-	gateway->ADD_NODE_CANA(DEADRECK_ID);
-	gateway->ADD_NODE_CANA(BDC_ID);
-	gateway->ADD_NODE_CANA(INPUT_ID);
-	gateway->ADD_NODE_CANA(MAGNET_ID);
-	gateway->ADD_NODE_CANA(SERVO_ID);
-	gateway->ADD_NODE_CANA(SONAR_ID);
-	gateway->ADD_NODE_CANA(SUPPLY_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
+	gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
 	//---------- add node VEGE ----------
 
 
 	//---------- node PINGprocess ELEJE ----------
 	console->PINGprocess();
 	deadreck->PINGprocess();
-	drive->PINGprocess();
+	bdc->PINGprocess();
 	input->PINGprocess();
 	magnet->PINGprocess();
 	servo->PINGprocess();
 	sonar->PINGprocess();
-	supply->PINGprocess();
+	power->PINGprocess();
 	//---------- node PINGprocess VEGE ----------
 
 
-	//---------- SET_KEEP_ALIVE_MS() ELEJE ----------
-	broadcast->SET_KEEP_ALIVE_MS(1000);
-	//---------- SET_KEEP_ALIVE_MS() VEGE ----------
-
-
-	//---------- SET_SEND_PERIOD_MS() ELEJE ----------
-	broadcast->SET_SEND_PERIOD_MS(100);
-	//---------- SET_SEND_PERIOD_MS() VEGE ----------
+	//---------- idozites ELEJE ----------
+	broadcast->SET_KEEP_ALIVE_MS(KEEP_ALIVE_MS);
+	broadcast->SET_SEND_PERIOD_TO_PC_MS(SEND_PERIOD_TO_PC_MS);
+	broadcast->SET_SEND_PERIOD_TO_NODE_MS(SEND_PERIOD_TO_NODE_MS);
+	//---------- idozites VEGE ----------
 
 
 	//---------- keepAlive ELEJE ----------
@@ -169,6 +156,13 @@ PrimitivesCan::PrimitivesCan(){
 
 
 PrimitivesCan::~PrimitivesCan(){
+
+}
+
+
+bool PrimitivesCan::Init(void){
+
+	return true;
 
 }
 
@@ -227,22 +221,25 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(drive->stop_inProgress || drive->goto_inProgress || drive->turn_inProgress || drive->setspeed_inProgress){
+	if(bdc->stop_inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(drive->go_finished){
-		drive->go_finished = false;
+	else if(bdc->move_finished){
+		bdc->move_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(drive->go_inProgress){
+	else if(bdc->move_inProgress){
 
 		//ha utkozes van
-		if(input->button[BUTTON_FRONT_LEFT_INDEX] || input->button[BUTTON_FRONT_RIGHT_INDEX] || input->button[BUTTON_REAR_LEFT_INDEX] || input->button[BUTTON_REAR_RIGHT_INDEX])
-			ret = ACT_ERROR;
+		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+				ret = ACT_ERROR;
 
 		//ha nincs utkozes
 		else
@@ -252,7 +249,7 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		drive->GO(distance, max_speed, max_acc);
+		bdc->BDC_GO(distance, max_speed, max_acc);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -272,22 +269,25 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(drive->stop_inProgress || drive->go_inProgress || drive->turn_inProgress || drive->setspeed_inProgress){
+	if(bdc->stop_inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(drive->goto_finished){
-		drive->goto_finished = false;
+	else if(bdc->move_finished){
+		bdc->move_finished = false;
 		ret =  ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(drive->goto_inProgress){
+	else if(bdc->move_inProgress){
 
 		//ha utkozes van
-		if(input->button[BUTTON_FRONT_LEFT_INDEX] || input->button[BUTTON_FRONT_RIGHT_INDEX] || input->button[BUTTON_REAR_LEFT_INDEX] || input->button[BUTTON_REAR_RIGHT_INDEX])
-			ret =  ACT_ERROR;
+		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+				ret =  ACT_ERROR;
 
 		//ha nincs utkozes
 		else
@@ -297,7 +297,7 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		drive->GOTO(x-deadreckPosOffsetX, y-deadreckPosOffsetY, max_speed, max_acc);
+		bdc->BDC_GOTO(x-deadreckPosOffsetX, y-deadreckPosOffsetY, max_speed, max_acc);
 		ret =  ACT_INPROGRESS;
 	}
 
@@ -320,22 +320,25 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(drive->stop_inProgress || drive->go_inProgress || drive->goto_inProgress || drive->setspeed_inProgress){
+	if(bdc->stop_inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(drive->turn_finished){
-		drive->turn_finished = false;
+	else if(bdc->move_finished){
+		bdc->move_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(drive->turn_inProgress){
+	else if(bdc->move_inProgress){
 
 		//ha utkozes van
-		if(input->button[BUTTON_FRONT_LEFT_INDEX] || input->button[BUTTON_FRONT_RIGHT_INDEX] || input->button[BUTTON_REAR_LEFT_INDEX] || input->button[BUTTON_REAR_RIGHT_INDEX])
-			ret = ACT_ERROR;
+		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
+			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+				ret = ACT_ERROR;
 
 		//ha nincs utkozes
 		else
@@ -345,7 +348,7 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		drive->TURN(angle, max_speed, max_acc);
+		bdc->BDC_TURN(angle, max_speed, max_acc);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -367,18 +370,18 @@ int PrimitivesCan::SetSpeed(double v, double w){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(drive->stop_inProgress || drive->go_inProgress || drive->goto_inProgress || drive->turn_inProgress){
+	if(bdc->stop_inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(drive->setspeed_finished){
-		drive->setspeed_finished = false;
+	else if(bdc->move_finished){
+		bdc->move_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(drive->setspeed_inProgress){
+	else if(bdc->move_inProgress){
 
 		//ha utkozes van
 		if(false)
@@ -392,7 +395,7 @@ int PrimitivesCan::SetSpeed(double v, double w){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		drive->SET_SPEED(v, w);
+		bdc->BDC_SET_SPEED(v, w);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -419,19 +422,22 @@ int PrimitivesCan::MotionStop(double dec = 0){
 	}
 
 	//ha most vegzett
-	else if(drive->stop_finished){
-		drive->stop_finished = false;
+	else if(bdc->stop_finished){
+		bdc->stop_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(drive->stop_inProgress){
+	else if(bdc->stop_inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		drive->STOP(dec);
+
+		if(dec != 0)	bdc->BDC_STOP(dec);
+		else			bdc->BDC_HARD_STOP();
+
 		ret = ACT_INPROGRESS;
 	}
 
@@ -479,21 +485,21 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 
 	if(GetMyColor() == COLOR_RED){
 
-		startX		= deadreckStartDistanceX;
-		startY		= deadreckStartDistanceY;
+		startX		= DEADRECK_START_DISTANCE_X;
+		startY		= DEADRECK_START_DISTANCE_Y;
 		startPhi	= M_PI/2;
-		onYWallPosX	= onRearWallRobotDistance;
-		onXWallPosY	= onRearWallRobotDistance;
+		onYWallPosX	= ROBOT_DISTANCE_ON_REAR_WALL;
+		onXWallPosY	= ROBOT_DISTANCE_ON_REAR_WALL;
 
 	}
 
 	else{
 
-		startX		= deadreckStartDistanceX;
-		startY		= areaLengthY - deadreckStartDistanceY;
+		startX		= DEADRECK_START_DISTANCE_X;
+		startY		= AREA_LENGTH_Y - DEADRECK_START_DISTANCE_Y;
 		startPhi	= -M_PI/2;
-		onYWallPosX	= onRearWallRobotDistance;
-		onXWallPosY	= areaLengthY - onRearWallRobotDistance;
+		onYWallPosX	= ROBOT_DISTANCE_ON_REAR_WALL;
+		onXWallPosY	= AREA_LENGTH_Y - ROBOT_DISTANCE_ON_REAR_WALL;
 
 	}
 
@@ -522,7 +528,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//GoToWall() Y
 			case 1:
 				//ha rajta vagyunk
-				if(GoToWall((-1)*deadreckCalibSpeedAbs, deadreckCalibOmegaAbs) == ACT_FINISHED){
+				if(GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS) == ACT_FINISHED){
 					cout << "GoToWall() Y READY" << endl;
 					GetRobotPos(&posX, &posY, &posPhi);
 					SetRobotPos(onYWallPosX, posY, 0);
@@ -534,7 +540,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az Y faltol, beallitjuk a sebesseget
 			case 2:
 				//ha beallitotta a sebesseget
-				if(SetSpeed(deadreckCalibSpeedAbs, 0) == ACT_FINISHED){
+				if(SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0) == ACT_FINISHED){
 					deadreckCalibPhase++;
 				}
 				ret = ACT_INPROGRESS;
@@ -562,7 +568,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//fordulunk +/- pi/2 fokot
 			case 5:
 				//ha elfordultunk
-				if(Turn(startPhi, deadreckCalibOmegaAbs, deadreckCalibBetaAbs) == ACT_FINISHED){
+				if(Turn(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS) == ACT_FINISHED){
 					deadreckCalibPhase++;
 				}
 				ret = ACT_INPROGRESS;
@@ -571,7 +577,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//GoToWall() X
 			case 6:
 				//ha rajta vagyunk
-				if(GoToWall((-1)*deadreckCalibSpeedAbs, deadreckCalibOmegaAbs) == ACT_FINISHED){
+				if(GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS) == ACT_FINISHED){
 					cout << "GoToWall() X READY" << endl;
 					GetRobotPos(&posX, &posY, &posPhi);
 					SetRobotPos(posX, onXWallPosY, startPhi);
@@ -583,7 +589,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az X faltol, beallitjuk a sebesseget
 			case 7:
 				//ha beallitotta a sebesseget
-				if(SetSpeed(deadreckCalibSpeedAbs, 0) == ACT_FINISHED){
+				if(SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0) == ACT_FINISHED){
 					deadreckCalibPhase++;
 				}
 				ret = ACT_INPROGRESS;
@@ -638,19 +644,22 @@ int PrimitivesCan::MotorSupply(bool powered){
 
 
 	//ha most vegzett
-	if(supply->motor_finished){
-		supply->motor_finished = false;
+	if(power->motor_on_off_finished){
+		power->motor_on_off_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzet, es folyamatban
-	else if(supply->motor_inProgress){
+	else if(power->motor_on_off_inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		supply->MOTOR(powered);
+
+		if(powered)	power->POWER_MOTOR_ON();
+		else		power->POWER_MOTOR_OFF();
+
 		ret = ACT_INPROGRESS;
 	}
 
@@ -671,21 +680,21 @@ int PrimitivesCan::SetGripperPos(double pos){
 
 
 	//ha most vegzett mindegyik szervo
-	if(servo->setservo_finished[SERVO_GRIPPER_LEFT_INDEX] && servo->setservo_finished[SERVO_GRIPPER_RIGHT_INDEX]){
-		servo->setservo_finished[SERVO_GRIPPER_LEFT_INDEX] = false;
-		servo->setservo_finished[SERVO_GRIPPER_RIGHT_INDEX] = false;
+	if(servo->move_finished[SERVO_GRIPPER_LEFT_INDEX] && servo->move_finished[SERVO_GRIPPER_RIGHT_INDEX]){
+		servo->move_finished[SERVO_GRIPPER_LEFT_INDEX] = false;
+		servo->move_finished[SERVO_GRIPPER_RIGHT_INDEX] = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett mindegyik, valamelyik folyamatban
-	else if(servo->setservo_inProgress[SERVO_GRIPPER_LEFT_INDEX] || servo->setservo_inProgress[SERVO_GRIPPER_RIGHT_INDEX]){
+	else if(servo->move_inProgress[SERVO_GRIPPER_LEFT_INDEX] || servo->move_inProgress[SERVO_GRIPPER_RIGHT_INDEX]){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett mindegyik, es nincs is folyamatban semelyik sem
 	else{
-		servo->SET_SERVO(SERVO_GRIPPER_LEFT_INDEX, pos, 999999999, 999999999);	//nagy sebesseg es gyorsulas megengedett
-		servo->SET_SERVO(SERVO_GRIPPER_RIGHT_INDEX, pos, 999999999, 999999999);	//nagy sebesseg es gyorsulas megengedett
+		servo->SERVO_SET_POS(SERVO_GRIPPER_LEFT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
+		servo->SERVO_SET_POS(SERVO_GRIPPER_RIGHT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -713,19 +722,19 @@ int PrimitivesCan::SetConsolePos(double pos, double speed, double acc){
 	}
 
 	//ha most vegzett
-	else if(console->setpos_finished){
-		console->setpos_finished = false;
+	else if(console->move_finished){
+		console->move_finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(console->setpos_inProgress){
+	else if(console->move_inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		console->SET_POS(pos, speed, acc);
+		console->CONSOLE_SET_POS(pos, speed, acc);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -745,7 +754,7 @@ int PrimitivesCan::CalibrateConsole(void){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(console->setpos_inProgress || console->stop_inProgress){
+	if(console->move_inProgress || console->stop_inProgress){
 		ret = ACT_ERROR;
 	}
 
@@ -762,7 +771,7 @@ int PrimitivesCan::CalibrateConsole(void){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		console->CALIBRATE();
+		console->CONSOLE_CALIBRATE();
 		ret = ACT_INPROGRESS;
 	}
 
@@ -799,7 +808,7 @@ int PrimitivesCan::ConsoleStop(void){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		console->STOP();
+		console->CONSOLE_STOP();
 		ret = ACT_INPROGRESS;
 	}
 
@@ -833,31 +842,31 @@ int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
 
 	EnterCritical();
 
+
 	int ret;
+	unsigned int num;
 
-
-	unsigned int servoNum;
 
 	if(left)
-		servoNum = SERVO_LEFT_ARM_INDEX;
+		num = SERVO_LEFT_ARM_INDEX;
 	else
-		servoNum = SERVO_RIGHT_ARM_INDEX;
+		num = SERVO_RIGHT_ARM_INDEX;
 
 
 	//ha most vegzett
-	if(servo->setservo_finished[servoNum]){
-		servo->setservo_finished[servoNum] = false;
+	if(servo->move_finished[num]){
+		servo->move_finished[num] = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(servo->setservo_inProgress[servoNum]){
+	else if(servo->move_inProgress[num]){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		servo->SET_SERVO(servoNum, pos, speed, acc);
+		servo->SERVO_SET_POS(num, pos, speed, acc);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -877,31 +886,31 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 
 	EnterCritical();
 
+
 	int ret;
+	unsigned int num;
 
-
-	unsigned int magnetNum;
 
 	if(left)
-		magnetNum = MAGNET_LEFT_INDEX;
+		num = MAGNET_LEFT_INDEX;
 	else
-		magnetNum = MAGNET_RIGHT_INDEX;
+		num = MAGNET_RIGHT_INDEX;
 
 
 	//ha most vegzett
-	if(magnet->setmagnet_finished[magnetNum]){
-		magnet->setmagnet_finished[magnetNum] = false;
+	if(magnet->set_polarity_finished[num]){
+		magnet->set_polarity_finished[num] = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(magnet->setmagnet_inProgress[magnetNum]){
+	else if(magnet->set_polarity_inProgress[num]){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		magnet->SET_MAGNET(magnetNum, polarity);
+		magnet->MAGNET_SET_POLARITY(num, polarity);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -917,7 +926,7 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
-	bool ret =input->button[BUTTON_START_INDEX];
+	bool ret =input->button[INPUT_BUTTON_START_INDEX];
 
 	ExitCritical();
 
@@ -930,7 +939,7 @@ bool PrimitivesCan::GetStopButton(void){
 
 	EnterCritical();
 
-	bool ret = supply->StopButton;
+	bool ret = power->StopButton;
 
 	ExitCritical();
 
@@ -943,7 +952,7 @@ bool PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	bool ret = input->button[BUTTON_COLOR_INDEX];
+	bool ret = input->button[INPUT_BUTTON_COLOR_INDEX];
 
 	ExitCritical();
 
@@ -1023,12 +1032,12 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
 	deadreck->evalMsg(msg);
-	drive->evalMsg(msg);
+	bdc->evalMsg(msg);
 	input->evalMsg(msg);
 	magnet->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
-	supply->evalMsg(msg);
+	power->evalMsg(msg);
 
 }
 
@@ -1049,7 +1058,7 @@ void PrimitivesCan::KEEP_ALIVE_SEND(void){
 
 void PrimitivesCan::KEEP_ALIVE_SLEEP(void){
 
-	usleep(keepAlivePeriod_ms * 1000);
+	usleep(KEEP_ALIVE_PERIOD_MS * 1000);
 
 }
 
@@ -1075,17 +1084,17 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			//ha elorefele megyunk
 			if(speedSigned > 0){
 				//ha bal utkozes
-				if(input->button[BUTTON_FRONT_LEFT_INDEX])
+				if(input->button[INPUT_BUTTON_FRONT_LEFT_INDEX])
 					goToWallPhase = 3;
-				else if(input->button[BUTTON_FRONT_RIGHT_INDEX])
+				else if(input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX])
 					goToWallPhase = 4;
 			}
 			//ha hatrafele megyunk
 			else{
 				//ha bal utkozes
-				if(input->button[BUTTON_REAR_LEFT_INDEX])
+				if(input->button[INPUT_BUTTON_REAR_LEFT_INDEX])
 					goToWallPhase = 3;
-				else if(input->button[BUTTON_REAR_RIGHT_INDEX])
+				else if(input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
 					goToWallPhase = 4;
 			}
 			return ACT_INPROGRESS;
@@ -1123,13 +1132,13 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			//ha elorefele megyunk
 			if(speedSigned > 0){
 				//ha mindket utkozeskapcsolo jelez
-				if(input->button[BUTTON_FRONT_LEFT_INDEX] && input->button[BUTTON_FRONT_RIGHT_INDEX])
+				if(input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] && input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX])
 					goToWallPhase = 8;
 			}
 			//ha hatrafele megyunk
 			else{
 				//ha mindket utkozeskapcsolo jelez
-				if(input->button[BUTTON_REAR_LEFT_INDEX] && input->button[BUTTON_REAR_RIGHT_INDEX])
+				if(input->button[INPUT_BUTTON_REAR_LEFT_INDEX] && input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
 					goToWallPhase = 8;
 			}
 			return ACT_INPROGRESS;

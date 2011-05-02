@@ -21,10 +21,10 @@ node_Input::node_Input(void){
 
 
 	//----- valtozo init ELEJE -----
-	for(unsigned int i=0 ; i<DISTANCE_COUNT ; i++)
+	for(unsigned int i=0 ; i<INPUT_DISTANCE_COUNT ; i++)
 		distance_mm[i] = 0;
 
-	for(unsigned int i=0 ; i<BUTTON_COUNT ; i++)
+	for(unsigned int i=0 ; i<INPUT_BUTTON_COUNT ; i++)
 		button[i] = false;
 	//----- valtozo init VEGE -----
 
@@ -47,13 +47,13 @@ void node_Input::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_DISTANCE:
-				for(unsigned int i=0 ; i<DISTANCE_COUNT ; i++)
-					distance_mm[i] = distanceMultiplier * (double)(*(unsigned short*)(&(msg->data[2*i])));
+			case MSG_INPUT_DISTANCE:
+				for(unsigned int i=0 ; i<INPUT_DISTANCE_COUNT ; i++)
+					distance_mm[i] = INPUT_DISTANCE_MULTIPLIER * (double)(*(unsigned short*)(&(msg->data[2*i])));
 				break;
 
-			case MSG_BUTTON:
-				for(unsigned int i=0 ; i<BUTTON_COUNT ; i++)
+			case MSG_INPUT_BUTTON:
+				for(unsigned int i=0 ; i<INPUT_BUTTON_COUNT ; i++)
 					button[i] = ((msg->data[0] & (0x01 << i)) ? true : false);
 				break;
 

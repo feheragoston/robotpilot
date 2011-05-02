@@ -13,34 +13,24 @@
 
 
 
-//------------------------------ define ELEJE ------------------------------
-#define	ROBOTPILOT
-//------------------------------ define VEGE ------------------------------
-
-
-
-
-
 //------------------------------ include ELEJE ------------------------------
 #include "nodes/include/node_Broadcast.h"
 #include "nodes/include/node_Gateway.h"
 #include "nodes/include/node_Console.h"
 #include "nodes/include/node_Deadreck.h"
-#include "nodes/include/node_Drive.h"
+#include "nodes/include/node_BDC.h"
 #include "nodes/include/node_Input.h"
 #include "nodes/include/node_Magnet.h"
 #include "nodes/include/node_Servo.h"
 #include "nodes/include/node_Sonar.h"
-#include "nodes/include/node_Supply.h"
+#include "nodes/include/node_Power.h"
 
 #include <fstream>
 
 #include <sys/time.h>
 #include <math.h>
 
-#ifdef	ROBOTPILOT
-	#include "Primitives.h"
-#endif
+#include "Primitives.h"
 //------------------------------ include VEGE ------------------------------
 
 
@@ -48,20 +38,14 @@
 
 
 //------------------------------ PrimitivesCan ELEJE ------------------------------
-#ifdef	ROBOTPILOT
 class PrimitivesCan : public Primitives{
-#else
-class PrimitivesCan{
-#endif
 
 public:
 
-	#ifdef	ROBOTPILOT
-		PrimitivesCan(Config* config);
-	#else
-		PrimitivesCan();
-	#endif
+	PrimitivesCan(Config* config);
 	~PrimitivesCan();
+
+	bool Init(void);
 
 	bool Wait(long int useconds);
 
@@ -101,22 +85,10 @@ public:
 private:
 
 
-	//----- int visszateresi ertekek ELEJE -----
-	static const int	ACT_INPROGRESS		= 1;
-	static const int	ACT_FINISHED		= 0;
-	static const int	ACT_ERROR			= -1;
-	//----- int visszateresi ertekek VEGE -----
-
-
 	//----- recieve ELEJE -----
 	sem_t				newMessageSemaphore;
 	pthread_mutex_t		recieveMutex;
 	//----- recieve VEGE -----
-
-
-	//----- keepAlive ELEJE -----
-	static const unsigned int keepAlivePeriod_ms	= 20;
-	//----- keepAlive ELEJE -----
 
 
 	//---------- node ELEJE ----------
@@ -124,12 +96,12 @@ private:
 	node_Gateway*		gateway;
 	node_Console*		console;
 	node_Deadreck*		deadreck;
-	node_Drive*			drive;
+	node_BDC*			bdc;
 	node_Input*			input;
 	node_Magnet*		magnet;
 	node_Servo*			servo;
 	node_Sonar*			sonar;
-	node_Supply*		supply;
+	node_Power*			power;
 	//---------- node VEGE ----------
 
 
@@ -140,24 +112,6 @@ private:
 	//----- valtozo VEGE -----
 
 
-	//----- index ELEJE -----
-	static const unsigned int	SERVO_GRIPPER_LEFT_INDEX		= 0;
-	static const unsigned int	SERVO_GRIPPER_RIGHT_INDEX		= 1;
-	static const unsigned int	SERVO_LEFT_ARM_INDEX			= 2;
-	static const unsigned int	SERVO_RIGHT_ARM_INDEX			= 3;
-
-	static const unsigned int	MAGNET_LEFT_INDEX				= 0;
-	static const unsigned int	MAGNET_RIGHT_INDEX				= 1;
-
-	static const unsigned int	BUTTON_START_INDEX				= 0;
-	static const unsigned int	BUTTON_COLOR_INDEX				= 1;
-	static const unsigned int	BUTTON_FRONT_LEFT_INDEX			= 2;
-	static const unsigned int	BUTTON_FRONT_RIGHT_INDEX		= 3;
-	static const unsigned int	BUTTON_REAR_LEFT_INDEX			= 4;
-	static const unsigned int	BUTTON_REAR_RIGHT_INDEX			= 5;
-	//----- index VEGE -----
-
-
 	//----- define ELEJE -----
 	static const bool			COLOR_RED						= true;
 	static const bool			COLOR_BLUE						= !COLOR_RED;
@@ -165,17 +119,6 @@ private:
 
 
 	//----- deadreckCalib ELEJE -----
-	static const double areaLengthX					= 2100;
-	static const double areaLengthY					= 3000;
-	static const double onFrontWallRobotDistance	= 200;
-	static const double onRearWallRobotDistance		= 150;
-
-	static const double deadreckCalibSpeedAbs		= 0.1;
-	static const double deadreckCalibOmegaAbs		= 0.2;
-	static const double deadreckCalibBetaAbs		= 0.08;
-	static const double deadreckStartDistanceX		= 250;
-	static const double deadreckStartDistanceY		= 250;
-
 	unsigned int deadreckCalibPhase;
 	int GoToWall(double speed, double omega);
 	unsigned int goToWallPhase;
