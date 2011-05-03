@@ -20,6 +20,8 @@
 #define MSG_CALIBRATECONSOLE 9
 #define MSG_CONSOLEMOVE 10
 #define MSG_CONSOLESTOP 11
+#define MSG_ARMMOVE 12
+#define MSG_MAGNET 13
 
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;
@@ -67,6 +69,20 @@ typedef struct msgd4 {
 	double d3;
 	double d4;
 } msgd4;
+
+typedef struct msgarm {
+	function_t function;
+	bool left;
+	double pos;
+	double speed;
+	double acc;
+} msgarm;
+
+typedef struct msgmagnet {
+	function_t function;
+	bool left;
+	int8_t polarity;
+};
 #pragma pack()
 
 #endif /* PROTOCOL_H_ */

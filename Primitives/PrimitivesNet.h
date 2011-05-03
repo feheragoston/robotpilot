@@ -48,6 +48,8 @@ public:
 	int SetConsolePos(double pos, double max_speed, double max_acc);
 	int ConsoleStop();
 	double GetConsolePos();
+	int SetArmPos(bool left, double pos, double max_speed, double max_acc);
+	int Magnet(bool left, int polarity);
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa
@@ -63,6 +65,7 @@ protected:
 
 	progress gripperMove;
 	progress consoleMove;
+	progress armMove;
 
 	position robot, opponent;
 };
