@@ -50,6 +50,9 @@ public:
 	double GetConsolePos();
 
 protected:
+	// a halozatbol jovo uzenet feldolgozasa
+	bool processMessage(const void* buffer, int size);
+
 	Net* netConnection;
 
 	progress calibrateDeadreckoning;

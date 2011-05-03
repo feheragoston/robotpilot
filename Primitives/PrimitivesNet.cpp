@@ -31,16 +31,27 @@ bool PrimitivesNet::Init() {
 
 bool PrimitivesNet::Wait(long int useconds) {
 	char buffer[255];
-	int size = netConnection->Receive(buffer, 255, useconds);
 
-	if (size < 0) {
-		return false;
+	while (true) {
+		int size = netConnection->Receive(buffer, 255, useconds);
+		useconds = 0;
+
+		if (size < 0) {
+			return false;
+		}
+
+		if (size == 0) {
+			return true;
+		}
+
+		if (processMessage(buffer, size)) {
+		}
 	}
 
-	if (size == 0) {
-		return true;
-	}
+	return true;
+}
 
+bool PrimitivesNet::processMessage(const void* buffer, int size) {
 	function_t* function = (function_t*) buffer;
 	if (*function == MSG_REFRESHSTATUS && size == sizeof(msgstatus)) {
 		msgstatus* data = (msgstatus*) buffer;
@@ -89,6 +100,7 @@ bool PrimitivesNet::Wait(long int useconds) {
 		}
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
+		return false;
 	}
 	return true;
 }
