@@ -40,16 +40,16 @@ bool Net::IsConnected() {
 	return false;
 }
 
-bool Net::Send(void* c, uint32_t size) {
+bool Net::Send(void* c, msglen_t size) {
 	if (s > 0) {
-		if (send(s, &size, sizeof(uint32_t), 0) >= 0 && send(s, c, size, 0) >= 0) {
+		if (send(s, &size, sizeof(msglen_t), 0) >= 0 && send(s, c, size, 0) >= 0) {
 			return true;
 		}
 	}
 	return false;
 }
 
-int Net::Receive(void* c, uint32_t size, long int useconds) {
+int Net::Receive(void* c, msglen_t size, long int useconds) {
 	if (s > 0) {
 		struct timeval tv;
 		fd_set rfd;
@@ -70,8 +70,8 @@ int Net::Receive(void* c, uint32_t size, long int useconds) {
 			break;
 		default:
 			if (FD_ISSET(s, &rfd)) {
-				int size_read = recv(s, c, sizeof(uint32_t), 0);
-				uint32_t msg_len = *((uint32_t*) c);
+				int size_read = recv(s, c, sizeof(msglen_t), 0);
+				msglen_t msg_len = *((msglen_t*) c);
 				size_read = recv(s, c, msg_len, 0);
 				if (size_read < 1) {
 					CloseConnection();

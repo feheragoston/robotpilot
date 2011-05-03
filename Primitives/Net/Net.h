@@ -14,6 +14,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "Protocol/Protocol.h"
+
 class Net {
 	public:
 		Net();
@@ -22,8 +24,8 @@ class Net {
 		bool ConnectToHost(int PortNo, const char* IPAddress);
 		void CloseConnection();
 		bool IsConnected();
-		bool Send(void* c, uint32_t size);
-		int Receive(void* c, uint32_t size, long int useconds);
+		bool Send(void* c, msglen_t size);
+		int Receive(void* c, msglen_t size, long int useconds);
 
 	protected:
 

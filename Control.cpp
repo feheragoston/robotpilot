@@ -8,6 +8,7 @@
 #include "Control.h"
 
 Primitives* Control::mPrimitives = NULL;
+Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 
@@ -66,6 +67,9 @@ bool Control::Init() {
 	}
 
 	if (mPrimitives->Init()) {
+		mServer = new Server();
+		mServer->setMessageCallback(serverMessageCallback);
+		mServer->Listen(13001);
 		return true;
 	}
 
@@ -101,6 +105,8 @@ void Control::Run() {
 			if (!mPrimitives->Wait(50000)) {
 				return;
 			}
+			log();
+
 			bool noread = true;
 			while (true) {
 				FD_ZERO(&rfd);
@@ -124,6 +130,26 @@ void Control::Run() {
 			}
 		}
 	}
+}
+
+void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
+	function_t* function = (function_t*) message;
+	if (*function == MSG_REFRESHSTATUS && size == sizeof(msgb1)) {
+		msgstatus response;
+		response.function = MSG_REFRESHSTATUS;
+		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
+		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
+		response.startButton = mPrimitives->GetStartButton();
+		response.stopButton = mPrimitives->GetStopButton();
+		response.color = mPrimitives->GetMyColor();
+		mServer->Send(n, &response, sizeof(msgstatus));
+	} else {
+		printf("Unknown or invalid function: %d size: %d\n", *function, size);
+	}
+}
+
+void Control::log() {
+	mServer->Process();
 }
 
 void Control::report_errors(lua_State *L, int status) {
@@ -152,6 +178,7 @@ int Control::LuaWait(lua_State *L) {
 		exitControl = true;
 		return luaL_error(L, "Primitives->Wait failed, exiting\n");
 	}
+	log();
 	return 0;
 }
 

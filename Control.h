@@ -21,6 +21,8 @@ extern "C" {
 #include "Primitives/Primitives.h"
 #include "Primitives/PrimitivesCan.h"
 #include "Primitives/PrimitivesNet.h"
+#include "Server.h"
+#include "Primitives/Net/Protocol/Protocol.h"
 
 class Control {
 public:
@@ -35,9 +37,12 @@ public:
 	 */
 	void Run();
 
+	static void serverMessageCallback(int n, const void* message, msglen_t size);
+
 protected:
 	Config* mConfig;
 	static Primitives* mPrimitives;
+	static Server* mServer;
 
 	lua_State *L;
 
@@ -46,6 +51,8 @@ protected:
 	struct timeval matchStart; // Start gomb megnyomasanak ideje
 	static bool matchStarted; // Meccs elkezdodott
 	static bool exitControl;
+
+	static void log();
 
 	void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);

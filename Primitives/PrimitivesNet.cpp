@@ -30,8 +30,8 @@ bool PrimitivesNet::Init() {
 }
 
 bool PrimitivesNet::Wait(long int useconds) {
-	char buffer[256];
-	int size = netConnection->Receive(buffer, 256, useconds);
+	char buffer[255];
+	int size = netConnection->Receive(buffer, 255, useconds);
 
 	if (size < 0) {
 		return false;
@@ -41,7 +41,7 @@ bool PrimitivesNet::Wait(long int useconds) {
 		return true;
 	}
 
-	int* function = (int*) buffer;
+	function_t* function = (function_t*) buffer;
 	if (*function == MSG_REFRESHSTATUS && size == sizeof(msgstatus)) {
 		msgstatus* data = (msgstatus*) buffer;
 		robot.x = data->x;

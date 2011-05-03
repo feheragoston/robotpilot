@@ -21,9 +21,12 @@
 #define MSG_CONSOLEMOVE 10
 #define MSG_CONSOLESTOP 11
 
+typedef uint8_t msglen_t;
+typedef uint8_t function_t;
+
 #pragma pack(1)
 typedef struct msgstatus {
-	uint32_t function;
+	function_t function;
 	double x;
 	double y;
 	double phi;
@@ -35,30 +38,30 @@ typedef struct msgstatus {
 } msgstatus;
 
 typedef struct msgb1 {
-	uint32_t function;
+	function_t function;
 	bool b1;
 } msgb1;
 
 typedef struct msgd1 {
-	uint32_t function;
+	function_t function;
 	double d1;
 } msgd1;
 
 typedef struct msgd2 {
-	uint32_t function;
+	function_t function;
 	double d1;
 	double d2;
 } msgd2;
 
 typedef struct msgd3 {
-	uint32_t function;
+	function_t function;
 	double d1;
 	double d2;
 	double d3;
 } msgd3;
 
 typedef struct msgd4 {
-	uint32_t function;
+	function_t function;
 	double d1;
 	double d2;
 	double d3;
