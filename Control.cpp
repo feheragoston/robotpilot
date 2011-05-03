@@ -30,9 +30,16 @@ Control::Control(Config* config) {
 	lua_register(L, "Go", LuaGo);
 	lua_register(L, "GoTo", LuaGoTo);
 	lua_register(L, "Turn", LuaTurn);
+	lua_register(L, "TurnTo", LuaTurnTo);
 	lua_register(L, "MotionStop", LuaMotionStop);
 	lua_register(L, "GetRobotPos", LuaGetRobotPos);
 	lua_register(L, "GetOpponentPos", LuaGetOpponentPos);
+
+	lua_register(L, "SetGripperPos", LuaSetGripperPos);
+	lua_register(L, "CalibrateConsole", LuaCalibrateConsole);
+	lua_register(L, "SetConsolePos", LuaSetConsolePos);
+	lua_register(L, "ConsoleStop", LuaConsoleStop);
+	lua_register(L, "GetConsolePos", LuaGetConsolePos);
 
 	matchStarted = false;
 	exitControl = false;
@@ -135,6 +142,7 @@ bool Control::optbool(lua_State *L, int narg, bool d) {
 
 int Control::LuaExit(lua_State *L) {
 	exitControl = true;
+	luaL_error(L, "Exit() called, exiting\n");
 	return 0;
 }
 
@@ -230,9 +238,37 @@ int Control::LuaGoTo(lua_State *L) {
 }
 
 int Control::LuaTurn(lua_State *L) {
-	double angle = luaL_optnumber(L, 1, 1.570796327);
+	double angle = luaL_optnumber(L, 1, M_PI_2);
 	double speed = luaL_optnumber(L, 2, 2);
-	double acc = luaL_optnumber(L, 3, 1);
+	double acc = luaL_optnumber(L, 3, 2);
+	while (angle > M_PI) {
+		angle -= M_PI * 2;
+	}
+	while (angle < -M_PI) {
+		angle += M_PI * 2;
+	}
+	int i = mPrimitives->Turn(angle, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaTurnTo(lua_State *L) {
+	double x = lua_tonumber(L, 1);
+	double y = lua_tonumber(L, 2);
+	double speed = luaL_optnumber(L, 3, 2);
+	double acc = luaL_optnumber(L, 4, 2);
+
+	double mx, my, mphi;
+	mPrimitives->GetRobotPos(&mx, &my, &mphi);
+
+	double angle = atan2f(y - my, x - mx) - mphi;
+
+	while (angle > M_PI) {
+		angle -= M_PI * 2;
+	}
+	while (angle < -M_PI) {
+		angle += M_PI * 2;
+	}
 	int i = mPrimitives->Turn(angle, speed, acc);
 	lua_pushinteger(L, i);
 	return 1;
@@ -261,3 +297,38 @@ int Control::LuaGetOpponentPos(lua_State *L) {
 	lua_pushnumber(L, y);
 	return 2;
 }
+
+int Control::LuaSetGripperPos(lua_State *L) {
+	double pos = luaL_optnumber(L, 1, 0);
+	int i = mPrimitives->SetGripperPos(pos);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaCalibrateConsole(lua_State *L) {
+	int i = mPrimitives->CalibrateConsole();
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaSetConsolePos(lua_State *L) {
+	double pos = luaL_optnumber(L, 1, 0);
+	double speed = luaL_optnumber(L, 2, 2);
+	double acc = luaL_optnumber(L, 3, 10);
+	int i = mPrimitives->SetConsolePos(pos, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaConsoleStop(lua_State *L) {
+	int i = mPrimitives->ConsoleStop();
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaGetConsolePos(lua_State *L) {
+	double pos = mPrimitives->GetConsolePos();
+	lua_pushnumber(L, pos);
+	return 1;
+}
+

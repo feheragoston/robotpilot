@@ -12,12 +12,14 @@
 #include "Net/Net.h"
 #include "Net/Protocol/Protocol.h"
 
-typedef struct {
+typedef struct progress {
+	progress() : inprogress(false), finished(false) {}
 	bool inprogress;
 	bool finished;
 } progress;
 
-typedef struct {
+typedef struct position {
+	position() : x(0.), y(0.), phi(0.) {}
 	double x;
 	double y;
 	double phi;
@@ -41,13 +43,23 @@ public:
 	void GetRobotPos(double* x, double* y, double* phi);
 	void GetOpponentPos(double * x, double* y);
 
+	int SetGripperPos(double pos);
+	int CalibrateConsole();
+	int SetConsolePos(double pos, double max_speed, double max_acc);
+	int ConsoleStop();
+	double GetConsolePos();
+
 protected:
 	Net* netConnection;
 
+	progress calibrateDeadreckoning;
 	progress go;
 	progress goTo;
 	progress turn;
 	progress motionStop;
+
+	progress gripperMove;
+	progress consoleMove;
 
 	position robot, opponent;
 };

@@ -10,15 +10,6 @@
 PrimitivesNet::PrimitivesNet(Config* config) :
 	Primitives(config) {
 	netConnection = new Net();
-
-	go.inprogress = false;
-	go.finished = false;
-	goTo.inprogress = false;
-	goTo.finished = false;
-	turn.inprogress = false;
-	turn.finished = false;
-	motionStop.inprogress = false;
-	motionStop.finished = false;
 }
 
 PrimitivesNet::~PrimitivesNet() {
@@ -61,25 +52,40 @@ bool PrimitivesNet::Wait(long int useconds) {
 		mStartButton = data->startButton;
 		mStopButton = data->stopButton;
 		mRobotColor = data->color;
+	} else if (*function == MSG_CALIBRATEPOS && size == sizeof(msgb1)) {
+		msgb1* data = (msgb1*) buffer;
+		if (data->b1 && calibrateDeadreckoning.inprogress) {
+			calibrateDeadreckoning.finished = true;
+		}
 	} else if (*function == MSG_GO && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
+		if (data->b1 && go.inprogress) {
 			go.finished = true;
 		}
 	} else if (*function == MSG_GOTO && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
+		if (data->b1 && goTo.inprogress) {
 			goTo.finished = true;
 		}
 	} else if (*function == MSG_TURN && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
+		if (data->b1 && turn.inprogress) {
 			turn.finished = true;
 		}
 	} else if (*function == MSG_MOTIONSTOP && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
+		if (data->b1 && motionStop.inprogress) {
 			motionStop.finished = true;
+		}
+	} else if (*function == MSG_GRIPPERMOVE && size == sizeof(msgb1)) {
+		msgb1* data = (msgb1*) buffer;
+		if (data->b1 && gripperMove.inprogress) {
+			gripperMove.finished = true;
+		}
+	} else if (*function == MSG_CONSOLEMOVE && size == sizeof(msgb1)) {
+		msgb1* data = (msgb1*) buffer;
+		if (data->b1 && consoleMove.inprogress) {
+			consoleMove.finished = true;
 		}
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
@@ -88,11 +94,20 @@ bool PrimitivesNet::Wait(long int useconds) {
 }
 
 int PrimitivesNet::CalibrateDeadreckoning(bool simulate) {
-	msgb1 message;
-	message.function = MSG_CALIBRATEPOS;
-	message.b1 = simulate;
-	netConnection->Send(&message, sizeof(msgb1));
-	return 1;
+	if (calibrateDeadreckoning.inprogress) {
+		if (calibrateDeadreckoning.finished) {
+			calibrateDeadreckoning.inprogress = false;
+			calibrateDeadreckoning.finished = false;
+			return 1;
+		}
+	} else {
+		msgb1 message;
+		message.function = MSG_CALIBRATEPOS;
+		message.b1 = simulate;
+		netConnection->Send(&message, sizeof(msgb1));
+		calibrateDeadreckoning.inprogress = true;
+	}
+	return 0;
 }
 
 int PrimitivesNet::SetSpeed(double v, double w) {
@@ -188,4 +203,60 @@ void PrimitivesNet::GetRobotPos(double* x, double* y, double* phi) {
 void PrimitivesNet::GetOpponentPos(double * x, double* y) {
 	*x = opponent.x;
 	*y = opponent.y;
+}
+
+int PrimitivesNet::SetGripperPos(double pos) {
+	if (gripperMove.inprogress) {
+		if (gripperMove.finished) {
+			gripperMove.inprogress = false;
+			gripperMove.finished = false;
+			return 1;
+		}
+	} else {
+		msgd1 message;
+		message.function = MSG_GRIPPERMOVE;
+		message.d1 = pos;
+		netConnection->Send(&message, sizeof(msgd1));
+		gripperMove.inprogress = true;
+	}
+	return 0;
+}
+
+int PrimitivesNet::CalibrateConsole() {
+	msgb1 message;
+	message.function = MSG_CALIBRATECONSOLE;
+	message.b1 = true;
+	netConnection->Send(&message, sizeof(msgb1));
+	return 1;
+}
+
+int PrimitivesNet::SetConsolePos(double pos, double max_speed, double max_acc) {
+	if (consoleMove.inprogress) {
+		if (consoleMove.finished) {
+			consoleMove.inprogress = false;
+			consoleMove.finished = false;
+			return 1;
+		}
+	} else {
+		msgd3 message;
+		message.function = MSG_CONSOLEMOVE;
+		message.d1 = pos;
+		message.d2 = max_speed;
+		message.d3 = max_acc;
+		netConnection->Send(&message, sizeof(msgd3));
+		consoleMove.inprogress = true;
+	}
+	return 0;
+}
+
+int PrimitivesNet::ConsoleStop() {
+	msgb1 message;
+	message.function = MSG_CONSOLESTOP;
+	message.b1 = true;
+	netConnection->Send(&message, sizeof(msgb1));
+	return 1;
+}
+
+double PrimitivesNet::GetConsolePos() {
+	return 0.;
 }

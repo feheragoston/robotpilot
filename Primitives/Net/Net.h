@@ -22,8 +22,8 @@ class Net {
 		bool ConnectToHost(int PortNo, const char* IPAddress);
 		void CloseConnection();
 		bool IsConnected();
-		bool Send(void* c, size_t size);
-		int Receive(void* c, size_t size, long int useconds);
+		bool Send(void* c, uint32_t size);
+		int Receive(void* c, uint32_t size, long int useconds);
 
 	protected:
 

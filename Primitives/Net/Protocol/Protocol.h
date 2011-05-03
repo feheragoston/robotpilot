@@ -22,7 +22,7 @@
 #define MSG_CONSOLESTOP 11
 
 typedef struct msgstatus {
-	int function;
+	uint32_t function;
 	double x;
 	double y;
 	double phi;
@@ -34,30 +34,30 @@ typedef struct msgstatus {
 } msgstatus;
 
 typedef struct msgb1 {
-	int function;
+	uint32_t function;
 	bool b1;
 } msgb1;
 
 typedef struct msgd1 {
-	int function;
+	uint32_t function;
 	double d1;
 } msgd1;
 
 typedef struct msgd2 {
-	int function;
+	uint32_t function;
 	double d1;
 	double d2;
 } msgd2;
 
 typedef struct msgd3 {
-	int function;
+	uint32_t function;
 	double d1;
 	double d2;
 	double d3;
 } msgd3;
 
 typedef struct msgd4 {
-	int function;
+	uint32_t function;
 	double d1;
 	double d2;
 	double d3;
