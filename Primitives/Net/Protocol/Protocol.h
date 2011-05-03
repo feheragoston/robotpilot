@@ -21,6 +21,7 @@
 #define MSG_CONSOLEMOVE 10
 #define MSG_CONSOLESTOP 11
 
+#pragma pack(1)
 typedef struct msgstatus {
 	uint32_t function;
 	double x;
@@ -63,5 +64,6 @@ typedef struct msgd4 {
 	double d3;
 	double d4;
 } msgd4;
+#pragma pack()
 
 #endif /* PROTOCOL_H_ */
