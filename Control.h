@@ -10,6 +10,7 @@
 
 #include <sys/time.h>
 #include <string>
+#include <list>
 
 extern "C" {
 #include "lua/lua.h"
@@ -59,7 +60,10 @@ protected:
 
 	static int LuaExit(lua_State *L);
 	static int LuaWait(lua_State *L);
+	static int LuaControl(lua_State *L);
+	static int LuaRunParallel(lua_State *L);
 	static int LuaPrint(lua_State *L);
+	static int LuaTest(lua_State *L);
 
 	static int LuaGetStartButton(lua_State *L);
 	static int LuaGetStopButton(lua_State *L);
@@ -81,6 +85,8 @@ protected:
 	static int LuaSetConsolePos(lua_State *L);
 	static int LuaConsoleStop(lua_State *L);
 	static int LuaGetConsolePos(lua_State *L);
+	static int LuaSetArmPos(lua_State *L);
+	static int LuaMagnet(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

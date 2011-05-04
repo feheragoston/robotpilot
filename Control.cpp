@@ -19,7 +19,12 @@ Control::Control(Config* config) {
 
 	lua_register(L, "Exit", LuaExit);
 	lua_register(L, "ControlWait", LuaWait);
+	lua_register(L, "Control", LuaControl);
+	lua_register(L, "RunParallel", LuaRunParallel);
 	lua_register(L, "Print", LuaPrint);
+	lua_register(L, "Test", LuaTest);
+	lua_register(L, "Test1", LuaTest);
+	lua_register(L, "Test2", LuaTest);
 
 	lua_register(L, "GetStartButton", LuaGetStartButton);
 	lua_register(L, "GetStopButton", LuaGetStopButton);
@@ -182,6 +187,60 @@ int Control::LuaWait(lua_State *L) {
 	return 0;
 }
 
+int Control::LuaControl(lua_State *L) {
+	int i = lua_pushthread(L);
+	lua_pop(L, 1);
+	if (i == 1) {
+		std::cout << "> Control hivas mainbol" << std::endl;
+		lua_getfield(L, LUA_GLOBALSINDEX, "ControlWait");
+		lua_call(L, 0, 0);
+		return 0;
+	} else {
+		std::cout << "	Control hivas coroutine-bol" << std::endl;
+		return lua_yield(L, 0);
+	}
+}
+
+int Control::LuaRunParallel(lua_State *L) {
+	std::list<lua_State*> threads;
+	int argc = lua_gettop(L);
+	// parameterek sorrendjet megforditjuk
+	for (int n = 1; n <= argc; ++n) {
+		lua_insert(L, n);
+	}
+	// vegigmegyunk a parametereken hatulrol (eredetiben elorol)
+	for (int n = 1; n <= argc; ++n) {
+		if (lua_isfunction(L, -1)) {
+			lua_State* N = lua_newthread(L); // ha funkcio, letrehozunk neki egy uj szalat
+			lua_pop(L, 1); // kiszedjuk a stackbol a letrehozott szalat
+			lua_xmove(L, N, 1); // atmozgatjuk a parameterul kapott funkciot a szalhoz
+			threads.push_back(N); // hozzaadjuk a threadpoolhoz
+		} else {
+			if (threads.front() != NULL) {
+				lua_xmove(L, threads.back(), 1); // ha mar van szalunk, hozzaadjuk a parametert
+			} else {
+				lua_pop(L, 1); // ha nincs szalunk kiszedjuk a stackbol
+			}
+		}
+	}
+	while (threads.size() > 0) {
+		for (int i = threads.size(); i > 0; i--) {
+			int exit = lua_resume(threads.front(), lua_gettop(threads.front()) - 1);
+			if (exit == LUA_YIELD) {
+				threads.push_back(threads.front());
+			} else if (exit != 0) {
+				std::cout << "Parallel thread error: " << luaL_optstring(threads.front(), -1, "-") << std::endl;
+			}
+			threads.pop_front();
+		}
+		if (threads.size() > 0) {
+			lua_getfield(L, LUA_GLOBALSINDEX, "Control");
+			lua_call(L, 0, 0);
+		}
+	}
+	return 0;
+}
+
 int Control::LuaPrint(lua_State *L) {
 	int argc = lua_gettop(L);
 	for (int n = 1; n <= argc; ++n) {
@@ -201,6 +260,20 @@ int Control::LuaPrint(lua_State *L) {
 			std::cout << luaL_typename(L, n);
 		}
 	}
+	std::cout << std::endl;
+	return 0;
+}
+
+int Control::LuaTest(lua_State *L) {
+	lua_Debug ar;
+	lua_getstack(L, 0, &ar);
+	lua_getinfo(L, "nS", &ar);
+	std::cout << "name: " << ar.name << " what: " << ar.what << " namewhat: " << ar.namewhat;
+
+	int i = lua_pushthread(L);
+	lua_pop(L, 1);
+	std::cout << " " << i;
+
 	std::cout << std::endl;
 	return 0;
 }
@@ -359,3 +432,12 @@ int Control::LuaGetConsolePos(lua_State *L) {
 	return 1;
 }
 
+int Control::LuaSetArmPos(lua_State *L) {
+	bool left = lua_toboolean(L, 1);
+	double pos = luaL_optnumber(L, 2, 0);
+	double speed = luaL_optnumber(L, 3, 2);
+	double acc = luaL_optnumber(L, 4, 10);
+	int i = mPrimitives->SetArmPos(left, pos, speed, acc);
+	lua_pushinteger(L, i);
+	return 1;
+}

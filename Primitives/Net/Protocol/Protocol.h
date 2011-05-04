@@ -82,7 +82,8 @@ typedef struct msgmagnet {
 	function_t function;
 	bool left;
 	int8_t polarity;
-};
+} msgmagnet;
+
 #pragma pack()
 
 #endif /* PROTOCOL_H_ */
