@@ -100,8 +100,10 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		}
 	} else if (*function == MSG_ARMMOVE && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
-		if (data->b1 && armMove.inprogress) {
-			armMove.finished = true;
+		if (data->b1 && leftArmMove.inprogress) {
+			leftArmMove.finished = true;
+		} else if (rightArmMove.inprogress) {
+			rightArmMove.finished = true;
 		}
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
@@ -279,10 +281,16 @@ double PrimitivesNet::GetConsolePos() {
 }
 
 int PrimitivesNet::SetArmPos(bool left, double pos, double max_speed, double max_acc) {
-	if (armMove.inprogress) {
-		if (armMove.finished) {
-			armMove.inprogress = false;
-			armMove.finished = false;
+	progress* p;
+	if (left) {
+		p = &leftArmMove;
+	} else {
+		p = &rightArmMove;
+	}
+	if (p->inprogress) {
+		if (p->finished) {
+			p->inprogress = false;
+			p->finished = false;
 			return 1;
 		}
 	} else {
@@ -293,7 +301,7 @@ int PrimitivesNet::SetArmPos(bool left, double pos, double max_speed, double max
 		message.speed = max_speed;
 		message.acc = max_acc;
 		netConnection->Send(&message, sizeof(msgarm));
-		armMove.inprogress = true;
+		p->inprogress = true;
 	}
 	return 0;
 }

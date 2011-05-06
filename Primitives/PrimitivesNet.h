@@ -65,7 +65,7 @@ protected:
 
 	progress gripperMove;
 	progress consoleMove;
-	progress armMove;
+	progress leftArmMove, rightArmMove;
 
 	position robot, opponent;
 };
