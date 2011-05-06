@@ -46,6 +46,10 @@ bool PrimitivesNet::Wait(long int useconds) {
 
 		if (processMessage(buffer, size)) {
 		}
+		if (mStopButton) {
+			std::cout << "Stop button, exiting" << std::endl;
+			return false;
+		}
 	}
 
 	return true;
