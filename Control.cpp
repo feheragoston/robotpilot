@@ -46,6 +46,7 @@ Control::Control(Config* config) {
 	lua_register(L, "SetConsolePos", LuaSetConsolePos);
 	lua_register(L, "ConsoleStop", LuaConsoleStop);
 	lua_register(L, "GetConsolePos", LuaGetConsolePos);
+	lua_register(L, "SetArmPos", LuaSetArmPos);
 
 	matchStarted = false;
 	exitControl = false;
@@ -191,12 +192,10 @@ int Control::LuaControl(lua_State *L) {
 	int i = lua_pushthread(L);
 	lua_pop(L, 1);
 	if (i == 1) {
-		std::cout << "> Control hivas mainbol" << std::endl;
 		lua_getfield(L, LUA_GLOBALSINDEX, "ControlWait");
 		lua_call(L, 0, 0);
 		return 0;
 	} else {
-		std::cout << "	Control hivas coroutine-bol" << std::endl;
 		return lua_yield(L, 0);
 	}
 }
@@ -205,7 +204,7 @@ int Control::LuaRunParallel(lua_State *L) {
 	std::list<lua_State*> threads;
 	int argc = lua_gettop(L);
 	// parameterek sorrendjet megforditjuk
-	for (int n = 1; n <= argc; ++n) {
+	for (int n = 1; n < argc; ++n) {
 		lua_insert(L, n);
 	}
 	// vegigmegyunk a parametereken hatulrol (eredetiben elorol)
@@ -225,11 +224,30 @@ int Control::LuaRunParallel(lua_State *L) {
 	}
 	while (threads.size() > 0) {
 		for (int i = threads.size(); i > 0; i--) {
-			int exit = lua_resume(threads.front(), lua_gettop(threads.front()) - 1);
+			lua_State* N = threads.front();
+			/* hibakereses
+			for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
+				if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
+					std::cout << i << " elrontott lua thread: " << lua_status(*j) << std::endl;
+				}
+			}
+			if (lua_status(N) != LUA_YIELD && lua_status(N) != 0) {
+				std::cout << "elotte: " << lua_status(N) << std::endl;
+			}
+			*/
+			int exit = lua_resume(N, lua_gettop(N) - 1);
 			if (exit == LUA_YIELD) {
-				threads.push_back(threads.front());
+				threads.push_back(N);
 			} else if (exit != 0) {
-				std::cout << "Parallel thread error: " << luaL_optstring(threads.front(), -1, "-") << std::endl;
+				std::cout << "Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
+				/* hibakereses
+				std::cout << "utana: " << lua_status(N) << std::endl;
+				for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
+					if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
+						std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
+					}
+				}
+				*/
 			}
 			threads.pop_front();
 		}
@@ -265,6 +283,9 @@ int Control::LuaPrint(lua_State *L) {
 }
 
 int Control::LuaTest(lua_State *L) {
+	std::cout << "test status: " << lua_status(L) << std::endl;
+	return 0;
+
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);

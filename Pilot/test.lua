@@ -1,23 +1,3 @@
-function Control()
-	if (coroutine.running()) then
-		coroutine.yield();
-	else
-		ControlWait();
-	end
-end
-
--- coroutine-ok parhuzamos futtatasa
-function RunParallel(t1, t2)
-	while (coroutine.status(t1) == "suspended" or coroutine.status(t2) == "suspended") do
-		if (coroutine.status(t1) == "suspended") then
-			coroutine.resume(t1);
-		end
-		if (coroutine.status(t2) == "suspended") then
-			coroutine.resume(t2);
-		end
-		Control();
-	end
-end
 
 PI = 3.141592;
 Offset = 0;
@@ -25,6 +5,34 @@ Ori = 1;
 
 repeat Control(); until (CalibrateDeadreckoning() ~= 0);
 Print("Calibrate finished");
+
+i = 0;
+repeat
+RunParallel(
+function()
+	--Control();
+	--Print("Test", i);
+	--Control();
+	--Print("Test", i);
+end);
+i = i + 1;
+until (i > 10);
+
+RunParallel(
+function()
+	Control();
+	--Print("Test", i);
+	Control();
+	--Print("Test", i);
+end);
+
+RunParallel(
+function()
+	Control();
+	--Print("Test", i);
+	Control();
+	--Print("Test", i);
+end);
 
 repeat Control(); until (GetStartButton());
 
@@ -46,39 +54,39 @@ x, y, phi = GetRobotPos();
 repeat Control(); until (Turn(-phi) ~= 0);
 repeat Control(); until (GoTo(560, Offset + Ori * 740) ~= 0);
 repeat Control(); until (GoTo(1600, Offset + Ori * 800) ~= 0);
-local c1 = coroutine.create(function()
+RunParallel(
+function()
 	repeat Control(); until (SetGripperPos(0) ~= 0);
-end);
-local c2 = coroutine.create(function()
+end,
+function()
 	repeat Control(); until (GoTo(1770, Offset + Ori * 700) ~= 0);
-end);
-RunParallel(c1, c2);
+end
+);
 
-local c1 = coroutine.create(function()
+RunParallel(
+function()
 	repeat Control(); until (SetGripperPos(70) ~= 0);
-end);
-local c2 = coroutine.create(function()
+end,
+function()
 	repeat Control(); until (SetConsolePos(100) ~= 0);
 	repeat Control(); until (Go(-360) ~= 0);
-end);
-RunParallel(c1, c2);
+end
+);
 
 -- paraszt kihuzasa a zold teruletrol
 x, y, phi = GetRobotPos();
-local c1 = coroutine.create(function()
-	local c1 = coroutine.create(function()
-		repeat Control(); until (SetGripperPos(90) ~= 0);
-	end);
-	local c2 = coroutine.create(function()
-		repeat Control(); until (SetConsolePos(0) ~= 0);
-	end);
-	RunParallel(c1, c2);
-end);
-local c2 = coroutine.create(function()
+RunParallel(
+function()
+	repeat Control(); until (SetGripperPos(90) ~= 0);
+end,
+function()
+	repeat Control(); until (SetConsolePos(0) ~= 0);
+end,
+function()
 	repeat Control(); until (TurnTo(690+2*280, y) ~= 0);
 	repeat Control(); until (GoTo(690+2*280, y) ~= 0);
-end);
-RunParallel(c1, c2);
+end
+);
 
 x, y, phi = GetRobotPos();
 repeat Control(); until (TurnTo(x, Offset + Ori * 280) ~= 0);
@@ -92,13 +100,11 @@ repeat Control(); until (Go(-120) ~= 0);
 -- kiraly felszedese
 x, y, phi = GetRobotPos();
 repeat Control(); until (TurnTo(690+3*280, y) ~= 0);
-local c1 = coroutine.create(function()
+RunParallel(function()
 	repeat Control(); until (SetConsolePos(0) ~= 0);
-end);
-local c2 = coroutine.create(function()
+end, function()
 	repeat Control(); until (GoTo(690+3*280, y) ~= 0);
 end);
-RunParallel(c1, c2);
 
 x, y, phi = GetRobotPos();
 repeat Control(); until (TurnTo(x, Offset + Ori * 280) ~= 0);
@@ -136,18 +142,3 @@ repeat Control(); until (SetGripperPos(0) ~= 0);
 repeat Control(); until (SetConsolePos(60) ~= 0);
 
 Exit();
-
-repeat Control(); until (GoTo(275, 975) ~= 0);
-
-repeat Control(); until (Go(-200) ~= 0);
-x, y, phi = GetRobotPos();
-repeat Control(); until (Turn(PI/2 - phi, 2, 2) ~= 0);
-repeat Control(); until (GoTo(475, 1500) ~= 0);
-x, y, phi = GetRobotPos();
-repeat Control(); until (Turn(-phi, 2, 2) ~= 0);
-repeat Control(); until (GoTo(1050, 1500) ~= 0);
-repeat Control(); until (GoTo(1800, 1325) ~= 0);
-
-repeat Control(); until (Go(-200) ~= 0);
-
---Exit();
