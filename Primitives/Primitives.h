@@ -144,6 +144,13 @@ public:
 	virtual void GetOpponentPos(double * x, double* y);
 
 	/**
+	 * sebessegertekek lekerdezese
+	 * @param v [mm/s]
+	 * @param w [rad/s]
+	 */
+	virtual void GetSpeed(double* v, double* w);
+
+	/**
 	 * robot poziciojanak beallitasa
 	 * @param x [mm]
 	 * @param y [mm]

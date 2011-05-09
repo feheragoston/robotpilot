@@ -58,6 +58,14 @@ protected:
 	void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
 
+	// lua exception handling
+	// http://lua-users.org/wiki/FinalizedExceptions
+	static int safecall(lua_State *L);
+	static int protect(lua_State *L);
+	static int finalize(lua_State *L);
+	static int do_nothing(lua_State *L);
+	static int newtry(lua_State *L);
+
 	static int LuaExit(lua_State *L);
 	static int LuaWait(lua_State *L);
 	static int LuaControl(lua_State *L);

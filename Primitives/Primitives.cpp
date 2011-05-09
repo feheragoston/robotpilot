@@ -92,6 +92,9 @@ void Primitives::GetRobotPos(double* x, double* y, double* phi) {
 void Primitives::GetOpponentPos(double * x, double* y) {
 }
 
+void Primitives::GetSpeed(double* v, double* w) {
+}
+
 void Primitives::SetRobotPos(double x, double y, double phi) {
 }
 

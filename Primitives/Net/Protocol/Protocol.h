@@ -32,6 +32,8 @@ typedef struct msgstatus {
 	double x;
 	double y;
 	double phi;
+	double v;
+	double w;
 	double ox;
 	double oy;
 	bool startButton;

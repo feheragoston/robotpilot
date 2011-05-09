@@ -19,10 +19,12 @@ typedef struct progress {
 } progress;
 
 typedef struct position {
-	position() : x(0.), y(0.), phi(0.) {}
+	position() : x(0.), y(0.), phi(0.), v(0.), w(0.) {}
 	double x;
 	double y;
 	double phi;
+	double v;
+	double w;
 } position;
 
 class PrimitivesNet: public Primitives {
@@ -42,6 +44,7 @@ public:
 	int MotionStop(double dec);
 	void GetRobotPos(double* x, double* y, double* phi);
 	void GetOpponentPos(double * x, double* y);
+	void GetSpeed(double* v, double* w);
 
 	int SetGripperPos(double pos);
 	int CalibrateConsole();

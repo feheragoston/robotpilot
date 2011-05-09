@@ -46,10 +46,6 @@ bool PrimitivesNet::Wait(long int useconds) {
 
 		if (processMessage(buffer, size)) {
 		}
-		if (mStopButton) {
-			std::cout << "Stop button, exiting" << std::endl;
-			return false;
-		}
 	}
 
 	return true;
@@ -62,6 +58,8 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		robot.x = data->x;
 		robot.y = data->y;
 		robot.phi = data->phi;
+		robot.v = data->v;
+		robot.w = data->w;
 		opponent.x = data->ox;
 		opponent.y = data->oy;
 		mStartButton = data->startButton;
@@ -226,6 +224,11 @@ void PrimitivesNet::GetRobotPos(double* x, double* y, double* phi) {
 void PrimitivesNet::GetOpponentPos(double * x, double* y) {
 	*x = opponent.x;
 	*y = opponent.y;
+}
+
+void PrimitivesNet::GetSpeed(double* v, double* w) {
+	*v = robot.v;
+	*w = robot.w;
 }
 
 int PrimitivesNet::SetGripperPos(double pos) {

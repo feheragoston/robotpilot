@@ -17,6 +17,12 @@ Control::Control(Config* config) {
 	this->L = luaL_newstate();
 	luaL_openlibs(L);
 
+	lua_register(L, "safecall", safecall);
+	lua_register(L, "protect", protect);
+	lua_register(L, "finalize", finalize);
+	lua_register(L, "do_nothing", do_nothing);
+	lua_register(L, "newtry", newtry);
+
 	lua_register(L, "Exit", LuaExit);
 	lua_register(L, "ControlWait", LuaWait);
 	lua_register(L, "Control", LuaControl);
@@ -155,7 +161,6 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 }
 
 void Control::log() {
-	mServer->Process();
 }
 
 void Control::report_errors(lua_State *L, int status) {
@@ -172,6 +177,46 @@ bool Control::optbool(lua_State *L, int narg, bool d) {
 	return d;
 }
 
+int Control::safecall(lua_State *L) {
+	lua_pushvalue(L, lua_upvalueindex(1));
+	lua_insert(L, 1);
+	if (lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0) != 0) {
+		lua_pushnil(L);
+		lua_insert(L, 1);
+		return 2;
+	} else {
+		return lua_gettop(L);
+	}
+}
+
+int Control::protect(lua_State *L) {
+	lua_pushcclosure(L, safecall, 1);
+	return 1;
+}
+
+int Control::finalize(lua_State *L) {
+    if (!lua_toboolean(L, 1)) {
+        lua_pushvalue(L, lua_upvalueindex(1));
+        lua_pcall(L, 0, 0, 0);
+        lua_settop(L, 2);
+        lua_error(L);
+        return 0;
+    } else return lua_gettop(L);
+}
+
+int Control::do_nothing(lua_State *L) {
+    (void) L;
+    return 0;
+}
+
+int Control::newtry(lua_State *L) {
+    lua_settop(L, 1);
+    if (lua_isnil(L, 1))
+        lua_pushcfunction(L, do_nothing);
+    lua_pushcclosure(L, finalize, 1);
+    return 1;
+}
+
 int Control::LuaExit(lua_State *L) {
 	exitControl = true;
 	luaL_error(L, "Exit() called, exiting\n");
@@ -180,11 +225,22 @@ int Control::LuaExit(lua_State *L) {
 
 int Control::LuaWait(lua_State *L) {
 	long int useconds = luaL_optinteger(L, 1, 50000);
+
+	/* Primitives statuszfrissitest varunk */
 	if (!mPrimitives->Wait(useconds)) {
 		exitControl = true;
 		return luaL_error(L, "Primitives->Wait failed, exiting\n");
 	}
+
+	/* logolunk es a csatlakozott klienseket feldolgozzuk */
 	log();
+	mServer->Process();
+
+	/* statusz ellenorzesek */
+	if (mPrimitives->GetStopButton()) {
+		exitControl = true;
+		return luaL_error(L, "Stop button, exiting\n");
+	}
 	return 0;
 }
 
@@ -226,28 +282,28 @@ int Control::LuaRunParallel(lua_State *L) {
 		for (int i = threads.size(); i > 0; i--) {
 			lua_State* N = threads.front();
 			/* hibakereses
-			for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
-				if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
-					std::cout << i << " elrontott lua thread: " << lua_status(*j) << std::endl;
-				}
-			}
-			if (lua_status(N) != LUA_YIELD && lua_status(N) != 0) {
-				std::cout << "elotte: " << lua_status(N) << std::endl;
-			}
-			*/
+			 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
+			 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
+			 std::cout << i << " elrontott lua thread: " << lua_status(*j) << std::endl;
+			 }
+			 }
+			 if (lua_status(N) != LUA_YIELD && lua_status(N) != 0) {
+			 std::cout << "elotte: " << lua_status(N) << std::endl;
+			 }
+			 */
 			int exit = lua_resume(N, lua_gettop(N) - 1);
 			if (exit == LUA_YIELD) {
 				threads.push_back(N);
 			} else if (exit != 0) {
 				std::cout << "Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
 				/* hibakereses
-				std::cout << "utana: " << lua_status(N) << std::endl;
-				for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
-					if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
-						std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
-					}
-				}
-				*/
+				 std::cout << "utana: " << lua_status(N) << std::endl;
+				 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
+				 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
+				 std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
+				 }
+				 }
+				 */
 			}
 			threads.pop_front();
 		}
@@ -397,7 +453,7 @@ int Control::LuaTurnTo(lua_State *L) {
 
 int Control::LuaMotionStop(lua_State *L) {
 	double dec = luaL_optnumber(L, 1, 0);
-	int  i = mPrimitives->MotionStop(dec);
+	int i = mPrimitives->MotionStop(dec);
 	lua_pushinteger(L, i);
 	return 1;
 }
