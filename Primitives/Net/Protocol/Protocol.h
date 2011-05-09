@@ -22,6 +22,7 @@
 #define MSG_CONSOLESTOP 11
 #define MSG_ARMMOVE 12
 #define MSG_MAGNET 13
+#define MSG_PAWNS 14
 
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;
@@ -40,6 +41,26 @@ typedef struct msgstatus {
 	bool stopButton;
 	bool color;
 } msgstatus;
+
+typedef struct msgpawn {
+	float x;
+	float y;
+	uint8_t type;
+} msgpawn;
+
+typedef struct msgpawns {
+	function_t function;
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	float x3;
+	float y3;
+	float x4;
+	float y4;
+	uint8_t num;
+	msgpawn pawns[19];
+} msgpawns;
 
 typedef struct msgb1 {
 	function_t function;
