@@ -20,6 +20,8 @@
 #include <string.h>
 
 #include <pthread.h>
+
+#include "../define/type.h"
 //------------------------------ include VEGE ------------------------------
 
 
@@ -44,8 +46,8 @@ public:
 
 	static void init(const char* TargetHostIp);
 	
-	static bool recieve(void* buffer, unsigned int maxCount, unsigned int* count, struct timeval* timeOut);
-	static void send(void* buffer, unsigned int count);
+	static bool recieve(void* buffer, u32 maxCount, u32* count, struct timeval* timeOut);
+	static void send(void* buffer, u32 count);
 
 
 private:

@@ -31,13 +31,22 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
 
-	void SERVO_SET_POS(unsigned int num, double pos, double speed, double acc);
+
+	void SERVO_SET_POS(u8 num, double pos, double speed, double acc);
 
 
-	bool move_inProgress[SERVO_COUNT];
-	bool move_finished[SERVO_COUNT];
+	progress_t move[SERVO_COUNT];
 
+
+private:
+
+	double Servo_Rad_Incr_x0[SERVO_COUNT];
+	double Servo_Rad_Incr_y0[SERVO_COUNT];
+	double Servo_Rad_Incr_x1[SERVO_COUNT];
+	double Servo_Rad_Incr_y1[SERVO_COUNT];
+	double Servo_Rad_Incr_grad[SERVO_COUNT];
 
 };
 //------------------------------ node_Servo VEGE ------------------------------

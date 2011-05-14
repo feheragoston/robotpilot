@@ -106,40 +106,85 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	//---------- recieve VEGE ----------
 
 
-	//---------- gateway PINGprocess ELEJE ----------
+	//---------- node ELEJE ----------
 	gateway->PINGprocess();
-	//---------- gateway PINGprocess VEGE ----------
+	gateway->INIT_PARAM();
+	gateway->SET_KEEP_ALIVE_MS(GATEWAY_KEEP_ALIVE_MS);
+	gateway->SET_SEND_PERIOD_TO_PC_MS(GATEWAY_SEND_PERIOD_TO_PC_MS);
+	gateway->SET_SEND_PERIOD_TO_NODE_MS(GATEWAY_SEND_PERIOD_TO_NODE_MS);
 
 
-	//---------- add node ELEJE ----------
-	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
-	gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
-	//---------- add node VEGE ----------
-
-
-	//---------- node PINGprocess ELEJE ----------
+	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
 	console->PINGprocess();
+	console->INIT_PARAM();
+	console->SET_KEEP_ALIVE_MS(CONSOLE_KEEP_ALIVE_MS);
+	console->SET_SEND_PERIOD_TO_PC_MS(CONSOLE_SEND_PERIOD_TO_PC_MS);
+	console->SET_SEND_PERIOD_TO_NODE_MS(CONSOLE_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
 	deadreck->PINGprocess();
+	deadreck->INIT_PARAM();
+	deadreck->SET_KEEP_ALIVE_MS(DEADRECK_KEEP_ALIVE_MS);
+	deadreck->SET_SEND_PERIOD_TO_PC_MS(DEADRECK_SEND_PERIOD_TO_PC_MS);
+	deadreck->SET_SEND_PERIOD_TO_NODE_MS(DEADRECK_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!BDC_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(BDC_ID);
 	bdc->PINGprocess();
+	bdc->INIT_PARAM();
+	bdc->SET_KEEP_ALIVE_MS(BDC_KEEP_ALIVE_MS);
+	bdc->SET_SEND_PERIOD_TO_PC_MS(BDC_SEND_PERIOD_TO_PC_MS);
+	bdc->SET_SEND_PERIOD_TO_NODE_MS(BDC_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 	input->PINGprocess();
+	input->INIT_PARAM();
+	input->SET_KEEP_ALIVE_MS(INPUT_KEEP_ALIVE_MS);
+	input->SET_SEND_PERIOD_TO_PC_MS(INPUT_SEND_PERIOD_TO_PC_MS);
+	input->SET_SEND_PERIOD_TO_NODE_MS(INPUT_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!MAGNET_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(MAGNET_ID);
 	magnet->PINGprocess();
+	magnet->INIT_PARAM();
+	magnet->SET_KEEP_ALIVE_MS(MAGNET_KEEP_ALIVE_MS);
+	magnet->SET_SEND_PERIOD_TO_PC_MS(MAGNET_SEND_PERIOD_TO_PC_MS);
+	magnet->SET_SEND_PERIOD_TO_NODE_MS(MAGNET_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
 	servo->PINGprocess();
+	servo->INIT_PARAM();
+	servo->SET_KEEP_ALIVE_MS(SERVO_KEEP_ALIVE_MS);
+	servo->SET_SEND_PERIOD_TO_PC_MS(SERVO_SEND_PERIOD_TO_PC_MS);
+	servo->SET_SEND_PERIOD_TO_NODE_MS(SERVO_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!SONAR_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);
 	sonar->PINGprocess();
+	sonar->INIT_PARAM();
+	sonar->SET_KEEP_ALIVE_MS(SONAR_KEEP_ALIVE_MS);
+	sonar->SET_SEND_PERIOD_TO_PC_MS(SONAR_SEND_PERIOD_TO_PC_MS);
+	sonar->SET_SEND_PERIOD_TO_NODE_MS(SONAR_SEND_PERIOD_TO_NODE_MS);
+
+
+	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
 	power->PINGprocess();
-	//---------- node PINGprocess VEGE ----------
-
-
-	//---------- idozites ELEJE ----------
-	broadcast->SET_KEEP_ALIVE_MS(KEEP_ALIVE_MS);
-	broadcast->SET_SEND_PERIOD_TO_PC_MS(SEND_PERIOD_TO_PC_MS);
-	broadcast->SET_SEND_PERIOD_TO_NODE_MS(SEND_PERIOD_TO_NODE_MS);
-	//---------- idozites VEGE ----------
+	power->INIT_PARAM();
+	power->SET_KEEP_ALIVE_MS(POWER_KEEP_ALIVE_MS);
+	power->SET_SEND_PERIOD_TO_PC_MS(POWER_SEND_PERIOD_TO_PC_MS);
+	power->SET_SEND_PERIOD_TO_NODE_MS(POWER_SEND_PERIOD_TO_NODE_MS);
+	//---------- node VEGE ----------
 
 
 	//---------- keepAlive ELEJE ----------
@@ -221,24 +266,24 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop_inProgress){
+	if(bdc->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(bdc->move_finished){
-		bdc->move_finished = false;
+	else if(bdc->move.finished){
+		bdc->move.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(bdc->move_inProgress){
+	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret = ACT_ERROR;
 
 		//ha nincs utkozes
@@ -269,24 +314,24 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop_inProgress){
+	if(bdc->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(bdc->move_finished){
-		bdc->move_finished = false;
+	else if(bdc->move.finished){
+		bdc->move.finished = false;
 		ret =  ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(bdc->move_inProgress){
+	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret =  ACT_ERROR;
 
 		//ha nincs utkozes
@@ -320,24 +365,24 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop_inProgress){
+	if(bdc->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(bdc->move_finished){
-		bdc->move_finished = false;
+	else if(bdc->move.finished){
+		bdc->move.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(bdc->move_inProgress){
+	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_LEFT_INDEX] ||
-			input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret = ACT_ERROR;
 
 		//ha nincs utkozes
@@ -370,18 +415,18 @@ int PrimitivesCan::SetSpeed(double v, double w){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop_inProgress){
+	if(bdc->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(bdc->move_finished){
-		bdc->move_finished = false;
+	else if(bdc->move.finished){
+		bdc->move.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(bdc->move_inProgress){
+	else if(bdc->move.inProgress){
 
 		//ha utkozes van
 		if(false)
@@ -422,13 +467,13 @@ int PrimitivesCan::MotionStop(double dec = 0){
 	}
 
 	//ha most vegzett
-	else if(bdc->stop_finished){
-		bdc->stop_finished = false;
+	else if(bdc->stop.finished){
+		bdc->stop.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(bdc->stop_inProgress){
+	else if(bdc->stop.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -644,13 +689,13 @@ int PrimitivesCan::MotorSupply(bool powered){
 
 
 	//ha most vegzett
-	if(power->motor_on_off_finished){
-		power->motor_on_off_finished = false;
+	if(power->motor_on_off.finished){
+		power->motor_on_off.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzet, es folyamatban
-	else if(power->motor_on_off_inProgress){
+	else if(power->motor_on_off.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -680,14 +725,14 @@ int PrimitivesCan::SetGripperPos(double pos){
 
 
 	//ha most vegzett mindegyik szervo
-	if(servo->move_finished[SERVO_GRIPPER_LEFT_INDEX] && servo->move_finished[SERVO_GRIPPER_RIGHT_INDEX]){
-		servo->move_finished[SERVO_GRIPPER_LEFT_INDEX] = false;
-		servo->move_finished[SERVO_GRIPPER_RIGHT_INDEX] = false;
+	if(servo->move[SERVO_GRIPPER_LEFT_INDEX].finished && servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished){
+		servo->move[SERVO_GRIPPER_LEFT_INDEX].finished = false;
+		servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett mindegyik, valamelyik folyamatban
-	else if(servo->move_inProgress[SERVO_GRIPPER_LEFT_INDEX] || servo->move_inProgress[SERVO_GRIPPER_RIGHT_INDEX]){
+	else if(servo->move[SERVO_GRIPPER_LEFT_INDEX].inProgress || servo->move[SERVO_GRIPPER_RIGHT_INDEX].inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -717,18 +762,18 @@ int PrimitivesCan::SetConsolePos(double pos, double speed, double acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(console->calibrate_inProgress || console->stop_inProgress){
+	if(console->calibrate.inProgress || console->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(console->move_finished){
-		console->move_finished = false;
+	else if(console->move.finished){
+		console->move.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(console->move_inProgress){
+	else if(console->move.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -754,18 +799,18 @@ int PrimitivesCan::CalibrateConsole(void){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(console->move_inProgress || console->stop_inProgress){
+	if(console->move.inProgress || console->stop.inProgress){
 		ret = ACT_ERROR;
 	}
 
 	//ha most vegzett
-	else if(console->calibrate_finished){
-		console->calibrate_finished = false;
+	else if(console->calibrate.finished){
+		console->calibrate.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(console->calibrate_inProgress){
+	else if(console->calibrate.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -796,13 +841,13 @@ int PrimitivesCan::ConsoleStop(void){
 	}
 
 	//ha most vegzett
-	else if(console->stop_finished){
-		console->stop_finished = false;
+	else if(console->stop.finished){
+		console->stop.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(console->stop_inProgress){
+	else if(console->stop.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -825,7 +870,7 @@ double PrimitivesCan::GetConsolePos(void){
 
 	EnterCritical();
 
-	double ret = console->pos;
+	double ret = console->GET_POS();
 
 	ExitCritical();
 
@@ -844,7 +889,7 @@ int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
 
 
 	int ret;
-	unsigned int num;
+	u8 num;
 
 
 	if(left)
@@ -854,13 +899,13 @@ int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
 
 
 	//ha most vegzett
-	if(servo->move_finished[num]){
-		servo->move_finished[num] = false;
+	if(servo->move[num].finished){
+		servo->move[num].finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(servo->move_inProgress[num]){
+	else if(servo->move[num].inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
@@ -888,7 +933,7 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 
 
 	int ret;
-	unsigned int num;
+	u8 num;
 
 
 	if(left)
@@ -898,19 +943,21 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 
 
 	//ha most vegzett
-	if(magnet->set_polarity_finished[num]){
-		magnet->set_polarity_finished[num] = false;
+	if(magnet->set_polarity[num].finished){
+		magnet->set_polarity[num].finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzett, es folyamatban
-	else if(magnet->set_polarity_inProgress[num]){
+	else if(magnet->set_polarity[num].inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		magnet->MAGNET_SET_POLARITY(num, polarity);
+		if(polarity == 1)		magnet->MAGNET_SET_POLARITY(num, MAGNET_PULL);
+		else if(polarity == 0)	magnet->MAGNET_SET_POLARITY(num, MAGNET_OFF);
+		else if(polarity == -1)	magnet->MAGNET_SET_POLARITY(num, MAGNET_PUSH);
 		ret = ACT_INPROGRESS;
 	}
 
@@ -926,7 +973,7 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
-	bool ret =input->button[INPUT_BUTTON_START_INDEX];
+	bool ret = input->GET_DIGITAL(INPUT_BUTTON_START_INDEX);
 
 	ExitCritical();
 
@@ -939,7 +986,7 @@ bool PrimitivesCan::GetStopButton(void){
 
 	EnterCritical();
 
-	bool ret = power->StopButton;
+	bool ret = power->GET_STOP_BUTTON();
 
 	ExitCritical();
 
@@ -952,7 +999,14 @@ bool PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	bool ret = input->button[INPUT_BUTTON_COLOR_INDEX];
+	//active	active_is_red		color
+	//
+	//0			0					red
+	//0			1					blue
+	//1			0					blue
+	//1			1					red
+	bool is_red = input->GET_DIGITAL(INPUT_BUTTON_COLOR_INDEX) ^ INPUT_BUTTON_COLOR_IS_ACTIVE_RED;
+	bool ret = (is_red ? COLOR_RED : COLOR_BLUE);
 
 	ExitCritical();
 
@@ -965,10 +1019,13 @@ void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 
 	EnterCritical();
 
+	double tmpX, tmpY, tmpPhi;
 
-	*x		= deadreck->pos_x	+ deadreckPosOffsetX;
-	*y		= deadreck->pos_y	+ deadreckPosOffsetY;
-	*phi	= deadreck->pos_phi	+ deadreckPosOffsetPhi;
+	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+
+	*x		= tmpX		+ deadreckPosOffsetX;
+	*y		= tmpY		+ deadreckPosOffsetY;
+	*phi	= tmpPhi	+ deadreckPosOffsetPhi;
 
 	while(*phi > M_PI)
 		*phi -= 2*M_PI;
@@ -987,8 +1044,7 @@ void PrimitivesCan::GetOpponentPos(double* x, double* y){
 
 	EnterCritical();
 
-	*x		= sonar->pos_x;
-	*y		= sonar->pos_y;
+	sonar->GET_POS(x, y);
 
 	ExitCritical();
 
@@ -1000,9 +1056,13 @@ void PrimitivesCan::SetRobotPos(double x, double y, double phi){
 
 	EnterCritical();
 
-	deadreckPosOffsetX		= 	x	- deadreck->pos_x;
-	deadreckPosOffsetY		= 	y	- deadreck->pos_y;
-	deadreckPosOffsetPhi	= 	phi	- deadreck->pos_phi;
+	double tmpX, tmpY, tmpPhi;
+
+	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+
+	deadreckPosOffsetX		= 	x	- tmpX;
+	deadreckPosOffsetY		= 	y	- tmpY;
+	deadreckPosOffsetPhi	= 	phi	- tmpPhi;
 
 	ExitCritical();
 
@@ -1014,8 +1074,8 @@ void PrimitivesCan::GetDistances(double distance[6]){
 
 	EnterCritical();
 
-	for(unsigned int i=0 ; i<6 ; i++)
-		distance[i] = input->distance_mm[i];
+	for(u8 i=0 ; i<6 ; i++)
+		distance[i] = input->GET_DISTANCE(i);
 
 	ExitCritical();
 
@@ -1084,17 +1144,17 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			//ha elorefele megyunk
 			if(speedSigned > 0){
 				//ha bal utkozes
-				if(input->button[INPUT_BUTTON_FRONT_LEFT_INDEX])
+				if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX))
 					goToWallPhase = 3;
-				else if(input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX])
+				else if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX))
 					goToWallPhase = 4;
 			}
 			//ha hatrafele megyunk
 			else{
 				//ha bal utkozes
-				if(input->button[INPUT_BUTTON_REAR_LEFT_INDEX])
+				if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX))
 					goToWallPhase = 3;
-				else if(input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+				else if(input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 					goToWallPhase = 4;
 			}
 			return ACT_INPROGRESS;
@@ -1132,13 +1192,13 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			//ha elorefele megyunk
 			if(speedSigned > 0){
 				//ha mindket utkozeskapcsolo jelez
-				if(input->button[INPUT_BUTTON_FRONT_LEFT_INDEX] && input->button[INPUT_BUTTON_FRONT_RIGHT_INDEX])
+				if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX))
 					goToWallPhase = 8;
 			}
 			//ha hatrafele megyunk
 			else{
 				//ha mindket utkozeskapcsolo jelez
-				if(input->button[INPUT_BUTTON_REAR_LEFT_INDEX] && input->button[INPUT_BUTTON_REAR_RIGHT_INDEX])
+				if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 					goToWallPhase = 8;
 			}
 			return ACT_INPROGRESS;

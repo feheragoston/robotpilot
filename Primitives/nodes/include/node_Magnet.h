@@ -31,11 +31,12 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
-	void MAGNET_SET_POLARITY(unsigned int num, char polarity);
+	void INIT_PARAM(void);
+
+	void MAGNET_SET_POLARITY(u8 num, u8 polarity);
 
 
-	bool set_polarity_inProgress[MAGNET_COUNT];
-	bool set_polarity_finished[MAGNET_COUNT];
+	progress_t set_polarity[MAGNET_COUNT];
 
 
 };

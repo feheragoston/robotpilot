@@ -21,11 +21,6 @@ node_BDC::node_BDC(void){
 
 
 	//----- valtozo init ELEJE -----
-	stop_inProgress		= false;
-	move_inProgress		= false;
-
-	stop_finished		= false;
-	move_finished		= false;
 	//----- valtozo init VEGE -----
 
 }
@@ -49,16 +44,16 @@ void node_BDC::evalMsg(UDPmsg* msg){
 
 			case MSG_BDC_STOP_REPLY:
 			case MSG_BDC_HARD_STOP_REPLY:
-				stop_inProgress = false;
-				stop_finished = true;
+				stop.inProgress = false;
+				stop.finished = true;
 				break;
 
 			case MSG_BDC_GO_REPLY:
 			case MSG_BDC_GOTO_REPLY:
 			case MSG_BDC_TURN_REPLY:
 			case MSG_BDC_SET_SPEED_REPLY:
-				move_inProgress = false;
-				move_finished = true;
+				move.inProgress = false;
+				move.finished = true;
 				break;
 
 			default:
@@ -74,19 +69,17 @@ void node_BDC::evalMsg(UDPmsg* msg){
 
 void node_BDC::BDC_STOP(double acc){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_STOP;
 	msg.length		= 4;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)acc;
+	SET_FLOAT(&(msg.data[0]), acc);
 
 	UDPdriver::send(&msg);
 
-	stop_inProgress = true;
-	stop_finished = false;
+	stop.inProgress = true;
+	stop.finished = false;
 
 }
 
@@ -101,91 +94,96 @@ void node_BDC::BDC_HARD_STOP(void){
 
 	UDPdriver::send(&msg);
 
-	stop_inProgress = true;
-	stop_finished = false;
+	stop.inProgress = true;
+	stop.finished = false;
 
 }
 
 
 void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_GO;
 	msg.length		= 12;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)distance;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)max_speed;
-	tmp = (float*)(&(msg.data[8]));		*tmp = (float)max_acc;
+	SET_FLOAT(&(msg.data[0]), distance);
+	SET_FLOAT(&(msg.data[4]), max_speed);
+	SET_FLOAT(&(msg.data[8]), max_acc);
 
 	UDPdriver::send(&msg);
 
-	move_inProgress = true;
-	move_finished = false;
+	move.inProgress = true;
+	move.finished = false;
 
 }
 
 
 void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_GOTO;
 	msg.length		= 16;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)x;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)y;
-	tmp = (float*)(&(msg.data[8]));		*tmp = (float)max_speed;
-	tmp = (float*)(&(msg.data[12]));	*tmp = (float)max_acc;
+	SET_FLOAT(&(msg.data[0]), x);
+	SET_FLOAT(&(msg.data[4]), y);
+	SET_FLOAT(&(msg.data[8]), max_speed);
+	SET_FLOAT(&(msg.data[12]), max_acc);
 
 	UDPdriver::send(&msg);
 
-	move_inProgress = true;
-	move_finished = false;
+	move.inProgress = true;
+	move.finished = false;
 
 }
 
 
 void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_TURN;
 	msg.length		= 12;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)angle;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)max_speed;
-	tmp = (float*)(&(msg.data[8]));		*tmp = (float)max_acc;
+	SET_FLOAT(&(msg.data[0]), angle);
+	SET_FLOAT(&(msg.data[4]), max_speed);
+	SET_FLOAT(&(msg.data[8]), max_acc);
 
 	UDPdriver::send(&msg);
 
-	move_inProgress = true;
-	move_finished = false;
+	move.inProgress = true;
+	move.finished = false;
 
 }
 
 
 void node_BDC::BDC_SET_SPEED(double v, double w){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_SET_SPEED;
 	msg.length		= 8;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)v;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)w;
+	SET_FLOAT(&(msg.data[0]), v);
+	SET_FLOAT(&(msg.data[4]), w);
 
 	UDPdriver::send(&msg);
 
-	move_inProgress = true;
-	move_finished = false;
+	move.inProgress = true;
+	move.finished = false;
+
+}
+
+
+void node_BDC::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
 
 }

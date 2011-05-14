@@ -70,7 +70,7 @@ void UDPconn::init_socket(void){
 }
 
 
-bool UDPconn::recieve(void* buffer, unsigned int maxCount, unsigned int* count, struct timeval* timeOut){
+bool UDPconn::recieve(void* buffer, u32 maxCount, u32* count, struct timeval* timeOut){
 
 	//megnezzuk, hogy jott-e uzenet
 	switch(select(1+mSockFd, &mGatewayInputset, NULL, NULL, timeOut)){
@@ -107,7 +107,7 @@ bool UDPconn::recieve(void* buffer, unsigned int maxCount, unsigned int* count, 
 }
 
 
-void UDPconn::send(void* buffer, unsigned int count){
+void UDPconn::send(void* buffer, u32 count){
 
 	if ((hp = gethostbyname(TargetHost)) == NULL){
 		cerr << "ERROR gethostbyname" << endl;

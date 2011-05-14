@@ -36,19 +36,20 @@ public:
 	void CONSOLE_SET_POS(double pos, double speed, double acc);
 	void CONSOLE_CALIBRATE(void);
 
-
-	bool stop_inProgress;
-	bool stop_finished;
-
-	bool move_inProgress;
-	bool move_finished;
-
-	bool calibrate_inProgress;
-	bool calibrate_finished;
+	void INIT_PARAM(void);
 
 
-	double pos;
+	progress_t stop;
+	progress_t move;
+	progress_t calibrate;
 
+
+	double GET_POS(void);
+
+
+private:
+
+	u32 ConsolePos;
 
 };
 //------------------------------ node_Console VEGE ------------------------------

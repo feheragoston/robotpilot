@@ -49,56 +49,69 @@ void node_Gateway::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Gateway::GATEWAY_REMOVE_NODE(unsigned int node_id){
+void node_Gateway::GATEWAY_REMOVE_NODE(u8 node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_GATEWAY_REMOVE_NODE;
 	msg.length		= 1;
-	msg.data[0]		= node_id;
+	SET_U8(&(msg.data[0]), node_id);
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node_Gateway::GATEWAY_ADD_NODE_CANA(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_NODE_CANA(u8 node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_GATEWAY_ADD_NODE_CANA;
 	msg.length		= 1;
-	msg.data[0]		= node_id;
+	SET_U8(&(msg.data[0]), node_id);
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node_Gateway::GATEWAY_ADD_NODE_CANB(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_NODE_CANB(u8 node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_GATEWAY_ADD_NODE_CANB;
 	msg.length		= 1;
-	msg.data[0]		= node_id;
+	SET_U8(&(msg.data[0]), node_id);
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node_Gateway::GATEWAY_ADD_BOOTLOADER_ID(unsigned int node_id){
+void node_Gateway::GATEWAY_ADD_BOOTLOADER_ID(u8 node_id){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_GATEWAY_ADD_BOOTLOADER_ID;
 	msg.length		= 1;
-	msg.data[0]		= node_id;
+	SET_U8(&(msg.data[0]), node_id);
+
+	UDPdriver::send(&msg);
+
+}
+
+
+void node_Gateway::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+	msg.length		= 0;
 
 	UDPdriver::send(&msg);
 

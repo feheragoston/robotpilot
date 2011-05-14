@@ -21,11 +21,41 @@ node_Servo::node_Servo(void){
 
 
 	//----- valtozo init ELEJE -----
-	for(unsigned int i=0 ; i<SERVO_COUNT ; i++)
-		move_inProgress[i] = false;
+	Servo_Rad_Incr_x0[0]		= SERVO_0_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[0]		= SERVO_0_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[0]		= SERVO_0_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[0]		= SERVO_0_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[0]		= SERVO_0_RAD_INCR_GRAD;
 
-	for(unsigned int i=0 ; i<SERVO_COUNT ; i++)
-		move_finished[i] = false;
+	Servo_Rad_Incr_x0[1]		= SERVO_1_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[1]		= SERVO_1_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[1]		= SERVO_1_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[1]		= SERVO_1_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[1]		= SERVO_1_RAD_INCR_GRAD;
+
+	Servo_Rad_Incr_x0[2]		= SERVO_2_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[2]		= SERVO_2_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[2]		= SERVO_2_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[2]		= SERVO_2_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[2]		= SERVO_2_RAD_INCR_GRAD;
+
+	Servo_Rad_Incr_x0[3]		= SERVO_3_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[3]		= SERVO_3_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[3]		= SERVO_3_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[3]		= SERVO_3_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[3]		= SERVO_3_RAD_INCR_GRAD;
+
+	Servo_Rad_Incr_x0[4]		= SERVO_4_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[4]		= SERVO_4_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[4]		= SERVO_4_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[4]		= SERVO_4_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[4]		= SERVO_4_RAD_INCR_GRAD;
+
+	Servo_Rad_Incr_x0[5]		= SERVO_5_RAD_INCR_X0;
+	Servo_Rad_Incr_y0[5]		= SERVO_5_RAD_INCR_Y0;
+	Servo_Rad_Incr_x1[5]		= SERVO_5_RAD_INCR_X1;
+	Servo_Rad_Incr_y1[5]		= SERVO_5_RAD_INCR_Y1;
+	Servo_Rad_Incr_grad[5]		= SERVO_5_RAD_INCR_GRAD;
 	//----- valtozo init VEGE -----
 
 }
@@ -38,7 +68,7 @@ node_Servo::~node_Servo(){
 
 void node_Servo::evalMsg(UDPmsg* msg){
 
-	unsigned char num;
+	u8 num;
 
 
 	//ha o a cimzett, csak akkor dolgozza fel
@@ -51,9 +81,9 @@ void node_Servo::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_SERVO_SET_POS_REPLY:
-				num = (unsigned char)(msg->data[0]);
-				move_inProgress[num] = false;
-				move_finished[num] = true;
+				num = GET_U8(&(msg->data[0]));
+				move[num].inProgress = false;
+				move[num].finished = true;
 				break;
 
 			default:
@@ -67,9 +97,7 @@ void node_Servo::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Servo::SERVO_SET_POS(unsigned int num, double pos, double speed, double acc){
-
-	float*	tmp;
+void node_Servo::SERVO_SET_POS(u8 num, double pos, double speed, double acc){
 
 	UDPmsg msg;
 
@@ -77,14 +105,48 @@ void node_Servo::SERVO_SET_POS(unsigned int num, double pos, double speed, doubl
 	msg.function	= CMD_SERVO_SET_POS;
 
 	msg.length		= 13;
-	msg.data[0] = num;
-	tmp = (float*)(&(msg.data[1]));		*tmp = (float)pos;
-	tmp = (float*)(&(msg.data[5]));		*tmp = (float)speed;
-	tmp = (float*)(&(msg.data[9]));		*tmp = (float)acc;
+	SET_U8(&(msg.data[0]), num);
+	//grad = (y-y0) / (x-x0)
+	//y = (x-x0) * grad + y0
+	SET_U16(&(msg.data[1]), (u16)(pos-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
+	SET_U16(&(msg.data[5]), (u16)(speed-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
+	SET_U16(&(msg.data[9]), (u16)(acc-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
 
 	UDPdriver::send(&msg);
 
-	move_inProgress[num] = true;
-	move_finished[num] = false;
+	move[num].inProgress = true;
+	move[num].finished = false;
+
+}
+
+
+void node_Servo::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+
+	msg.length		= 24;
+
+	SET_U16(&(msg.data[0]), SERVO_0_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[2]), SERVO_0_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	SET_U16(&(msg.data[4]), SERVO_1_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[6]), SERVO_1_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	SET_U16(&(msg.data[8]), SERVO_2_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[10]), SERVO_2_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	SET_U16(&(msg.data[12]), SERVO_3_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[14]), SERVO_3_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	SET_U16(&(msg.data[16]), SERVO_4_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[18]), SERVO_4_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	SET_U16(&(msg.data[20]), SERVO_5_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U16(&(msg.data[22]), SERVO_5_HARDWARE_LIMIT_HIGH_POS_INCR);
+
+	UDPdriver::send(&msg);
 
 }

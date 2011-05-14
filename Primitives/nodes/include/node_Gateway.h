@@ -31,11 +31,13 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
 
-	void GATEWAY_REMOVE_NODE(unsigned int node_id);
-	void GATEWAY_ADD_NODE_CANA(unsigned int node_id);
-	void GATEWAY_ADD_NODE_CANB(unsigned int node_id);
-	void GATEWAY_ADD_BOOTLOADER_ID(unsigned int node_id);
+
+	void GATEWAY_REMOVE_NODE(u8 node_id);
+	void GATEWAY_ADD_NODE_CANA(u8 node_id);
+	void GATEWAY_ADD_NODE_CANB(u8 node_id);
+	void GATEWAY_ADD_BOOTLOADER_ID(u8 node_id);
 
 
 };

@@ -41,48 +41,48 @@ void node::KEEP_ALIVE(void){
 }
 
 
-void node::SET_KEEP_ALIVE_MS(unsigned short keep_alive_ms){
+void node::SET_KEEP_ALIVE_MS(u16 keep_alive_ms){
 
-	unsigned short*	tmp;
+	u16*	tmp;
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_KEEP_ALIVE_MS;
 	msg.length		= 2;
-	tmp = (unsigned short*)(&(msg.data[0]));		*tmp = keep_alive_ms;
+	tmp = (u16*)(&(msg.data[0]));		*tmp = keep_alive_ms;
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node::SET_SEND_PERIOD_TO_NODE_MS(unsigned short period_ms){
+void node::SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms){
 
-	unsigned short*	tmp;
+	u16*	tmp;
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_NODE_MS;
 	msg.length		= 2;
-	tmp = (unsigned short*)(&(msg.data[0]));		*tmp = period_ms;
+	tmp = (u16*)(&(msg.data[0]));		*tmp = period_ms;
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node::SET_SEND_PERIOD_TO_PC_MS(unsigned short period_ms){
+void node::SET_SEND_PERIOD_TO_PC_MS(u16 period_ms){
 
-	unsigned short*	tmp;
+	u16*	tmp;
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_PC_MS;
 	msg.length		= 2;
-	tmp = (unsigned short*)(&(msg.data[0]));		*tmp = period_ms;
+	tmp = (u16*)(&(msg.data[0]));		*tmp = period_ms;
 
 	UDPdriver::send(&msg);
 

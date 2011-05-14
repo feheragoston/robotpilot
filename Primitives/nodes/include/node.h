@@ -17,9 +17,10 @@
 #include <semaphore.h>
 #include "../../UDP/UDPdriver.h"
 
-#include "function.h"
-#include "id.h"
-#include "param.h"
+#include "../../define/type.h"
+#include "../../define/function.h"
+#include "../../define/id.h"
+#include "../../define/param.h"
 //------------------------------ include VEGE ------------------------------
 
 
@@ -33,17 +34,17 @@ public:
 
 	void CORE_RESET(void);
 	void KEEP_ALIVE(void);
-	void SET_KEEP_ALIVE_MS(unsigned short keep_alive_ms);
-	void SET_SEND_PERIOD_TO_NODE_MS(unsigned short period_ms);
-	void SET_SEND_PERIOD_TO_PC_MS(unsigned short period_ms);
+	void SET_KEEP_ALIVE_MS(u16 keep_alive_ms);
+	void SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms);
+	void SET_SEND_PERIOD_TO_PC_MS(u16 period_ms);
 	
 	void PINGprocess(void);
 	
 	
 protected:
 
-	unsigned int	id;
-	char			name[32];
+	u16		id;
+	char	name[32];
 	
 
 	void PING(void);

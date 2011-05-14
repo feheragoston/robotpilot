@@ -112,12 +112,6 @@ private:
 	//----- valtozo VEGE -----
 
 
-	//----- define ELEJE -----
-	static const bool			COLOR_RED						= true;
-	static const bool			COLOR_BLUE						= !COLOR_RED;
-	//----- define VEGE -----
-
-
 	//----- deadreckCalib ELEJE -----
 	unsigned int deadreckCalibPhase;
 	int GoToWall(double speed, double omega);

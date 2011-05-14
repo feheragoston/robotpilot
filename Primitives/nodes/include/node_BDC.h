@@ -31,6 +31,8 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
+
 
 	void BDC_STOP(double acc);
 	void BDC_HARD_STOP(void);
@@ -40,11 +42,8 @@ public:
 	void BDC_SET_SPEED(double v, double w);
 
 
-	bool stop_inProgress;
-	bool stop_finished;
-
-	bool move_inProgress;
-	bool move_finished;
+	progress_t stop;
+	progress_t move;
 
 
 };

@@ -10,6 +10,8 @@
 
 
 #include "include/node_Input.h"
+#include "include/sharp_table.h"
+
 
 using namespace std;
 
@@ -21,11 +23,27 @@ node_Input::node_Input(void){
 
 
 	//----- valtozo init ELEJE -----
-	for(unsigned int i=0 ; i<INPUT_DISTANCE_COUNT ; i++)
-		distance_mm[i] = 0;
+	for(u8 i=0 ; i<INPUT_ANALOG_COUNT ; i++)
+		analog[i] = 0;
 
-	for(unsigned int i=0 ; i<INPUT_BUTTON_COUNT ; i++)
-		button[i] = false;
+	for(u8 i=0 ; i<INPUT_DIGITAL_COUNT ; i++)
+		digital[i] = false;
+
+	analog_has_long_sharp[0] = ((INPUT_LONG_SHARP_ON_ANALOG_0 != 0) ? true : false);
+	analog_has_long_sharp[1] = ((INPUT_LONG_SHARP_ON_ANALOG_1 != 0) ? true : false);
+	analog_has_long_sharp[2] = ((INPUT_LONG_SHARP_ON_ANALOG_2 != 0) ? true : false);
+	analog_has_long_sharp[3] = ((INPUT_LONG_SHARP_ON_ANALOG_3 != 0) ? true : false);
+	analog_has_long_sharp[4] = ((INPUT_LONG_SHARP_ON_ANALOG_4 != 0) ? true : false);
+	analog_has_long_sharp[5] = ((INPUT_LONG_SHARP_ON_ANALOG_5 != 0) ? true : false);
+	analog_has_long_sharp[6] = ((INPUT_LONG_SHARP_ON_ANALOG_6 != 0) ? true : false);
+
+	active_level_digital[0] = ((INPUT_ACTIVE_LEVEL_DIGITAL_0 != 0) ? true : false);
+	active_level_digital[1] = ((INPUT_ACTIVE_LEVEL_DIGITAL_1 != 0) ? true : false);
+	active_level_digital[2] = ((INPUT_ACTIVE_LEVEL_DIGITAL_2 != 0) ? true : false);
+	active_level_digital[3] = ((INPUT_ACTIVE_LEVEL_DIGITAL_3 != 0) ? true : false);
+	active_level_digital[4] = ((INPUT_ACTIVE_LEVEL_DIGITAL_4 != 0) ? true : false);
+	active_level_digital[5] = ((INPUT_ACTIVE_LEVEL_DIGITAL_5 != 0) ? true : false);
+	active_level_digital[6] = ((INPUT_ACTIVE_LEVEL_DIGITAL_6 != 0) ? true : false);
 	//----- valtozo init VEGE -----
 
 }
@@ -47,14 +65,14 @@ void node_Input::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_INPUT_DISTANCE:
-				for(unsigned int i=0 ; i<INPUT_DISTANCE_COUNT ; i++)
-					distance_mm[i] = INPUT_DISTANCE_MULTIPLIER * (double)(*(unsigned short*)(&(msg->data[2*i])));
-				break;
+			case MSG_PERIODIC_TO_PC:
 
-			case MSG_INPUT_BUTTON:
-				for(unsigned int i=0 ; i<INPUT_BUTTON_COUNT ; i++)
-					button[i] = ((msg->data[0] & (0x01 << i)) ? true : false);
+				for(u8 i=0 ; i<INPUT_ANALOG_COUNT ; i++)
+					analog[i] = GET_U16(&(msg->data[2*i]));
+
+				for(u8 i=0 ; i<INPUT_DIGITAL_COUNT ; i++)
+					digital[i] = GET_BOOL(&(msg->data[14+0]), i);
+
 				break;
 
 			default:
@@ -64,5 +82,82 @@ void node_Input::evalMsg(UDPmsg* msg){
 		}
 
 	}
+
+}
+
+
+void node_Input::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
+
+}
+
+
+double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
+
+	//grad = (y-y0) / (x-x0)
+	//y = (x-x0) * grad + y0
+	double voltage = ((double)analog_value - INPUT_ANALOG_V_X0) * INPUT_ANALOG_V_GRAD + INPUT_ANALOG_V_Y0;
+	u8 i;
+	double der;	//V-mm karakterisztika meredeksege
+
+
+
+	//megkeressuk a tablaban a helyet, amelyik elott van
+	for(i=0 ; i < size ; i++)
+		if(table[i][1] < voltage)
+			break;
+
+
+	//ITT: ha i!=size, akkor az i-edik mar kisebb
+
+
+	//ha csak kisebb van a tablazatban
+	if(i==size)
+		return table[size-1][1];	//max
+
+	//ha csak nagyobb van a tablazatban
+	else if(i==0)
+		return table[0][1];	//min
+
+	//ha van kisebb es nagyobb is a tablazatban
+	//(i-1)-edik V meg nagyobb, i-edik V mar kisebb
+	//(i-1)-edik mm meg kisebb, i-edik mm mar nagyobb
+	else{
+
+		//V-mm karakterisztika meredeksege
+		//der = (y1 - y2) / (x1 - x2)
+		der = (table[i-1][0] - table[i][0]) / (table[i-1][1] - table[i][1]);
+
+		//der = (y - y0) / (x - x0)  ->  y = y0 + der * (x - x0)
+		return table[i-1][0] + der * (voltage - table[i-1][1]);
+
+	}
+
+}
+
+
+double node_Input::GET_DISTANCE(u8 num){
+
+	//long
+	if(analog_has_long_sharp[num])
+		return (GET_SHARP_MM(analog[num], LONG_SHARP_MM_V, LONG_SHARP_TABLE_SIZE));
+
+	//short
+	else
+		return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
+
+}
+
+
+bool node_Input::GET_DIGITAL(u8 num){
+
+	return ((digital[num] == active_level_digital[num]) ? true : false);
 
 }

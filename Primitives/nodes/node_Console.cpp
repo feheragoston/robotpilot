@@ -21,15 +21,7 @@ node_Console::node_Console(void){
 
 
 	//----- valtozo init ELEJE -----
-	pos = 0;
-
-	stop_inProgress			= false;
-	move_inProgress		= false;
-	calibrate_inProgress	= false;
-
-	stop_finished			= false;
-	move_finished			= false;
-	calibrate_finished		= false;
+	ConsolePos = 0;
 	//----- valtozo init VEGE -----
 
 }
@@ -51,23 +43,23 @@ void node_Console::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_CONSOLE_POS:
-				pos	= *(float*)(&(msg->data[0]));
+			case MSG_PERIODIC_TO_PC:
+				ConsolePos	= GET_U32(&(msg->data[0]));
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:
-				stop_inProgress = false;
-				stop_finished = true;
+				stop.inProgress = false;
+				stop.finished = true;
 				break;
 
 			case MSG_CONSOLE_SET_POS_REPLY:
-				move_inProgress = false;
-				move_finished = true;
+				move.inProgress = false;
+				move.finished = true;
 				break;
 
 			case MSG_CONSOLE_CALIBRATE_REPLY:
-				calibrate_inProgress = false;
-				calibrate_finished = true;
+				calibrate.inProgress = false;
+				calibrate.finished = true;
 				break;
 
 			default:
@@ -91,29 +83,29 @@ void node_Console::CONSOLE_STOP(void){
 
 	UDPdriver::send(&msg);
 
-	stop_inProgress = true;
-	stop_finished = false;
+	stop.inProgress = true;
+	stop.finished = false;
 
 }
 
 
 void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 
-	float*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_CONSOLE_SET_POS;
 	msg.length		= 12;
-	tmp = (float*)(&(msg.data[0]));		*tmp = (float)pos;
-	tmp = (float*)(&(msg.data[4]));		*tmp = (float)speed;
-	tmp = (float*)(&(msg.data[8]));		*tmp = (float)acc;
+	//grad = (y-y0) / (x-x0)
+	//x = (y-y0) / grad + x0
+	SET_U32(&(msg.data[0]), (u32)((pos - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
+	SET_U32(&(msg.data[4]), (u32)((speed - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
+	SET_U32(&(msg.data[8]), (u32)((acc - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
 
 	UDPdriver::send(&msg);
 
-	move_inProgress = true;
-	move_finished = false;
+	move.inProgress = true;
+	move.finished = false;
 
 }
 
@@ -128,7 +120,41 @@ void node_Console::CONSOLE_CALIBRATE(void){
 
 	UDPdriver::send(&msg);
 
-	calibrate_inProgress = true;
-	calibrate_finished = false;
+	calibrate.inProgress = true;
+	calibrate.finished = false;
+
+}
+
+
+void node_Console::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+	msg.length		= 30;
+
+	SET_U32(&(msg.data[0]), CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR);
+	SET_U32(&(msg.data[4]), CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR);
+	SET_U32(&(msg.data[8]), CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR);
+	SET_U32(&(msg.data[12]), CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR);
+	SET_FLOAT(&(msg.data[16]), CONSOLE_CONTROLLER_PARAMETER_P);
+	SET_FLOAT(&(msg.data[20]), CONSOLE_CONTROLLER_PARAMETER_I);
+	SET_FLOAT(&(msg.data[24]), CONSOLE_CONTROLLER_PARAMETER_D);
+	SET_U8(&(msg.data[28]), CONSOLE_PWM_MODE);
+	SET_BOOL(&(msg.data[29]), 0, (CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH != 0) ? true : false);
+	SET_BOOL(&(msg.data[29]), 1, (CONSOLE_IS_ENC_EQEP1 != 0) ? true : false);
+	SET_BOOL(&(msg.data[29]), 2, (CONSOLE_MOTOR_PLUS_CW != 0) ? true : false);
+
+	UDPdriver::send(&msg);
+
+}
+
+
+double node_Console::GET_POS(void){
+
+	//grad = (y-y0) / (x-x0)
+	//y = (x-x0) * grad + y0
+	return ((double)ConsolePos - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0;
 
 }

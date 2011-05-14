@@ -31,11 +31,21 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
 
-public:
+	double GET_DISTANCE(u8 analog_num);
+	bool GET_DIGITAL(u8 digital_num);
 
-	double distance_mm[INPUT_DISTANCE_COUNT];
-	bool button[INPUT_BUTTON_COUNT];
+
+private:
+
+	u16 analog[INPUT_ANALOG_COUNT];
+	bool digital[INPUT_DIGITAL_COUNT];
+
+	bool analog_has_long_sharp[INPUT_ANALOG_COUNT];
+	bool active_level_digital[INPUT_DIGITAL_COUNT];
+
+	double GET_SHARP_MM(u16 analog_value, double table[][2], u8 size);
 
 
 };

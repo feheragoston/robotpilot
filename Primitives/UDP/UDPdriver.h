@@ -15,6 +15,7 @@
 
 //------------------------------ include ELEJE ------------------------------
 #include "UDPconn.h"
+#include "conv.h"
 //------------------------------ include VEGE ------------------------------
 
 
@@ -32,10 +33,10 @@
 
 //------------------------------ UDPmsg ELEJE ------------------------------
 typedef struct{
-	unsigned int	node_id;
-	unsigned int	function;
-	char			data[MAX_MSG_LENGTH];
-	unsigned int	length;
+	u8	node_id;
+	u8	function;
+	u8	data[MAX_MSG_LENGTH];
+	u8	length;
 }UDPmsg;
 //------------------------------ UDPmsg VEGE ------------------------------
 
@@ -58,9 +59,9 @@ private:
 
 	static void getMsg(UDPmsg* msg);
 
-	static char					recieveBuffer[RECIEVE_BUFFER_SIZE];
-	static unsigned int			recieveBufferNextIndex;
-	static unsigned int			recieveBufferCount;
+	static u8		recieveBuffer[RECIEVE_BUFFER_SIZE];
+	static u32		recieveBufferNextIndex;
+	static u32		recieveBufferCount;
 
 };
 //------------------------------ UDPdriver VEGE ------------------------------

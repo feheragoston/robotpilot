@@ -21,8 +21,8 @@ node_Sonar::node_Sonar(void){
 
 
 	//----- valtozo init ELEJE -----
-	pos_x = 0;
-	pos_y = 0;
+	SonarPosX = 0;
+	SonarPosY = 0;
 	//----- valtozo init VEGE -----
 
 }
@@ -44,9 +44,9 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				sem_post(&pingSemaphore);
 				break;
 
-			case MSG_SONAR_POS:
-				pos_x	= *(float*)(&(msg->data[0]));
-				pos_y	= *(float*)(&(msg->data[4]));
+			case MSG_PERIODIC_TO_PC:
+				SonarPosX	= GET_FLOAT(&(msg->data[0]));
+				SonarPosY	= GET_FLOAT(&(msg->data[4]));
 				break;
 
 			default:
@@ -56,5 +56,27 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 		}
 
 	}
+
+}
+
+
+void node_Sonar::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
+
+}
+
+
+void node_Sonar::GET_POS(double* x, double* y){
+
+	*x = SonarPosX;
+	*y = SonarPosY;
 
 }

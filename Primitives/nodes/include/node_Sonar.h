@@ -31,9 +31,15 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
 
-	double pos_x;
-	double pos_y;
+	void GET_POS(double* x, double* y);
+
+
+private:
+
+	double SonarPosX;
+	double SonarPosY;
 
 
 };

@@ -34,14 +34,20 @@ public:
 
 	void DEADRECK_RESET_POS(void);
 
-
-	bool reset_pos_inProgress;
-	bool reset_pos_finished;
+	void INIT_PARAM(void);
 
 
-	double pos_x;
-	double pos_y;
-	double pos_phi;
+	void GET_POS(double* x, double* y, double* phi);
+
+
+private:
+
+	progress_t reset_pos;
+
+
+	double DeadreckPosX;
+	double DeadreckPosY;
+	double DeadreckPosPhi;
 
 
 };

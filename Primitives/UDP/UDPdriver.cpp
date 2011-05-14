@@ -13,9 +13,9 @@
 
 
 //----- valtozo ELEJE -----
-char					UDPdriver::recieveBuffer[RECIEVE_BUFFER_SIZE];
-unsigned int			UDPdriver::recieveBufferNextIndex;
-unsigned int			UDPdriver::recieveBufferCount;
+u8			UDPdriver::recieveBuffer[RECIEVE_BUFFER_SIZE];
+u32			UDPdriver::recieveBufferNextIndex;
+u32			UDPdriver::recieveBufferCount;
 //----- valtozo VEGE -----
 
 
@@ -88,7 +88,7 @@ bool UDPdriver::recieve(UDPmsg* msg, __time_t sec, __suseconds_t usec){
 
 void UDPdriver::send(UDPmsg* msg){
 
-	char	sendBuffer[MAX_MSG_LENGTH];
+	u8	sendBuffer[MAX_MSG_LENGTH];
 
 
 	sendBuffer[0] = msg->node_id;

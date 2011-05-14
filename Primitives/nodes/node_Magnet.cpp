@@ -21,11 +21,6 @@ node_Magnet::node_Magnet(void){
 
 
 	//----- valtozo init ELEJE -----
-	for(unsigned int i=0 ; i<MAGNET_COUNT ; i++)
-		set_polarity_inProgress[i] = false;
-
-	for(unsigned int i=0 ; i<MAGNET_COUNT ; i++)
-		set_polarity_finished[i] = false;
 	//----- valtozo init VEGE -----
 
 }
@@ -38,7 +33,7 @@ node_Magnet::~node_Magnet(){
 
 void node_Magnet::evalMsg(UDPmsg* msg){
 
-	unsigned char num;
+	u8 num;
 
 
 	//ha o a cimzett, csak akkor dolgozza fel
@@ -51,9 +46,9 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_MAGNET_SET_POLARITY_REPLY:
-				num = (unsigned char)(msg->data[0]);
-				set_polarity_inProgress[num] = false;
-				set_polarity_finished[num] = true;
+				num = GET_U8(&(msg->data[0]));
+				set_polarity[num].inProgress = false;
+				set_polarity[num].finished = true;
 				break;
 
 			default:
@@ -67,20 +62,32 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Magnet::MAGNET_SET_POLARITY(unsigned int num, char polarity){
+void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_MAGNET_SET_POLARITY;
-
 	msg.length		= 1;
-	msg.data[0] = num;
-	msg.data[1] = polarity;
+	SET_U8(&(msg.data[0]), num);
+	SET_U8(&(msg.data[1]), polarity);
 
 	UDPdriver::send(&msg);
 
-	set_polarity_inProgress[num] = true;
-	set_polarity_finished[num] = false;
+	set_polarity[num].inProgress = true;
+	set_polarity[num].finished = false;
+
+}
+
+
+void node_Magnet::INIT_PARAM(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_INIT_PARAM;
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
 
 }

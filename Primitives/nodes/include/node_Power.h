@@ -35,12 +35,23 @@ public:
 	void POWER_MOTOR_ON();
 	void POWER_MOTOR_OFF();
 
+	void INIT_PARAM(void);
 
-	bool motor_on_off_inProgress;
-	bool motor_on_off_finished;
+	progress_t motor_on_off;
 
 
-	bool StopButton;
+	double GET_ACCU_VOLTAGE(void);
+	bool GET_ACCU_CHARGING(void);
+	bool GET_PLUG_IN(void);
+	bool GET_STOP_BUTTON(void);
+
+
+private:
+
+	u16 PowerAccuVoltage;
+	bool PowerAccuCharging;
+	bool PowerPlugIn;
+	bool PowerStopButton;
 
 
 };
