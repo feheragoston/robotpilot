@@ -42,11 +42,11 @@ public:
 
 private:
 
-	double Servo_Rad_Incr_x0[SERVO_COUNT];
-	double Servo_Rad_Incr_y0[SERVO_COUNT];
-	double Servo_Rad_Incr_x1[SERVO_COUNT];
-	double Servo_Rad_Incr_y1[SERVO_COUNT];
-	double Servo_Rad_Incr_grad[SERVO_COUNT];
+	double Servo_Deg_Incr_x0[SERVO_COUNT];
+	double Servo_Deg_Incr_y0[SERVO_COUNT];
+	double Servo_Deg_Incr_x1[SERVO_COUNT];
+	double Servo_Deg_Incr_y1[SERVO_COUNT];
+	double Servo_Deg_Incr_grad[SERVO_COUNT];
 
 };
 //------------------------------ node_Servo VEGE ------------------------------

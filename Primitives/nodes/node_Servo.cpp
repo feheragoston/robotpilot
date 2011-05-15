@@ -21,41 +21,41 @@ node_Servo::node_Servo(void){
 
 
 	//----- valtozo init ELEJE -----
-	Servo_Rad_Incr_x0[0]		= SERVO_0_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[0]		= SERVO_0_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[0]		= SERVO_0_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[0]		= SERVO_0_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[0]		= SERVO_0_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[0]		= SERVO_0_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[0]		= SERVO_0_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[0]		= SERVO_0_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[0]		= SERVO_0_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[0]		= SERVO_0_DEG_INCR_GRAD;
 
-	Servo_Rad_Incr_x0[1]		= SERVO_1_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[1]		= SERVO_1_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[1]		= SERVO_1_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[1]		= SERVO_1_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[1]		= SERVO_1_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[1]		= SERVO_1_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[1]		= SERVO_1_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[1]		= SERVO_1_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[1]		= SERVO_1_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[1]		= SERVO_1_DEG_INCR_GRAD;
 
-	Servo_Rad_Incr_x0[2]		= SERVO_2_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[2]		= SERVO_2_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[2]		= SERVO_2_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[2]		= SERVO_2_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[2]		= SERVO_2_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[2]		= SERVO_2_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[2]		= SERVO_2_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[2]		= SERVO_2_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[2]		= SERVO_2_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[2]		= SERVO_2_DEG_INCR_GRAD;
 
-	Servo_Rad_Incr_x0[3]		= SERVO_3_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[3]		= SERVO_3_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[3]		= SERVO_3_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[3]		= SERVO_3_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[3]		= SERVO_3_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[3]		= SERVO_3_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[3]		= SERVO_3_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[3]		= SERVO_3_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[3]		= SERVO_3_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[3]		= SERVO_3_DEG_INCR_GRAD;
 
-	Servo_Rad_Incr_x0[4]		= SERVO_4_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[4]		= SERVO_4_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[4]		= SERVO_4_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[4]		= SERVO_4_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[4]		= SERVO_4_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[4]		= SERVO_4_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[4]		= SERVO_4_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[4]		= SERVO_4_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[4]		= SERVO_4_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[4]		= SERVO_4_DEG_INCR_GRAD;
 
-	Servo_Rad_Incr_x0[5]		= SERVO_5_RAD_INCR_X0;
-	Servo_Rad_Incr_y0[5]		= SERVO_5_RAD_INCR_Y0;
-	Servo_Rad_Incr_x1[5]		= SERVO_5_RAD_INCR_X1;
-	Servo_Rad_Incr_y1[5]		= SERVO_5_RAD_INCR_Y1;
-	Servo_Rad_Incr_grad[5]		= SERVO_5_RAD_INCR_GRAD;
+	Servo_Deg_Incr_x0[5]		= SERVO_5_DEG_INCR_X0;
+	Servo_Deg_Incr_y0[5]		= SERVO_5_DEG_INCR_Y0;
+	Servo_Deg_Incr_x1[5]		= SERVO_5_DEG_INCR_X1;
+	Servo_Deg_Incr_y1[5]		= SERVO_5_DEG_INCR_Y1;
+	Servo_Deg_Incr_grad[5]		= SERVO_5_DEG_INCR_GRAD;
 	//----- valtozo init VEGE -----
 
 }
@@ -108,9 +108,9 @@ void node_Servo::SERVO_SET_POS(u8 num, double pos, double speed, double acc){
 	SET_U8(&(msg.data[0]), num);
 	//grad = (y-y0) / (x-x0)
 	//y = (x-x0) * grad + y0
-	SET_U16(&(msg.data[1]), (u16)(pos-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
-	SET_U16(&(msg.data[5]), (u16)(speed-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
-	SET_U16(&(msg.data[9]), (u16)(acc-Servo_Rad_Incr_x0[num]) * Servo_Rad_Incr_grad[num] + Servo_Rad_Incr_y0[num]);
+	SET_U16(&(msg.data[1]), (u16)(pos-Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num]);
+	SET_U16(&(msg.data[5]), (u16)(speed-Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num]);
+	SET_U16(&(msg.data[9]), (u16)(acc-Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num]);
 
 	UDPdriver::send(&msg);
 
