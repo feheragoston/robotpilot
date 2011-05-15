@@ -96,11 +96,20 @@
 
 
 //---------- POWER_ID ----------
-#define CMD_POWER_MOTOR_ON					0x00	//spec.h "spec fuggvenyei" reszben
-#define MSG_POWER_MOTOR_ON_REPLY			0x00	//driver.c "REPLY" reszben
+#define CMD_POWER_ACT_ON					0x00	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_ACT_ON_REPLY				0x00	//driver.c "REPLY" reszben
 
-#define CMD_POWER_MOTOR_OFF					0x01	//spec.h "spec fuggvenyei" reszben
-#define MSG_POWER_MOTOR_OFF_REPLY			0x01	//driver.c "REPLY" reszben
+#define CMD_POWER_ACT_OFF					0x01	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_ACT_OFF_REPLY				0x01	//driver.c "REPLY" reszben
+
+#define CMD_POWER_CHG_ON					0x02	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_CHG_ON_REPLY				0x02	//driver.c "REPLY" reszben
+
+#define CMD_POWER_CHG_OFF					0x03	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_CHG_OFF_REPLY				0x03	//driver.c "REPLY" reszben
+
+#define CMD_POWER_MAIN_OFF					0x04	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_MAIN_OFF_REPLY			0x04	//driver.c "REPLY" reszben
 //------------------------------ function VEGE ------------------------------
 
 

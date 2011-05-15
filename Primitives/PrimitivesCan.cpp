@@ -689,21 +689,21 @@ int PrimitivesCan::MotorSupply(bool powered){
 
 
 	//ha most vegzett
-	if(power->motor_on_off.finished){
-		power->motor_on_off.finished = false;
+	if(power->act_on_off.finished){
+		power->act_on_off.finished = false;
 		ret = ACT_FINISHED;
 	}
 
 	//ha most nem vegzet, es folyamatban
-	else if(power->motor_on_off.inProgress){
+	else if(power->act_on_off.inProgress){
 		ret = ACT_INPROGRESS;
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
 
-		if(powered)	power->POWER_MOTOR_ON();
-		else		power->POWER_MOTOR_OFF();
+		if(powered)	power->POWER_ACT_ON();
+		else		power->POWER_ACT_OFF();
 
 		ret = ACT_INPROGRESS;
 	}
