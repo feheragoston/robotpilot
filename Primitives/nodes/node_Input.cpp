@@ -37,13 +37,13 @@ node_Input::node_Input(void){
 	analog_has_long_sharp[5] = ((INPUT_LONG_SHARP_ON_ANALOG_5 != 0) ? true : false);
 	analog_has_long_sharp[6] = ((INPUT_LONG_SHARP_ON_ANALOG_6 != 0) ? true : false);
 
-	active_level_digital[0] = ((INPUT_ACTIVE_LEVEL_DIGITAL_0 != 0) ? true : false);
-	active_level_digital[1] = ((INPUT_ACTIVE_LEVEL_DIGITAL_1 != 0) ? true : false);
-	active_level_digital[2] = ((INPUT_ACTIVE_LEVEL_DIGITAL_2 != 0) ? true : false);
-	active_level_digital[3] = ((INPUT_ACTIVE_LEVEL_DIGITAL_3 != 0) ? true : false);
-	active_level_digital[4] = ((INPUT_ACTIVE_LEVEL_DIGITAL_4 != 0) ? true : false);
-	active_level_digital[5] = ((INPUT_ACTIVE_LEVEL_DIGITAL_5 != 0) ? true : false);
-	active_level_digital[6] = ((INPUT_ACTIVE_LEVEL_DIGITAL_6 != 0) ? true : false);
+	digital_active_level[0] = ((INPUT_ACTIVE_LEVEL_DIGITAL_0 != 0) ? true : false);
+	digital_active_level[1] = ((INPUT_ACTIVE_LEVEL_DIGITAL_1 != 0) ? true : false);
+	digital_active_level[2] = ((INPUT_ACTIVE_LEVEL_DIGITAL_2 != 0) ? true : false);
+	digital_active_level[3] = ((INPUT_ACTIVE_LEVEL_DIGITAL_3 != 0) ? true : false);
+	digital_active_level[4] = ((INPUT_ACTIVE_LEVEL_DIGITAL_4 != 0) ? true : false);
+	digital_active_level[5] = ((INPUT_ACTIVE_LEVEL_DIGITAL_5 != 0) ? true : false);
+	digital_active_level[6] = ((INPUT_ACTIVE_LEVEL_DIGITAL_6 != 0) ? true : false);
 	//----- valtozo init VEGE -----
 
 }
@@ -92,7 +92,9 @@ void node_Input::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 0;
+	msg.length		= 1;
+	for(u8 i=0 ; i<INPUT_DIGITAL_PIN_COUNT ; i++)
+		SET_BOOL(&(msg.data[0]), i, digital_pullup[i]);
 
 	UDPdriver::send(&msg);
 
@@ -158,6 +160,6 @@ double node_Input::GET_DISTANCE(u8 num){
 
 bool node_Input::GET_DIGITAL(u8 num){
 
-	return ((digital[num] == active_level_digital[num]) ? true : false);
+	return ((digital[num] == digital_active_level[num]) ? true : false);
 
 }
