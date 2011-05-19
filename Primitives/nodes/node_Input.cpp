@@ -44,6 +44,17 @@ node_Input::node_Input(void){
 	digital_active_level[4] = ((INPUT_ACTIVE_LEVEL_DIGITAL_4 != 0) ? true : false);
 	digital_active_level[5] = ((INPUT_ACTIVE_LEVEL_DIGITAL_5 != 0) ? true : false);
 	digital_active_level[6] = ((INPUT_ACTIVE_LEVEL_DIGITAL_6 != 0) ? true : false);
+	digital_active_level[7] = ((INPUT_ACTIVE_LEVEL_DIGITAL_7 != 0) ? true : false);
+	digital_active_level[8] = ((INPUT_ACTIVE_LEVEL_DIGITAL_8 != 0) ? true : false);
+	digital_active_level[9] = ((INPUT_ACTIVE_LEVEL_DIGITAL_9 != 0) ? true : false);
+
+	digital_pullup[0] = ((INPUT_PULLUP_DIGITAL_01 != 0) ? true : false);
+	digital_pullup[1] = ((INPUT_PULLUP_DIGITAL_23 != 0) ? true : false);
+	digital_pullup[2] = ((INPUT_PULLUP_DIGITAL_45 != 0) ? true : false);
+	digital_pullup[3] = ((INPUT_PULLUP_DIGITAL_6 != 0) ? true : false);
+	digital_pullup[4] = ((INPUT_PULLUP_DIGITAL_7 != 0) ? true : false);
+	digital_pullup[5] = ((INPUT_PULLUP_DIGITAL_8 != 0) ? true : false);
+	digital_pullup[6] = ((INPUT_PULLUP_DIGITAL_9 != 0) ? true : false);
 	//----- valtozo init VEGE -----
 
 }

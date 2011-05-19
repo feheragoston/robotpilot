@@ -280,9 +280,7 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
 			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret = ACT_ERROR;
 
@@ -328,9 +326,7 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
 			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret =  ACT_ERROR;
 
@@ -379,9 +375,7 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
+		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
 			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				ret = ACT_ERROR;
 
@@ -1141,22 +1135,11 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 
 		//varunk az utkozesre
 		case 2:
-			//ha elorefele megyunk
-			if(speedSigned > 0){
-				//ha bal utkozes
-				if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX))
-					goToWallPhase = 3;
-				else if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX))
-					goToWallPhase = 4;
-			}
-			//ha hatrafele megyunk
-			else{
-				//ha bal utkozes
-				if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX))
-					goToWallPhase = 3;
-				else if(input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
-					goToWallPhase = 4;
-			}
+			//ha bal utkozes
+			if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX))
+				goToWallPhase = 3;
+			else if(input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+				goToWallPhase = 4;
 			return ACT_INPROGRESS;
 
 		//bal utkozes volt, megallunk
@@ -1189,18 +1172,9 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 
 		//mindket utkozeskapcsolora varunk
 		case 7:
-			//ha elorefele megyunk
-			if(speedSigned > 0){
-				//ha mindket utkozeskapcsolo jelez
-				if(input->GET_DIGITAL(INPUT_BUTTON_FRONT_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_FRONT_RIGHT_INDEX))
-					goToWallPhase = 8;
-			}
-			//ha hatrafele megyunk
-			else{
-				//ha mindket utkozeskapcsolo jelez
-				if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
-					goToWallPhase = 8;
-			}
+			//ha mindket utkozeskapcsolo jelez
+			if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+				goToWallPhase = 8;
 			return ACT_INPROGRESS;
 
 		//rajta vagyunk a falon, megallunk
