@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo"){
+node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS, SERVO_SEND_PERIOD_TO_PC_MS, SERVO_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Magnet::node_Magnet(void) : node(MAGNET_ID, "node_Magnet"){
+node_Magnet::node_Magnet(void) : node(MAGNET_ID, "node_Magnet", MAGNET_KEEP_ALIVE_MS, MAGNET_SEND_PERIOD_TO_PC_MS, MAGNET_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

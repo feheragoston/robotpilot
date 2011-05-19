@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Broadcast::node_Broadcast(void) : node(BROADCAST_ID, "node_Broadcast"){
+node_Broadcast::node_Broadcast(void) : node(BROADCAST_ID, "node_Broadcast", BROADCAST_KEEP_ALIVE_MS, BROADCAST_SEND_PERIOD_TO_PC_MS, BROADCAST_SEND_PERIOD_TO_NODE_MS){
 
 }
 

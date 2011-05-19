@@ -32,21 +32,21 @@ class node{
 
 public:
 
-	node(u16 id, const char* name);
+	node(u16 id, const char* name, u32 keepAlive_ms, u32 sendPeriodToPC_ms, u32 sendPeriodToNode_ms);
 	~node();
 
 	void CORE_RESET(void);
 	void START_ACTUATOR(void);
 	void STOP_ACTUATOR(void);
 	void KEEP_ALIVE(void);
-	void SET_KEEP_ALIVE_MS(u16 keep_alive_ms);
-	void SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms);
-	void SET_SEND_PERIOD_TO_PC_MS(u16 period_ms);
+	void SET_KEEP_ALIVE_MS(void);
+	void SET_SEND_PERIOD_TO_NODE_MS(void);
+	void SET_SEND_PERIOD_TO_PC_MS(void);
 
 	virtual void evalMsg(UDPmsg* msg);
 
-	void PINGprocess(void);
-	void INITPARAMprocess(void);
+	bool PINGprocess(void);
+	bool INITPARAMprocess(void);
 	
 	
 protected:
@@ -54,6 +54,10 @@ protected:
 	u16		id;
 	char	name[32];
 	
+	u32		keepAlive_ms;
+	u32		sendPeriodToPC_ms;
+	u32		sendPeriodToNode_ms;
+
 
 	void PING(void);
 	sem_t						pingSemaphore;

@@ -65,11 +65,10 @@ void* sendLoop(void* primitivescan_ptr){
 
 PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 
-	UDPconn::init(config->CanIp);
-	UDPdriver::init();
-
 
 	//---------- valtozo ELEJE ----------
+	strcpy(CanIp, config->CanIp);
+
 	deadreckPosOffsetX		= 0;
 	deadreckPosOffsetY		= 0;
 	deadreckPosOffsetPhi	= 0;
@@ -77,11 +76,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	deadreckCalibPhase		= 0;
 	goToWallPhase			= 0;
 	//---------- valtozo VEGE ----------
-
-
-	//---------- mutex ELEJE ----------
-	pthread_mutex_init(&recieveMutex, NULL);
-	//---------- mutex VEGE ----------
 
 
 	//---------- node ELEJE ----------
@@ -99,91 +93,68 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	//---------- node VEGE ----------
 
 
+}
+
+
+bool PrimitivesCan::init_node(node* node){
+
+	//ha nem sikeres a PING
+	if(!node->PINGprocess())
+		return false;
+
+	//ha nem sikeres az INIT_PARAM
+	if(!node->INITPARAMprocess())
+		return false;
+
+	//ha nem a BROADCAST_KEEP_ALIVE_MS erteket hasznaljuk
+	if(!USE_BROADCAST_KEEP_ALIVE_MS)
+		node->SET_KEEP_ALIVE_MS();
+
+	//ha nem a BROADCAST_SEND_PERIOD_TO_PC_MS erteket hasznaljuk
+	if(!USE_BROADCAST_SEND_PERIOD_TO_PC_MS)
+		node->SET_SEND_PERIOD_TO_PC_MS();
+
+	//ha nem a BROADCAST_SEND_PERIOD_TO_NODE_MS erteket hasznaljuk
+	if(!USE_BROADCAST_SEND_PERIOD_TO_NODE_MS)
+		node->SET_SEND_PERIOD_TO_NODE_MS();
+
+	//minden OK
+	return true;
+
+}
+
+
+bool PrimitivesCan::Init(void){
+
+
+	//---------- UDP ELEJE ----------
+	if(!UDPconn::init(CanIp))	return false;
+	UDPdriver::init();
+	//---------- UDP VEGE ----------
+
+
 	//---------- recieve ELEJE ----------
 	sem_init(&newMessageSemaphore, 0, 0);
+	pthread_mutex_init(&recieveMutex, NULL);
 	pthread_t rLoop;
 	pthread_create(&rLoop, NULL, recieveLoop, this);
 	//---------- recieve VEGE ----------
 
 
 	//---------- node ELEJE ----------
-	gateway->PINGprocess();
-	gateway->INIT_PARAM();
-	gateway->SET_KEEP_ALIVE_MS(GATEWAY_KEEP_ALIVE_MS);
-	gateway->SET_SEND_PERIOD_TO_PC_MS(GATEWAY_SEND_PERIOD_TO_PC_MS);
-	gateway->SET_SEND_PERIOD_TO_NODE_MS(GATEWAY_SEND_PERIOD_TO_NODE_MS);
+	if(!init_node(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(bdc)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(input)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(magnet)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(servo)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(sonar)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!init_node(power)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 
-
-	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
-	console->PINGprocess();
-	console->INIT_PARAM();
-	console->SET_KEEP_ALIVE_MS(CONSOLE_KEEP_ALIVE_MS);
-	console->SET_SEND_PERIOD_TO_PC_MS(CONSOLE_SEND_PERIOD_TO_PC_MS);
-	console->SET_SEND_PERIOD_TO_NODE_MS(CONSOLE_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
-	deadreck->PINGprocess();
-	deadreck->INIT_PARAM();
-	deadreck->SET_KEEP_ALIVE_MS(DEADRECK_KEEP_ALIVE_MS);
-	deadreck->SET_SEND_PERIOD_TO_PC_MS(DEADRECK_SEND_PERIOD_TO_PC_MS);
-	deadreck->SET_SEND_PERIOD_TO_NODE_MS(DEADRECK_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!BDC_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(BDC_ID);
-	bdc->PINGprocess();
-	bdc->INIT_PARAM();
-	bdc->SET_KEEP_ALIVE_MS(BDC_KEEP_ALIVE_MS);
-	bdc->SET_SEND_PERIOD_TO_PC_MS(BDC_SEND_PERIOD_TO_PC_MS);
-	bdc->SET_SEND_PERIOD_TO_NODE_MS(BDC_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
-	input->PINGprocess();
-	input->INIT_PARAM();
-	input->SET_KEEP_ALIVE_MS(INPUT_KEEP_ALIVE_MS);
-	input->SET_SEND_PERIOD_TO_PC_MS(INPUT_SEND_PERIOD_TO_PC_MS);
-	input->SET_SEND_PERIOD_TO_NODE_MS(INPUT_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!MAGNET_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(MAGNET_ID);
-	magnet->PINGprocess();
-	magnet->INIT_PARAM();
-	magnet->SET_KEEP_ALIVE_MS(MAGNET_KEEP_ALIVE_MS);
-	magnet->SET_SEND_PERIOD_TO_PC_MS(MAGNET_SEND_PERIOD_TO_PC_MS);
-	magnet->SET_SEND_PERIOD_TO_NODE_MS(MAGNET_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
-	servo->PINGprocess();
-	servo->INIT_PARAM();
-	servo->SET_KEEP_ALIVE_MS(SERVO_KEEP_ALIVE_MS);
-	servo->SET_SEND_PERIOD_TO_PC_MS(SERVO_SEND_PERIOD_TO_PC_MS);
-	servo->SET_SEND_PERIOD_TO_NODE_MS(SERVO_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!SONAR_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);
-	sonar->PINGprocess();
-	sonar->INIT_PARAM();
-	sonar->SET_KEEP_ALIVE_MS(SONAR_KEEP_ALIVE_MS);
-	sonar->SET_SEND_PERIOD_TO_PC_MS(SONAR_SEND_PERIOD_TO_PC_MS);
-	sonar->SET_SEND_PERIOD_TO_NODE_MS(SONAR_SEND_PERIOD_TO_NODE_MS);
-
-
-	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
-	power->PINGprocess();
-	power->INIT_PARAM();
-	power->SET_KEEP_ALIVE_MS(POWER_KEEP_ALIVE_MS);
-	power->SET_SEND_PERIOD_TO_PC_MS(POWER_SEND_PERIOD_TO_PC_MS);
-	power->SET_SEND_PERIOD_TO_NODE_MS(POWER_SEND_PERIOD_TO_NODE_MS);
+	if(USE_BROADCAST_KEEP_ALIVE_MS)				broadcast->SET_KEEP_ALIVE_MS();
+	if(USE_BROADCAST_SEND_PERIOD_TO_PC_MS)		broadcast->SET_SEND_PERIOD_TO_PC_MS();
+	if(USE_BROADCAST_SEND_PERIOD_TO_NODE_MS)	broadcast->SET_SEND_PERIOD_TO_NODE_MS();
 	//---------- node VEGE ----------
 
 
@@ -197,17 +168,15 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	sem_init(&newMessageSemaphore, 0, 0);
 	//---------- szemafor nullazasa VEGE ----------
 
+
+	//minden OK
+	return true;
+
+
 }
 
 
 PrimitivesCan::~PrimitivesCan(){
-
-}
-
-
-bool PrimitivesCan::Init(void){
-
-	return true;
 
 }
 

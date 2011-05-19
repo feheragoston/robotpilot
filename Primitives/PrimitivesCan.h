@@ -85,6 +85,9 @@ public:
 private:
 
 
+	bool init_node(node* node);
+
+
 	//----- recieve ELEJE -----
 	sem_t				newMessageSemaphore;
 	pthread_mutex_t		recieveMutex;
@@ -106,6 +109,8 @@ private:
 
 
 	//----- valtozo ELEJE -----
+	char CanIp[16];
+
 	double deadreckPosOffsetX;
 	double deadreckPosOffsetY;
 	double deadreckPosOffsetPhi;

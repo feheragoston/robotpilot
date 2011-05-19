@@ -15,10 +15,15 @@ using namespace std;
 
 
 
-node::node(u16 id, const char* name){
+node::node(u16 id, const char* name, u32 keepAlive_ms, u32 sendPeriodToPC_ms, u32 sendPeriodToNode_ms){
 
 	this->id = id;
+
 	strcpy(this->name, name);
+
+	this->keepAlive_ms = keepAlive_ms;
+	this->sendPeriodToPC_ms = sendPeriodToPC_ms;
+	this->sendPeriodToNode_ms = sendPeriodToNode_ms;
 
 }
 
@@ -81,42 +86,42 @@ void node::KEEP_ALIVE(void){
 }
 
 
-void node::SET_KEEP_ALIVE_MS(u16 keep_alive_ms){
+void node::SET_KEEP_ALIVE_MS(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_KEEP_ALIVE_MS;
 	msg.length		= 2;
-	SET_U16(&(msg.data[0]), keep_alive_ms);
+	SET_U16(&(msg.data[0]), keepAlive_ms);
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node::SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms){
+void node::SET_SEND_PERIOD_TO_NODE_MS(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_NODE_MS;
 	msg.length		= 2;
-	SET_U16(&(msg.data[0]), period_ms);
+	SET_U16(&(msg.data[0]), sendPeriodToNode_ms);
 
 	UDPdriver::send(&msg);
 
 }
 
 
-void node::SET_SEND_PERIOD_TO_PC_MS(u16 period_ms){
+void node::SET_SEND_PERIOD_TO_PC_MS(void){
 
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_PC_MS;
 	msg.length		= 2;
-	SET_U16(&(msg.data[0]), period_ms);
+	SET_U16(&(msg.data[0]), sendPeriodToPC_ms);
 
 	UDPdriver::send(&msg);
 
@@ -146,7 +151,7 @@ void node::evalMsg(UDPmsg* msg){
 }
 
 
-void node::PINGprocess(void){
+bool node::PINGprocess(void){
 
 	sem_init(&pingSemaphore, 0, 0);
 
@@ -157,17 +162,21 @@ void node::PINGprocess(void){
 	ts.tv_sec += PING_REPLY_MAX_WAIT_TIME_SEC;
 
 	//ha jott valasz
-	if(sem_timedwait(&pingSemaphore, &ts) == 0)
+	if(sem_timedwait(&pingSemaphore, &ts) == 0){
 		cout << "-> ping OK!\t" << name << "(" << id << ")" << endl;
+		return true;
+	}
 
 	//ha nem jott valasz
-	else
+	else{
 		cerr << "-> ping TIMED OUT!\t" << name << "(" << id << ")" << endl;
+		return false;
+	}
 
 }
 
 
-void node::INITPARAMprocess(void){
+bool node::INITPARAMprocess(void){
 
 	sem_init(&initparamSemaphore, 0, 0);
 
@@ -181,16 +190,23 @@ void node::INITPARAMprocess(void){
 	if(sem_timedwait(&initparamSemaphore, &ts) == 0){
 
 		//ha rendben vannak a parameterek
-		if(initparamOK)
+		if(initparamOK){
 			cout << "-> initparam OK!\t" << name << "(" << id << ")" << endl;
+			return true;
+		}
 
 		//ha nincsenek rendben a parameterek
-		else
+		else{
 			cout << "-> initparam ERROR!\t" << name << "(" << id << ")" << endl;
+			return false;
+		}
+
 	}
 
 	//ha nem jott valasz
-	else
+	else{
 		cerr << "-> initparam TIMED OUT!\t" << name << "(" << id << ")" << endl;
+		return false;
+	}
 
 }

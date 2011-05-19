@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Power::node_Power(void) : node(POWER_ID, "node_Power"){
+node_Power::node_Power(void) : node(POWER_ID, "node_Power", POWER_KEEP_ALIVE_MS, POWER_SEND_PERIOD_TO_PC_MS, POWER_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

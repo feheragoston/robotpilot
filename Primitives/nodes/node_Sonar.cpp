@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar"){
+node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar", SONAR_KEEP_ALIVE_MS, SONAR_SEND_PERIOD_TO_PC_MS, SONAR_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

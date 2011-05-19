@@ -16,7 +16,7 @@
 using namespace std;
 
 
-node_Input::node_Input(void) : node(INPUT_ID, "node_Input"){
+node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS, INPUT_SEND_PERIOD_TO_PC_MS, INPUT_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

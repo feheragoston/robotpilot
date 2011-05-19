@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Deadreck::node_Deadreck(void) : node(DEADRECK_ID, "node_Deadreck"){
+node_Deadreck::node_Deadreck(void) : node(DEADRECK_ID, "node_Deadreck", DEADRECK_KEEP_ALIVE_MS, DEADRECK_SEND_PERIOD_TO_PC_MS, DEADRECK_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

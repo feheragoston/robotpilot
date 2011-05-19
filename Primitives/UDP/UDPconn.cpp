@@ -28,24 +28,24 @@ pthread_mutex_t			UDPconn::sendMutex;
 //----- valtozo VEGE -----
 
 
-void UDPconn::init(const char* TargetHostIp){
+bool UDPconn::init(const char* TargetHostIp){
 
 	if(strcmp(TargetHostIp, "") == 0)	strcpy(TargetHost, DefaultTargetHost);
 	else								strcpy(TargetHost, TargetHostIp);
 
 	pthread_mutex_init(&sendMutex, NULL);
 
-	init_socket();
+	return init_socket();
 
 }
 
 
-void UDPconn::init_socket(void){
+bool UDPconn::init_socket(void){
 
 	//socket letrehozasa
 	if( ( mSockFd = socket(AF_INET, SOCK_DGRAM, 0) ) == -1 ){
 			cerr << "ERROR socket" << endl;
-			return;
+			return false;
 	}
 
 
@@ -59,13 +59,17 @@ void UDPconn::init_socket(void){
 	//socket bind
 	if( bind(mSockFd, (struct sockaddr *) &addr, sizeof(addr)) == -1){
 		cerr << "ERROR bind" << endl;
-		return;
+		return false;
 	}
 
 
 	//figyelendo filedescriptorok
 	FD_ZERO(&mGatewayInputset);
 	FD_SET(mSockFd, &mGatewayInputset);
+
+
+	//minden OK
+	return true;
 
 }
 

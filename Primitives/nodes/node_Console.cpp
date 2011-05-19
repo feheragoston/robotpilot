@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Console::node_Console(void) : node(CONSOLE_ID, "node_Console"){
+node_Console::node_Console(void) : node(CONSOLE_ID, "node_Console", CONSOLE_KEEP_ALIVE_MS, CONSOLE_SEND_PERIOD_TO_PC_MS, CONSOLE_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

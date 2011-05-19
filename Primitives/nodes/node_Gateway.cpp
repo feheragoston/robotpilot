@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_Gateway::node_Gateway(void) : node(GATEWAY_ID, "node_Gateway"){
+node_Gateway::node_Gateway(void) : node(GATEWAY_ID, "node_Gateway", GATEWAY_KEEP_ALIVE_MS, GATEWAY_SEND_PERIOD_TO_PC_MS, GATEWAY_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

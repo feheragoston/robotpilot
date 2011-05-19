@@ -14,7 +14,7 @@
 using namespace std;
 
 
-node_BDC::node_BDC(void) : node(BDC_ID, "node_BDC"){
+node_BDC::node_BDC(void) : node(BDC_ID, "node_BDC", BDC_KEEP_ALIVE_MS, BDC_SEND_PERIOD_TO_PC_MS, BDC_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----

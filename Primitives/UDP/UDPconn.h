@@ -44,7 +44,7 @@ class UDPconn{
 
 public:
 
-	static void init(const char* TargetHostIp);
+	static bool init(const char* TargetHostIp);
 	
 	static bool recieve(void* buffer, u32 maxCount, u32* count, struct timeval* timeOut);
 	static void send(void* buffer, u32 count);
@@ -52,7 +52,7 @@ public:
 
 private:
 
-	static void init_socket(void);
+	static bool init_socket(void);
 	
 	static char					TargetHost[16];
 
