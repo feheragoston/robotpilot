@@ -48,6 +48,8 @@ private:
 	double Servo_Deg_Incr_y1[SERVO_COUNT];
 	double Servo_Deg_Incr_grad[SERVO_COUNT];
 
+	u16 SERVO_DEG_TO_INCR(u8 num, double deg);
+
 };
 //------------------------------ node_Servo VEGE ------------------------------
 

@@ -51,16 +51,19 @@ void node_Console::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:
+				stop.error = GET_BOOL(&(msg->data[0]), 0);
 				stop.inProgress = false;
 				stop.finished = true;
 				break;
 
 			case MSG_CONSOLE_SET_POS_REPLY:
+				move.error = GET_BOOL(&(msg->data[0]), 0);
 				move.inProgress = false;
 				move.finished = true;
 				break;
 
 			case MSG_CONSOLE_CALIBRATE_REPLY:
+				calibrate.error = GET_BOOL(&(msg->data[0]), 0);
 				calibrate.inProgress = false;
 				calibrate.finished = true;
 				break;
@@ -88,6 +91,7 @@ void node_Console::CONSOLE_STOP(void){
 
 	stop.inProgress = true;
 	stop.finished = false;
+	stop.error = false;
 
 }
 
@@ -108,6 +112,7 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 
 	move.inProgress = true;
 	move.finished = false;
+	move.error = false;
 
 }
 
@@ -124,6 +129,7 @@ void node_Console::CONSOLE_CALIBRATE(void){
 
 	calibrate.inProgress = true;
 	calibrate.finished = false;
+	calibrate.error = false;
 
 }
 

@@ -49,11 +49,14 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_DEADRECK_RESET_POS_REPLY:
-				DeadreckPosX	= 0;
-				DeadreckPosY	= 0;
-				DeadreckPosPhi	= 0;
+				reset_pos.error = GET_BOOL(&(msg->data[0]), 0);
 				reset_pos.inProgress = false;
 				reset_pos.finished = true;
+				if(!reset_pos.error){
+					DeadreckPosX	= 0;
+					DeadreckPosY	= 0;
+					DeadreckPosPhi	= 0;
+				}
 				break;
 
 			case MSG_PERIODIC_TO_PC:
@@ -88,6 +91,7 @@ void node_Deadreck::DEADRECK_RESET_POS(void){
 
 	reset_pos.inProgress = true;
 	reset_pos.finished = false;
+	reset_pos.error = false;
 
 }
 

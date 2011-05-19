@@ -56,6 +56,7 @@ void node_Power::evalMsg(UDPmsg* msg){
 
 			case MSG_POWER_ACT_ON_REPLY:
 			case MSG_POWER_ACT_OFF_REPLY:
+				act_on_off.error = GET_BOOL(&(msg->data[0]), 0);
 				act_on_off.inProgress = false;
 				act_on_off.finished = true;
 				break;
@@ -83,6 +84,7 @@ void node_Power::POWER_ACT_ON(void){
 
 	act_on_off.inProgress = true;
 	act_on_off.finished = false;
+	act_on_off.error = false;
 
 }
 
@@ -99,6 +101,7 @@ void node_Power::POWER_ACT_OFF(void){
 
 	act_on_off.inProgress = true;
 	act_on_off.finished = false;
+	act_on_off.error = false;
 
 }
 

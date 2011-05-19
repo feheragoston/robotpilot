@@ -156,8 +156,11 @@ void node::PINGprocess(void){
 	clock_gettime(CLOCK_REALTIME, &ts);
 	ts.tv_sec += PING_REPLY_MAX_WAIT_TIME_SEC;
 
+	//ha jott valasz
 	if(sem_timedwait(&pingSemaphore, &ts) == 0)
 		cout << "-> ping OK!\t" << name << "(" << id << ")" << endl;
+
+	//ha nem jott valasz
 	else
 		cerr << "-> ping TIMED OUT!\t" << name << "(" << id << ")" << endl;
 
@@ -174,12 +177,19 @@ void node::INITPARAMprocess(void){
 	clock_gettime(CLOCK_REALTIME, &ts);
 	ts.tv_sec += INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC;
 
+	//ha jott valasz
 	if(sem_timedwait(&initparamSemaphore, &ts) == 0){
+
+		//ha rendben vannak a parameterek
 		if(initparamOK)
 			cout << "-> initparam OK!\t" << name << "(" << id << ")" << endl;
+
+		//ha nincsenek rendben a parameterek
 		else
 			cout << "-> initparam ERROR!\t" << name << "(" << id << ")" << endl;
 	}
+
+	//ha nem jott valasz
 	else
 		cerr << "-> initparam TIMED OUT!\t" << name << "(" << id << ")" << endl;
 

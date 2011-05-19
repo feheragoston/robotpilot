@@ -50,6 +50,7 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 
 			case MSG_MAGNET_SET_POLARITY_REPLY:
 				num = GET_U8(&(msg->data[0]));
+				set_polarity[num].error = GET_BOOL(&(msg->data[1]), 0);
 				set_polarity[num].inProgress = false;
 				set_polarity[num].finished = true;
 				break;
@@ -79,6 +80,7 @@ void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 
 	set_polarity[num].inProgress = true;
 	set_polarity[num].finished = false;
+	set_polarity[num].error = false;
 
 }
 
