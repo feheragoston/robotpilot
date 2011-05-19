@@ -182,19 +182,27 @@
 
 
 //---------- atszamitas ELEJE ----------
-#define MESV_TO_ANALOG(mesv)			((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
-#define V_TO_MESV(v)					((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
-#define A_TO_MESV(a)					((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
+#define MESV_TO_ANALOG(mesv)					((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
+#define ANALOG_TO_MESV(analog)					((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
 
-#define V_TO_ANALOG(v)					MESV_TO_ANALOG(V_TO_MESV(v))
-#define A_TO_ANALOG(a)					MESV_TO_ANALOG(A_TO_MESV(a))
+#define POWER_V_TO_MESV(v)						((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
+#define POWER_A_TO_MESV(a)						((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
 
-#define ANALOG_TO_MESV(analog)			((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
-#define MESV_TO_V(mesv)					((float)(mesv) * (10 + 100) / 10)			//feszultsegmeresekhez 10k-100k leosztas
-#define MESV_TO_A(mesv)					((float)(mesv) * (-30/2.5) + 30)			//2.5V -> 0A, 0V -> 30A
+#define POWER_MESV_TO_V(mesv)					((float)(mesv) * (10 + 100) / 10)			//feszultsegmeresekhez 10k-100k leosztas
+#define POWER_MESV_TO_A(mesv)					((float)(mesv) * (-30/2.5) + 30)			//2.5V -> 0A, 0V -> 30A
 
-#define ANALOG_TO_V(analog)				MESV_TO_V(ANALOG_TO_MESV(analog))
-#define ANALOG_TO_A(analog)				MESV_TO_A(ANALOG_TO_MESV(analog))
+#define POWER_V_TO_ANALOG(v)					MESV_TO_ANALOG(POWER_V_TO_MESV(v))
+#define POWER_A_TO_ANALOG(a)					MESV_TO_ANALOG(POWER_A_TO_MESV(a))
+
+#define POWER_ANALOG_TO_V(analog)				POWER_MESV_TO_V(ANALOG_TO_MESV(analog))
+#define POWER_ANALOG_TO_A(analog)				POWER_MESV_TO_A(ANALOG_TO_MESV(analog))
+
+#define INPUT_MESV_TO_V(mesv)					((float)(mesv) * (22 + 22) / 22)			//feszultsegmeresekhez 22k-22k leosztas
+#define INPUT_V_TO_MESV(v)						((float)(v) * 22 / (22 + 22))				//feszultsegmeresekhez 22k-22k leosztas
+
+
+#define INPUT_V_TO_ANALOG(v)					MESV_TO_ANALOG(INPUT_V_TO_MESV(v))
+#define INPUT_ANALOG_TO_V(analog)				INPUT_MESV_TO_V(ANALOG_TO_MESV(analog))
 //---------- atszamitas VEGE ----------
 
 
