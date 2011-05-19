@@ -96,11 +96,10 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 	msg.node_id		= id;
 	msg.function	= CMD_CONSOLE_SET_POS;
 	msg.length		= 12;
-	//grad = (y-y0) / (x-x0)
-	//x = (y-y0) / grad + x0
-	SET_U32(&(msg.data[0]), (u32)((pos - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
-	SET_U32(&(msg.data[4]), (u32)((speed - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
-	SET_U32(&(msg.data[8]), (u32)((acc - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0));
+
+	SET_U32(&(msg.data[0]), CONSOLE_INCR_TO_MM(pos));
+	SET_U32(&(msg.data[4]), CONSOLE_INCR_TO_MM(speed));
+	SET_U32(&(msg.data[8]), CONSOLE_INCR_TO_MM(acc));
 
 	UDPdriver::send(&msg);
 
@@ -153,8 +152,6 @@ void node_Console::INIT_PARAM(void){
 
 double node_Console::GET_POS(void){
 
-	//grad = (y-y0) / (x-x0)
-	//y = (x-x0) * grad + y0
-	return ((double)ConsolePos - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0;
+	return CONSOLE_INCR_TO_MM(ConsolePos);
 
 }

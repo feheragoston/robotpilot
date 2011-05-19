@@ -152,7 +152,7 @@
 
 
 
-//AAA_BBB_CCC_X0:		AAA node-nal a BBB-CCC fuggveny X0, Y0, X1, Y1 pontjai, hogy egy egyenes ket ponttal adjunk meg
+//AAA_BBB_CCC_X0:		AAA node-nal a BBB-CCC fuggveny X0, Y0, X1, Y1 pontjai, hogy egy egyenest ket ponttal adjunk meg
 //AAA_BBB_CCC_GRAD:		AAA node-nal a BBB-CCC fuggveny meredeksege (dCCC / dBBB)
 #define CONSOLE_INCR_MM_X0					1
 #define CONSOLE_INCR_MM_Y0					100
@@ -160,16 +160,9 @@
 #define CONSOLE_INCR_MM_Y1					200
 #define CONSOLE_INCR_MM_GRAD				((double)(CONSOLE_INCR_MM_Y1 - CONSOLE_INCR_MM_Y0) / (CONSOLE_INCR_MM_X1 - CONSOLE_INCR_MM_X0))
 
+#define CONSOLE_MM_TO_INCR(mm)				((u32)(((double)(mm) - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0)));
+#define CONSOLE_INCR_TO_MM(incr)			(((double)(incr) - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0)
 
-/*
-//0V -> 0
-//3V -> (2^12 - 1)
-#define INPUT_ANALOG_V_X0					0
-#define INPUT_ANALOG_V_Y0					0
-#define INPUT_ANALOG_V_X1					((((u32)0x01) << 12) - 1)	//(2^12 - 1)
-#define INPUT_ANALOG_V_Y1					3
-#define INPUT_ANALOG_V_GRAD					((double)(INPUT_ANALOG_V_Y1 - INPUT_ANALOG_V_Y0) / (INPUT_ANALOG_V_X1 - INPUT_ANALOG_V_X0))
-*/
 
 
 //---------- atszamitas ELEJE ----------
@@ -210,13 +203,13 @@
 #define INPUT_ACTIVE_LEVEL_DIGITAL_9			1
 
 
-#define INPUT_PULLUP_DIGITAL_01					1
-#define INPUT_PULLUP_DIGITAL_23					1
-#define INPUT_PULLUP_DIGITAL_45					1
-#define INPUT_PULLUP_DIGITAL_6					1
-#define INPUT_PULLUP_DIGITAL_7					1
-#define INPUT_PULLUP_DIGITAL_8					1
-#define INPUT_PULLUP_DIGITAL_9					1
+#define INPUT_PULLUP_DIGITAL_01					0
+#define INPUT_PULLUP_DIGITAL_23					0
+#define INPUT_PULLUP_DIGITAL_45					0
+#define INPUT_PULLUP_DIGITAL_6					0
+#define INPUT_PULLUP_DIGITAL_7					0
+#define INPUT_PULLUP_DIGITAL_8					0
+#define INPUT_PULLUP_DIGITAL_9					0
 
 
 
@@ -288,12 +281,6 @@
 
 
 
-/*
-#define POWER_VOLTAGE_WARNING_V				18
-#define POWER_VOLTAGE_ERROR_V				20
-#define POWER_CURRENT_WARNING_A				3
-#define POWER_CURRENT_ERROR_A				5
-*/
 
 
 #define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							20
@@ -310,33 +297,6 @@
 #define POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL						12
 
 
-
-/*
-//0V -> 0
-//3V -> (2^12 - 1)
-#define POWER_ANALOG_V_X0					0
-#define POWER_ANALOG_V_Y0					0
-#define POWER_ANALOG_V_X1					((((u32)0x01) << 12) - 1)	//(2^12 - 1)
-#define POWER_ANALOG_V_Y1					3
-#define POWER_ANALOG_V_GRAD					((double)(POWER_ANALOG_V_Y1 - POWER_ANALOG_V_Y0) / (POWER_ANALOG_V_X1 - POWER_ANALOG_V_X0))
-
-
-//2.5V -> 0A
-//0V -> 30A
-#define POWER_V_A_X0					0
-#define POWER_V_A_Y0					30
-#define POWER_V_A_X1					2.5
-#define POWER_V_A_Y1					0
-#define POWER_V_A_GRAD					((double)(POWER_V_A_Y1 - POWER_V_A_Y0) / (POWER_V_A_X1 - POWER_V_A_X0))
-
-
-
-
-//grad = (y-y0) / (x-x0)
-//x = (y-y0) / grad + x0
-#define POWER_CURRENT_WARNING_V				((double)(POWER_CURRENT_WARNING_A - POWER_V_A_Y0) / POWER_V_A_GRAD + POWER_V_A_X0)
-#define POWER_CURRENT_ERROR_V				((double)(POWER_CURRENT_ERROR_A - POWER_V_A_Y0) / POWER_V_A_GRAD + POWER_V_A_X0)
-*/
 
 
 
