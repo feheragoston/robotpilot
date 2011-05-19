@@ -6,7 +6,8 @@
 
 
 
-#define PING_REPLY_MAX_WAIT_TIME_SEC		1
+#define PING_REPLY_MAX_WAIT_TIME_SEC			1
+#define INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC		1
 
 
 #define SERVO_COUNT							6
@@ -160,6 +161,7 @@
 #define CONSOLE_INCR_MM_GRAD				((double)(CONSOLE_INCR_MM_Y1 - CONSOLE_INCR_MM_Y0) / (CONSOLE_INCR_MM_X1 - CONSOLE_INCR_MM_X0))
 
 
+/*
 //0V -> 0
 //3V -> (2^12 - 1)
 #define INPUT_ANALOG_V_X0					0
@@ -167,6 +169,24 @@
 #define INPUT_ANALOG_V_X1					((((u32)0x01) << 12) - 1)	//(2^12 - 1)
 #define INPUT_ANALOG_V_Y1					3
 #define INPUT_ANALOG_V_GRAD					((double)(INPUT_ANALOG_V_Y1 - INPUT_ANALOG_V_Y0) / (INPUT_ANALOG_V_X1 - INPUT_ANALOG_V_X0))
+*/
+
+
+//---------- atszamitas ELEJE ----------
+#define MESV_TO_ANALOG(mesv)			((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
+#define V_TO_MESV(v)					((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
+#define A_TO_MESV(a)					((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
+
+#define V_TO_ANALOG(v)					MESV_TO_ANALOG(V_TO_MESV(v))
+#define A_TO_ANALOG(a)					MESV_TO_ANALOG(A_TO_MESV(a))
+
+#define ANALOG_TO_MESV(analog)			((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
+#define MESV_TO_V(mesv)					((float)(mesv) * (10 + 100) / 10)			//feszultsegmeresekhez 10k-100k leosztas
+#define MESV_TO_A(mesv)					((float)(mesv) * (-30/2.5) + 30)			//2.5V -> 0A, 0V -> 30A
+
+#define ANALOG_TO_V(analog)				MESV_TO_V(ANALOG_TO_MESV(analog))
+#define ANALOG_TO_A(analog)				MESV_TO_A(ANALOG_TO_MESV(analog))
+//---------- atszamitas VEGE ----------
 
 
 #define INPUT_LONG_SHARP_ON_ANALOG_0			0
@@ -268,15 +288,30 @@
 
 
 
-
+/*
 #define POWER_VOLTAGE_WARNING_V				18
 #define POWER_VOLTAGE_ERROR_V				20
 #define POWER_CURRENT_WARNING_A				3
 #define POWER_CURRENT_ERROR_A				5
+*/
+
+
+#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							20
+#define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3
+#define POWER_MAIN_VOLTAGE_BETWEEN_SHUTDOWN_STOPBUTTON_US			10
+
+#define POWER_MAIN_CURRENT_SHUTDOWN_LEVEL							3
+#define POWER_ACT_CURRENT_SHUTDOWN_LEVEL							8
+#define POWER_BETWEEN_ACT_MAIN_CURRENT_SHUTDOWN_MS					500
+
+#define POWER_ACCU_VOLTAGE_OK_LEVEL									23
+
+#define POWER_CHARGE_VOLTAGE_READY_LEVEL							26
+#define POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL						12
 
 
 
-
+/*
 //0V -> 0
 //3V -> (2^12 - 1)
 #define POWER_ANALOG_V_X0					0
@@ -301,7 +336,7 @@
 //x = (y-y0) / grad + x0
 #define POWER_CURRENT_WARNING_V				((double)(POWER_CURRENT_WARNING_A - POWER_V_A_Y0) / POWER_V_A_GRAD + POWER_V_A_X0)
 #define POWER_CURRENT_ERROR_V				((double)(POWER_CURRENT_ERROR_A - POWER_V_A_Y0) / POWER_V_A_GRAD + POWER_V_A_X0)
-
+*/
 
 
 

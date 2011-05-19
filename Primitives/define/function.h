@@ -17,14 +17,18 @@
 
 
 //---------- all ----------
-#define MSG_PERIODIC_TO_NODE				0x17	//driver.c "SEND_PERIOD" reszben
-#define MSG_PERIODIC_TO_PC					0x18	//driver.c "SEND_PERIOD" reszben
+#define MSG_PERIODIC_TO_NODE				0x15	//driver.c "SEND_PERIOD" reszben
+#define MSG_PERIODIC_TO_PC					0x16	//driver.c "SEND_PERIOD" reszben
 
-#define CMD_INIT_PARAM						0x19	//spec.h "valtozo", es driver.c "EVAL" reszben
+#define CMD_INIT_PARAM						0x17	//spec.h "valtozo", es driver.c "EVAL" reszben
+#define MSG_INIT_PARAM_REPLY				0x17	//driver.c "REPLY" reszben
 
 
 //---------- common ----------
-#define CMD_CORE_RESET						0x1A	//driver.c "eval_common" fuggvenyben
+#define CMD_CORE_RESET						0x18	//driver.c "eval_common" fuggvenyben
+
+#define CMD_START_ACTUATOR					0x19	//driver.c "eval_common" fuggvenyben
+#define CMD_STOP_ACTUATOR					0x1A	//driver.c "eval_common" fuggvenyben
 
 #define CMD_KEEP_ALIVE						0x1B	//driver.c "eval_common" fuggvenyben
 #define CMD_SET_KEEP_ALIVE_MS				0x1C	//driver.c "eval_common" fuggvenyben
@@ -102,14 +106,8 @@
 #define CMD_POWER_ACT_OFF					0x01	//spec.h "spec fuggvenyei" reszben
 #define MSG_POWER_ACT_OFF_REPLY				0x01	//driver.c "REPLY" reszben
 
-#define CMD_POWER_CHG_ON					0x02	//spec.h "spec fuggvenyei" reszben
-#define MSG_POWER_CHG_ON_REPLY				0x02	//driver.c "REPLY" reszben
-
-#define CMD_POWER_CHG_OFF					0x03	//spec.h "spec fuggvenyei" reszben
-#define MSG_POWER_CHG_OFF_REPLY				0x03	//driver.c "REPLY" reszben
-
-#define CMD_POWER_MAIN_OFF					0x04	//spec.h "spec fuggvenyei" reszben
-#define MSG_POWER_MAIN_OFF_REPLY			0x04	//driver.c "REPLY" reszben
+#define CMD_POWER_MAIN_OFF					0x02	//spec.h "spec fuggvenyei" reszben
+#define MSG_POWER_MAIN_OFF_REPLY			0x02	//driver.c "REPLY" reszben
 //------------------------------ function VEGE ------------------------------
 
 

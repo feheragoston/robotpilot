@@ -33,6 +33,8 @@ class node{
 public:
 
 	void CORE_RESET(void);
+	void START_ACTUATOR(void);
+	void STOP_ACTUATOR(void);
 	void KEEP_ALIVE(void);
 	void SET_KEEP_ALIVE_MS(u16 keep_alive_ms);
 	void SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms);

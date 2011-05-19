@@ -114,9 +114,7 @@ void node_Input::INIT_PARAM(void){
 
 double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 
-	//grad = (y-y0) / (x-x0)
-	//y = (x-x0) * grad + y0
-	double voltage = ((double)analog_value - INPUT_ANALOG_V_X0) * INPUT_ANALOG_V_GRAD + INPUT_ANALOG_V_Y0;
+	double voltage = ANALOG_TO_V(analog_value);
 	u8 i;
 	double der;	//V-mm karakterisztika meredeksege
 

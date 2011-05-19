@@ -28,6 +28,32 @@ void node::CORE_RESET(void){
 }
 
 
+void node::START_ACTUATOR(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_START_ACTUATOR;
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
+
+}
+
+
+void node::STOP_ACTUATOR(void){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_STOP_ACTUATOR;
+	msg.length		= 0;
+
+	UDPdriver::send(&msg);
+
+}
+
+
 void node::KEEP_ALIVE(void){
 
 	UDPmsg msg;

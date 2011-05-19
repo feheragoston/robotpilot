@@ -21,10 +21,9 @@ node_Power::node_Power(void){
 
 
 	//----- valtozo init ELEJE -----
-	PowerChargeVoltage = 0;
 	PowerMainVoltage = 0;
-	PowerActCurrent = 0;
-	PowerMainCurrent = 0;
+	PowerAccuVoltageOk = true;
+	PowerStopButton = true;
 	//----- valtozo init VEGE -----
 
 }
@@ -47,22 +46,15 @@ void node_Power::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
-				PowerChargeVoltage = GET_U16(&(msg->data[0]));
-				PowerMainVoltage = GET_U16(&(msg->data[2]));
-				PowerActCurrent = GET_U16(&(msg->data[4]));
-				PowerMainCurrent = GET_U16(&(msg->data[6]));
+				PowerMainVoltage = GET_U16(&(msg->data[0]));
+				PowerAccuVoltageOk = GET_BOOL(&(msg->data[2]), 0);
+				PowerStopButton = GET_BOOL(&(msg->data[2]), 0);
 				break;
 
 			case MSG_POWER_ACT_ON_REPLY:
 			case MSG_POWER_ACT_OFF_REPLY:
 				act_on_off.inProgress = false;
 				act_on_off.finished = true;
-				break;
-
-			case MSG_POWER_CHG_ON_REPLY:
-			case MSG_POWER_CHG_OFF_REPLY:
-				chg_on_off.inProgress = false;
-				chg_on_off.finished = true;
 				break;
 
 			default:
@@ -108,38 +100,6 @@ void node_Power::POWER_ACT_OFF(void){
 }
 
 
-void node_Power::POWER_CHG_ON(void){
-
-	UDPmsg msg;
-
-	msg.node_id		= id;
-	msg.function	= CMD_POWER_CHG_ON;
-	msg.length		= 0;
-
-	UDPdriver::send(&msg);
-
-	chg_on_off.inProgress = true;
-	chg_on_off.finished = false;
-
-}
-
-
-void node_Power::POWER_CHG_OFF(void){
-
-	UDPmsg msg;
-
-	msg.node_id		= id;
-	msg.function	= CMD_POWER_CHG_OFF;
-	msg.length		= 0;
-
-	UDPdriver::send(&msg);
-
-	chg_on_off.inProgress = true;
-	chg_on_off.finished = false;
-
-}
-
-
 void node_Power::POWER_MAIN_OFF(void){
 
 	UDPmsg msg;
@@ -159,48 +119,42 @@ void node_Power::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 8;
+	msg.length		= 17;
 
-	//grad = (y-y0) / (x-x0)
-	//x = (y-y0) / grad + x0
-	SET_U16(&(msg.data[0]), (u16)((POWER_VOLTAGE_WARNING_V - POWER_ANALOG_V_Y0) / POWER_ANALOG_V_GRAD + POWER_ANALOG_V_X0));
-	SET_U16(&(msg.data[2]), (u16)((POWER_VOLTAGE_ERROR_V - POWER_ANALOG_V_Y0) / POWER_ANALOG_V_GRAD + POWER_ANALOG_V_X0));
-	SET_U16(&(msg.data[4]), (u16)((POWER_CURRENT_WARNING_V - POWER_ANALOG_V_Y0) / POWER_ANALOG_V_GRAD + POWER_ANALOG_V_X0));
-	SET_U16(&(msg.data[6]), (u16)((POWER_CURRENT_ERROR_V - POWER_ANALOG_V_Y0) / POWER_ANALOG_V_GRAD + POWER_ANALOG_V_X0));
+	SET_U16(&(msg.data[0]), V_TO_ANALOG(POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL));
+	SET_U16(&(msg.data[2]), V_TO_ANALOG(POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL));
+	SET_U8(&(msg.data[4]), POWER_MAIN_VOLTAGE_BETWEEN_SHUTDOWN_STOPBUTTON_US);
+
+	SET_U16(&(msg.data[5]), A_TO_ANALOG(POWER_MAIN_CURRENT_SHUTDOWN_LEVEL));
+	SET_U16(&(msg.data[7]), A_TO_ANALOG(POWER_ACT_CURRENT_SHUTDOWN_LEVEL));
+	SET_U16(&(msg.data[9]), POWER_BETWEEN_ACT_MAIN_CURRENT_SHUTDOWN_MS);
+
+	SET_U16(&(msg.data[11]), V_TO_ANALOG(POWER_ACCU_VOLTAGE_OK_LEVEL));
+
+	SET_U16(&(msg.data[13]), V_TO_ANALOG(POWER_CHARGE_VOLTAGE_READY_LEVEL));
+	SET_U16(&(msg.data[15]), V_TO_ANALOG(POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL));
 
 	UDPdriver::send(&msg);
 
 }
 
 
-double node_Power::GET_ACCU_VOLTAGE(void){
+double node_Power::GET_MAIN_VOLTAGE(void){
 
-	//grad = (y-y0) / (x-x0)
-	//y = (x-x0) * grad + y0
-	return ((double)PowerChargeVoltage - POWER_ANALOG_V_X0) * POWER_ANALOG_V_GRAD + POWER_ANALOG_V_Y0;
+	return ANALOG_TO_V(PowerMainVoltage);
 
 }
 
 
-bool node_Power::GET_ACCU_CHARGING(void){
+bool node_Power::GET_ACCU_VOLTAGE_OK(void){
 
-	//!!! szamolni !!!
-	return false;
-
-}
-
-
-bool node_Power::GET_PLUG_IN(void){
-
-	//!!! szamolni !!!
-	return false;
+	return PowerAccuVoltageOk;
 
 }
 
 
 bool node_Power::GET_STOP_BUTTON(void){
 
-	//!!! szamolni !!!
-	return false;
+	return PowerStopButton;
 
 }
