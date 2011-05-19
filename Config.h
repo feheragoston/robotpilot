@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string.h>
+#include "misc.h"
 
 class Config {
 public:

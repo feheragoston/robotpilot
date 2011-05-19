@@ -7,6 +7,8 @@
 
 #include "Control.h"
 
+using namespace std;
+
 Primitives* Control::mPrimitives = NULL;
 Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
@@ -102,6 +104,8 @@ void Control::Run() {
 				s = lua_pcall(L, 0, LUA_MULTRET, 0);
 			}
 			report_errors(L, s);
+
+			std::cout << "Finished running " << mConfig->LuaFile << std::endl;
 		}
 
 		fd_set rfd;
@@ -111,13 +115,13 @@ void Control::Run() {
 		struct timeval tv;
 		tv.tv_sec = 0;
 		tv.tv_usec = 0;
-		std::string luaBuffer = "";
+		string luaBuffer = "";
 
 		while (!exitControl) {
-			if (!mPrimitives->Wait(50000)) {
-				return;
-			}
-			log();
+			lua_getfield(L, LUA_GLOBALSINDEX, "ControlWait");
+			lua_pushinteger(L, 50000);
+			s = lua_pcall(L, 1, 0, 0);
+			report_errors(L, s);
 
 			bool noread = true;
 			while (true) {
@@ -129,9 +133,19 @@ void Control::Run() {
 					luaBuffer.append(buf);
 					noread = false;
 				} else {
-					if (noread) {
+					if (noread && !luaBuffer.empty()) {
+						// ha csak egy sortores van
+						if (luaBuffer.find('\n') == luaBuffer.rfind('\n')) {
+							// es nincs benne ;=
+							if (luaBuffer.find_first_of(";=") == string::npos) {
+								// akkor korbevesszuk Print()-el
+								sprintf(buf, "Print(%s);\n", luaBuffer.c_str());
+								luaBuffer.clear();
+								luaBuffer.append(buf);
+							}
+						}
 						s = luaL_loadstring(L, luaBuffer.c_str());
-						luaBuffer = "";
+						luaBuffer.clear();
 						if (s == 0) {
 							s = lua_pcall(L, 0, LUA_MULTRET, 0);
 						}
@@ -150,17 +164,32 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		msgstatus response;
 		response.function = MSG_REFRESHSTATUS;
 		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
+		mPrimitives->GetSpeed(&(response.v), &(response.w));
 		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
 		response.startButton = mPrimitives->GetStartButton();
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		mServer->Send(n, &response, sizeof(msgstatus));
 	} else {
-		printf("Unknown or invalid function: %d size: %d\n", *function, size);
+		std::cout << "Unknown or invalid function: " << *function << " size: " << size << std::endl;
 	}
 }
 
 void Control::log() {
+}
+
+bool Control::opponentTooClose() {
+	return mPrimitives->GetStartButton();
+
+	double x, y, phi, v, w, ox, oy;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	mPrimitives->GetSpeed(&v, &w);
+	mPrimitives->GetOpponentPos(&ox, &oy);
+
+	double distance = v * v / (2 * MAX_DEC);
+
+	Circle* opponent = new Circle(ox, oy, ROBOT_RADIUS * 2.5);
+	return opponent->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi));
 }
 
 void Control::report_errors(lua_State *L, int status) {
@@ -239,7 +268,11 @@ int Control::LuaWait(lua_State *L) {
 	/* statusz ellenorzesek */
 	if (mPrimitives->GetStopButton()) {
 		exitControl = true;
-		return luaL_error(L, "Stop button, exiting\n");
+		return luaL_error(L, "Stop button, exiting");
+	}
+	if (opponentTooClose()) {
+		std::cout << "Opponent too close!" << std::endl;
+		return luaL_error(L, "Opponent too close");
 	}
 	return 0;
 }

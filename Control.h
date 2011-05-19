@@ -24,6 +24,7 @@ extern "C" {
 #include "Primitives/PrimitivesNet.h"
 #include "Server.h"
 #include "Primitives/Net/Protocol/Protocol.h"
+#include "Obstacles/Circle.h"
 
 class Control {
 public:
@@ -54,6 +55,8 @@ protected:
 	static bool exitControl;
 
 	static void log();
+
+	static bool opponentTooClose();
 
 	void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
