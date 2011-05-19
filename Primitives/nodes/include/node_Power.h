@@ -31,12 +31,12 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
+
 
 	void POWER_ACT_ON();
 	void POWER_ACT_OFF();
 	void POWER_MAIN_OFF();
-
-	void INIT_PARAM(void);
 
 	progress_t act_on_off;
 

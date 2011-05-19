@@ -31,12 +31,12 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
+
 
 	void CONSOLE_STOP(void);
 	void CONSOLE_SET_POS(double pos, double speed, double acc);
 	void CONSOLE_CALIBRATE(void);
-
-	void INIT_PARAM(void);
 
 
 	progress_t stop;

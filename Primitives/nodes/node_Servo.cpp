@@ -14,10 +14,7 @@
 using namespace std;
 
 
-node_Servo::node_Servo(void){
-
-	id = SERVO_ID;
-	strcpy(name, "node_Servo");
+node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo"){
 
 
 	//----- valtozo init ELEJE -----
@@ -58,6 +55,7 @@ node_Servo::node_Servo(void){
 	Servo_Deg_Incr_grad[5]		= SERVO_5_DEG_INCR_GRAD;
 	//----- valtozo init VEGE -----
 
+
 }
 
 
@@ -78,6 +76,11 @@ void node_Servo::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_SERVO_SET_POS_REPLY:

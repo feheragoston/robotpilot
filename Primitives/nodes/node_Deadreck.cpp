@@ -14,10 +14,7 @@
 using namespace std;
 
 
-node_Deadreck::node_Deadreck(void){
-
-	id = DEADRECK_ID;
-	strcpy(name, "node_Deadreck");
+node_Deadreck::node_Deadreck(void) : node(DEADRECK_ID, "node_Deadreck"){
 
 
 	//----- valtozo init ELEJE -----
@@ -25,6 +22,7 @@ node_Deadreck::node_Deadreck(void){
 	DeadreckPosY = 0;
 	DeadreckPosPhi = 0;
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -43,6 +41,11 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_DEADRECK_RESET_POS_REPLY:

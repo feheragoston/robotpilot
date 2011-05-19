@@ -31,10 +31,10 @@ public:
 
 	void evalMsg(UDPmsg* msg);
 
+	void INIT_PARAM(void);
+
 
 	void DEADRECK_RESET_POS(void);
-
-	void INIT_PARAM(void);
 
 
 	void GET_POS(double* x, double* y, double* phi);

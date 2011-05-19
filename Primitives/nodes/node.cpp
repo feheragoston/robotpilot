@@ -15,6 +15,20 @@ using namespace std;
 
 
 
+node::node(u16 id, const char* name){
+
+	this->id = id;
+	strcpy(this->name, name);
+
+}
+
+
+
+node::~node(){
+
+}
+
+
 void node::CORE_RESET(void){
 
 	UDPmsg msg;
@@ -69,14 +83,12 @@ void node::KEEP_ALIVE(void){
 
 void node::SET_KEEP_ALIVE_MS(u16 keep_alive_ms){
 
-	u16*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_KEEP_ALIVE_MS;
 	msg.length		= 2;
-	tmp = (u16*)(&(msg.data[0]));		*tmp = keep_alive_ms;
+	SET_U16(&(msg.data[0]), keep_alive_ms);
 
 	UDPdriver::send(&msg);
 
@@ -85,14 +97,12 @@ void node::SET_KEEP_ALIVE_MS(u16 keep_alive_ms){
 
 void node::SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms){
 
-	u16*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_NODE_MS;
 	msg.length		= 2;
-	tmp = (u16*)(&(msg.data[0]));		*tmp = period_ms;
+	SET_U16(&(msg.data[0]), period_ms);
 
 	UDPdriver::send(&msg);
 
@@ -101,14 +111,12 @@ void node::SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms){
 
 void node::SET_SEND_PERIOD_TO_PC_MS(u16 period_ms){
 
-	u16*	tmp;
-
 	UDPmsg msg;
 
 	msg.node_id		= id;
 	msg.function	= CMD_SET_SEND_PERIOD_TO_PC_MS;
 	msg.length		= 2;
-	tmp = (u16*)(&(msg.data[0]));		*tmp = period_ms;
+	SET_U16(&(msg.data[0]), period_ms);
 
 	UDPdriver::send(&msg);
 
@@ -128,6 +136,16 @@ void node::PING(void){
 }
 
 
+void node::INIT_PARAM(void){
+
+}
+
+
+void node::evalMsg(UDPmsg* msg){
+
+}
+
+
 void node::PINGprocess(void){
 
 	sem_init(&pingSemaphore, 0, 0);
@@ -141,6 +159,28 @@ void node::PINGprocess(void){
 	if(sem_timedwait(&pingSemaphore, &ts) == 0)
 		cout << "-> ping OK!\t" << name << "(" << id << ")" << endl;
 	else
-		cerr << "-> ping ERROR!\t" << name << "(" << id << ")" << endl;
+		cerr << "-> ping TIMED OUT!\t" << name << "(" << id << ")" << endl;
+
+}
+
+
+void node::INITPARAMprocess(void){
+
+	sem_init(&initparamSemaphore, 0, 0);
+
+	INIT_PARAM();
+
+	timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	ts.tv_sec += INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC;
+
+	if(sem_timedwait(&initparamSemaphore, &ts) == 0){
+		if(initparamOK)
+			cout << "-> initparam OK!\t" << name << "(" << id << ")" << endl;
+		else
+			cout << "-> initparam ERROR!\t" << name << "(" << id << ")" << endl;
+	}
+	else
+		cerr << "-> initparam TIMED OUT!\t" << name << "(" << id << ")" << endl;
 
 }

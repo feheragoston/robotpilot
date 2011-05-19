@@ -14,14 +14,12 @@
 using namespace std;
 
 
-node_BDC::node_BDC(void){
-
-	id = BDC_ID;
-	strcpy(name, "node_BDC");
+node_BDC::node_BDC(void) : node(BDC_ID, "node_BDC"){
 
 
 	//----- valtozo init ELEJE -----
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -40,6 +38,11 @@ void node_BDC::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_BDC_STOP_REPLY:

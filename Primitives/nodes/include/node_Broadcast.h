@@ -29,6 +29,8 @@ public:
 	node_Broadcast(void);
 	~node_Broadcast();
 
+	void INIT_PARAM(void);
+
 	void PINGprocess(void);	//node_Broadcast-nak nincs PINGprocess-e, felulirjuk
 
 

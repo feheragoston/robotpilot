@@ -32,6 +32,9 @@ class node{
 
 public:
 
+	node(u16 id, const char* name);
+	~node();
+
 	void CORE_RESET(void);
 	void START_ACTUATOR(void);
 	void STOP_ACTUATOR(void);
@@ -39,8 +42,11 @@ public:
 	void SET_KEEP_ALIVE_MS(u16 keep_alive_ms);
 	void SET_SEND_PERIOD_TO_NODE_MS(u16 period_ms);
 	void SET_SEND_PERIOD_TO_PC_MS(u16 period_ms);
-	
+
+	virtual void evalMsg(UDPmsg* msg);
+
 	void PINGprocess(void);
+	void INITPARAMprocess(void);
 	
 	
 protected:
@@ -51,6 +57,10 @@ protected:
 
 	void PING(void);
 	sem_t						pingSemaphore;
+
+	virtual void INIT_PARAM(void);
+	sem_t						initparamSemaphore;
+	bool						initparamOK;
 
 
 };

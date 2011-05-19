@@ -14,16 +14,14 @@
 using namespace std;
 
 
-node_Sonar::node_Sonar(void){
-
-	id = SONAR_ID;
-	strcpy(name, "node_Sonar");
+node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar"){
 
 
 	//----- valtozo init ELEJE -----
 	SonarPosX = 0;
 	SonarPosY = 0;
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -42,6 +40,11 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_PERIODIC_TO_PC:

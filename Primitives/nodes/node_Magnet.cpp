@@ -14,14 +14,12 @@
 using namespace std;
 
 
-node_Magnet::node_Magnet(void){
-
-	id = MAGNET_ID;
-	strcpy(name, "node_Magnet");
+node_Magnet::node_Magnet(void) : node(MAGNET_ID, "node_Magnet"){
 
 
 	//----- valtozo init ELEJE -----
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -43,6 +41,11 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_MAGNET_SET_POLARITY_REPLY:

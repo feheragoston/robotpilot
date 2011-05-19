@@ -16,10 +16,7 @@
 using namespace std;
 
 
-node_Input::node_Input(void){
-
-	id = INPUT_ID;
-	strcpy(name, "node_Input");
+node_Input::node_Input(void) : node(INPUT_ID, "node_Input"){
 
 
 	//----- valtozo init ELEJE -----
@@ -57,6 +54,7 @@ node_Input::node_Input(void){
 	digital_pullup[6] = ((INPUT_PULLUP_DIGITAL_9 != 0) ? true : false);
 	//----- valtozo init VEGE -----
 
+
 }
 
 
@@ -74,6 +72,11 @@ void node_Input::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_PERIODIC_TO_PC:

@@ -14,10 +14,12 @@
 using namespace std;
 
 
-node_Gateway::node_Gateway(void){
+node_Gateway::node_Gateway(void) : node(GATEWAY_ID, "node_Gateway"){
 
-	id = GATEWAY_ID;
-	strcpy(name, "node_Gateway");
+
+	//----- valtozo init ELEJE -----
+	//----- valtozo init VEGE -----
+
 
 }
 
@@ -36,6 +38,11 @@ void node_Gateway::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			default:

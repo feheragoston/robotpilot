@@ -14,10 +14,7 @@
 using namespace std;
 
 
-node_Power::node_Power(void){
-
-	id = POWER_ID;
-	strcpy(name, "node_Power");
+node_Power::node_Power(void) : node(POWER_ID, "node_Power"){
 
 
 	//----- valtozo init ELEJE -----
@@ -25,6 +22,7 @@ node_Power::node_Power(void){
 	PowerAccuVoltageOk = true;
 	PowerStopButton = true;
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -43,6 +41,11 @@ void node_Power::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_PERIODIC_TO_PC:

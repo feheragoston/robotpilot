@@ -14,15 +14,13 @@
 using namespace std;
 
 
-node_Console::node_Console(void){
-
-	id = CONSOLE_ID;
-	strcpy(name, "node_Console");
+node_Console::node_Console(void) : node(CONSOLE_ID, "node_Console"){
 
 
 	//----- valtozo init ELEJE -----
 	ConsolePos = 0;
 	//----- valtozo init VEGE -----
+
 
 }
 
@@ -41,6 +39,11 @@ void node_Console::evalMsg(UDPmsg* msg){
 
 			case MSG_PING_REPLY:
 				sem_post(&pingSemaphore);
+				break;
+
+			case MSG_INIT_PARAM_REPLY:
+				initparamOK	= GET_BOOL(&(msg->data[0]), 0);
+				sem_post(&initparamSemaphore);
 				break;
 
 			case MSG_PERIODIC_TO_PC:
