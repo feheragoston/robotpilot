@@ -24,6 +24,13 @@
 #define MSG_MAGNET 13
 #define MSG_PAWNS 14
 
+#define FIG_NOTHING 0
+#define FIG_PAWN 1
+#define FIG_KING 2
+#define FIG_PPAWN 3
+#define FIG_PKING 4
+#define FIG_PPKING 5
+
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;
 

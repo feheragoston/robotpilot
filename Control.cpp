@@ -179,12 +179,14 @@ void Control::log() {
 }
 
 bool Control::opponentTooClose() {
-	return mPrimitives->GetStartButton();
-
 	double x, y, phi, v, w, ox, oy;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
 	mPrimitives->GetOpponentPos(&ox, &oy);
+
+	if (fabs(v) < 0.1) {
+		return false;
+	}
 
 	double distance = v * v / (2 * MAX_DEC);
 
