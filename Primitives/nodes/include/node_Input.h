@@ -42,7 +42,6 @@ private:
 	u16 analog[INPUT_ANALOG_COUNT];
 	bool digital[INPUT_DIGITAL_COUNT];
 
-	bool analog_has_long_sharp[INPUT_ANALOG_COUNT];
 	bool digital_active_level[INPUT_DIGITAL_COUNT];
 	bool digital_pullup[INPUT_DIGITAL_PIN_COUNT];
 

@@ -255,8 +255,8 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				ret = ACT_ERROR;
 
 		//ha nincs utkozes
@@ -307,8 +307,8 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				ret =  ACT_ERROR;
 
 		//ha nincs utkozes
@@ -362,8 +362,8 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) ||
-			input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				ret = ACT_ERROR;
 
 		//ha nincs utkozes
@@ -1005,7 +1005,7 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
-	bool ret = input->GET_DIGITAL(INPUT_BUTTON_START_INDEX);
+	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_START_BUTTON_INDEX);
 
 	ExitCritical();
 
@@ -1031,14 +1031,7 @@ bool PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	//active	active_is_red		color
-	//
-	//0			0					red
-	//0			1					blue
-	//1			0					blue
-	//1			1					red
-	bool is_red = input->GET_DIGITAL(INPUT_BUTTON_COLOR_INDEX) ^ INPUT_BUTTON_COLOR_IS_ACTIVE_RED;
-	bool ret = (is_red ? COLOR_RED : COLOR_BLUE);
+	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_RED : COLOR_BLUE);
 
 	ExitCritical();
 
@@ -1177,9 +1170,9 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 		//varunk az utkozesre
 		case 2:
 			//ha bal utkozes
-			if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX))
+			if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 3;
-			else if(input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+			else if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 4;
 			ret = ACT_INPROGRESS;
 
@@ -1218,7 +1211,7 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 		//mindket utkozeskapcsolora varunk
 		case 7:
 			//ha mindket utkozeskapcsolo jelez
-			if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
+			if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) && input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 8;
 			ret = ACT_INPROGRESS;
 

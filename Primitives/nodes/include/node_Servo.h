@@ -43,11 +43,14 @@ public:
 private:
 
 	double Servo_Deg_Incr_x0[SERVO_COUNT];
-	double Servo_Deg_Incr_y0[SERVO_COUNT];
+	u16 Servo_Deg_Incr_y0[SERVO_COUNT];
 	double Servo_Deg_Incr_x1[SERVO_COUNT];
-	double Servo_Deg_Incr_y1[SERVO_COUNT];
+	u16 Servo_Deg_Incr_y1[SERVO_COUNT];
 	double Servo_Deg_Incr_grad[SERVO_COUNT];
+	u16 Servo_Limit_Low_Pos_Incr[SERVO_COUNT];
+	u16 Servo_Limit_High_Pos_Incr[SERVO_COUNT];
 
+	double SERVO_GET_GRAD(u8 num);
 	u16 SERVO_DEG_TO_INCR(u8 num, double deg);
 
 };

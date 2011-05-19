@@ -10,7 +10,7 @@
 
 
 #include "include/node_Input.h"
-#include "include/sharp_table.h"
+#include "../define/sharp_table.h"
 
 
 using namespace std;
@@ -26,32 +26,24 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	for(u8 i=0 ; i<INPUT_DIGITAL_COUNT ; i++)
 		digital[i] = false;
 
-	analog_has_long_sharp[0] = ((INPUT_LONG_SHARP_ON_ANALOG_0 != 0) ? true : false);
-	analog_has_long_sharp[1] = ((INPUT_LONG_SHARP_ON_ANALOG_1 != 0) ? true : false);
-	analog_has_long_sharp[2] = ((INPUT_LONG_SHARP_ON_ANALOG_2 != 0) ? true : false);
-	analog_has_long_sharp[3] = ((INPUT_LONG_SHARP_ON_ANALOG_3 != 0) ? true : false);
-	analog_has_long_sharp[4] = ((INPUT_LONG_SHARP_ON_ANALOG_4 != 0) ? true : false);
-	analog_has_long_sharp[5] = ((INPUT_LONG_SHARP_ON_ANALOG_5 != 0) ? true : false);
-	analog_has_long_sharp[6] = ((INPUT_LONG_SHARP_ON_ANALOG_6 != 0) ? true : false);
+	digital_active_level[INPUT_DIGITAL_START_BUTTON_INDEX]				= ((INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
+	digital_active_level[INPUT_DIGITAL_COLOR_BUTTON_INDEX]				= ((INPUT_DIGITAL_COLOR_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
+	digital_active_level[INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)		? true : false);
+	digital_active_level[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_0_INDEX]					= ((INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL != 0)						? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_1_INDEX]					= ((INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL != 0)						? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_2_INDEX]					= ((INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL != 0)						? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_3_INDEX]					= ((INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL != 0)						? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_4_INDEX]					= ((INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL != 0)						? true : false);
+	digital_active_level[INPUT_DIGITAL_PLUS_5_INDEX]					= ((INPUT_DIGITAL_PLUS_5_ACTIVE_LEVEL != 0)						? true : false);
 
-	digital_active_level[0] = ((INPUT_ACTIVE_LEVEL_DIGITAL_0 != 0) ? true : false);
-	digital_active_level[1] = ((INPUT_ACTIVE_LEVEL_DIGITAL_1 != 0) ? true : false);
-	digital_active_level[2] = ((INPUT_ACTIVE_LEVEL_DIGITAL_2 != 0) ? true : false);
-	digital_active_level[3] = ((INPUT_ACTIVE_LEVEL_DIGITAL_3 != 0) ? true : false);
-	digital_active_level[4] = ((INPUT_ACTIVE_LEVEL_DIGITAL_4 != 0) ? true : false);
-	digital_active_level[5] = ((INPUT_ACTIVE_LEVEL_DIGITAL_5 != 0) ? true : false);
-	digital_active_level[6] = ((INPUT_ACTIVE_LEVEL_DIGITAL_6 != 0) ? true : false);
-	digital_active_level[7] = ((INPUT_ACTIVE_LEVEL_DIGITAL_7 != 0) ? true : false);
-	digital_active_level[8] = ((INPUT_ACTIVE_LEVEL_DIGITAL_8 != 0) ? true : false);
-	digital_active_level[9] = ((INPUT_ACTIVE_LEVEL_DIGITAL_9 != 0) ? true : false);
-
-	digital_pullup[0] = ((INPUT_PULLUP_DIGITAL_01 != 0) ? true : false);
-	digital_pullup[1] = ((INPUT_PULLUP_DIGITAL_23 != 0) ? true : false);
-	digital_pullup[2] = ((INPUT_PULLUP_DIGITAL_45 != 0) ? true : false);
-	digital_pullup[3] = ((INPUT_PULLUP_DIGITAL_6 != 0) ? true : false);
-	digital_pullup[4] = ((INPUT_PULLUP_DIGITAL_7 != 0) ? true : false);
-	digital_pullup[5] = ((INPUT_PULLUP_DIGITAL_8 != 0) ? true : false);
-	digital_pullup[6] = ((INPUT_PULLUP_DIGITAL_9 != 0) ? true : false);
+	digital_pullup[0]	= ((INPUT_PULLUP_DIGITAL_01 != 0)	? true : false);
+	digital_pullup[1]	= ((INPUT_PULLUP_DIGITAL_23 != 0)	? true : false);
+	digital_pullup[2]	= ((INPUT_PULLUP_DIGITAL_45 != 0)	? true : false);
+	digital_pullup[3]	= ((INPUT_PULLUP_DIGITAL_6 != 0)	? true : false);
+	digital_pullup[4]	= ((INPUT_PULLUP_DIGITAL_7 != 0)	? true : false);
+	digital_pullup[5]	= ((INPUT_PULLUP_DIGITAL_8 != 0)	? true : false);
+	digital_pullup[6]	= ((INPUT_PULLUP_DIGITAL_9 != 0)	? true : false);
 	//----- valtozo init VEGE -----
 
 
@@ -159,13 +151,8 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 
 double node_Input::GET_DISTANCE(u8 num){
 
-	//long
-	if(analog_has_long_sharp[num])
-		return (GET_SHARP_MM(analog[num], LONG_SHARP_MM_V, LONG_SHARP_TABLE_SIZE));
-
 	//short
-	else
-		return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
+	return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
 
 }
 
