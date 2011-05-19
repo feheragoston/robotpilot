@@ -44,6 +44,7 @@ public:
 protected:
 	Config* mConfig;
 	static Primitives* mPrimitives;
+	static PrimitivesNet* mCamera;
 	static Server* mServer;
 
 	lua_State *L;
@@ -98,6 +99,8 @@ protected:
 	static int LuaGetConsolePos(lua_State *L);
 	static int LuaSetArmPos(lua_State *L);
 	static int LuaMagnet(lua_State *L);
+
+	static int LuaRefreshPawnPositions(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

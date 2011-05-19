@@ -10,6 +10,7 @@
 using namespace std;
 
 Primitives* Control::mPrimitives = NULL;
+PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
@@ -55,6 +56,9 @@ Control::Control(Config* config) {
 	lua_register(L, "ConsoleStop", LuaConsoleStop);
 	lua_register(L, "GetConsolePos", LuaGetConsolePos);
 	lua_register(L, "SetArmPos", LuaSetArmPos);
+	lua_register(L, "Magnet", LuaMagnet);
+
+	lua_register(L, "RefreshPawnPositions", LuaRefreshPawnPositions);
 
 	matchStarted = false;
 	exitControl = false;
@@ -63,6 +67,12 @@ Control::Control(Config* config) {
 Control::~Control() {
 	if (mPrimitives) {
 		delete mPrimitives;
+	}
+	if (mCamera) {
+		delete mCamera;
+	}
+	if (mServer) {
+		delete mServer;
 	}
 	lua_close(L);
 }
@@ -81,6 +91,15 @@ bool Control::Init() {
 	}
 
 	if (mPrimitives->Init()) {
+		mCamera = new PrimitivesNet(mConfig);
+		if (mCamera->CameraInit()) {
+			cout << "Connected to camera" << endl;
+		} else {
+			cout << "Error connecting to camera" << endl;
+			delete mCamera;
+			mCamera = NULL;
+		}
+
 		mServer = new Server();
 		mServer->setMessageCallback(serverMessageCallback);
 		mServer->Listen(13001);
@@ -226,26 +245,27 @@ int Control::protect(lua_State *L) {
 }
 
 int Control::finalize(lua_State *L) {
-    if (!lua_toboolean(L, 1)) {
-        lua_pushvalue(L, lua_upvalueindex(1));
-        lua_pcall(L, 0, 0, 0);
-        lua_settop(L, 2);
-        lua_error(L);
-        return 0;
-    } else return lua_gettop(L);
+	if (!lua_toboolean(L, 1)) {
+		lua_pushvalue(L, lua_upvalueindex(1));
+		lua_pcall(L, 0, 0, 0);
+		lua_settop(L, 2);
+		lua_error(L);
+		return 0;
+	} else
+		return lua_gettop(L);
 }
 
 int Control::do_nothing(lua_State *L) {
-    (void) L;
-    return 0;
+	(void) L;
+	return 0;
 }
 
 int Control::newtry(lua_State *L) {
-    lua_settop(L, 1);
-    if (lua_isnil(L, 1))
-        lua_pushcfunction(L, do_nothing);
-    lua_pushcclosure(L, finalize, 1);
-    return 1;
+	lua_settop(L, 1);
+	if (lua_isnil(L, 1))
+		lua_pushcfunction(L, do_nothing);
+	lua_pushcclosure(L, finalize, 1);
+	return 1;
 }
 
 int Control::LuaExit(lua_State *L) {
@@ -261,6 +281,13 @@ int Control::LuaWait(lua_State *L) {
 	if (!mPrimitives->Wait(useconds)) {
 		exitControl = true;
 		return luaL_error(L, "Primitives->Wait failed, exiting\n");
+	}
+	if (mCamera) {
+		if (!mCamera->Wait(0)) {
+			cout << "Camera disconnected" << endl;
+			delete mCamera;
+			mCamera = NULL;
+		}
 	}
 
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */
@@ -339,6 +366,8 @@ int Control::LuaRunParallel(lua_State *L) {
 				 }
 				 }
 				 */
+			} else {
+				//lua_close(N);
 			}
 			threads.pop_front();
 		}
@@ -552,4 +581,21 @@ int Control::LuaSetArmPos(lua_State *L) {
 	int i = mPrimitives->SetArmPos(left, pos, speed, acc);
 	lua_pushinteger(L, i);
 	return 1;
+}
+
+int Control::LuaMagnet(lua_State *L) {
+	bool left = lua_toboolean(L, 1);
+	int polarity = luaL_optinteger(L, 2, 0);
+	int i = mPrimitives->Magnet(left, polarity);
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int Control::LuaRefreshPawnPositions(lua_State *L) {
+	if (mCamera) {
+		int i = mCamera->RefreshPawnPositions();
+		lua_pushinteger(L, i);
+		return 1;
+	}
+	return 0;
 }

@@ -33,6 +33,7 @@ public:
 	virtual ~PrimitivesNet();
 
 	bool Init();
+	bool CameraInit();
 
 	bool Wait(long int useconds);
 
@@ -53,6 +54,8 @@ public:
 	double GetConsolePos();
 	int SetArmPos(bool left, double pos, double max_speed, double max_acc);
 	int Magnet(bool left, int polarity);
+
+	int RefreshPawnPositions();
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa

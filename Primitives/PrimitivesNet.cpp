@@ -22,10 +22,19 @@ bool PrimitivesNet::Init() {
 			return false;
 		}
 	}
-	gettimeofday(&lastWait, NULL);
 	char buffer[256];
 	strcpy(buffer, "robot");
 	netConnection->Send(buffer, strlen(buffer));
+	return true;
+}
+
+bool PrimitivesNet::CameraInit() {
+	if (strlen(mConfig->NetIp) == 0 || !netConnection->ConnectToHost(13000, mConfig->NetIp)) {
+		if (!netConnection->ConnectToHost(13000, "127.0.0.1")) {
+			std::cerr << "Hiba a halozati kapcsolodaskor" << std::endl;
+			return false;
+		}
+	}
 	return true;
 }
 
@@ -106,6 +115,11 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 			leftArmMove.finished = true;
 		} else if (rightArmMove.inprogress) {
 			rightArmMove.finished = true;
+		}
+	} else if (*function == MSG_PAWNS && size == sizeof(msgpawns)) {
+		msgpawns* data = (msgpawns*) buffer;
+		for (int i = 0; i < data->num; i++) {
+			std::cout << i << ": " << (int)(data->pawns[i].type) << ", " << data->pawns[i].x << " " << data->pawns[i].y << std::endl;
 		}
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
@@ -319,5 +333,13 @@ int PrimitivesNet::Magnet(bool left, int polarity) {
 	message.left = left;
 	message.polarity = polarity;
 	netConnection->Send(&message, sizeof(msgmagnet));
+	return 1;
+}
+
+int PrimitivesNet::RefreshPawnPositions() {
+	msgb1 message;
+	message.function = MSG_PAWNS;
+	message.b1 = true;
+	netConnection->Send(&message, sizeof(msgb1));
 	return 1;
 }
