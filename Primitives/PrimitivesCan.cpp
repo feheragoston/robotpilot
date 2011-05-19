@@ -241,8 +241,14 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 	//ha most vegzett
 	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.error)	ret = ACT_ERROR;
+		else				ret = ACT_FINISHED;
+
 		bdc->move.finished = false;
-		ret = ACT_FINISHED;
+		bdc->move.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -287,8 +293,14 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 	//ha most vegzett
 	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.error)	ret = ACT_ERROR;
+		else				ret = ACT_FINISHED;
+
 		bdc->move.finished = false;
-		ret =  ACT_FINISHED;
+		bdc->move.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -336,8 +348,14 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 	//ha most vegzett
 	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.error)	ret = ACT_ERROR;
+		else				ret = ACT_FINISHED;
+
 		bdc->move.finished = false;
-		ret = ACT_FINISHED;
+		bdc->move.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -384,8 +402,14 @@ int PrimitivesCan::SetSpeed(double v, double w){
 
 	//ha most vegzett
 	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.error)	ret = ACT_ERROR;
+		else				ret = ACT_FINISHED;
+
 		bdc->move.finished = false;
-		ret = ACT_FINISHED;
+		bdc->move.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -431,8 +455,14 @@ int PrimitivesCan::MotionStop(double dec = 0){
 
 	//ha most vegzett
 	else if(bdc->stop.finished){
+
+		//hiba volt-e
+		if(bdc->stop.error)	ret = ACT_ERROR;
+		else				ret = ACT_FINISHED;
+
 		bdc->stop.finished = false;
-		ret = ACT_FINISHED;
+		bdc->stop.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -536,22 +566,22 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//GoToWall() Y
 			case 1:
 				//ha rajta vagyunk
-				if(GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS) == ACT_FINISHED){
+				if((ret = GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
 					cout << "GoToWall() Y READY" << endl;
 					GetRobotPos(&posX, &posY, &posPhi);
 					SetRobotPos(onYWallPosX, posY, 0);
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//eljovunk az Y faltol, beallitjuk a sebesseget
 			case 2:
 				//ha beallitotta a sebesseget
-				if(SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0) == ACT_FINISHED){
+				if((ret = SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//eljovunk az Y faltol
@@ -567,40 +597,40 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//megallunk
 			case 4:
 				//ha megalltunk
-				if(MotionStop(0) == ACT_FINISHED){
+				if((ret = MotionStop(0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//fordulunk +/- pi/2 fokot
 			case 5:
 				//ha elfordultunk
-				if(Turn(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS) == ACT_FINISHED){
+				if((ret = Turn(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS)) == ACT_FINISHED){
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//GoToWall() X
 			case 6:
 				//ha rajta vagyunk
-				if(GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS) == ACT_FINISHED){
+				if((ret = GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
 					cout << "GoToWall() X READY" << endl;
 					GetRobotPos(&posX, &posY, &posPhi);
 					SetRobotPos(posX, onXWallPosY, startPhi);
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//eljovunk az X faltol, beallitjuk a sebesseget
 			case 7:
 				//ha beallitotta a sebesseget
-				if(SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0) == ACT_FINISHED){
+				if((ret = SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
+					ret = ACT_INPROGRESS;
 				}
-				ret = ACT_INPROGRESS;
 				break;
 
 			//eljovunk az Y faltol
@@ -616,14 +646,11 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//megallunk
 			case 9:
 				//ha megalltunk
-				if(MotionStop(0) == ACT_FINISHED){
+				if((ret = MotionStop(0)) == ACT_FINISHED){
 					deadreckCalibPhase = 0;
 					cout << "CalibrateDeadreckoning READY" << endl;
 					ret = ACT_FINISHED;
 				}
-				//ha meg nem alltunk meg
-				else
-					ret = ACT_INPROGRESS;
 				break;
 
 			//nem lehet, hiba
@@ -634,6 +661,11 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 		}
 
 	}
+
+
+	//ha hiba, alapallapotba
+	if(ret == ACT_ERROR)
+		deadreckCalibPhase = 0;
 
 
 	ExitCritical();
@@ -653,8 +685,14 @@ int PrimitivesCan::MotorSupply(bool powered){
 
 	//ha most vegzett
 	if(power->act_on_off.finished){
+
+		//hiba volt-e
+		if(power->act_on_off.error)	ret = ACT_ERROR;
+		else						ret = ACT_FINISHED;
+
 		power->act_on_off.finished = false;
-		ret = ACT_FINISHED;
+		power->act_on_off.error = false;
+
 	}
 
 	//ha most nem vegzet, es folyamatban
@@ -669,6 +707,7 @@ int PrimitivesCan::MotorSupply(bool powered){
 		else		power->POWER_ACT_OFF();
 
 		ret = ACT_INPROGRESS;
+
 	}
 
 
@@ -689,9 +728,20 @@ int PrimitivesCan::SetGripperPos(double pos){
 
 	//ha most vegzett mindegyik szervo
 	if(servo->move[SERVO_GRIPPER_LEFT_INDEX].finished && servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished){
+
+		//hiba volt-e
+		if(	servo->move[SERVO_GRIPPER_LEFT_INDEX].error ||
+			servo->move[SERVO_GRIPPER_RIGHT_INDEX].error)
+			ret = ACT_ERROR;
+		else
+			ret = ACT_FINISHED;
+
 		servo->move[SERVO_GRIPPER_LEFT_INDEX].finished = false;
 		servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished = false;
-		ret = ACT_FINISHED;
+
+		servo->move[SERVO_GRIPPER_LEFT_INDEX].error = false;
+		servo->move[SERVO_GRIPPER_RIGHT_INDEX].error = false;
+
 	}
 
 	//ha most nem vegzett mindegyik, valamelyik folyamatban
@@ -731,8 +781,14 @@ int PrimitivesCan::SetConsolePos(double pos, double speed, double acc){
 
 	//ha most vegzett
 	else if(console->move.finished){
+
+		//hiba volt-e
+		if(console->move.error)	ret = ACT_ERROR;
+		else					ret = ACT_FINISHED;
+
 		console->move.finished = false;
-		ret = ACT_FINISHED;
+		console->move.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -768,8 +824,14 @@ int PrimitivesCan::CalibrateConsole(void){
 
 	//ha most vegzett
 	else if(console->calibrate.finished){
+
+		//hiba volt-e
+		if(console->calibrate.error)	ret = ACT_ERROR;
+		else							ret = ACT_FINISHED;
+
 		console->calibrate.finished = false;
-		ret = ACT_FINISHED;
+		console->calibrate.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -805,8 +867,14 @@ int PrimitivesCan::ConsoleStop(void){
 
 	//ha most vegzett
 	else if(console->stop.finished){
+
+		//hiba volt-e
+		if(console->stop.error)	ret = ACT_ERROR;
+		else					ret = ACT_FINISHED;
+
 		console->stop.finished = false;
-		ret = ACT_FINISHED;
+		console->stop.error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -852,19 +920,19 @@ int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
 
 
 	int ret;
-	u8 num;
-
-
-	if(left)
-		num = SERVO_LEFT_ARM_INDEX;
-	else
-		num = SERVO_RIGHT_ARM_INDEX;
+	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
 
 
 	//ha most vegzett
 	if(servo->move[num].finished){
+
+		//hiba volt-e
+		if(servo->move[num].error)	ret = ACT_ERROR;
+		else						ret = ACT_FINISHED;
+
 		servo->move[num].finished = false;
-		ret = ACT_FINISHED;
+		servo->move[num].error = false;
+
 	}
 
 	//ha most nem vegzett, es folyamatban
@@ -896,13 +964,7 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 
 
 	int ret;
-	u8 num;
-
-
-	if(left)
-		num = MAGNET_LEFT_INDEX;
-	else
-		num = MAGNET_RIGHT_INDEX;
+	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
 
 
 	//ha most vegzett
@@ -913,7 +975,14 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 
 	//ha most nem vegzett, es folyamatban
 	else if(magnet->set_polarity[num].inProgress){
-		ret = ACT_INPROGRESS;
+
+		//hiba volt-e
+		if(magnet->set_polarity[num].error)	ret = ACT_ERROR;
+		else								ret = ACT_FINISHED;
+
+		magnet->set_polarity[num].finished = false;
+		magnet->set_polarity[num].error = false;
+
 	}
 
 	//ha most nem vegzett, es nincs is folyamatban
@@ -1088,19 +1157,22 @@ void PrimitivesCan::KEEP_ALIVE_SLEEP(void){
 
 int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 
+	int ret;
+
 	switch(goToWallPhase){
 
 		//start
 		case 0:
 			goToWallPhase++;
-			return ACT_INPROGRESS;
+			ret = ACT_INPROGRESS;
 
 		//beallitjuk a sebesseget, amivel megyunk
 		case 1:
 			//ha beallitotta a sebesseget
-			if(SetSpeed(speedSigned, 0) == ACT_FINISHED)
+			if((ret = SetSpeed(speedSigned, 0)) == ACT_FINISHED){
 				goToWallPhase++;
-			return ACT_INPROGRESS;
+				ret = ACT_INPROGRESS;
+			}
 
 		//varunk az utkozesre
 		case 2:
@@ -1109,56 +1181,67 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 				goToWallPhase = 3;
 			else if(input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				goToWallPhase = 4;
-			return ACT_INPROGRESS;
+			ret = ACT_INPROGRESS;
 
 		//bal utkozes volt, megallunk
 		case 3:
 			//ha megalltunk
-			if(MotionStop(0) == ACT_FINISHED)
+			if((ret = MotionStop(0)) == ACT_FINISHED){
 				goToWallPhase = 5;
-			return ACT_INPROGRESS;
+				ret = ACT_INPROGRESS;
+			}
 
 		//jobb utkozes volt, megallunk
 		case 4:
 			//ha megalltunk
-			if(MotionStop(0) == ACT_FINISHED)
+			if((ret = MotionStop(0)) == ACT_FINISHED){
 				goToWallPhase = 6;
-			return ACT_INPROGRESS;
+				ret = ACT_INPROGRESS;
+			}
 
 		//bal utkozes volt, megalltunk, rafordulunk a falra
 		case 5:
 			//ha beallitotta a sebesseget
-			if(SetSpeed(speedSigned / 2, omegaAbs) == ACT_FINISHED)
+			if((ret = SetSpeed(speedSigned / 2, omegaAbs)) == ACT_FINISHED){
 				goToWallPhase = 7;
-			return ACT_INPROGRESS;
+				ret = ACT_INPROGRESS;
+			}
 
 		//jobb utkozes volt, megalltunk, rafordulunk a falra
 		case 6:
 			//ha beallitotta a sebesseget
-			if(SetSpeed(speedSigned / 2, -omegaAbs) == ACT_FINISHED)
+			if((ret = SetSpeed(speedSigned / 2, -omegaAbs)) == ACT_FINISHED){
 				goToWallPhase = 7;
-			return ACT_INPROGRESS;
+				ret = ACT_INPROGRESS;
+			}
 
 		//mindket utkozeskapcsolora varunk
 		case 7:
 			//ha mindket utkozeskapcsolo jelez
 			if(input->GET_DIGITAL(INPUT_BUTTON_REAR_LEFT_INDEX) && input->GET_DIGITAL(INPUT_BUTTON_REAR_RIGHT_INDEX))
 				goToWallPhase = 8;
-			return ACT_INPROGRESS;
+			ret = ACT_INPROGRESS;
 
 		//rajta vagyunk a falon, megallunk
 		case 8:
 			//ha megalltunk, ACT_FINISHED
-			if(MotionStop(0) == ACT_FINISHED){
+			if((ret = MotionStop(0)) == ACT_FINISHED){
 				goToWallPhase = 0;
-				return ACT_FINISHED;
+				ret = ACT_FINISHED;
 			}
-			return ACT_INPROGRESS;
 
 		//nem lehet, hiba
 		default:
-			return ACT_ERROR;
+			ret = ACT_ERROR;
 
 	}
+
+
+	//ha hiba
+	if(ret == ACT_ERROR)
+		goToWallPhase = 0;
+
+
+	return ret;
 
 }
