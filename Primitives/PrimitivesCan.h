@@ -85,7 +85,8 @@ public:
 private:
 
 
-	bool init_node(node* node);
+	void addNodesToCan(void);
+	bool initNode(node* node);
 
 
 	//----- recieve ELEJE -----

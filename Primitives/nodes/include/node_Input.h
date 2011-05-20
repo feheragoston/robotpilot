@@ -43,7 +43,6 @@ private:
 	bool digital[INPUT_DIGITAL_COUNT];
 
 	bool digital_active_level[INPUT_DIGITAL_COUNT];
-	bool digital_pullup[INPUT_DIGITAL_PIN_COUNT];
 
 	double GET_SHARP_MM(u16 analog_value, double table[][2], u8 size);
 

@@ -36,14 +36,6 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_active_level[INPUT_DIGITAL_PLUS_3_INDEX]					= ((INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_4_INDEX]					= ((INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_5_INDEX]					= ((INPUT_DIGITAL_PLUS_5_ACTIVE_LEVEL != 0)						? true : false);
-
-	digital_pullup[0]	= ((INPUT_PULLUP_DIGITAL_01 != 0)	? true : false);
-	digital_pullup[1]	= ((INPUT_PULLUP_DIGITAL_23 != 0)	? true : false);
-	digital_pullup[2]	= ((INPUT_PULLUP_DIGITAL_45 != 0)	? true : false);
-	digital_pullup[3]	= ((INPUT_PULLUP_DIGITAL_6 != 0)	? true : false);
-	digital_pullup[4]	= ((INPUT_PULLUP_DIGITAL_7 != 0)	? true : false);
-	digital_pullup[5]	= ((INPUT_PULLUP_DIGITAL_8 != 0)	? true : false);
-	digital_pullup[6]	= ((INPUT_PULLUP_DIGITAL_9 != 0)	? true : false);
 	//----- valtozo init VEGE -----
 
 
@@ -98,9 +90,7 @@ void node_Input::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 1;
-	for(u8 i=0 ; i<INPUT_DIGITAL_PIN_COUNT ; i++)
-		SET_BOOL(&(msg.data[0]), i, digital_pullup[i]);
+	msg.length		= 0;
 
 	UDPdriver::send(&msg);
 

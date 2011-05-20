@@ -163,7 +163,7 @@ bool node::PINGprocess(void){
 
 	//ha jott valasz
 	if(sem_timedwait(&pingSemaphore, &ts) == 0){
-		cout << "-> ping OK!\t" << name << "(" << id << ")" << endl;
+		cout << "-> ping OK!\t\t" << name << "(" << id << ")" << endl;
 		return true;
 	}
 

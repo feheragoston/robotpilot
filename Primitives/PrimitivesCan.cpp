@@ -96,7 +96,38 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 }
 
 
-bool PrimitivesCan::init_node(node* node){
+void PrimitivesCan::addNodesToCan(void){
+
+
+	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
+
+	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
+
+	if(!BDC_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(BDC_ID);
+
+	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
+
+	if(!MAGNET_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(MAGNET_ID);
+
+	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
+
+	if(!SONAR_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);
+
+	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
+
+
+}
+
+
+bool PrimitivesCan::initNode(node* node){
 
 	//ha nem sikeres a PING
 	if(!node->PINGprocess())
@@ -142,15 +173,16 @@ bool PrimitivesCan::Init(void){
 
 
 	//---------- node ELEJE ----------
-	if(!init_node(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(bdc)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(input)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(magnet)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(servo)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(sonar)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!init_node(power)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	addNodesToCan();
+	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(bdc)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(input)	&& INIT_RETURN_FALSE_IF_ERROR)			return false;
+	if(!initNode(magnet)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(servo)	&& INIT_RETURN_FALSE_IF_ERROR)			return false;
+	if(!initNode(sonar)	&& INIT_RETURN_FALSE_IF_ERROR)			return false;
+	if(!initNode(power)	&& INIT_RETURN_FALSE_IF_ERROR)			return false;
 
 	if(USE_BROADCAST_KEEP_ALIVE_MS)				broadcast->SET_KEEP_ALIVE_MS();
 	if(USE_BROADCAST_SEND_PERIOD_TO_PC_MS)		broadcast->SET_SEND_PERIOD_TO_PC_MS();
@@ -1031,7 +1063,7 @@ bool PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_RED : COLOR_BLUE);
+	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
 
 	ExitCritical();
 
