@@ -20,7 +20,7 @@ node_Power::node_Power(void) : node(POWER_ID, "node_Power", POWER_KEEP_ALIVE_MS,
 	//----- valtozo init ELEJE -----
 	PowerMainVoltage = 0;
 	PowerAccuVoltageOk = true;
-	PowerStopButton = true;
+	PowerStopButton = false;
 	//----- valtozo init VEGE -----
 
 
