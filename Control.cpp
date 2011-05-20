@@ -14,6 +14,7 @@ PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
+msgpawns* Control::pawns = NULL;
 
 Control::Control(Config* config) {
 	mConfig = config;
@@ -62,6 +63,8 @@ Control::Control(Config* config) {
 
 	matchStarted = false;
 	exitControl = false;
+
+	pawns = new msgpawns();
 }
 
 Control::~Control() {
@@ -593,7 +596,12 @@ int Control::LuaMagnet(lua_State *L) {
 
 int Control::LuaRefreshPawnPositions(lua_State *L) {
 	if (mCamera) {
-		int i = mCamera->RefreshPawnPositions();
+		int i = mCamera->RefreshPawnPositions(pawns);
+		if (i == 1) {
+			for (int i = 0; i < pawns->num; i++) {
+				std::cout << i << ": " << (int)(pawns->pawns[i].type) << ", " << pawns->pawns[i].x << " " << pawns->pawns[i].y << std::endl;
+			}
+		}
 		lua_pushinteger(L, i);
 		return 1;
 	}

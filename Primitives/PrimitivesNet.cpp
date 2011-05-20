@@ -118,8 +118,14 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		}
 	} else if (*function == MSG_PAWNS && size == sizeof(msgpawns)) {
 		msgpawns* data = (msgpawns*) buffer;
+		pawns->num = data->num;
 		for (int i = 0; i < data->num; i++) {
-			std::cout << i << ": " << (int)(data->pawns[i].type) << ", " << data->pawns[i].x << " " << data->pawns[i].y << std::endl;
+			pawns->pawns[i].type = data->pawns[i].type;
+			pawns->pawns[i].x = data->pawns[i].x;
+			pawns->pawns[i].y = data->pawns[i].y;
+		}
+		if (pawnRefresh.inprogress) {
+			pawnRefresh.finished = true;
 		}
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
@@ -336,10 +342,20 @@ int PrimitivesNet::Magnet(bool left, int polarity) {
 	return 1;
 }
 
-int PrimitivesNet::RefreshPawnPositions() {
-	msgb1 message;
-	message.function = MSG_PAWNS;
-	message.b1 = true;
-	netConnection->Send(&message, sizeof(msgb1));
-	return 1;
+int PrimitivesNet::RefreshPawnPositions(msgpawns* pawns) {
+	this->pawns = pawns;
+	if (pawnRefresh.inprogress) {
+		if (pawnRefresh.finished) {
+			pawnRefresh.inprogress = false;
+			pawnRefresh.finished = false;
+			return 1;
+		}
+	} else {
+		msgb1 message;
+		message.function = MSG_PAWNS;
+		message.b1 = true;
+		netConnection->Send(&message, sizeof(msgb1));
+		pawnRefresh.inprogress = true;
+	}
+	return 0;
 }

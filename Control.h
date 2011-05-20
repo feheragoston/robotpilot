@@ -47,6 +47,8 @@ protected:
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
 
+	static msgpawns* pawns;
+
 	lua_State *L;
 
 	struct timeval runStart; // Run indulasanak ideje
