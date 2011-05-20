@@ -78,8 +78,8 @@ void node_BDC::BDC_STOP(double acc){
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_STOP;
-	msg.length		= 4;
-	SET_FLOAT(&(msg.data[0]), acc);
+	msg.length		= 2;
+	SET_U16(&(msg.data[0]), BDC_CONV_ACC(acc));
 
 	UDPdriver::send(&msg);
 
@@ -113,10 +113,10 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_GO;
-	msg.length		= 12;
-	SET_FLOAT(&(msg.data[0]), distance);
-	SET_FLOAT(&(msg.data[4]), max_speed);
-	SET_FLOAT(&(msg.data[8]), max_acc);
+	msg.length		= 8;
+	SET_S32(&(msg.data[0]), BDC_CONV_DIST(distance));
+	SET_U16(&(msg.data[4]), BDC_CONV_SPEED(max_speed));
+	SET_U16(&(msg.data[6]), BDC_CONV_ACC(max_acc));
 
 	UDPdriver::send(&msg);
 
@@ -133,11 +133,11 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_GOTO;
-	msg.length		= 16;
+	msg.length		= 12;
 	SET_FLOAT(&(msg.data[0]), x);
 	SET_FLOAT(&(msg.data[4]), y);
-	SET_FLOAT(&(msg.data[8]), max_speed);
-	SET_FLOAT(&(msg.data[12]), max_acc);
+	SET_U16(&(msg.data[8]), BDC_CONV_SPEED(max_speed));
+	SET_U16(&(msg.data[10]), BDC_CONV_ACC(max_acc));
 
 	UDPdriver::send(&msg);
 
@@ -154,10 +154,10 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_TURN;
-	msg.length		= 12;
+	msg.length		= 8;
 	SET_FLOAT(&(msg.data[0]), angle);
-	SET_FLOAT(&(msg.data[4]), max_speed);
-	SET_FLOAT(&(msg.data[8]), max_acc);
+	SET_U16(&(msg.data[4]), BDC_CONV_SPEED(max_speed));
+	SET_U16(&(msg.data[6]), BDC_CONV_ACC(max_acc));
 
 	UDPdriver::send(&msg);
 
@@ -174,9 +174,16 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_SET_SPEED;
-	msg.length		= 8;
-	SET_FLOAT(&(msg.data[0]), v);
-	SET_FLOAT(&(msg.data[4]), w);
+	msg.length		= 4;
+
+	double r = v / w;			//w = v / r
+	double t = 2 * r * M_PI / v;	//v = 2*r*Pi / t
+	double dr = WHEEL_DISTANCE_MM / 2;
+	s16 vLeft	= 2 * (r - dr) * M_PI / t;
+	s16 vRight	= 2 * (r + dr) * M_PI / t;
+
+	SET_S16(&(msg.data[0]), (BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : vRight);
+	SET_S16(&(msg.data[2]), (BDC_IS_LEFT_MOTOR1 != 0) ? vRight : vLeft);
 
 	UDPdriver::send(&msg);
 
@@ -193,7 +200,9 @@ void node_BDC::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 0;
+	msg.length		= 5;
+	SET_BOOL(&(msg.data[0]), 0, BDC_IS_LEFT_MOTOR1);
+	SET_U32(&(msg.data[1]), BDC_ROBOT_FULL_TURN_INCR);
 
 	UDPdriver::send(&msg);
 

@@ -319,12 +319,80 @@
 
 
 
-#define DEADRECK_WHEEL_DISTANCE						500
+
+
+
+
+
+#define BDC_GEARBOX									66
+#define BDC_INCR_PER_MOTORROT						3000
+#define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
+
+
+/*
+//1
+#define BDC_WHEEL_DIAMETER_MM						51
+#define BDC_WHEEL_DISTRICT_MM						(M_PI * BDC_WHEEL_DIAMETER_MM)
+#define BDC_INCR_PER_MM								((double)BDC_INCR_PER_WHEELROT / BDC_WHEEL_DISTRICT_MM)
+*/
+
+//2
+#define BDC_DELTA_MM								1	//!!! mérni !!!
+#define BDC_DELTA_INCR								1200	//!!! mérni !!!
+#define BDC_INCR_PER_MM								((double)BDC_DELTA_INCR / BDC_DELTA_MM)
+#define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
+#define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
+
+//2+
+#define BDC_DELTA_DEG								3600	//!!! mérni !!!
+#define BDC_DELTA_INCR								1200	//!!! mérni !!!
+#define BDC_INCR_PER_FULL_TURN						((double)BDC_DELTA_INCR / ((double)BDC_DELTA_DEG / 360))
+
+
+#define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
+
+#define BDC_MM_TO_INCR(mm)							((double)(mm) * BDC_INCR_PER_MM)
+#define BDC_MM_TO_MOTORROT(mm)						((double)(mm) * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
+#define BDC_SEC_TO_MIN(sec)							((double)(sec) / 60)
+
+#define BDC_CONV_MM_TO_INCR(mm)						BDC_MM_TO_INCR(mm)
+#define BDC_CONV_MMS_TO_RPM(mms)					BDC_SEC_TO_MIN(BDC_MM_TO_MOTORROT(mms))
+#define BDC_CONV_MMS2_TO_MOTORROTS2(mms2)			BDC_MM_TO_MOTORROT(mms2)
+
+#define BDC_CONV_ACC(acc)							((u16)BDC_CONV_MMS2_TO_MOTORROTS2(acc))
+#define BDC_CONV_SPEED(speed)						((u16)BDC_CONV_MMS_TO_RPM(speed))
+#define BDC_CONV_DIST(dist)							((s32)BDC_CONV_MM_TO_INCR(dist))
+
+
+
+
+
+
+
+#define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
+#define WHEEL_DISTANCE_MM							((double)BDC_MM_PER_FULL_TURN / M_PI)
+
+
+
+#define BDC_IS_LEFT_MOTOR1							0
+#define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
+
+
+
+
+
+#define DEADRECK_WHEEL_DISTANCE						WHEEL_DISTANCE_MM
 #define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		0.1
 #define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		0.1
 #define DEADRECK_LEFT_IS_ROTATE_DIR_A				1
 #define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1
 #define DEADRECK_IS_LEFT_EQEP1						1
+
+
+
+
+
+
 
 
 
