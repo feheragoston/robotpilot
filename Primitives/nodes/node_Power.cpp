@@ -21,6 +21,8 @@ node_Power::node_Power(void) : node(POWER_ID, "node_Power", POWER_KEEP_ALIVE_MS,
 	PowerMainVoltage = 0;
 	PowerAccuVoltageOk = true;
 	PowerStopButton = false;
+	PowerActOn = false;
+	PowerActOn_prev = false;
 	//----- valtozo init VEGE -----
 
 
@@ -51,12 +53,13 @@ void node_Power::evalMsg(UDPmsg* msg){
 			case MSG_PERIODIC_TO_PC:
 				PowerMainVoltage = GET_U16(&(msg->data[0]));
 				PowerAccuVoltageOk = GET_BOOL(&(msg->data[2]), 0);
-				PowerStopButton = GET_BOOL(&(msg->data[2]), 0);
+				PowerStopButton = GET_BOOL(&(msg->data[2]), 1);
+				PowerActOn = GET_BOOL(&(msg->data[2]), 2);
 				break;
 
 			case MSG_POWER_ACT_ON_REPLY:
 			case MSG_POWER_ACT_OFF_REPLY:
-				act_on_off.error = GET_BOOL(&(msg->data[0]), 0);
+				act_on_off.done = GET_BOOL(&(msg->data[0]), 0);
 				act_on_off.inProgress = false;
 				act_on_off.finished = true;
 				break;
@@ -84,7 +87,6 @@ void node_Power::POWER_ACT_ON(void){
 
 	act_on_off.inProgress = true;
 	act_on_off.finished = false;
-	act_on_off.error = false;
 
 }
 
@@ -101,7 +103,6 @@ void node_Power::POWER_ACT_OFF(void){
 
 	act_on_off.inProgress = true;
 	act_on_off.finished = false;
-	act_on_off.error = false;
 
 }
 
@@ -162,5 +163,28 @@ bool node_Power::GET_ACCU_VOLTAGE_OK(void){
 bool node_Power::GET_STOP_BUTTON(void){
 
 	return PowerStopButton;
+
+}
+
+
+//visszaadja, hogy valtozott-e
+bool node_Power::GET_ACT_ON(bool* ActOn){
+
+	(*ActOn) = PowerActOn;
+
+	bool ret;
+
+	//ha vatozott
+	if(PowerActOn_prev != PowerActOn)
+		ret = true;
+
+	//ha nem vatozott
+	else
+		ret = false;
+
+
+	PowerActOn_prev = PowerActOn;
+
+	return ret;
 
 }

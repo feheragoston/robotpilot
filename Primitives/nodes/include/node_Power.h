@@ -44,6 +44,7 @@ public:
 	double GET_MAIN_VOLTAGE(void);
 	bool GET_ACCU_VOLTAGE_OK(void);
 	bool GET_STOP_BUTTON(void);
+	bool GET_ACT_ON(bool* ActOn);
 
 
 private:
@@ -51,6 +52,9 @@ private:
 	u16 PowerMainVoltage;
 	bool PowerAccuVoltageOk;
 	bool PowerStopButton;
+	bool PowerActOn;
+
+	bool PowerActOn_prev;
 
 
 };

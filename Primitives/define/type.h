@@ -7,10 +7,10 @@
 
 //------------------------------ tipus ELEJE ------------------------------
 typedef struct progress_t{
-	progress_t() : inProgress(false), finished(false), error(false) {}
+	progress_t() : inProgress(false), finished(false){}
 	bool inProgress;
 	bool finished;
-	bool error;
+	bool done;
 }progress_t;
 //------------------------------ tipus VEGE ------------------------------
 

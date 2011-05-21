@@ -124,6 +124,8 @@ private:
 	unsigned int goToWallPhase;
 	//----- deadreckCalib VEGE -----
 
+	void detectActChange(void);
+
 
 };
 //------------------------------ PrimitivesCan VEGE ------------------------------

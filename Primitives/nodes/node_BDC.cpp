@@ -47,7 +47,7 @@ void node_BDC::evalMsg(UDPmsg* msg){
 
 			case MSG_BDC_STOP_REPLY:
 			case MSG_BDC_HARD_STOP_REPLY:
-				stop.error = GET_BOOL(&(msg->data[0]), 0);
+				stop.done = GET_BOOL(&(msg->data[0]), 0);
 				stop.inProgress = false;
 				stop.finished = true;
 				break;
@@ -56,7 +56,7 @@ void node_BDC::evalMsg(UDPmsg* msg){
 			case MSG_BDC_GOTO_REPLY:
 			case MSG_BDC_TURN_REPLY:
 			case MSG_BDC_SET_SPEED_REPLY:
-				move.error = GET_BOOL(&(msg->data[0]), 0);
+				move.done = GET_BOOL(&(msg->data[0]), 0);
 				move.inProgress = false;
 				move.finished = true;
 				break;
@@ -85,7 +85,6 @@ void node_BDC::BDC_STOP(double acc){
 
 	stop.inProgress = true;
 	stop.finished = false;
-	stop.error = false;
 
 }
 
@@ -102,7 +101,6 @@ void node_BDC::BDC_HARD_STOP(void){
 
 	stop.inProgress = true;
 	stop.finished = false;
-	stop.error = false;
 
 }
 
@@ -122,7 +120,6 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
 	move.inProgress = true;
 	move.finished = false;
-	move.error = false;
 
 }
 
@@ -143,7 +140,6 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
 	move.inProgress = true;
 	move.finished = false;
-	move.error = false;
 
 }
 
@@ -163,7 +159,6 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 
 	move.inProgress = true;
 	move.finished = false;
-	move.error = false;
 
 }
 
@@ -189,7 +184,6 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 
 	move.inProgress = true;
 	move.finished = false;
-	move.error = false;
 
 }
 

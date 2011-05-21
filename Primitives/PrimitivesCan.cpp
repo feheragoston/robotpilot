@@ -201,6 +201,13 @@ bool PrimitivesCan::Init(void){
 	//---------- szemafor nullazasa VEGE ----------
 
 
+
+	//ha aktuator tap alapbol bekapcsolva
+	if(SEND_START_ACTUATOR_IN_INIT)
+		broadcast->START_ACTUATOR();
+
+
+
 	//minden OK
 	return true;
 
@@ -275,11 +282,10 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	else if(bdc->move.finished){
 
 		//hiba volt-e
-		if(bdc->move.error)	ret = ACT_ERROR;
-		else				ret = ACT_FINISHED;
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
 
 		bdc->move.finished = false;
-		bdc->move.error = false;
 
 	}
 
@@ -327,11 +333,10 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	else if(bdc->move.finished){
 
 		//hiba volt-e
-		if(bdc->move.error)	ret = ACT_ERROR;
-		else				ret = ACT_FINISHED;
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
 
 		bdc->move.finished = false;
-		bdc->move.error = false;
 
 	}
 
@@ -382,11 +387,10 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 	else if(bdc->move.finished){
 
 		//hiba volt-e
-		if(bdc->move.error)	ret = ACT_ERROR;
-		else				ret = ACT_FINISHED;
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
 
 		bdc->move.finished = false;
-		bdc->move.error = false;
 
 	}
 
@@ -436,11 +440,10 @@ int PrimitivesCan::SetSpeed(double v, double w){
 	else if(bdc->move.finished){
 
 		//hiba volt-e
-		if(bdc->move.error)	ret = ACT_ERROR;
-		else				ret = ACT_FINISHED;
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
 
 		bdc->move.finished = false;
-		bdc->move.error = false;
 
 	}
 
@@ -489,11 +492,10 @@ int PrimitivesCan::MotionStop(double dec = 0){
 	else if(bdc->stop.finished){
 
 		//hiba volt-e
-		if(bdc->stop.error)	ret = ACT_ERROR;
-		else				ret = ACT_FINISHED;
+		if(bdc->stop.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
 
 		bdc->stop.finished = false;
-		bdc->stop.error = false;
 
 	}
 
@@ -719,11 +721,10 @@ int PrimitivesCan::MotorSupply(bool powered){
 	if(power->act_on_off.finished){
 
 		//hiba volt-e
-		if(power->act_on_off.error)	ret = ACT_ERROR;
-		else						ret = ACT_FINISHED;
+		if(power->act_on_off.done)	ret = ACT_FINISHED;
+		else						ret = ACT_ERROR;
 
 		power->act_on_off.finished = false;
-		power->act_on_off.error = false;
 
 	}
 
@@ -762,17 +763,14 @@ int PrimitivesCan::SetGripperPos(double pos){
 	if(servo->move[SERVO_GRIPPER_LEFT_INDEX].finished && servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished){
 
 		//hiba volt-e
-		if(	servo->move[SERVO_GRIPPER_LEFT_INDEX].error ||
-			servo->move[SERVO_GRIPPER_RIGHT_INDEX].error)
-			ret = ACT_ERROR;
-		else
+		if(	servo->move[SERVO_GRIPPER_LEFT_INDEX].done &&
+			servo->move[SERVO_GRIPPER_RIGHT_INDEX].done)
 			ret = ACT_FINISHED;
+		else
+			ret = ACT_ERROR;
 
 		servo->move[SERVO_GRIPPER_LEFT_INDEX].finished = false;
 		servo->move[SERVO_GRIPPER_RIGHT_INDEX].finished = false;
-
-		servo->move[SERVO_GRIPPER_LEFT_INDEX].error = false;
-		servo->move[SERVO_GRIPPER_RIGHT_INDEX].error = false;
 
 	}
 
@@ -815,11 +813,10 @@ int PrimitivesCan::SetConsolePos(double pos, double speed, double acc){
 	else if(console->move.finished){
 
 		//hiba volt-e
-		if(console->move.error)	ret = ACT_ERROR;
-		else					ret = ACT_FINISHED;
+		if(console->move.done)	ret = ACT_FINISHED;
+		else					ret = ACT_ERROR;
 
 		console->move.finished = false;
-		console->move.error = false;
 
 	}
 
@@ -858,11 +855,10 @@ int PrimitivesCan::CalibrateConsole(void){
 	else if(console->calibrate.finished){
 
 		//hiba volt-e
-		if(console->calibrate.error)	ret = ACT_ERROR;
-		else							ret = ACT_FINISHED;
+		if(console->calibrate.done)	ret = ACT_FINISHED;
+		else						ret = ACT_ERROR;
 
 		console->calibrate.finished = false;
-		console->calibrate.error = false;
 
 	}
 
@@ -901,11 +897,10 @@ int PrimitivesCan::ConsoleStop(void){
 	else if(console->stop.finished){
 
 		//hiba volt-e
-		if(console->stop.error)	ret = ACT_ERROR;
-		else					ret = ACT_FINISHED;
+		if(console->stop.done)	ret = ACT_FINISHED;
+		else					ret = ACT_ERROR;
 
 		console->stop.finished = false;
-		console->stop.error = false;
 
 	}
 
@@ -959,11 +954,10 @@ int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
 	if(servo->move[num].finished){
 
 		//hiba volt-e
-		if(servo->move[num].error)	ret = ACT_ERROR;
-		else						ret = ACT_FINISHED;
+		if(servo->move[num].done)	ret = ACT_FINISHED;
+		else							ret = ACT_ERROR;
 
 		servo->move[num].finished = false;
-		servo->move[num].error = false;
 
 	}
 
@@ -1009,11 +1003,10 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 	else if(magnet->set_polarity[num].inProgress){
 
 		//hiba volt-e
-		if(magnet->set_polarity[num].error)	ret = ACT_ERROR;
-		else								ret = ACT_FINISHED;
+		if(magnet->set_polarity[num].done)	ret = ACT_FINISHED;
+		else								ret = ACT_ERROR;
 
 		magnet->set_polarity[num].finished = false;
-		magnet->set_polarity[num].error = false;
 
 	}
 
@@ -1139,6 +1132,26 @@ void PrimitivesCan::GetDistances(double distance[6]){
 }
 
 
+void PrimitivesCan::detectActChange(void){
+
+	bool ActOn;
+
+	//ha valtozott az aktuatortap allapota
+	if(power->GET_ACT_ON(&ActOn)){
+
+		//ha felkapcsolodott
+		if(ActOn)
+			broadcast->START_ACTUATOR();
+
+		//ha lekapcsolodott
+		else
+			broadcast->STOP_ACTUATOR();
+
+	}
+
+}
+
+
 void PrimitivesCan::evalMsg(UDPmsg* msg){
 
 	//cout << msg->node_id << "\t" << msg->function << "\t" << msg->length << "\t" << msg->data << endl;
@@ -1155,6 +1168,10 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
 	power->evalMsg(msg);
+
+	//figyeljuk az aktuatortap valtozasat
+	detectActChange();
+
 
 }
 

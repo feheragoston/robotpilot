@@ -163,13 +163,13 @@ bool node::PINGprocess(void){
 
 	//ha jott valasz
 	if(sem_timedwait(&pingSemaphore, &ts) == 0){
-		cout << "-> ping OK!\t\t" << name << "(" << id << ")" << endl;
+		cout << "-> OK!\t\tping\t\t" << name << "(" << id << ")" << endl;
 		return true;
 	}
 
 	//ha nem jott valasz
 	else{
-		cerr << "-> ping TIMED OUT!\t" << name << "(" << id << ")" << endl;
+		cerr << "-> TIMED OUT!\tping\t\t" << name << "(" << id << ")" << endl;
 		return false;
 	}
 
@@ -191,13 +191,13 @@ bool node::INITPARAMprocess(void){
 
 		//ha rendben vannak a parameterek
 		if(initparamOK){
-			cout << "-> initparam OK!\t" << name << "(" << id << ")" << endl;
+			cout << "-> OK!\t\tinitparam\t" << name << "(" << id << ")" << endl;
 			return true;
 		}
 
 		//ha nincsenek rendben a parameterek
 		else{
-			cout << "-> initparam ERROR!\t" << name << "(" << id << ")" << endl;
+			cout << "-> ERROR!\tinitparam\t" << name << "(" << id << ")" << endl;
 			return false;
 		}
 
@@ -205,7 +205,7 @@ bool node::INITPARAMprocess(void){
 
 	//ha nem jott valasz
 	else{
-		cerr << "-> initparam TIMED OUT!\t" << name << "(" << id << ")" << endl;
+		cerr << "-> TIMED OUT!\tinitparam\t" << name << "(" << id << ")" << endl;
 		return false;
 	}
 

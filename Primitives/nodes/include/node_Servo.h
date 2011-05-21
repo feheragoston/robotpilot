@@ -51,7 +51,10 @@ private:
 	u16 Servo_Limit_High_Pos_Incr[SERVO_COUNT];
 
 	double SERVO_GET_GRAD(u8 num);
-	u16 SERVO_DEG_TO_INCR(u8 num, double deg);
+	double SERVO_DEG_TO_INCR(u8 num, double deg);
+	u16 SERVO_CONV_POS(u8 num, double pos);
+	u16 SERVO_CONV_SPEED(u8 num, double speed);
+	u16 SERVO_CONV_ACC(u8 num, double acc);
 
 };
 //------------------------------ node_Servo VEGE ------------------------------

@@ -49,10 +49,10 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_DEADRECK_RESET_POS_REPLY:
-				reset_pos.error = GET_BOOL(&(msg->data[0]), 0);
+				reset_pos.done = GET_BOOL(&(msg->data[0]), 0);
 				reset_pos.inProgress = false;
 				reset_pos.finished = true;
-				if(!reset_pos.error){
+				if(reset_pos.done){
 					DeadreckPosX	= 0;
 					DeadreckPosY	= 0;
 					DeadreckPosPhi	= 0;
@@ -91,7 +91,6 @@ void node_Deadreck::DEADRECK_RESET_POS(void){
 
 	reset_pos.inProgress = true;
 	reset_pos.finished = false;
-	reset_pos.error = false;
 
 }
 

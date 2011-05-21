@@ -98,7 +98,7 @@ void node_Servo::evalMsg(UDPmsg* msg){
 
 			case MSG_SERVO_SET_POS_REPLY:
 				num = GET_U8(&(msg->data[0]));
-				move[num].error = GET_BOOL(&(msg->data[1]), 0);
+				move[num].done = GET_BOOL(&(msg->data[1]), 0);
 				move[num].inProgress = false;
 				move[num].finished = true;
 				break;
@@ -120,18 +120,17 @@ void node_Servo::SERVO_SET_POS(u8 num, double pos, double speed, double acc){
 
 	msg.node_id		= id;
 	msg.function	= CMD_SERVO_SET_POS;
-	msg.length		= 13;
+	msg.length		= 7;
 
 	SET_U8(&(msg.data[0]), num);
-	SET_U16(&(msg.data[1]), SERVO_DEG_TO_INCR(num, pos));
-	SET_U16(&(msg.data[5]), SERVO_DEG_TO_INCR(num, speed));
-	SET_U16(&(msg.data[9]), SERVO_DEG_TO_INCR(num, acc));
+	SET_U16(&(msg.data[1]), SERVO_CONV_POS(num, pos));
+	SET_U16(&(msg.data[3]), SERVO_CONV_SPEED(num, speed));
+	SET_U16(&(msg.data[5]), SERVO_CONV_ACC(num, acc));
 
 	UDPdriver::send(&msg);
 
 	move[num].inProgress = true;
 	move[num].finished = false;
-	move[num].error = false;
 
 }
 
@@ -175,8 +174,31 @@ double node_Servo::SERVO_GET_GRAD(u8 num){
 }
 
 
-u16 node_Servo::SERVO_DEG_TO_INCR(u8 num, double deg){
+double node_Servo::SERVO_DEG_TO_INCR(u8 num, double deg){
 
-	return (u16)((deg - Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num]);
+	//grad = (y - y0) / (x - x0)
+	//y = (x - x0) * grad + y0
+	return (deg - Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num];
+
+}
+
+
+u16 node_Servo::SERVO_CONV_POS(u8 num, double pos){
+
+	return (u16)SERVO_DEG_TO_INCR(num, pos);
+
+}
+
+
+u16 node_Servo::SERVO_CONV_SPEED(u8 num, double speed){
+
+	return (u16)ABS(SERVO_DEG_TO_INCR(num, speed));
+
+}
+
+
+u16 node_Servo::SERVO_CONV_ACC(u8 num, double acc){
+
+	return (u16)ABS(SERVO_DEG_TO_INCR(num, acc));
 
 }

@@ -6,6 +6,15 @@
 
 
 
+
+#define SEND_START_ACTUATOR_IN_INIT				1
+
+
+#define ABS(a)			(((a) > 0) ? (a) : (-(a)))
+
+
+
+
 #define PING_REPLY_MAX_WAIT_TIME_SEC			1
 #define INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC		1
 
@@ -86,8 +95,8 @@
 
 
 
-#define SERVO_GRIPPER_MAX_SPEED						100	//deg/s
-#define SERVO_GRIPPER_MAX_ACC						10	//deg/s^2
+#define SERVO_GRIPPER_MAX_SPEED						1000	//deg/s
+#define SERVO_GRIPPER_MAX_ACC						1000	//deg/s^2
 
 
 #define KEEP_ALIVE_PERIOD_MS				200
@@ -242,8 +251,8 @@
 
 
 
-#define SERVO_GRIPPER_LEFT_INDEX						0
-#define SERVO_GRIPPER_RIGHT_INDEX						1
+#define SERVO_GRIPPER_LEFT_INDEX						1
+#define SERVO_GRIPPER_RIGHT_INDEX						0
 #define SERVO_LEFT_ARM_INDEX							2
 #define SERVO_RIGHT_ARM_INDEX							3
 #define SERVO_PLUS_0_INDEX								4
@@ -251,17 +260,17 @@
 
 
 
-#define SERVO_GRIPPER_LEFT_DEG_INCR_X0					0
-#define SERVO_GRIPPER_LEFT_DEG_INCR_Y0					1000
-#define SERVO_GRIPPER_LEFT_DEG_INCR_X1					180
-#define SERVO_GRIPPER_LEFT_DEG_INCR_Y1					2000
+#define SERVO_GRIPPER_LEFT_DEG_INCR_X0					0	//mérni
+#define SERVO_GRIPPER_LEFT_DEG_INCR_Y0					800	//mérni
+#define SERVO_GRIPPER_LEFT_DEG_INCR_X1					90	//mérni
+#define SERVO_GRIPPER_LEFT_DEG_INCR_Y1					1600	//mérni
 #define SERVO_GRIPPER_LEFT_LIMIT_LOW_POS_INCR			700
 #define SERVO_GRIPPER_LEFT_LIMIT_HIGH_POS_INCR			2200
 
-#define SERVO_GRIPPER_RIGHT_DEG_INCR_X0					0
-#define SERVO_GRIPPER_RIGHT_DEG_INCR_Y0					1000
-#define SERVO_GRIPPER_RIGHT_DEG_INCR_X1					180
-#define SERVO_GRIPPER_RIGHT_DEG_INCR_Y1					2000
+#define SERVO_GRIPPER_RIGHT_DEG_INCR_X0					0	//mérni
+#define SERVO_GRIPPER_RIGHT_DEG_INCR_Y0					2050	//mérni
+#define SERVO_GRIPPER_RIGHT_DEG_INCR_X1					90	//mérni
+#define SERVO_GRIPPER_RIGHT_DEG_INCR_Y1					1150	//mérni
 #define SERVO_GRIPPER_RIGHT_LIMIT_LOW_POS_INCR			700
 #define SERVO_GRIPPER_RIGHT_LIMIT_HIGH_POS_INCR			2200
 
@@ -329,24 +338,11 @@
 #define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
 
 
-/*
-//1
-#define BDC_WHEEL_DIAMETER_MM						51
-#define BDC_WHEEL_DISTRICT_MM						(M_PI * BDC_WHEEL_DIAMETER_MM)
-#define BDC_INCR_PER_MM								((double)BDC_INCR_PER_WHEELROT / BDC_WHEEL_DISTRICT_MM)
-*/
-
-//2
-#define BDC_DELTA_MM								1	//!!! mérni !!!
-#define BDC_DELTA_INCR								1200	//!!! mérni !!!
-#define BDC_INCR_PER_MM								((double)BDC_DELTA_INCR / BDC_DELTA_MM)
+#define BDC_INCR_PER_MM								((double)494317 / 40)
 #define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
 #define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
 
-//2+
-#define BDC_DELTA_DEG								3600	//!!! mérni !!!
-#define BDC_DELTA_INCR								1200	//!!! mérni !!!
-#define BDC_INCR_PER_FULL_TURN						((double)BDC_DELTA_INCR / ((double)BDC_DELTA_DEG / 360))
+#define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10)
 
 
 #define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
