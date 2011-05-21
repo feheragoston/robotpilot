@@ -338,7 +338,7 @@
 #define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
 
 
-#define BDC_INCR_PER_MM								((double)494317 / 40)
+#define BDC_INCR_PER_MM								((double)494317 / 400)
 #define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
 #define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
 
