@@ -453,8 +453,8 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 		startX		= DEADRECK_START_DISTANCE_X;
 		startY		= DEADRECK_START_DISTANCE_Y;
 		startPhi	= M_PI/2;
-		onYWallPosX	= ROBOT_DISTANCE_ON_REAR_WALL;
-		onXWallPosY	= ROBOT_DISTANCE_ON_REAR_WALL;
+		onYWallPosX	= ROBOT_DISTANCE_ON_FRONT_WALL;
+		onXWallPosY	= ROBOT_DISTANCE_ON_FRONT_WALL;
 
 	}
 
@@ -463,8 +463,8 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 		startX		= DEADRECK_START_DISTANCE_X;
 		startY		= AREA_LENGTH_Y - DEADRECK_START_DISTANCE_Y;
 		startPhi	= -M_PI/2;
-		onYWallPosX	= ROBOT_DISTANCE_ON_REAR_WALL;
-		onXWallPosY	= AREA_LENGTH_Y - ROBOT_DISTANCE_ON_REAR_WALL;
+		onYWallPosX	= ROBOT_DISTANCE_ON_FRONT_WALL;
+		onXWallPosY	= AREA_LENGTH_Y - ROBOT_DISTANCE_ON_FRONT_WALL;
 
 	}
 
@@ -588,6 +588,9 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 		}
 
 	}
+
+
+	cout << "dp\t" << deadreckCalibPhase << endl;
 
 
 	//ha hiba, alapallapotba
@@ -1081,14 +1084,16 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 		case 0:
 			goToWallPhase++;
 			ret = ACT_INPROGRESS;
+			break;
 
 		//beallitjuk a sebesseget, amivel megyunk
 		case 1:
 			//ha beallitotta a sebesseget
-			if((ret = SetSpeed(speedSigned, 0)) == ACT_FINISHED){
+			if((ret = SetSpeed_Unsafe(speedSigned, 0)) == ACT_FINISHED){
 				goToWallPhase++;
 				ret = ACT_INPROGRESS;
 			}
+			break;
 
 		//varunk az utkozesre
 		case 2:
@@ -1098,38 +1103,43 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 4;
 			ret = ACT_INPROGRESS;
+			break;
 
 		//bal utkozes volt, megallunk
 		case 3:
 			//ha megalltunk
-			if((ret = MotionStop(0)) == ACT_FINISHED){
+			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
 				goToWallPhase = 5;
 				ret = ACT_INPROGRESS;
 			}
+			break;
 
 		//jobb utkozes volt, megallunk
 		case 4:
 			//ha megalltunk
-			if((ret = MotionStop(0)) == ACT_FINISHED){
+			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
 				goToWallPhase = 6;
 				ret = ACT_INPROGRESS;
 			}
+			break;
 
 		//bal utkozes volt, megalltunk, rafordulunk a falra
 		case 5:
 			//ha beallitotta a sebesseget
-			if((ret = SetSpeed(speedSigned / 2, omegaAbs)) == ACT_FINISHED){
+			if((ret = SetSpeed_Unsafe(speedSigned / 2, omegaAbs)) == ACT_FINISHED){
 				goToWallPhase = 7;
 				ret = ACT_INPROGRESS;
 			}
+			break;
 
 		//jobb utkozes volt, megalltunk, rafordulunk a falra
 		case 6:
 			//ha beallitotta a sebesseget
-			if((ret = SetSpeed(speedSigned / 2, -omegaAbs)) == ACT_FINISHED){
+			if((ret = SetSpeed_Unsafe(speedSigned / 2, -omegaAbs)) == ACT_FINISHED){
 				goToWallPhase = 7;
 				ret = ACT_INPROGRESS;
 			}
+			break;
 
 		//mindket utkozeskapcsolora varunk
 		case 7:
@@ -1137,20 +1147,26 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 			if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) && input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 8;
 			ret = ACT_INPROGRESS;
+			break;
 
 		//rajta vagyunk a falon, megallunk
 		case 8:
 			//ha megalltunk, ACT_FINISHED
-			if((ret = MotionStop(0)) == ACT_FINISHED){
+			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
 				goToWallPhase = 0;
 				ret = ACT_FINISHED;
 			}
+			break;
 
 		//nem lehet, hiba
 		default:
 			ret = ACT_ERROR;
+			break;
 
 	}
+
+
+	cout << "gp\t" << goToWallPhase << endl;
 
 
 	//ha hiba
