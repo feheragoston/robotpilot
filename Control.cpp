@@ -65,6 +65,8 @@ Control::Control(Config* config) {
 	exitControl = false;
 
 	pawns = new msgpawns();
+	pawns->function = MSG_PAWNS;
+	pawns->num = 0;
 }
 
 Control::~Control() {
@@ -192,8 +194,10 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		mServer->Send(n, &response, sizeof(msgstatus));
+	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
+		mServer->Send(n, pawns, sizeof(msgpawns));
 	} else {
-		std::cout << "Unknown or invalid function: " << *function << " size: " << size << std::endl;
+		std::cout << "Unknown or invalid function: " << (int)*function << " size: " << (int)size << std::endl;
 	}
 }
 
@@ -206,13 +210,20 @@ bool Control::opponentTooClose() {
 	mPrimitives->GetSpeed(&v, &w);
 	mPrimitives->GetOpponentPos(&ox, &oy);
 
-	if (fabs(v) < 0.1) {
+	if (fabs(v) < 0.01) {
 		return false;
 	}
 
-	double distance = v * v / (2 * MAX_DEC);
+	double distance = v * v / (2 * MAX_DEC) + ROBOT_RADIUS;
 
 	Circle* opponent = new Circle(ox, oy, ROBOT_RADIUS * 2.5);
+	msgd4 message;
+	message.function = MSG_GO;
+	message.d1 = x;
+	message.d2 = y;
+	message.d3 = x + distance * cos(phi);
+	message.d4 = y + distance * sin(phi);
+	mServer->Send(0, &message, sizeof(msgd4));
 	return opponent->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi));
 }
 
@@ -302,10 +313,7 @@ int Control::LuaWait(lua_State *L) {
 		exitControl = true;
 		return luaL_error(L, "Stop button, exiting");
 	}
-	if (opponentTooClose()) {
-		std::cout << "Opponent too close!" << std::endl;
-		return luaL_error(L, "Opponent too close");
-	}
+
 	return 0;
 }
 
@@ -463,6 +471,11 @@ int Control::LuaSetSpeed(lua_State *L) {
 }
 
 int Control::LuaGo(lua_State *L) {
+	if (opponentTooClose()) {
+		std::cout << "Opponent too close!" << std::endl;
+		return luaL_error(L, "Opponent too close");
+	}
+
 	double distance = luaL_optnumber(L, 1, 1000);
 	double speed = luaL_optnumber(L, 2, 1000);
 	double acc = luaL_optnumber(L, 3, 500);
@@ -472,6 +485,11 @@ int Control::LuaGo(lua_State *L) {
 }
 
 int Control::LuaGoTo(lua_State *L) {
+	if (opponentTooClose()) {
+		std::cout << "Opponent too close!" << std::endl;
+		return luaL_error(L, "Opponent too close");
+	}
+
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 1000);
@@ -482,6 +500,11 @@ int Control::LuaGoTo(lua_State *L) {
 }
 
 int Control::LuaTurn(lua_State *L) {
+	if (opponentTooClose()) {
+		std::cout << "Opponent too close!" << std::endl;
+		return luaL_error(L, "Opponent too close");
+	}
+
 	double angle = luaL_optnumber(L, 1, M_PI_2);
 	double speed = luaL_optnumber(L, 2, 2);
 	double acc = luaL_optnumber(L, 3, 2);
@@ -597,11 +620,6 @@ int Control::LuaMagnet(lua_State *L) {
 int Control::LuaRefreshPawnPositions(lua_State *L) {
 	if (mCamera) {
 		int i = mCamera->RefreshPawnPositions(pawns);
-		if (i == 1) {
-			for (int i = 0; i < pawns->num; i++) {
-				std::cout << i << ": " << (int)(pawns->pawns[i].type) << ", " << pawns->pawns[i].x << " " << pawns->pawns[i].y << std::endl;
-			}
-		}
 		lua_pushinteger(L, i);
 		return 1;
 	}

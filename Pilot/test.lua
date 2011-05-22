@@ -34,6 +34,8 @@ function()
 	--Print("Test", i);
 end);
 
+repeat Control(); until (RefreshPawnPositions() ~= 0);
+
 repeat Control(); until (GetStartButton());
 
 if (GetMyColor()) then

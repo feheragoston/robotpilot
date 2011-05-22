@@ -223,6 +223,13 @@ int PrimitivesNet::MotionStop(double dec) {
 		if (motionStop.finished) {
 			motionStop.inprogress = false;
 			motionStop.finished = false;
+
+			goTo.finished = false;
+			goTo.inprogress = false;
+			go.finished = false;
+			go.inprogress = false;
+			turn.finished = false;
+			turn.inprogress = false;
 			return 1;
 		}
 	} else {
