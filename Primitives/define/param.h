@@ -104,14 +104,22 @@
 
 #define AREA_LENGTH_X							2100
 #define AREA_LENGTH_Y							3000
-#define ROBOT_DISTANCE_ON_FRONT_WALL			200
+//#define ROBOT_DISTANCE_ON_FRONT_WALL			200
 //#define ROBOT_DISTANCE_ON_REAR_WALL				150
 
-#define DEADRECK_CALIB_SPEED_ABS				0.1
-#define DEADRECK_CALIB_OMEGA_ABS				0.2
-#define DEADRECK_CALIB_BETA_ABS					0.08
-#define DEADRECK_START_DISTANCE_X				250
-#define DEADRECK_START_DISTANCE_Y				250
+//#define DEADRECK_CALIB_SPEED_ABS				0.1
+//#define DEADRECK_CALIB_OMEGA_ABS				0.2
+//#define DEADRECK_CALIB_BETA_ABS					0.08
+
+//az Y falra kell rasimitani
+//az Y falhoz kozelebbi kapcsolot kell benyomni
+#define DEADRECK_CALIB_DISTANCE_X				((double)167.4)
+#define DEADRECK_CALIB_DISTANCE_Y				((double)174)
+#define DEADRECK_CALIB_PHI						((double)53.75 * M_PI / 180)
+
+
+//#define DEADRECK_START_DISTANCE_X				250
+//#define DEADRECK_START_DISTANCE_Y				250
 
 
 

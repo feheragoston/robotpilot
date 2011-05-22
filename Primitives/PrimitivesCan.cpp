@@ -422,180 +422,24 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 	int ret;
 
 
-	double posX, posY, posPhi;
-
-
-	/**
-	 *
-	 *       |<------------- 3000 ------------->|
-	 *
-	 *  -    0------- y -----> -----------------
-	 *  ^    |     |                      |     |
-	 *  |    |piros|                      | kek |
-	 *  |    |-----                        -----|
-	 *  |    x                                  |
-	 * 2100  |           |-O---|                |
-	 *  |    |           |robot|-->             |
-	 *  |    v           |-O---|                |
-	 *  |    |                                  |
-	 *  |    |                                  |
-	 *  v    |                                  |
-	 *  -     ----------------------------------
-	 *
-	 */
-
-
-	double startX, startY, startPhi;
-	double onYWallPosX, onXWallPosY;
-
-	if(GetMyColor_Unsafe() == COLOR_RED){
-
-		startX		= DEADRECK_START_DISTANCE_X;
-		startY		= DEADRECK_START_DISTANCE_Y;
-		startPhi	= M_PI/2;
-		onYWallPosX	= ROBOT_DISTANCE_ON_FRONT_WALL;
-		onXWallPosY	= ROBOT_DISTANCE_ON_FRONT_WALL;
-
-	}
-
-	else{
-
-		startX		= DEADRECK_START_DISTANCE_X;
-		startY		= AREA_LENGTH_Y - DEADRECK_START_DISTANCE_Y;
-		startPhi	= -M_PI/2;
-		onYWallPosX	= ROBOT_DISTANCE_ON_FRONT_WALL;
-		onXWallPosY	= AREA_LENGTH_Y - ROBOT_DISTANCE_ON_FRONT_WALL;
-
-	}
-
-
-
-
-	//ha csak szimulacio
-	if(simulate){
-		SetRobotPos_Unsafe(startX, startY, startPhi);
+	//bal kapcsolo -> red
+	if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX)){
+		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, M_PI/2 - DEADRECK_CALIB_PHI);
 		ret = ACT_FINISHED;
 	}
 
 
-	//ha nem csak szimulacio
-	else{
-
-		switch(deadreckCalibPhase){
-
-			//start
-			case 0:
-				cout << "CalibrateDeadreckoning START" << endl;
-				deadreckCalibPhase++;
-				ret = ACT_INPROGRESS;
-				break;
-
-			//GoToWall() Y
-			case 1:
-				//ha rajta vagyunk
-				if((ret = GoToWall(DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
-					cout << "GoToWall() Y READY" << endl;
-					GetRobotPos_Unsafe(&posX, &posY, &posPhi);
-					SetRobotPos_Unsafe(onYWallPosX, posY, 0);
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//eljovunk az Y faltol, beallitjuk a sebesseget
-			case 2:
-				//ha beallitotta a sebesseget
-				if((ret = SetSpeed_Unsafe((-1)*DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//eljovunk az Y faltol
-			case 3:
-				//ha eljottunk a faltol
-				GetRobotPos_Unsafe(&posX, &posY, &posPhi);
-				if(posX >= startX){
-					deadreckCalibPhase++;
-				}
-				ret = ACT_INPROGRESS;
-				break;
-
-			//megallunk
-			case 4:
-				//ha megalltunk
-				if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//fordulunk +/- pi/2 fokot
-			case 5:
-				//ha elfordultunk
-				if((ret = Turn_Unsafe(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS)) == ACT_FINISHED){
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//GoToWall() X
-			case 6:
-				//ha rajta vagyunk
-				if((ret = GoToWall(DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
-					cout << "GoToWall() X READY" << endl;
-					GetRobotPos_Unsafe(&posX, &posY, &posPhi);
-					SetRobotPos_Unsafe(posX, onXWallPosY, startPhi);
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//eljovunk az X faltol, beallitjuk a sebesseget
-			case 7:
-				//ha beallitotta a sebesseget
-				if((ret = SetSpeed_Unsafe((-1)*DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
-					deadreckCalibPhase++;
-					ret = ACT_INPROGRESS;
-				}
-				break;
-
-			//eljovunk az Y faltol
-			case 8:
-				//ha eljottunk a faltol
-				GetRobotPos_Unsafe(&posX, &posY, &posPhi);
-				if(	((GetMyColor_Unsafe() == COLOR_RED) && (posY >= startY))	||	((GetMyColor_Unsafe() == COLOR_BLUE) && (posY <= startY))	){
-					deadreckCalibPhase++;
-				}
-				ret = ACT_INPROGRESS;
-				break;
-
-			//megallunk
-			case 9:
-				//ha megalltunk
-				if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
-					deadreckCalibPhase = 0;
-					cout << "CalibrateDeadreckoning READY" << endl;
-					ret = ACT_FINISHED;
-				}
-				break;
-
-			//nem lehet, hiba
-			default:
-				ret = ACT_ERROR;
-				break;
-
-		}
-
+	//jobb kapcsolo -> blue
+	else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)){
+		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y, - M_PI/2 + DEADRECK_CALIB_PHI);
+		ret = ACT_FINISHED;
 	}
 
 
-	cout << "dp\t" << deadreckCalibPhase << endl;
-
-
-	//ha hiba, alapallapotba
-	if(ret == ACT_ERROR)
-		deadreckCalibPhase = 0;
+	//nincs kapcsolo -> varunk
+	else{
+		ret = ACT_INPROGRESS;
+	}
 
 
 	ExitCritical();
