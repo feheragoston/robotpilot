@@ -103,7 +103,7 @@ void node_Deadreck::INIT_PARAM(void){
 	msg.function	= CMD_INIT_PARAM;
 	msg.length		= 13;
 
-	SET_FLOAT(&(msg.data[0]), DEADRECK_WHEEL_DISTANCE);
+	SET_FLOAT(&(msg.data[0]), DEADRECK_WHEEL_DISTANCE_REC);
 	SET_FLOAT(&(msg.data[4]), DEADRECK_LEFT_ONE_INCREMENT_DISTANCE);
 	SET_FLOAT(&(msg.data[8]), DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE);
 	SET_BOOL(&(msg.data[12]), 0, (DEADRECK_LEFT_IS_ROTATE_DIR_A != 0) ? true : false);
