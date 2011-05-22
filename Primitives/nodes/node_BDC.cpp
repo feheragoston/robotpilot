@@ -50,6 +50,7 @@ void node_BDC::evalMsg(UDPmsg* msg){
 				stop.done = GET_BOOL(&(msg->data[0]), 0);
 				stop.inProgress = false;
 				stop.finished = true;
+				cout << name << "\tSTOP_REPLY\t" << (stop.done ? "1" : "0") << endl;
 				break;
 
 			case MSG_BDC_GO_REPLY:
@@ -59,6 +60,7 @@ void node_BDC::evalMsg(UDPmsg* msg){
 				move.done = GET_BOOL(&(msg->data[0]), 0);
 				move.inProgress = false;
 				move.finished = true;
+				cout << name << "\tMOVE_REPLY\t" << (stop.done ? "1" : "0") << endl;
 				break;
 
 			default:
@@ -86,6 +88,8 @@ void node_BDC::BDC_STOP(double acc){
 	stop.inProgress = true;
 	stop.finished = false;
 
+	cout << name << "\tSTOP\t" << endl;
+
 }
 
 
@@ -101,6 +105,8 @@ void node_BDC::BDC_HARD_STOP(void){
 
 	stop.inProgress = true;
 	stop.finished = false;
+
+	cout << name << "\tHARD_STOP\t" << endl;
 
 }
 
@@ -120,6 +126,8 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
 	move.inProgress = true;
 	move.finished = false;
+
+	cout << name << "\tGO\t" << endl;
 
 }
 
@@ -141,6 +149,8 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 	move.inProgress = true;
 	move.finished = false;
 
+	cout << name << "\tGOTO\t" << endl;
+
 }
 
 
@@ -159,6 +169,8 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 
 	move.inProgress = true;
 	move.finished = false;
+
+	cout << name << "\tTURN\t" << endl;
 
 }
 
@@ -184,6 +196,8 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 
 	move.inProgress = true;
 	move.finished = false;
+
+	cout << name << "\tSET_SPEED\t" << endl;
 
 }
 

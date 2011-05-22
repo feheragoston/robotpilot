@@ -127,6 +127,15 @@ private:
 	void detectActChange(void);
 
 
+
+	int Turn_Unsafe(double angle, double max_speed, double max_acc);
+	int SetSpeed_Unsafe(double v, double w);
+	int MotionStop_Unsafe(double dec);
+	bool GetMyColor_Unsafe(void);
+	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
+	void SetRobotPos_Unsafe(double x, double y, double phi);
+
+
 };
 //------------------------------ PrimitivesCan VEGE ------------------------------
 

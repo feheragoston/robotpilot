@@ -293,8 +293,8 @@ int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
-			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				ret = ACT_ERROR;
 
 		//ha nincs utkozes
@@ -344,8 +344,8 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	else if(bdc->move.inProgress){
 
 		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
-			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				ret =  ACT_ERROR;
 
 		//ha nincs utkozes
@@ -375,45 +375,7 @@ int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 	EnterCritical();
 
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->move.finished){
-
-		//hiba volt-e
-		if(bdc->move.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->move.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->move.inProgress){
-
-		//ha utkozes van
-		if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
-			input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
-				ret = ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		bdc->BDC_TURN(angle, max_speed, max_acc);
-		ret = ACT_INPROGRESS;
-	}
-
+	int ret = Turn_Unsafe(angle, max_speed, max_acc);
 
 	ExitCritical();
 
@@ -428,44 +390,7 @@ int PrimitivesCan::SetSpeed(double v, double w){
 
 	EnterCritical();
 
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(bdc->stop.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->move.finished){
-
-		//hiba volt-e
-		if(bdc->move.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->move.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->move.inProgress){
-
-		//ha utkozes van
-		if(false)
-			ret = ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		bdc->BDC_SET_SPEED(v, w);
-		ret = ACT_INPROGRESS;
-	}
-
+	int ret = SetSpeed_Unsafe(v, w);
 
 	ExitCritical();
 
@@ -480,39 +405,7 @@ int PrimitivesCan::MotionStop(double dec = 0){
 
 	EnterCritical();
 
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(false){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->stop.finished){
-
-		//hiba volt-e
-		if(bdc->stop.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->stop.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->stop.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-
-		if(dec != 0)	bdc->BDC_STOP(dec);
-		else			bdc->BDC_HARD_STOP();
-
-		ret = ACT_INPROGRESS;
-	}
-
+	int ret = MotionStop_Unsafe(dec);
 
 	ExitCritical();
 
@@ -555,7 +448,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 	double startX, startY, startPhi;
 	double onYWallPosX, onXWallPosY;
 
-	if(GetMyColor() == COLOR_RED){
+	if(GetMyColor_Unsafe() == COLOR_RED){
 
 		startX		= DEADRECK_START_DISTANCE_X;
 		startY		= DEADRECK_START_DISTANCE_Y;
@@ -580,7 +473,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 
 	//ha csak szimulacio
 	if(simulate){
-		SetRobotPos(startX, startY, startPhi);
+		SetRobotPos_Unsafe(startX, startY, startPhi);
 		ret = ACT_FINISHED;
 	}
 
@@ -600,10 +493,10 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//GoToWall() Y
 			case 1:
 				//ha rajta vagyunk
-				if((ret = GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
+				if((ret = GoToWall(DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
 					cout << "GoToWall() Y READY" << endl;
-					GetRobotPos(&posX, &posY, &posPhi);
-					SetRobotPos(onYWallPosX, posY, 0);
+					GetRobotPos_Unsafe(&posX, &posY, &posPhi);
+					SetRobotPos_Unsafe(onYWallPosX, posY, 0);
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -612,7 +505,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az Y faltol, beallitjuk a sebesseget
 			case 2:
 				//ha beallitotta a sebesseget
-				if((ret = SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
+				if((ret = SetSpeed_Unsafe((-1)*DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -621,7 +514,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az Y faltol
 			case 3:
 				//ha eljottunk a faltol
-				GetRobotPos(&posX, &posY, &posPhi);
+				GetRobotPos_Unsafe(&posX, &posY, &posPhi);
 				if(posX >= startX){
 					deadreckCalibPhase++;
 				}
@@ -631,7 +524,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//megallunk
 			case 4:
 				//ha megalltunk
-				if((ret = MotionStop(0)) == ACT_FINISHED){
+				if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -640,7 +533,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//fordulunk +/- pi/2 fokot
 			case 5:
 				//ha elfordultunk
-				if((ret = Turn(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS)) == ACT_FINISHED){
+				if((ret = Turn_Unsafe(startPhi, DEADRECK_CALIB_OMEGA_ABS, DEADRECK_CALIB_BETA_ABS)) == ACT_FINISHED){
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -649,10 +542,10 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//GoToWall() X
 			case 6:
 				//ha rajta vagyunk
-				if((ret = GoToWall((-1)*DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
+				if((ret = GoToWall(DEADRECK_CALIB_SPEED_ABS, DEADRECK_CALIB_OMEGA_ABS)) == ACT_FINISHED){
 					cout << "GoToWall() X READY" << endl;
-					GetRobotPos(&posX, &posY, &posPhi);
-					SetRobotPos(posX, onXWallPosY, startPhi);
+					GetRobotPos_Unsafe(&posX, &posY, &posPhi);
+					SetRobotPos_Unsafe(posX, onXWallPosY, startPhi);
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -661,7 +554,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az X faltol, beallitjuk a sebesseget
 			case 7:
 				//ha beallitotta a sebesseget
-				if((ret = SetSpeed(DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
+				if((ret = SetSpeed_Unsafe((-1)*DEADRECK_CALIB_SPEED_ABS, 0)) == ACT_FINISHED){
 					deadreckCalibPhase++;
 					ret = ACT_INPROGRESS;
 				}
@@ -670,8 +563,8 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//eljovunk az Y faltol
 			case 8:
 				//ha eljottunk a faltol
-				GetRobotPos(&posX, &posY, &posPhi);
-				if(	((GetMyColor() == COLOR_RED) && (posY >= startY))	||	((GetMyColor() == COLOR_BLUE) && (posY <= startY))	){
+				GetRobotPos_Unsafe(&posX, &posY, &posPhi);
+				if(	((GetMyColor_Unsafe() == COLOR_RED) && (posY >= startY))	||	((GetMyColor_Unsafe() == COLOR_BLUE) && (posY <= startY))	){
 					deadreckCalibPhase++;
 				}
 				ret = ACT_INPROGRESS;
@@ -680,7 +573,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//megallunk
 			case 9:
 				//ha megalltunk
-				if((ret = MotionStop(0)) == ACT_FINISHED){
+				if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
 					deadreckCalibPhase = 0;
 					cout << "CalibrateDeadreckoning READY" << endl;
 					ret = ACT_FINISHED;
@@ -1056,7 +949,7 @@ bool PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
+	bool ret = GetMyColor_Unsafe();
 
 	ExitCritical();
 
@@ -1069,20 +962,7 @@ void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 
 	EnterCritical();
 
-	double tmpX, tmpY, tmpPhi;
-
-	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
-
-	*x		= tmpX		+ deadreckPosOffsetX;
-	*y		= tmpY		+ deadreckPosOffsetY;
-	*phi	= tmpPhi	+ deadreckPosOffsetPhi;
-
-	while(*phi > M_PI)
-		*phi -= 2*M_PI;
-
-	while(*phi <= -M_PI)
-		*phi += 2*M_PI;
-
+	GetRobotPos_Unsafe(x, y, phi);
 
 	ExitCritical();
 
@@ -1106,13 +986,7 @@ void PrimitivesCan::SetRobotPos(double x, double y, double phi){
 
 	EnterCritical();
 
-	double tmpX, tmpY, tmpPhi;
-
-	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
-
-	deadreckPosOffsetX		= 	x	- tmpX;
-	deadreckPosOffsetY		= 	y	- tmpY;
-	deadreckPosOffsetPhi	= 	phi	- tmpPhi;
+	SetRobotPos_Unsafe(x, y, phi);
 
 	ExitCritical();
 
@@ -1219,9 +1093,9 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 		//varunk az utkozesre
 		case 2:
 			//ha bal utkozes
-			if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX))
+			if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 3;
-			else if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
+			else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 4;
 			ret = ACT_INPROGRESS;
 
@@ -1260,7 +1134,7 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 		//mindket utkozeskapcsolora varunk
 		case 7:
 			//ha mindket utkozeskapcsolo jelez
-			if(input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) && input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
+			if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) && input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				goToWallPhase = 8;
 			ret = ACT_INPROGRESS;
 
@@ -1285,5 +1159,184 @@ int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 
 
 	return ret;
+
+}
+
+
+int PrimitivesCan::Turn_Unsafe(double angle, double max_speed, double max_acc){
+
+	int ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(bdc->stop.inProgress){
+		ret = ACT_ERROR;
+	}
+
+	//ha most vegzett
+	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
+
+		bdc->move.finished = false;
+
+	}
+
+	//ha most nem vegzett, es folyamatban
+	else if(bdc->move.inProgress){
+
+		//ha utkozes van
+		if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
+			input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
+				ret = ACT_ERROR;
+
+		//ha nincs utkozes
+		else
+			ret = ACT_INPROGRESS;
+
+	}
+
+	//ha most nem vegzett, es nincs is folyamatban
+	else{
+		bdc->BDC_TURN(angle, max_speed, max_acc);
+		ret = ACT_INPROGRESS;
+	}
+
+
+	return ret;
+
+}
+
+
+int PrimitivesCan::SetSpeed_Unsafe(double v, double w){
+
+	int ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(bdc->stop.inProgress){
+		ret = ACT_ERROR;
+	}
+
+	//ha most vegzett
+	else if(bdc->move.finished){
+
+		//hiba volt-e
+		if(bdc->move.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
+
+		bdc->move.finished = false;
+
+	}
+
+	//ha most nem vegzett, es folyamatban
+	else if(bdc->move.inProgress){
+
+		//ha utkozes van
+		if(false)
+			ret = ACT_ERROR;
+
+		//ha nincs utkozes
+		else
+			ret = ACT_INPROGRESS;
+
+	}
+
+	//ha most nem vegzett, es nincs is folyamatban
+	else{
+		bdc->BDC_SET_SPEED(v, w);
+		ret = ACT_INPROGRESS;
+	}
+
+
+	return ret;
+
+}
+
+
+int PrimitivesCan::MotionStop_Unsafe(double dec){
+
+	int ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(false){
+		ret = ACT_ERROR;
+	}
+
+	//ha most vegzett
+	else if(bdc->stop.finished){
+
+		//hiba volt-e
+		if(bdc->stop.done)	ret = ACT_FINISHED;
+		else				ret = ACT_ERROR;
+
+		bdc->stop.finished = false;
+
+	}
+
+	//ha most nem vegzett, es folyamatban
+	else if(bdc->stop.inProgress){
+		ret = ACT_INPROGRESS;
+	}
+
+	//ha most nem vegzett, es nincs is folyamatban
+	else{
+
+		if(dec != 0)	bdc->BDC_STOP(dec);
+		else			bdc->BDC_HARD_STOP();
+
+		ret = ACT_INPROGRESS;
+	}
+
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetMyColor_Unsafe(void){
+
+	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
+
+	return ret;
+
+}
+
+
+void PrimitivesCan::GetRobotPos_Unsafe(double* x, double* y, double* phi){
+
+	double tmpX, tmpY, tmpPhi;
+
+	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+
+	*x		= tmpX		+ deadreckPosOffsetX;
+	*y		= tmpY		+ deadreckPosOffsetY;
+	*phi	= tmpPhi	+ deadreckPosOffsetPhi;
+
+	while(*phi > M_PI){
+		*phi -= 2*M_PI;
+		deadreckPosOffsetPhi -= 2*M_PI;
+	}
+
+	while(*phi < -M_PI){
+		*phi += 2*M_PI;
+		deadreckPosOffsetPhi += 2*M_PI;
+	}
+
+}
+
+
+void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
+
+	double tmpX, tmpY, tmpPhi;
+
+	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+
+	deadreckPosOffsetX		= 	x	- tmpX;
+	deadreckPosOffsetY		= 	y	- tmpY;
+	deadreckPosOffsetPhi	= 	phi	- tmpPhi;
 
 }
