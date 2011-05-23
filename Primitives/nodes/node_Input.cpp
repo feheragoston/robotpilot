@@ -97,6 +97,7 @@ void node_Input::INIT_PARAM(void){
 }
 
 
+u8 nnn;
 double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 
 	double voltage = INPUT_ANALOG_TO_V(analog_value);
@@ -104,6 +105,8 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 	double der;	//V-mm karakterisztika meredeksege
 
 
+	if((nnn == 1) && (voltage < 1))
+		der = 1;
 
 	//megkeressuk a tablaban a helyet, amelyik elott van
 	for(i=0 ; i < size ; i++)
@@ -116,11 +119,11 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 
 	//ha csak kisebb van a tablazatban
 	if(i==size)
-		return table[size-1][1];	//max
+		return table[size-1][0];	//max
 
 	//ha csak nagyobb van a tablazatban
 	else if(i==0)
-		return table[0][1];	//min
+		return table[0][0];	//min
 
 	//ha van kisebb es nagyobb is a tablazatban
 	//(i-1)-edik V meg nagyobb, i-edik V mar kisebb
@@ -142,6 +145,7 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 double node_Input::GET_DISTANCE(u8 num){
 
 	//short
+	nnn = num;
 	return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
 
 }

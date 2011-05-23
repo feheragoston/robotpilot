@@ -208,11 +208,12 @@ void node_BDC::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 13;
+	msg.length		= 17;
 	SET_BOOL(&(msg.data[0]), 0, BDC_IS_LEFT_MOTOR1);
 	SET_U32(&(msg.data[1]), BDC_WHEEL_DISTANCE);
 	SET_U32(&(msg.data[5]), BDC_ROBOT_FULL_TURN_INCR);
 	SET_U32(&(msg.data[9]), BDC_RPM_TO_MMPS);
+	SET_U32(&(msg.data[13]), BDC_MM_TO_INCR);
 
 	UDPdriver::send(&msg);
 
