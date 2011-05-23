@@ -225,18 +225,18 @@ bool PrimitivesCan::Wait(long int useconds){
 	timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
 
-	long int wait_nsec = (useconds % 1000) * 1000;
-	long int wait_sec = useconds / 1000;
+	long int wait_nsec = (useconds % 1000000) * 1000;
+	long int wait_sec = useconds / 1000000;
 
 	//ha nincs tulcsordulas nanosec-ben
-	if(1000000 - wait_nsec > ts.tv_nsec){
+	if(1000000000 - wait_nsec > ts.tv_nsec){
 		ts.tv_nsec += wait_nsec;
 		ts.tv_sec += wait_sec;
 	}
 
 	//ha tulcsordulas van a nanosec-ben
 	else{
-		ts.tv_nsec = (ts.tv_nsec + wait_nsec) - 1000000;
+		ts.tv_nsec = (ts.tv_nsec + wait_nsec) - 1000000000;
 		ts.tv_sec += wait_sec + 1;
 	}
 
