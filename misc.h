@@ -26,6 +26,9 @@
 
 #define		ROBOT_RADIUS		175		// a robot fordulasahoz szugseges sugar [mm]
 #define		ROBOT_WIDTH			140		// a robot szelessege / 2 [mm]
+#define		ROBOT_FRONT			140		// a robot elejenek tavolsaga a kozeppontbol [mm]
+#define		ROBOT_FRONT_MAX		240		// a robot elejenek tavolsaga nyitott megfogoval [mm]
+#define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 
 /////////////////
 // Robot szine

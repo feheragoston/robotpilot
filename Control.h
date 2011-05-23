@@ -52,8 +52,7 @@ protected:
 
 	static std::list<Obstacle*> obstacles;
 	static Circle* opponent;
-
-	static bool simulate;
+	static double angry;
 
 	lua_State *L;
 
@@ -67,6 +66,7 @@ protected:
 
 	static void refreshOpponent();
 	static bool opponentTooClose();
+	static bool obstacleCollision();
 
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);

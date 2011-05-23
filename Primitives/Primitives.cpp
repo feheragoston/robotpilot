@@ -172,7 +172,7 @@ bool Primitives::Wait(long int useconds) {
 		}
 	}
 
-	//usleep(useconds * 2);
+	//usleep(useconds);
 	return true;
 }
 

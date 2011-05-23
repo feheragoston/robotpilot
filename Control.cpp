@@ -17,6 +17,7 @@ bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 Circle* Control::opponent = NULL;
+double Control::angry = 0.;
 
 Control::Control(Config* config) {
 	mConfig = config;
@@ -235,7 +236,7 @@ void Control::log() {
 void Control::refreshOpponent() {
 	double ox, oy;
 	mPrimitives->GetOpponentPos(&ox, &oy);
-	opponent->Set(ox, oy, ROBOT_RADIUS * 2.5);
+	opponent->Set(ox, oy, ROBOT_RADIUS * 2.5 - angry);
 }
 
 bool Control::opponentTooClose() {
@@ -249,7 +250,13 @@ bool Control::opponentTooClose() {
 		return false;
 	}
 
-	double distance = v * v / (2 * MAX_DEC) + ROBOT_RADIUS;
+	double distance = v * v / (2 * MAX_DEC);
+	if (v < 0.) {
+		distance += ROBOT_BACK;
+		distance *= -1;
+	} else {
+		distance += ROBOT_FRONT;
+	}
 
 	/*
 	msgd4 message;
@@ -260,7 +267,60 @@ bool Control::opponentTooClose() {
 	message.d4 = y + distance * sin(phi);
 	mServer->Send(0, &message, sizeof(msgd4));
 	*/
-	return opponent->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi));
+	if (opponent->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi))) {
+		if (angry < ROBOT_RADIUS) {
+			angry += 5.;
+		}
+		//std::cout << "Opponent too close! angry: " << angry << std::endl;
+		return true;
+	}
+	if (angry > 0) {
+		angry -= 0.5;
+	}
+	return false;
+}
+
+bool Control::obstacleCollision() {
+	double x, y, phi, v, w;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	mPrimitives->GetSpeed(&v, &w);
+
+	if (fabs(v) < 0.01) {
+		return false;
+	}
+
+	double distance = v * v / (2 * MAX_DEC);
+	if (v < 0.) {
+		distance += ROBOT_BACK;
+		distance *= -1;
+	} else {
+		distance += ROBOT_FRONT;
+	}
+	double x2 = x + distance * cos(phi);
+	double y2 = y + distance * sin(phi);
+
+	for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+		if ((*i)->Intersect(x, y, x2, y2)) {
+			if (Circle *c = dynamic_cast<Circle*>(*i)) {
+				msgd3 message;
+				message.function = MSG_TURN;
+				message.d1 = c->x;
+				message.d2 = c->y;
+				message.d3 = c->r;
+				mServer->Send(0, &message, sizeof(msgd3));
+			} else if (Line *l = dynamic_cast<Line*>(*i)) {
+				msgd4 message;
+				message.function = MSG_GO;
+				message.d1 = l->minx;
+				message.d2 = l->miny;
+				message.d3 = l->maxx;
+				message.d4 = l->maxy;
+				mServer->Send(0, &message, sizeof(msgd4));
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 void Control::report_errors(lua_State *L, int status) {
@@ -427,19 +487,28 @@ int Control::LuaRunParallel(lua_State *L) {
 }
 
 int Control::LuaSimulate(lua_State *L) {
+	// lementjuk a rendes primitivest
 	Primitives* realPrimitives = mPrimitives;
+	// letrehozzuk a szimulalo primitivest allapot masolassal
 	mPrimitives = new Primitives(realPrimitives);
 	mPrimitives->Init();
+	// meghivjuk a parameterul kapott fuggvenyt
 	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
 	if (s != 0) {
+		// nem sikerult a szimulacio
 		std::cout << "Simulation failed: " << lua_tostring(L, -1) << std::endl;
 		lua_pop(L, 1); // remove error message
 		lua_pushboolean(L, false);
 	} else {
+		// sikeres szimulacio
 		lua_pushboolean(L, true);
 	}
 	delete mPrimitives;
+	// visszaallitjuk a rendes primitivest
 	mPrimitives = realPrimitives;
+	// frissitjuk az allapotat
+	lua_getfield(L, LUA_GLOBALSINDEX, "Control");
+	lua_call(L, 0, 0);
 	return 1;
 }
 
@@ -525,8 +594,10 @@ int Control::LuaSetSpeed(lua_State *L) {
 
 int Control::LuaGo(lua_State *L) {
 	if (opponentTooClose()) {
-		std::cout << "Opponent too close!" << std::endl;
 		return luaL_error(L, "Opponent too close");
+	}
+	if (obstacleCollision()) {
+		return luaL_error(L, "Obstacle collision");
 	}
 
 	double distance = luaL_optnumber(L, 1, 1000);
@@ -539,8 +610,10 @@ int Control::LuaGo(lua_State *L) {
 
 int Control::LuaGoTo(lua_State *L) {
 	if (opponentTooClose()) {
-		std::cout << "Opponent too close!" << std::endl;
 		return luaL_error(L, "Opponent too close");
+	}
+	if (obstacleCollision()) {
+		return luaL_error(L, "Obstacle collision");
 	}
 
 	double x = lua_tonumber(L, 1);
@@ -554,8 +627,10 @@ int Control::LuaGoTo(lua_State *L) {
 
 int Control::LuaTurn(lua_State *L) {
 	if (opponentTooClose()) {
-		std::cout << "Opponent too close!" << std::endl;
 		return luaL_error(L, "Opponent too close");
+	}
+	if (obstacleCollision()) {
+		return luaL_error(L, "Obstacle collision");
 	}
 
 	double angle = luaL_optnumber(L, 1, M_PI_2);

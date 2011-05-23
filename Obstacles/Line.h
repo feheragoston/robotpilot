@@ -23,9 +23,10 @@ public:
 	double Distance(double x, double y, double r, double xr, double yr, double omega);
 	
 	bool Intersect(double x1, double y1, double x2, double y2);
+
+	double minx, miny, maxx, maxy;
 protected:
 	double m, b;
-	double minx, miny, maxx, maxy;
 	bool ylonger;
 };
 

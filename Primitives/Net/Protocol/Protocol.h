@@ -57,14 +57,8 @@ typedef struct msgpawn {
 
 typedef struct msgpawns {
 	function_t function;
-	float x1;
-	float y1;
-	float x2;
-	float y2;
-	float x3;
-	float y3;
-	float x4;
-	float y4;
+	float x[4];
+	float y[4];
 	uint8_t num;
 	msgpawn pawns[19];
 } msgpawns;

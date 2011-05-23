@@ -23,6 +23,14 @@ bool Circle::Intersect(double x1, double y1, double x2, double y2) {
 	bool ylonger;
 	double A, B, C, D;
 
+	double r2 = sqr(r);
+	if (sqr(x1 - x) + sqr(y1 - y) < r2) {
+		return true;
+	}
+	if (sqr(x2 - x) + sqr(y2 - y) < r2) {
+		return true;
+	}
+
 	if (fabs(y2 - y1) > fabs(x2 - x1)) {
 		m = (x2 - x1) / (y2 - y1);
 		b = x1 - m * y1;
@@ -51,12 +59,12 @@ bool Circle::Intersect(double x1, double y1, double x2, double y2) {
 	if (ylonger) {
 		A = sqr(m) + 1;
 		B = 2 * (m * (b - x) - y);
-		C = sqr(b - x) + sqr(y) - sqr(r);
+		C = sqr(b - x) + sqr(y) - r2;
 		D = sqr(B) - 4 * A * C;
 	} else {
 		A = sqr(m) + 1;
 		B = 2 * (m * (b - y) - x);
-		C = sqr(b - y) + sqr(x) - sqr(r);
+		C = sqr(b - y) + sqr(x) - r2;
 		D = sqr(B) - 4 * A * C;
 	}
 
