@@ -25,6 +25,7 @@ extern "C" {
 #include "Server.h"
 #include "Primitives/Net/Protocol/Protocol.h"
 #include "Obstacles/Circle.h"
+#include "Obstacles/Line.h"
 
 class Control {
 public:
@@ -44,6 +45,8 @@ public:
 protected:
 	Config* mConfig;
 	static Primitives* mPrimitives;
+	static Primitives* mPrimitivesSim;
+	static Primitives* mPrimitivesReal;
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
 
@@ -51,6 +54,8 @@ protected:
 
 	static std::list<Obstacle*> obstacles;
 	static Circle* opponent;
+
+	static bool simulate;
 
 	lua_State *L;
 
@@ -65,7 +70,7 @@ protected:
 	static void refreshOpponent();
 	static bool opponentTooClose();
 
-	void report_errors(lua_State *L, int status);
+	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
 
 	// lua exception handling
@@ -80,6 +85,7 @@ protected:
 	static int LuaWait(lua_State *L);
 	static int LuaControl(lua_State *L);
 	static int LuaRunParallel(lua_State *L);
+	static int LuaSimulate(lua_State *L);
 	static int LuaPrint(lua_State *L);
 	static int LuaTest(lua_State *L);
 

@@ -10,13 +10,15 @@
 using namespace std;
 
 Primitives* Control::mPrimitives = NULL;
+Primitives* Control::mPrimitivesSim = NULL;
+Primitives* Control::mPrimitivesReal = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
-std::list<Obstacle*> Pilot::obstacles = std::list<Obstacle*>();
-Circle* Pilot::opponent = NULL;
+std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
+Circle* Control::opponent = NULL;
 
 Control::Control(Config* config) {
 	mConfig = config;
@@ -33,6 +35,7 @@ Control::Control(Config* config) {
 	lua_register(L, "ControlWait", LuaWait);
 	lua_register(L, "Control", LuaControl);
 	lua_register(L, "RunParallel", LuaRunParallel);
+	lua_register(L, "Simulate", LuaSimulate);
 	lua_register(L, "Print", LuaPrint);
 	lua_register(L, "Test", LuaTest);
 	lua_register(L, "Test1", LuaTest);
@@ -97,8 +100,11 @@ Control::Control(Config* config) {
 }
 
 Control::~Control() {
-	if (mPrimitives) {
-		delete mPrimitives;
+	if (mPrimitivesReal) {
+		delete mPrimitivesReal;
+	}
+	if (mPrimitivesSim) {
+		delete mPrimitivesSim;
 	}
 	if (mCamera) {
 		delete mCamera;
@@ -115,14 +121,18 @@ bool Control::Init() {
 	gettimeofday(&matchStart, NULL);
 
 	if (mConfig->PrimitivesCan) {
-		mPrimitives = new PrimitivesCan(mConfig);
+		mPrimitivesReal = new PrimitivesCan(mConfig);
 	} else if (mConfig->PrimitivesNet) {
-		mPrimitives = new PrimitivesNet(mConfig);
+		mPrimitivesReal = new PrimitivesNet(mConfig);
 	} else {
-		mPrimitives = new Primitives(mConfig);
+		mPrimitivesReal = new Primitives(mConfig);
 	}
+	mPrimitives = mPrimitivesReal;
 
 	if (mPrimitives->Init()) {
+		mPrimitivesSim = new Primitives(mConfig);
+		mPrimitivesSim->Init();
+
 		mCamera = new PrimitivesNet(mConfig);
 		if (mCamera->CameraInit()) {
 			cout << "Connected to camera" << endl;
@@ -420,6 +430,12 @@ int Control::LuaRunParallel(lua_State *L) {
 			lua_call(L, 0, 0);
 		}
 	}
+	return 0;
+}
+
+int Control::LuaSimulate(lua_State *L) {
+	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
+	report_errors(L, s);
 	return 0;
 }
 
