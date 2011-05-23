@@ -283,11 +283,11 @@
 #define SERVO_GRIPPER_RIGHT_LIMIT_HIGH_POS_INCR			2080	//ok
 
 #define SERVO_LEFT_ARM_DEG_INCR_X0						0
-#define SERVO_LEFT_ARM_DEG_INCR_Y0						1000
+#define SERVO_LEFT_ARM_DEG_INCR_Y0						1040	//ok, fuggoleges
 #define SERVO_LEFT_ARM_DEG_INCR_X1						90
-#define SERVO_LEFT_ARM_DEG_INCR_Y1						2000
-#define SERVO_LEFT_ARM_LIMIT_LOW_POS_INCR				700
-#define SERVO_LEFT_ARM_LIMIT_HIGH_POS_INCR				2200
+#define SERVO_LEFT_ARM_DEG_INCR_Y1						1830	//ok, vizszintes
+#define SERVO_LEFT_ARM_LIMIT_LOW_POS_INCR				1020	//ok
+#define SERVO_LEFT_ARM_LIMIT_HIGH_POS_INCR				2200	//ok
 
 #define SERVO_RIGHT_ARM_DEG_INCR_X0						0
 #define SERVO_RIGHT_ARM_DEG_INCR_Y0						1805	//ok, fuggoleges
@@ -350,17 +350,20 @@
 #define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
 #define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
 
+#define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
+
 #define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10)
 #define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
 
 
-#define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
+#define BDC_SEC_PER_MIN								60
 
-#define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
-#define BDC_MOTORROT_TO_MM(motorrot)				((double)(motorrot) * BDC_INCR_PER_MOTORROT / BDC_INCR_PER_MM)
+#define BDC_CONV_INCR_TO_MM(incr)					((double)(incr) / BDC_INCR_PER_MM)
+#define BDC_CONV_RPM_TO_MMS(rpm)					((double)(rpm) / BDC_SEC_PER_MIN * BDC_INCR_PER_MOTORROT / BDC_INCR_PER_MM)
+#define BDC_CONV_MOTORROTS2_TO_MMS2(motorrots2)		((double)(motorrots2) * BDC_INCR_PER_MOTORROT / BDC_INCR_PER_MM)
 
 #define BDC_CONV_MM_TO_INCR(mm)						((double)(mm) * BDC_INCR_PER_MM)
-#define BDC_CONV_MMS_TO_RPM(mms)					((double)(mms) * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT / 60)
+#define BDC_CONV_MMS_TO_RPM(mms)					((double)(mms) * BDC_SEC_PER_MIN * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
 #define BDC_CONV_MMS2_TO_MOTORROTS2(mms2)			((double)(mms2) * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
 
 #define BDC_CONV_ACC(acc)							((u16)BDC_CONV_MMS2_TO_MOTORROTS2(acc))
@@ -373,7 +376,7 @@
 #define BDC_IS_LEFT_MOTOR1							0
 #define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
-#define BDC_RPM_TO_MMPS								BDC_MOTORROT_TO_MM(1)
+#define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
 
 

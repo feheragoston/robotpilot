@@ -268,12 +268,6 @@ void PrimitivesCan::ExitCritical(void){
 //max_acc [mm/s^2]
 int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
-
-	cout << "HALI" << endl;
-	for(u8 i=0 ; i<INPUT_ANALOG_COUNT ; i++)
-		cout << input->GET_DISTANCE(i) << endl;
-	return 0;
-
 	EnterCritical();
 
 	int ret;
