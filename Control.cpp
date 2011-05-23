@@ -10,8 +10,6 @@
 using namespace std;
 
 Primitives* Control::mPrimitives = NULL;
-Primitives* Control::mPrimitivesSim = NULL;
-Primitives* Control::mPrimitivesReal = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
@@ -100,11 +98,8 @@ Control::Control(Config* config) {
 }
 
 Control::~Control() {
-	if (mPrimitivesReal) {
-		delete mPrimitivesReal;
-	}
-	if (mPrimitivesSim) {
-		delete mPrimitivesSim;
+	if (mPrimitives) {
+		delete mPrimitives;
 	}
 	if (mCamera) {
 		delete mCamera;
@@ -121,18 +116,14 @@ bool Control::Init() {
 	gettimeofday(&matchStart, NULL);
 
 	if (mConfig->PrimitivesCan) {
-		mPrimitivesReal = new PrimitivesCan(mConfig);
+		mPrimitives = new PrimitivesCan(mConfig);
 	} else if (mConfig->PrimitivesNet) {
-		mPrimitivesReal = new PrimitivesNet(mConfig);
+		mPrimitives = new PrimitivesNet(mConfig);
 	} else {
-		mPrimitivesReal = new Primitives(mConfig);
+		mPrimitives = new Primitives(mConfig);
 	}
-	mPrimitives = mPrimitivesReal;
 
 	if (mPrimitives->Init()) {
-		mPrimitivesSim = new Primitives(mConfig);
-		mPrimitivesSim->Init();
-
 		mCamera = new PrimitivesNet(mConfig);
 		if (mCamera->CameraInit()) {
 			cout << "Connected to camera" << endl;
@@ -260,6 +251,7 @@ bool Control::opponentTooClose() {
 
 	double distance = v * v / (2 * MAX_DEC) + ROBOT_RADIUS;
 
+	/*
 	msgd4 message;
 	message.function = MSG_GO;
 	message.d1 = x;
@@ -267,6 +259,7 @@ bool Control::opponentTooClose() {
 	message.d3 = x + distance * cos(phi);
 	message.d4 = y + distance * sin(phi);
 	mServer->Send(0, &message, sizeof(msgd4));
+	*/
 	return opponent->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi));
 }
 
@@ -434,9 +427,20 @@ int Control::LuaRunParallel(lua_State *L) {
 }
 
 int Control::LuaSimulate(lua_State *L) {
+	Primitives* realPrimitives = mPrimitives;
+	mPrimitives = new Primitives(realPrimitives);
+	mPrimitives->Init();
 	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
-	report_errors(L, s);
-	return 0;
+	if (s != 0) {
+		std::cout << "Simulation failed: " << lua_tostring(L, -1) << std::endl;
+		lua_pop(L, 1); // remove error message
+		lua_pushboolean(L, false);
+	} else {
+		lua_pushboolean(L, true);
+	}
+	delete mPrimitives;
+	mPrimitives = realPrimitives;
+	return 1;
 }
 
 int Control::LuaPrint(lua_State *L) {

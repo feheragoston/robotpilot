@@ -12,21 +12,6 @@
 #include "Net/Net.h"
 #include "Net/Protocol/Protocol.h"
 
-typedef struct progress {
-	progress() : inprogress(false), finished(false) {}
-	bool inprogress;
-	bool finished;
-} progress;
-
-typedef struct position {
-	position() : x(0.), y(0.), phi(0.), v(0.), w(0.) {}
-	double x;
-	double y;
-	double phi;
-	double v;
-	double w;
-} position;
-
 class PrimitivesNet: public Primitives {
 public:
 	PrimitivesNet(Config* config);
@@ -43,9 +28,6 @@ public:
 	int GoTo(double x, double y, double max_speed, double max_acc);
 	int Turn(double angle, double max_speed, double max_acc);
 	int MotionStop(double dec);
-	void GetRobotPos(double* x, double* y, double* phi);
-	void GetOpponentPos(double * x, double* y);
-	void GetSpeed(double* v, double* w);
 
 	int SetGripperPos(double pos);
 	int CalibrateConsole();
@@ -63,20 +45,8 @@ protected:
 
 	Net* netConnection;
 
-	progress calibrateDeadreckoning;
-	progress go;
-	progress goTo;
-	progress turn;
-	progress motionStop;
-
-	progress gripperMove;
-	progress consoleMove;
-	progress leftArmMove, rightArmMove;
-
 	progress pawnRefresh;
 	msgpawns* pawns;
-
-	position robot, opponent;
 };
 
 #endif /* PRIMITIVESNET_H_ */

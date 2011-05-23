@@ -9,12 +9,31 @@
 #define PRIMITIVES_H_
 
 #include <sys/time.h>
+#include <math.h>
 #include "../Config.h"
 #include "../tools.h"
+#include "../geom.h"
+
+typedef struct progress {
+	progress() : inprogress(false), finished(false) {}
+	bool inprogress;
+	bool finished;
+} progress;
+
+typedef struct position {
+	position() : x(0.), y(0.), phi(0.), v(0.), w(0.), a(0.) {}
+	double x; // x pozicio
+	double y; // y pozicio
+	double phi; // elfordulas szoge
+	double v; // sebesseg
+	double w; // szogsebesseg
+	double a; // gyorsulas
+} position;
 
 class Primitives {
 public:
 	Primitives(Config* config);
+	Primitives(Primitives* source);
 	virtual ~Primitives();
 
 	/**
@@ -159,6 +178,13 @@ public:
 	virtual void SetRobotPos(double x, double y, double phi);
 
 	/**
+	 * ellenfel poziciojanak beallitasa
+	 * @param x [mm]
+	 * @param y [mm]
+	 */
+	virtual void SetOpponentPos(double x, double y);
+
+	/**
 	 * Visszaadja a tavolsagerzekelok erteket
 	 * @param distance a hat tavolsagerzekelo erteke [mm]
 	 */
@@ -235,11 +261,6 @@ protected:
 	Config* mConfig;
 
 	/**
-	 * az utolso Wait fuggveny lefutasanak idejet tarolja
-	 */
-	struct timeval lastWait;
-
-	/**
 	 * a szinkapcsolo allasat tarolja
 	 */
 	bool mRobotColor;
@@ -251,6 +272,27 @@ protected:
 	 * a stopgomb allapotat tarolja
 	 */
 	bool mStopButton;
+
+	/**
+	 * a robot es az ellenfel pozicioja
+	 */
+	position robot, opponent;
+
+	/**
+	 * mozgasoknal a celpozicio
+	 */
+	position target;
+
+	progress calibrateDeadreckoning;
+	progress go;
+	progress goTo;
+	progress turn;
+	progress motionStop;
+
+	progress gripperMove;
+	progress consoleMove;
+	progress leftArmMove, rightArmMove;
+
 };
 
 #endif /* PRIMITIVES_H_ */

@@ -242,22 +242,6 @@ int PrimitivesNet::MotionStop(double dec) {
 	return 0;
 }
 
-void PrimitivesNet::GetRobotPos(double* x, double* y, double* phi) {
-	*x = robot.x;
-	*y = robot.y;
-	*phi = robot.phi;
-}
-
-void PrimitivesNet::GetOpponentPos(double * x, double* y) {
-	*x = opponent.x;
-	*y = opponent.y;
-}
-
-void PrimitivesNet::GetSpeed(double* v, double* w) {
-	*v = robot.v;
-	*w = robot.w;
-}
-
 int PrimitivesNet::SetGripperPos(double pos) {
 	if (gripperMove.inprogress) {
 		if (gripperMove.finished) {

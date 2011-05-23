@@ -45,8 +45,6 @@ public:
 protected:
 	Config* mConfig;
 	static Primitives* mPrimitives;
-	static Primitives* mPrimitivesSim;
-	static Primitives* mPrimitivesReal;
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
 
