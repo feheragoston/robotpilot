@@ -28,6 +28,7 @@
 #define		ROBOT_WIDTH			140		// a robot szelessege / 2 [mm]
 #define		ROBOT_FRONT			140		// a robot elejenek tavolsaga a kozeppontbol [mm]
 #define		ROBOT_FRONT_MAX		240		// a robot elejenek tavolsaga nyitott megfogoval [mm]
+#define		ROBOT_FRONT_PAWN	170		// paraszt felszedeshez a paraszt kozepetol valo tavolsag [mm]
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 
 /////////////////

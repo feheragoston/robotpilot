@@ -67,6 +67,15 @@ protected:
 	static void refreshOpponent();
 	static bool opponentTooClose();
 	static bool obstacleCollision();
+	/**
+	 * Szakasz utkozesenek tesztelese ellenfellel es akadalyokkal
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return true ha nincs utkozes
+	 */
+	static bool checkLine(double x1, double y1, double x2, double y2);
 
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
@@ -111,6 +120,8 @@ protected:
 	static int LuaMagnet(lua_State *L);
 
 	static int LuaRefreshPawnPositions(lua_State *L);
+	static int LuaFindPawn(lua_State *L);
+	static int LuaGetDeployPoint(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

@@ -48,9 +48,13 @@ Control::Control(Config* config) {
 	lua_register(L, "CalibrateDeadreckoning", LuaCalibrateDeadreckoning);
 	lua_register(L, "SetSpeed", LuaSetSpeed);
 	lua_register(L, "Go", LuaGo);
+	lua_register(L, "GoSafe", LuaGo);
 	lua_register(L, "GoTo", LuaGoTo);
+	lua_register(L, "GoToSafe", LuaGoTo);
 	lua_register(L, "Turn", LuaTurn);
+	lua_register(L, "TurnSafe", LuaTurn);
 	lua_register(L, "TurnTo", LuaTurnTo);
+	lua_register(L, "TurnToSafe", LuaTurnTo);
 	lua_register(L, "MotionStop", LuaMotionStop);
 	lua_register(L, "GetRobotPos", LuaGetRobotPos);
 	lua_register(L, "GetOpponentPos", LuaGetOpponentPos);
@@ -64,6 +68,8 @@ Control::Control(Config* config) {
 	lua_register(L, "Magnet", LuaMagnet);
 
 	lua_register(L, "RefreshPawnPositions", LuaRefreshPawnPositions);
+	lua_register(L, "FindPawn", LuaFindPawn);
+	lua_register(L, "GetDeployPoint", LuaGetDeployPoint);
 
 	matchStarted = false;
 	exitControl = false;
@@ -91,8 +97,8 @@ Control::Control(Config* config) {
 		obstacles.push_back(new Circle(1850, 1150, ROBOT_RADIUS));
 		obstacles.push_back(new Circle(1850, 1850, ROBOT_RADIUS));
 		obstacles.push_back(new Circle(1850, 2550, ROBOT_RADIUS));
-		obstacles.push_back(new Line(1980 - ROBOT_RADIUS, 450, 1980 - ROBOT_RADIUS, 1150));
-		obstacles.push_back(new Line(1980 - ROBOT_RADIUS, 1850, 1980 - ROBOT_RADIUS, 2550));
+		obstacles.push_back(new Line(1980 - ROBOT_WIDTH, 450, 1980 - ROBOT_WIDTH, 1150));
+		obstacles.push_back(new Line(1980 - ROBOT_WIDTH, 1850, 1980 - ROBOT_WIDTH, 2550));
 	}
 	// ellenfelet alapbol kirakjuk a palyarol
 	opponent = new Circle(-10, -10, 1);
@@ -321,6 +327,18 @@ bool Control::obstacleCollision() {
 		}
 	}
 	return false;
+}
+
+bool Control::checkLine(double x1, double y1, double x2, double y2) {
+	if (opponent->Intersect(x1, y1, x2, y2)) {
+		return false;
+	}
+	for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+		if ((*i)->Intersect(x1, y1, x2, y2)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 void Control::report_errors(lua_State *L, int status) {
@@ -593,11 +611,16 @@ int Control::LuaSetSpeed(lua_State *L) {
 }
 
 int Control::LuaGo(lua_State *L) {
-	if (opponentTooClose()) {
-		return luaL_error(L, "Opponent too close");
-	}
-	if (obstacleCollision()) {
-		return luaL_error(L, "Obstacle collision");
+	lua_Debug ar;
+	lua_getstack(L, 0, &ar);
+	lua_getinfo(L, "nS", &ar);
+	if (strcmp("GoSafe", ar.name) == 0) {
+		if (opponentTooClose()) {
+			return luaL_error(L, "Opponent too close");
+		}
+		if (obstacleCollision()) {
+			return luaL_error(L, "Obstacle collision");
+		}
 	}
 
 	double distance = luaL_optnumber(L, 1, 1000);
@@ -609,11 +632,16 @@ int Control::LuaGo(lua_State *L) {
 }
 
 int Control::LuaGoTo(lua_State *L) {
-	if (opponentTooClose()) {
-		return luaL_error(L, "Opponent too close");
-	}
-	if (obstacleCollision()) {
-		return luaL_error(L, "Obstacle collision");
+	lua_Debug ar;
+	lua_getstack(L, 0, &ar);
+	lua_getinfo(L, "nS", &ar);
+	if (strcmp("GoToSafe", ar.name) == 0) {
+		if (opponentTooClose()) {
+			return luaL_error(L, "Opponent too close");
+		}
+		if (obstacleCollision()) {
+			return luaL_error(L, "Obstacle collision");
+		}
 	}
 
 	double x = lua_tonumber(L, 1);
@@ -626,11 +654,16 @@ int Control::LuaGoTo(lua_State *L) {
 }
 
 int Control::LuaTurn(lua_State *L) {
-	if (opponentTooClose()) {
-		return luaL_error(L, "Opponent too close");
-	}
-	if (obstacleCollision()) {
-		return luaL_error(L, "Obstacle collision");
+	lua_Debug ar;
+	lua_getstack(L, 0, &ar);
+	lua_getinfo(L, "nS", &ar);
+	if (strcmp("TurnSafe", ar.name) == 0) {
+		if (opponentTooClose()) {
+			return luaL_error(L, "Opponent too close");
+		}
+		if (obstacleCollision()) {
+			return luaL_error(L, "Obstacle collision");
+		}
 	}
 
 	double angle = luaL_optnumber(L, 1, M_PI_2);
@@ -648,6 +681,18 @@ int Control::LuaTurn(lua_State *L) {
 }
 
 int Control::LuaTurnTo(lua_State *L) {
+	lua_Debug ar;
+	lua_getstack(L, 0, &ar);
+	lua_getinfo(L, "nS", &ar);
+	if (strcmp("TurnToSafe", ar.name) == 0) {
+		if (opponentTooClose()) {
+			return luaL_error(L, "Opponent too close");
+		}
+		if (obstacleCollision()) {
+			return luaL_error(L, "Obstacle collision");
+		}
+	}
+
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 2);
@@ -752,4 +797,98 @@ int Control::LuaRefreshPawnPositions(lua_State *L) {
 		return 1;
 	}
 	return 0;
+}
+
+/**
+ * 0: paraszt koordinatainak visszaadasa
+ * 1: koordinatak gripperes felszedeshez
+ * 2: koordinatak bal karhoz
+ * 3: koordinatak jobb karhoz
+ * @param L
+ * @return
+ */
+int Control::LuaFindPawn(lua_State *L) {
+	int target = luaL_optinteger(L, 1, 0);
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	bool color = mPrimitives->GetMyColor();
+	double minDist;
+	int closest = pawns->num;
+	for (int i = 0; i < pawns->num; i++) {
+		msgpawn* pawn = &(pawns->pawns[i]);
+		if (pawn->type == FIG_PAWN) {
+			if (checkLine(x, y, pawn->x, pawn->y)) {
+				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+				if (dist > ROBOT_FRONT_MAX) {
+					if (closest == pawns->num || dist < minDist) {
+						// megnezzuk, hogy a mi mezonkon van-e
+						if (pawn->y > 550 && pawn->y < 2450) {
+							int mx = (int)pawn->x;
+							int my = (int)pawn->y - 450;
+							mx = mx % 700;
+							my = my % 700;
+
+							if (color) {
+								mx = 700 - mx;
+							}
+							if (mx > 100 && mx < 250 && my > 450 && my < 600) {
+								continue;
+							}
+							if (mx > 450 && mx < 600 && my > 100 && my < 250) {
+								continue;
+							}
+						}
+
+						minDist = dist;
+						closest = i;
+					}
+				}
+			}
+		}
+	}
+	if (closest < pawns->num) {
+		double px = pawns->pawns[closest].x;
+		double py = pawns->pawns[closest].y;
+		if (target == 1) {
+			double angle = atan2f(y - py, x - px);
+			lua_pushnumber(L, px);
+			lua_pushnumber(L, py);
+			lua_pushnumber(L, px + cos(angle) * ROBOT_FRONT_PAWN);
+			lua_pushnumber(L, py + sin(angle) * ROBOT_FRONT_PAWN);
+			return 4;
+		} else {
+			lua_pushnumber(L, px);
+			lua_pushnumber(L, py);
+			lua_pushinteger(L, closest);
+			return 3;
+		}
+	} else {
+		lua_pushboolean(L, false);
+		return 1;
+	}
+}
+
+int Control::LuaGetDeployPoint(lua_State *L) {
+	static int n = 0;
+	if (n == 0) {
+		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
+		lua_pushnumber(L, 630);
+		lua_pushnumber(L, 1885);
+		lua_pushnumber(L, 630);
+	} else if (n == 1) {
+		lua_pushnumber(L, 1925 - ROBOT_FRONT_PAWN);
+		lua_pushnumber(L, 1325);
+		lua_pushnumber(L, 1925);
+		lua_pushnumber(L, 1325);
+	} else if (n == 2) {
+		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
+		lua_pushnumber(L, 2030);
+		lua_pushnumber(L, 1885);
+		lua_pushnumber(L, 2030);
+	} else {
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	n++;
+	return 4;
 }
