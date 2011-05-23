@@ -69,9 +69,9 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	//---------- valtozo ELEJE ----------
 	strcpy(CanIp, config->CanIp);
 
-	deadreckPosOffsetX		= 0;
-	deadreckPosOffsetY		= 0;
-	deadreckPosOffsetPhi	= 0;
+	deadreckCheckX		= 0;
+	deadreckCheckY		= 0;
+	deadreckCheckPhi	= 0;
 
 	deadreckCalibPhase		= 0;
 	goToWallPhase			= 0;
@@ -322,6 +322,8 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	EnterCritical();
 
 	int ret;
+	double xw, yw, phiw;
+	double xr, yr, phir;
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
@@ -356,7 +358,9 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		bdc->BDC_GOTO(x-deadreckPosOffsetX, y-deadreckPosOffsetY, max_speed, max_acc);
+		GetRobotPos_Unsafe(&xw, &yw, &phiw);
+		ConvWorldToRobot(xw, yw, phiw, &xr, &yr, &phir);
+		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
 		ret =  ACT_INPROGRESS;
 	}
 
@@ -414,6 +418,48 @@ int PrimitivesCan::MotionStop(double dec = 0){
 }
 
 
+int PrimitivesCan::DeadreckoningResetPos(void){
+
+	EnterCritical();
+
+	int ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(deadreck->reset_pos.inProgress){
+		ret = ACT_ERROR;
+	}
+
+	//ha most vegzett
+	else if(deadreck->reset_pos.finished){
+
+		//hiba volt-e
+		if(deadreck->reset_pos.done)	ret = ACT_FINISHED;
+		else							ret = ACT_ERROR;
+
+		deadreck->reset_pos.finished = false;
+
+	}
+
+	//ha most nem vegzett, es folyamatban
+	else if(deadreck->reset_pos.inProgress){
+		ret = ACT_INPROGRESS;
+	}
+
+	//ha most nem vegzett, es nincs is folyamatban
+	else{
+		deadreck->DEADRECK_RESET_POS();
+		ret =  ACT_INPROGRESS;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 //simulate = true => nem mozog, csak beallitja a kezdopoziciot
 int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 
@@ -422,27 +468,88 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 	int ret;
 
 
-	//bal kapcsolo -> red
-	if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX)){
-		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, M_PI/2 - DEADRECK_CALIB_PHI);
+	//ha csak szimulacio
+	if(simulate){
+
+		//red
+		if(GetMyColor_Unsafe() == COLOR_RED){
+			deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+			deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
+			deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
+		}
+
+		else{
+			deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+			deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
+			deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
+		}
+
 		ret = ACT_FINISHED;
+
 	}
 
 
-	//jobb kapcsolo -> blue
-	else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)){
-		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y, - M_PI/2 + DEADRECK_CALIB_PHI);
-		ret = ACT_FINISHED;
-	}
-
-
-	//nincs kapcsolo -> varunk
+	//ha nem csak szimulacio
 	else{
-		ret = ACT_INPROGRESS;
+
+		switch(deadreckCalibPhase){
+
+			//start
+			case 0:
+				deadreckCalibPhase = 1;
+				ret = ACT_INPROGRESS;
+				break;
+
+			//varunk az egyik kapcsolora
+			case 1:
+
+				//bal kapcsolo -> red
+				if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX))
+					deadreckCalibPhase = 1;
+
+
+				//jobb kapcsolo -> blue
+				else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
+					deadreckCalibPhase = 2;
+
+				ret = ACT_INPROGRESS;
+				break;
+
+			//red, varunk a reset deadreckoning-ra
+			case 2:
+				//ha megvolt a reset
+				if((ret = DeadreckoningResetPos()) == ACT_FINISHED){
+					deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+					deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
+					deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
+					deadreckCalibPhase = 0;
+				}
+				break;
+
+			//blue, varunk a reset deadreckoning-ra
+			case 3:
+				//ha megvolt a reset
+				if((ret = DeadreckoningResetPos()) == ACT_FINISHED){
+					deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+					deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
+					deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
+					deadreckCalibPhase = 0;
+				}
+				break;
+
+		}
+
+
 	}
 
 
-	ExitCritical();
+	cout << "dp\t" << deadreckCalibPhase << endl;
+
+
+	//ha hiba
+	if(ret == ACT_ERROR)
+		deadreckCalibPhase = 0;
+
 
 	return ret;
 
@@ -918,6 +1025,38 @@ void PrimitivesCan::KEEP_ALIVE_SLEEP(void){
 }
 
 
+void PrimitivesCan::ConvRobotToWorld(double xr, double yr, double phir, double* xw, double* yw, double* phiw){
+
+	//elforgatom, majd eltolom
+	*xw = deadreckCheckX + xr * cos(deadreckCheckPhi) - yr * sin(deadreckCheckPhi);
+	*yw = deadreckCheckY + xr * sin(deadreckCheckPhi) + yr * cos(deadreckCheckPhi);
+	*phiw = deadreckCheckPhi + phir;
+
+	while(*phiw > M_PI)
+		*phiw -= 2*M_PI;
+
+	while(*phiw <= -M_PI)
+		*phiw += 2*M_PI;
+
+}
+
+
+void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir){
+
+	//eltolom, majd elforgatom
+	*xr = (xw - deadreckCheckX) * cos(-deadreckCheckPhi) - (yw - deadreckCheckY) * sin(-deadreckCheckPhi);
+	*yr = (xw - deadreckCheckX) * sin(-deadreckCheckPhi) + (yw - deadreckCheckY) * cos(-deadreckCheckPhi);
+	*phir = phiw - deadreckCheckPhi;
+
+	while(*phir > M_PI)
+		*phir -= 2*M_PI;
+
+	while(*phir <= -M_PI)
+		*phir += 2*M_PI;
+
+}
+
+
 int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
 
 	int ret;
@@ -1168,23 +1307,11 @@ bool PrimitivesCan::GetMyColor_Unsafe(void){
 
 void PrimitivesCan::GetRobotPos_Unsafe(double* x, double* y, double* phi){
 
-	double tmpX, tmpY, tmpPhi;
+	double xr, yr, phir;
 
-	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+	deadreck->GET_POS(&xr, &yr, &phir);
 
-	*x		= tmpX		+ deadreckPosOffsetX;
-	*y		= tmpY		+ deadreckPosOffsetY;
-	*phi	= tmpPhi	+ deadreckPosOffsetPhi;
-
-	while(*phi > M_PI){
-		*phi -= 2*M_PI;
-		deadreckPosOffsetPhi -= 2*M_PI;
-	}
-
-	while(*phi < -M_PI){
-		*phi += 2*M_PI;
-		deadreckPosOffsetPhi += 2*M_PI;
-	}
+	ConvRobotToWorld(xr, yr, phir, x, y, phi);
 
 }
 
@@ -1193,10 +1320,10 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 	double tmpX, tmpY, tmpPhi;
 
-	deadreck->GET_POS(&tmpX, &tmpY, &tmpPhi);
+	GetRobotPos_Unsafe(&tmpX, &tmpY, &tmpPhi);
 
-	deadreckPosOffsetX		= 	x	- tmpX;
-	deadreckPosOffsetY		= 	y	- tmpY;
-	deadreckPosOffsetPhi	= 	phi	- tmpPhi;
+	deadreckCheckX		+= 	x	- tmpX;
+	deadreckCheckY		+= 	y	- tmpY;
+	deadreckCheckPhi	+= 	phi	- tmpPhi;
 
 }

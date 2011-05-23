@@ -39,11 +39,10 @@ public:
 
 	void GET_POS(double* x, double* y, double* phi);
 
-
-private:
-
 	progress_t reset_pos;
 
+
+private:
 
 	double DeadreckPosX;
 	double DeadreckPosY;

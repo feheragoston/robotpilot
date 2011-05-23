@@ -112,9 +112,9 @@ private:
 	//----- valtozo ELEJE -----
 	char CanIp[16];
 
-	double deadreckPosOffsetX;
-	double deadreckPosOffsetY;
-	double deadreckPosOffsetPhi;
+	double deadreckCheckX;
+	double deadreckCheckY;
+	double deadreckCheckPhi;
 	//----- valtozo VEGE -----
 
 
@@ -126,6 +126,11 @@ private:
 
 	void detectActChange(void);
 
+
+	int DeadreckoningResetPos(void);
+
+	void ConvRobotToWorld(double xr, double yr, double phir, double* xw, double* yw, double* phiw);
+	void ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir);
 
 
 	int Turn_Unsafe(double angle, double max_speed, double max_acc);
