@@ -118,7 +118,7 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 	msg.node_id		= id;
 	msg.function	= CMD_BDC_GO;
 	msg.length		= 8;
-	SET_S32(&(msg.data[0]), BDC_CONV_DIST(distance));
+	SET_S32(&(msg.data[0]), distance);
 	SET_U16(&(msg.data[4]), BDC_CONV_SPEED(max_speed));
 	SET_U16(&(msg.data[6]), BDC_CONV_ACC(max_acc));
 
@@ -185,7 +185,7 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 
 	double r = v / w;			//w = v / r
 	double t = 2 * r * M_PI / v;	//v = 2*r*Pi / t
-	double dr = WHEEL_DISTANCE_MM / 2;
+	double dr = BDC_WHEEL_DISTANCE / 2;
 	s16 vLeft	= 2 * (r - dr) * M_PI / t;
 	s16 vRight	= 2 * (r + dr) * M_PI / t;
 
@@ -208,9 +208,11 @@ void node_BDC::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 5;
+	msg.length		= 13;
 	SET_BOOL(&(msg.data[0]), 0, BDC_IS_LEFT_MOTOR1);
-	SET_U32(&(msg.data[1]), BDC_ROBOT_FULL_TURN_INCR);
+	SET_U32(&(msg.data[1]), BDC_WHEEL_DISTANCE);
+	SET_U32(&(msg.data[5]), BDC_ROBOT_FULL_TURN_INCR);
+	SET_U32(&(msg.data[9]), BDC_RPM_TO_MMPS);
 
 	UDPdriver::send(&msg);
 
