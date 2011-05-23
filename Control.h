@@ -49,6 +49,9 @@ protected:
 
 	static msgpawns* pawns;
 
+	static std::list<Obstacle*> obstacles;
+	static Circle* opponent;
+
 	lua_State *L;
 
 	struct timeval runStart; // Run indulasanak ideje
@@ -59,6 +62,7 @@ protected:
 
 	static void log();
 
+	static void refreshOpponent();
 	static bool opponentTooClose();
 
 	void report_errors(lua_State *L, int status);

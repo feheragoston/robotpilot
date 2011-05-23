@@ -15,6 +15,8 @@ Server* Control::mServer = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
+std::list<Obstacle*> Pilot::obstacles = std::list<Obstacle*>();
+Circle* Pilot::opponent = NULL;
 
 Control::Control(Config* config) {
 	mConfig = config;
@@ -67,6 +69,31 @@ Control::Control(Config* config) {
 	pawns = new msgpawns();
 	pawns->function = MSG_PAWNS;
 	pawns->num = 0;
+
+	if (obstacles.empty()) {
+		// Akadalyok definialasa
+		// Falak
+		obstacles.push_back(new Line(0, ROBOT_RADIUS, 2100, ROBOT_RADIUS));
+		obstacles.push_back(new Line(ROBOT_RADIUS, 0, ROBOT_RADIUS, 3000));
+		obstacles.push_back(new Line(0, 3000 - ROBOT_RADIUS, 2100, 3000 - ROBOT_RADIUS));
+		obstacles.push_back(new Line(2100 - ROBOT_RADIUS, 0, 2100 - ROBOT_RADIUS, 3000));
+
+		// start vedo falak
+		obstacles.push_back(new Line(400, 0, 400, 400));
+		obstacles.push_back(new Circle(400, 400, ROBOT_RADIUS));
+		obstacles.push_back(new Line(400, 3000, 400, 2600));
+		obstacles.push_back(new Circle(400, 2600, ROBOT_RADIUS));
+
+		// biztos terulet falai
+		obstacles.push_back(new Circle(1850, 450, ROBOT_RADIUS));
+		obstacles.push_back(new Circle(1850, 1150, ROBOT_RADIUS));
+		obstacles.push_back(new Circle(1850, 1850, ROBOT_RADIUS));
+		obstacles.push_back(new Circle(1850, 2550, ROBOT_RADIUS));
+		obstacles.push_back(new Line(1980 - ROBOT_RADIUS, 450, 1980 - ROBOT_RADIUS, 1150));
+		obstacles.push_back(new Line(1980 - ROBOT_RADIUS, 1850, 1980 - ROBOT_RADIUS, 2550));
+	}
+	// ellenfelet alapbol kirakjuk a palyarol
+	opponent = new Circle(-10, -10, 1);
 }
 
 Control::~Control() {
@@ -204,11 +231,18 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 void Control::log() {
 }
 
+void Control::refreshOpponent() {
+	double ox, oy;
+	mPrimitives->GetOpponentPos(&ox, &oy);
+	opponent->Set(ox, oy, ROBOT_RADIUS * 2.5);
+}
+
 bool Control::opponentTooClose() {
-	double x, y, phi, v, w, ox, oy;
+	double x, y, phi, v, w;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
-	mPrimitives->GetOpponentPos(&ox, &oy);
+
+	refreshOpponent();
 
 	if (fabs(v) < 0.01) {
 		return false;
@@ -216,7 +250,6 @@ bool Control::opponentTooClose() {
 
 	double distance = v * v / (2 * MAX_DEC) + ROBOT_RADIUS;
 
-	Circle* opponent = new Circle(ox, oy, ROBOT_RADIUS * 2.5);
 	msgd4 message;
 	message.function = MSG_GO;
 	message.d1 = x;
