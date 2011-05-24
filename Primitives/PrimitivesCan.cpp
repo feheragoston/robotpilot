@@ -538,7 +538,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 	}
 
 
-	cout << "dp\t" << deadreckCalibPhase << endl;
+	//cout << "dp\t" << deadreckCalibPhase << endl;
 
 
 	//ha hiba
