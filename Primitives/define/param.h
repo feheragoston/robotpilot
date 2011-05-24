@@ -261,8 +261,8 @@
 
 #define SERVO_GRIPPER_LEFT_INDEX						1
 #define SERVO_GRIPPER_RIGHT_INDEX						0
-#define SERVO_LEFT_ARM_INDEX							2
-#define SERVO_RIGHT_ARM_INDEX							3
+#define SERVO_LEFT_ARM_INDEX							3
+#define SERVO_RIGHT_ARM_INDEX							2
 #define SERVO_PLUS_0_INDEX								4
 #define SERVO_PLUS_1_INDEX								5
 
@@ -283,16 +283,16 @@
 #define SERVO_GRIPPER_RIGHT_LIMIT_HIGH_POS_INCR			2080	//ok
 
 #define SERVO_LEFT_ARM_DEG_INCR_X0						0
-#define SERVO_LEFT_ARM_DEG_INCR_Y0						1040	//ok, fuggoleges
+#define SERVO_LEFT_ARM_DEG_INCR_Y0						1021	//ok, fuggoleges
 #define SERVO_LEFT_ARM_DEG_INCR_X1						90
-#define SERVO_LEFT_ARM_DEG_INCR_Y1						1830	//ok, vizszintes
+#define SERVO_LEFT_ARM_DEG_INCR_Y1						1802	//ok, vizszintes
 #define SERVO_LEFT_ARM_LIMIT_LOW_POS_INCR				1020	//ok
 #define SERVO_LEFT_ARM_LIMIT_HIGH_POS_INCR				2200	//ok
 
 #define SERVO_RIGHT_ARM_DEG_INCR_X0						0
-#define SERVO_RIGHT_ARM_DEG_INCR_Y0						1805	//ok, fuggoleges
+#define SERVO_RIGHT_ARM_DEG_INCR_Y0						1812	//ok, fuggoleges
 #define SERVO_RIGHT_ARM_DEG_INCR_X1						90
-#define SERVO_RIGHT_ARM_DEG_INCR_Y1						1024	//ok, vizszintes
+#define SERVO_RIGHT_ARM_DEG_INCR_Y1						1066	//ok, vizszintes
 #define SERVO_RIGHT_ARM_LIMIT_LOW_POS_INCR				700	//ok
 #define SERVO_RIGHT_ARM_LIMIT_HIGH_POS_INCR				1820	//ok
 
