@@ -50,6 +50,12 @@ public:
 	virtual bool Wait(long int useconds);
 
 	/**
+	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
+	 * @return igaz, ha van benn paraszt
+	 */
+	virtual bool PawnInGripper();
+
+	/**
 	 * Start gomb allapotanak lekerdezese
 	 * @return igaz, ha le van nyomva
 	 */

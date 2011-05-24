@@ -869,6 +869,19 @@ int PrimitivesCan::Magnet(bool left, int polarity){
 }
 
 
+bool PrimitivesCan::PawnInGripper(void){
+
+	EnterCritical();
+
+	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();

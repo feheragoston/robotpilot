@@ -63,6 +63,7 @@ public:
 	double GetConsolePos(void);
 	int SetArmPos(bool left, double pos, double speed, double acc);
 	int Magnet(bool left, int polarity);
+	bool PawnInGripper(void);
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	bool GetMyColor(void);

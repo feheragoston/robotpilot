@@ -176,6 +176,10 @@ bool Primitives::Wait(long int useconds) {
 	return true;
 }
 
+bool Primitives::PawnInGripper(void){
+	return false;
+}
+
 bool Primitives::GetStartButton() {
 	return mStartButton;
 }
