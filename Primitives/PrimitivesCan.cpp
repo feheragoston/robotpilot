@@ -322,7 +322,6 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	EnterCritical();
 
 	int ret;
-	double xw, yw, phiw;
 	double xr, yr, phir;
 
 
@@ -358,8 +357,7 @@ int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
-		GetRobotPos_Unsafe(&xw, &yw, &phiw);
-		ConvWorldToRobot(xw, yw, phiw, &xr, &yr, &phir);
+		ConvWorldToRobot(x, y, 0, &xr, &yr, &phir);
 		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
 		ret =  ACT_INPROGRESS;
 	}
@@ -418,9 +416,7 @@ int PrimitivesCan::MotionStop(double dec = 0){
 }
 
 
-int PrimitivesCan::DeadreckoningResetPos(void){
-
-	EnterCritical();
+int PrimitivesCan::DeadreckoningResetPos_Unsafe(void){
 
 	int ret;
 
@@ -452,8 +448,6 @@ int PrimitivesCan::DeadreckoningResetPos(void){
 		ret =  ACT_INPROGRESS;
 	}
 
-
-	ExitCritical();
 
 	return ret;
 
@@ -505,12 +499,12 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 
 				//bal kapcsolo -> red
 				if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX))
-					deadreckCalibPhase = 1;
+					deadreckCalibPhase = 2;
 
 
 				//jobb kapcsolo -> blue
 				else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-					deadreckCalibPhase = 2;
+					deadreckCalibPhase = 3;
 
 				ret = ACT_INPROGRESS;
 				break;
@@ -518,7 +512,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//red, varunk a reset deadreckoning-ra
 			case 2:
 				//ha megvolt a reset
-				if((ret = DeadreckoningResetPos()) == ACT_FINISHED){
+				if((ret = DeadreckoningResetPos_Unsafe()) == ACT_FINISHED){
 					deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
 					deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
 					deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
@@ -529,7 +523,7 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 			//blue, varunk a reset deadreckoning-ra
 			case 3:
 				//ha megvolt a reset
-				if((ret = DeadreckoningResetPos()) == ACT_FINISHED){
+				if((ret = DeadreckoningResetPos_Unsafe()) == ACT_FINISHED){
 					deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
 					deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
 					deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
@@ -550,6 +544,8 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 	if(ret == ACT_ERROR)
 		deadreckCalibPhase = 0;
 
+
+	ExitCritical();
 
 	return ret;
 

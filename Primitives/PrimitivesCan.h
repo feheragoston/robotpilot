@@ -127,7 +127,7 @@ private:
 	void detectActChange(void);
 
 
-	int DeadreckoningResetPos(void);
+	int DeadreckoningResetPos_Unsafe(void);
 
 	void ConvRobotToWorld(double xr, double yr, double phir, double* xw, double* yw, double* phiw);
 	void ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir);
