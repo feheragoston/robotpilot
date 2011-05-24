@@ -378,6 +378,9 @@
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
+#define BDC_PRE_BRAKE_TIME							0.3
+#define BDC_OE_CONTROL_P							100
+#define BDC_OE_CONTROL_I							15
 
 
 
