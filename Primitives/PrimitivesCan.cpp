@@ -117,8 +117,9 @@ void PrimitivesCan::addNodesToCan(void){
 	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
 
+	/* SONAR-nak nem kuldunk semmit, pontosabban GATEWAY-nek nem adunk senkit a CAN_B-re, így oda tuti nem kuld, de fogadni fog
 	if(!SONAR_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);*/
 
 	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
