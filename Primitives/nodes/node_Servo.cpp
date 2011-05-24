@@ -192,13 +192,13 @@ u16 node_Servo::SERVO_CONV_POS(u8 num, double pos){
 
 u16 node_Servo::SERVO_CONV_SPEED(u8 num, double speed){
 
-	return (u16)ABS(SERVO_DEG_TO_INCR(num, speed));
+	return (u16)fabs(SERVO_DEG_TO_INCR(num, speed));
 
 }
 
 
 u16 node_Servo::SERVO_CONV_ACC(u8 num, double acc){
 
-	return (u16)ABS(SERVO_DEG_TO_INCR(num, acc));
+	return (u16)fabs(SERVO_DEG_TO_INCR(num, acc));
 
 }

@@ -10,9 +10,6 @@
 #define SEND_START_ACTUATOR_IN_INIT				1
 
 
-#define ABS(a)			(((a) > 0) ? (a) : (-(a)))
-
-
 
 
 #define PING_REPLY_MAX_WAIT_TIME_SEC			1
