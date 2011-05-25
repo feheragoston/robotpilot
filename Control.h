@@ -104,6 +104,7 @@ protected:
 	static int LuaGetStopButton(lua_State *L);
 	static int LuaGetMyColor(lua_State *L);
 	static int LuaPawnInGripper(lua_State *L);
+	static int LuaGetDistances(lua_State *L);
 	static int LuaMotorSupply(lua_State *L);
 
 	static int LuaCalibrateDeadreckoning(lua_State *L);

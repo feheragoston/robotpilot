@@ -62,6 +62,7 @@ Control::Control(Config* config) {
 	lua_register(L, "GetStopButton", LuaGetStopButton);
 	lua_register(L, "GetMyColor", LuaGetMyColor);
 	lua_register(L, "PawnInGripper", LuaPawnInGripper);
+	lua_register(L, "GetDistances", LuaGetDistances);
 	lua_register(L, "MotorSupply", LuaMotorSupply);
 
 	lua_register(L, "CalibrateDeadreckoning", LuaCalibrateDeadreckoning);
@@ -599,6 +600,15 @@ int Control::LuaPawnInGripper(lua_State *L) {
 	bool b = mPrimitives->PawnInGripper();
 	lua_pushboolean(L, b);
 	return 1;
+}
+
+int Control::LuaGetDistances(lua_State *L) {
+	double dist[6];
+	mPrimitives->GetDistances(dist);
+	for (int i = 0; i < 5; i++) {
+		lua_pushnumber(L, dist[i]);
+	}
+	return 6;
 }
 
 int Control::LuaMotorSupply(lua_State *L) {
