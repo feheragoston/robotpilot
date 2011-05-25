@@ -970,6 +970,21 @@ void PrimitivesCan::GetDistances(double distance[6]){
 }
 
 
+bool PrimitivesCan::GetMotorSupply(void){
+
+	EnterCritical();
+
+	bool ret;
+
+	power->GET_ACT_ON(&ret);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 void PrimitivesCan::detectActChange(void){
 
 	bool ActOn;

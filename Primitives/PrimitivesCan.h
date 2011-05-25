@@ -71,6 +71,7 @@ public:
 	void GetOpponentPos(double* x, double* y);
 	void SetRobotPos(double x, double y, double phi);
 	void GetDistances(double distance[6]);
+	bool GetMotorSupply(void);
 
 
 	void EnterCritical(void);
