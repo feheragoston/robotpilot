@@ -18,6 +18,24 @@ msgpawns* Control::pawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 Circle* Control::opponent = NULL;
 double Control::angry = 0.;
+bool Control::simulate = false;
+int Control::deployFields[30] = {
+		  0, -12,   0, -14,   0, -15,
+		-11,   0, -10,   0, -13,   0,
+		  0,  -2,   0,  -1,   0,  -8,
+		 -4,   0,  -3,   0,  -7,   0,
+		  0,  -5,   0,  -6,   0,  -9
+};
+
+#define ROBOT_POINT_NUM 6
+double Control::robotBody[][2] = {
+		{ 140,  140},
+		{-105,  140},
+		{-160,   65},
+		{-160,  -65},
+		{-105, -140},
+		{ 140, -140}
+};
 
 Control::Control(Config* config) {
 	mConfig = config;
@@ -43,6 +61,7 @@ Control::Control(Config* config) {
 	lua_register(L, "GetStartButton", LuaGetStartButton);
 	lua_register(L, "GetStopButton", LuaGetStopButton);
 	lua_register(L, "GetMyColor", LuaGetMyColor);
+	lua_register(L, "PawnInGripper", LuaPawnInGripper);
 	lua_register(L, "MotorSupply", LuaMotorSupply);
 
 	lua_register(L, "CalibrateDeadreckoning", LuaCalibrateDeadreckoning);
@@ -70,6 +89,7 @@ Control::Control(Config* config) {
 	lua_register(L, "RefreshPawnPositions", LuaRefreshPawnPositions);
 	lua_register(L, "FindPawn", LuaFindPawn);
 	lua_register(L, "GetDeployPoint", LuaGetDeployPoint);
+	lua_register(L, "SetDeployPointPriority", LuaSetDeployPointPriority);
 
 	matchStarted = false;
 	exitControl = false;
@@ -81,27 +101,25 @@ Control::Control(Config* config) {
 	if (obstacles.empty()) {
 		// Akadalyok definialasa
 		// Falak
-		obstacles.push_back(new Line(0, ROBOT_RADIUS, 2100, ROBOT_RADIUS));
-		obstacles.push_back(new Line(ROBOT_RADIUS, 0, ROBOT_RADIUS, 3000));
-		obstacles.push_back(new Line(0, 3000 - ROBOT_RADIUS, 2100, 3000 - ROBOT_RADIUS));
-		obstacles.push_back(new Line(2100 - ROBOT_RADIUS, 0, 2100 - ROBOT_RADIUS, 3000));
+		obstacles.push_back(new Line(0, 0, 2100, 0));
+		obstacles.push_back(new Line(0, 0, 0, 3000));
+		obstacles.push_back(new Line(0, 3000, 2100, 3000));
+		obstacles.push_back(new Line(2100, 0, 2100, 3000));
 
 		// start vedo falak
 		obstacles.push_back(new Line(400, 0, 400, 400));
-		obstacles.push_back(new Circle(400, 400, ROBOT_RADIUS));
 		obstacles.push_back(new Line(400, 3000, 400, 2600));
-		obstacles.push_back(new Circle(400, 2600, ROBOT_RADIUS));
 
 		// biztos terulet falai
-		obstacles.push_back(new Circle(1850, 450, ROBOT_RADIUS));
-		obstacles.push_back(new Circle(1850, 1150, ROBOT_RADIUS));
-		obstacles.push_back(new Circle(1850, 1850, ROBOT_RADIUS));
-		obstacles.push_back(new Circle(1850, 2550, ROBOT_RADIUS));
-		obstacles.push_back(new Line(1980 - ROBOT_WIDTH, 450, 1980 - ROBOT_WIDTH, 1150));
-		obstacles.push_back(new Line(1980 - ROBOT_WIDTH, 1850, 1980 - ROBOT_WIDTH, 2550));
+		obstacles.push_back(new Line(1850, 450, 2100, 450));
+		obstacles.push_back(new Line(1850, 1150, 2100, 1150));
+		obstacles.push_back(new Line(1850, 1850, 2100, 1850));
+		obstacles.push_back(new Line(1850, 2550, 2100, 2550));
+		obstacles.push_back(new Line(1980, 450, 1980, 1150));
+		obstacles.push_back(new Line(1980, 1850, 1980, 2550));
 	}
 	// ellenfelet alapbol kirakjuk a palyarol
-	opponent = new Circle(-10, -10, 1);
+	opponent = new Circle(-1000, -1000, 1);
 }
 
 Control::~Control() {
@@ -228,6 +246,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.startButton = mPrimitives->GetStartButton();
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
+		response.pawnInGripper = mPrimitives->PawnInGripper();
 		mServer->Send(n, &response, sizeof(msgstatus));
 	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
 		mServer->Send(n, pawns, sizeof(msgpawns));
@@ -287,43 +306,29 @@ bool Control::opponentTooClose() {
 }
 
 bool Control::obstacleCollision() {
-	double x, y, phi, v, w;
+	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	mPrimitives->GetSpeed(&v, &w);
 
-	if (fabs(v) < 0.01) {
-		return false;
-	}
+	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
+		double x1 = cos(phi) * robotBody[j][0] - sin(phi) * robotBody[j][1] + x;
+		double y1 = sin(phi) * robotBody[j][0] + cos(phi) * robotBody[j][1] + y;
+		double x2 = cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] - sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + x;
+		double y2 = sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] + cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + y;
 
-	double distance = v * v / (2 * MAX_DEC);
-	if (v < 0.) {
-		distance += ROBOT_BACK;
-		distance *= -1;
-	} else {
-		distance += ROBOT_FRONT;
-	}
-	double x2 = x + distance * cos(phi);
-	double y2 = y + distance * sin(phi);
+		if (j == 0) {
+			msgd4 message;
+			message.function = MSG_GO;
+			message.d1 = x1;
+			message.d2 = y1;
+			message.d3 = x2;
+			message.d4 = y2;
+			mServer->Send(0, &message, sizeof(msgd4));
+		}
 
-	for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
-		if ((*i)->Intersect(x, y, x2, y2)) {
-			if (Circle *c = dynamic_cast<Circle*>(*i)) {
-				msgd3 message;
-				message.function = MSG_TURN;
-				message.d1 = c->x;
-				message.d2 = c->y;
-				message.d3 = c->r;
-				mServer->Send(0, &message, sizeof(msgd3));
-			} else if (Line *l = dynamic_cast<Line*>(*i)) {
-				msgd4 message;
-				message.function = MSG_GO;
-				message.d1 = l->minx;
-				message.d2 = l->miny;
-				message.d3 = l->maxx;
-				message.d4 = l->maxy;
-				mServer->Send(0, &message, sizeof(msgd4));
+		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				return true;
 			}
-			return true;
 		}
 	}
 	return false;
@@ -505,6 +510,7 @@ int Control::LuaRunParallel(lua_State *L) {
 }
 
 int Control::LuaSimulate(lua_State *L) {
+	simulate = true;
 	// lementjuk a rendes primitivest
 	Primitives* realPrimitives = mPrimitives;
 	// letrehozzuk a szimulalo primitivest allapot masolassal
@@ -522,6 +528,7 @@ int Control::LuaSimulate(lua_State *L) {
 		lua_pushboolean(L, true);
 	}
 	delete mPrimitives;
+	simulate = false;
 	// visszaallitjuk a rendes primitivest
 	mPrimitives = realPrimitives;
 	// frissitjuk az allapotat
@@ -588,6 +595,12 @@ int Control::LuaGetMyColor(lua_State *L) {
 	return 1;
 }
 
+int Control::LuaPawnInGripper(lua_State *L) {
+	bool b = mPrimitives->PawnInGripper();
+	lua_pushboolean(L, b);
+	return 1;
+}
+
 int Control::LuaMotorSupply(lua_State *L) {
 	bool powered = lua_toboolean(L, 1);
 	int i = mPrimitives->MotorSupply(powered);
@@ -614,12 +627,14 @@ int Control::LuaGo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (strcmp("GoSafe", ar.name) == 0) {
+	if (ar.name == NULL || strcmp("GoSafe", ar.name) == 0) {
 		if (opponentTooClose()) {
 			return luaL_error(L, "Opponent too close");
 		}
-		if (obstacleCollision()) {
-			return luaL_error(L, "Obstacle collision");
+		if (simulate) {
+			if (obstacleCollision()) {
+				return luaL_error(L, "Obstacle collision");
+			}
 		}
 	}
 
@@ -635,12 +650,14 @@ int Control::LuaGoTo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (strcmp("GoToSafe", ar.name) == 0) {
+	if (ar.name == NULL || strcmp("GoToSafe", ar.name) == 0) {
 		if (opponentTooClose()) {
 			return luaL_error(L, "Opponent too close");
 		}
-		if (obstacleCollision()) {
-			return luaL_error(L, "Obstacle collision");
+		if (simulate) {
+			if (obstacleCollision()) {
+				return luaL_error(L, "Obstacle collision");
+			}
 		}
 	}
 
@@ -657,12 +674,14 @@ int Control::LuaTurn(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (strcmp("TurnSafe", ar.name) == 0) {
+	if (ar.name == NULL || strcmp("TurnSafe", ar.name) == 0) {
 		if (opponentTooClose()) {
 			return luaL_error(L, "Opponent too close");
 		}
-		if (obstacleCollision()) {
-			return luaL_error(L, "Obstacle collision");
+		if (simulate) {
+			if (obstacleCollision()) {
+				return luaL_error(L, "Obstacle collision");
+			}
 		}
 	}
 
@@ -684,12 +703,14 @@ int Control::LuaTurnTo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (strcmp("TurnToSafe", ar.name) == 0) {
+	if (ar.name == NULL || strcmp("TurnToSafe", ar.name) == 0) {
 		if (opponentTooClose()) {
 			return luaL_error(L, "Opponent too close");
 		}
-		if (obstacleCollision()) {
-			return luaL_error(L, "Obstacle collision");
+		if (simulate) {
+			if (obstacleCollision()) {
+				return luaL_error(L, "Obstacle collision");
+			}
 		}
 	}
 
@@ -819,6 +840,7 @@ int Control::LuaFindPawn(lua_State *L) {
 		if (pawn->type == FIG_PAWN) {
 			if (checkLine(x, y, pawn->x, pawn->y)) {
 				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
 				if (dist > ROBOT_FRONT_MAX) {
 					if (closest == pawns->num || dist < minDist) {
 						// megnezzuk, hogy a mi mezonkon van-e
@@ -869,26 +891,97 @@ int Control::LuaFindPawn(lua_State *L) {
 }
 
 int Control::LuaGetDeployPoint(lua_State *L) {
-	static int n = 0;
+	static int n = 3;
+
+	bool color = mPrimitives->GetMyColor();
+
+	int dir = 1;
+	int offset = 0;
+	if (color) {
+		dir = -1;
+		offset = 3000;
+	}
 	if (n == 0) {
 		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, 630);
+		lua_pushnumber(L, offset + dir * 625);
 		lua_pushnumber(L, 1885);
-		lua_pushnumber(L, 630);
+		lua_pushnumber(L, offset + dir * 625);
+		lua_pushinteger(L, -1);
+		lua_pushinteger(L, -1);
 	} else if (n == 1) {
 		lua_pushnumber(L, 1925 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, 1325);
+		lua_pushnumber(L, offset + dir * 1325);
 		lua_pushnumber(L, 1925);
-		lua_pushnumber(L, 1325);
+		lua_pushnumber(L, offset + dir * 1325);
+		lua_pushinteger(L, -1);
+		lua_pushinteger(L, -1);
 	} else if (n == 2) {
 		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, 2030);
+		lua_pushnumber(L, offset + dir * 2025);
 		lua_pushnumber(L, 1885);
-		lua_pushnumber(L, 2030);
+		lua_pushnumber(L, offset + dir * 2025);
+		lua_pushinteger(L, -1);
+		lua_pushinteger(L, -1);
 	} else {
-		lua_pushboolean(L, false);
-		return 1;
+		int min = 1;
+		int target = -1;
+
+		for (int i = 0; i < 30; i++) {
+			int d = (i / 6 + i % 6) % 2;
+			if ((color && d == 0) || (!color && d == 1)) {
+				cout << i << " " << d << endl;
+				if (deployFields[i] < min) {
+					min = deployFields[i];
+					target = i;
+				}
+			}
+		}
+
+		if (target != -1) {
+			double x = target / 6 * 350 + 175;
+			double y = target % 6 * 350 + 175 + 450;
+
+			double deployDistance = ROBOT_FRONT_PAWN;
+
+			if (x < 1050) {
+				deployDistance = -ROBOT_FRONT_PAWN;
+			}
+			lua_pushnumber(L, x - deployDistance);
+			lua_pushnumber(L, y);
+			lua_pushnumber(L, x);
+			lua_pushnumber(L, y);
+			lua_pushinteger(L, target);
+			lua_pushinteger(L, deployFields[target]);
+		} else {
+			lua_pushboolean(L, false);
+			return 1;
+		}
 	}
 	n++;
-	return 4;
+	return 6;
+}
+
+int Control::LuaSetDeployPointPriority(lua_State *L) {
+	int target = lua_tointeger(L, 1);
+	int priority = lua_tointeger(L, 2);
+	if (target < 0) {
+		return 0;
+	}
+	if (priority < 1) {
+		for (int i = 0; i < 30; i++) {
+			if (deployFields[i] <= priority) {
+				deployFields[i] -= 1;
+			}
+		}
+	}
+	deployFields[target] = priority;
+
+	msgdeploypriority message;
+	message.function = MSG_DEPLOYPRIORITY;
+	for (int i = 0; i < 30; i++) {
+		message.priority[i] = deployFields[i];
+	}
+	mServer->Send(0, &message, sizeof(msgdeploypriority));
+
+	return 0;
 }

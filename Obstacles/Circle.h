@@ -18,6 +18,8 @@ class Circle: public Obstacle {
 		void Set(double x, double y, double r);
 
 		bool Intersect(double x1, double y1, double x2, double y2);
+		bool Intersect(double x, double y, double r);
+		bool Intersect(Obstacle* obstacle);
 
 		double x, y, r;
 	protected:

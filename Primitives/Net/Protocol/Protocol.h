@@ -23,6 +23,7 @@
 #define MSG_ARMMOVE 12
 #define MSG_MAGNET 13
 #define MSG_PAWNS 14
+#define MSG_DEPLOYPRIORITY 15
 
 #define FIG_NOTHING 0
 #define FIG_PAWN 1
@@ -108,6 +109,11 @@ typedef struct msgmagnet {
 	bool left;
 	int8_t polarity;
 } msgmagnet;
+
+typedef struct msgdeploypriority {
+	function_t function;
+	int8_t priority[30];
+} msgdeploypriority;
 
 #pragma pack()
 

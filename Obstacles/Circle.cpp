@@ -8,6 +8,7 @@
 #include "Circle.h"
 
 Circle::Circle(double x, double y, double r) {
+	m_shapeType = SHAPE_CIRCLE;
 	this->Set(x, y, r);
 }
 
@@ -24,6 +25,8 @@ bool Circle::Intersect(double x1, double y1, double x2, double y2) {
 	double A, B, C, D;
 
 	double r2 = sqr(r);
+
+	// benne van
 	if (sqr(x1 - x) + sqr(y1 - y) < r2) {
 		return true;
 	}
@@ -118,6 +121,16 @@ bool Circle::Intersect(double x1, double y1, double x2, double y2) {
 		}
 	}
 	return false;
+}
+
+bool Circle::Intersect(double x, double y, double r) {
+	double dist2 = sqr(x - this->x) + sqr(y - this->y);
+	double r2 = sqr(r + this->r);
+	return r2 >= dist2;
+}
+
+bool Circle::Intersect(Obstacle* obstacle) {
+	return obstacle->Intersect(x, y, r);
 }
 
 Circle::~Circle() {

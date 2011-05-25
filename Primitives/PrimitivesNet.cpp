@@ -74,6 +74,7 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		mStartButton = data->startButton;
 		mStopButton = data->stopButton;
 		mRobotColor = data->color;
+		mPawnInGripper = data->pawnInGripper;
 	} else if (*function == MSG_CALIBRATEPOS && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
 		if (data->b1 && calibrateDeadreckoning.inprogress) {

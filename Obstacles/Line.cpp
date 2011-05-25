@@ -1,6 +1,7 @@
 #include "Line.h"
 
 Line::Line(double x1, double y1, double x2, double y2) {
+	m_shapeType = SHAPE_LINE;
 	this->Set(x1, y1, x2, y2);
 }
 
@@ -199,6 +200,87 @@ bool Line::Intersect(double x1, double y1, double x2, double y2) {
 	double d = sqrt(sqr(x2 - x1) + sqr(y2 - y1));
 	double d2 = Distance(x1, y1, phi);
 	return d > d2 && d2 > 0;
+}
+
+bool Line::Intersect(double x, double y, double r) {
+	double A, B, C, D;
+
+	double r2 = sqr(r);
+
+	// benne van
+	if (sqr(maxx - x) + sqr(maxy - y) < r2) {
+		return true;
+	}
+	if (sqr(minx - x) + sqr(miny - y) < r2) {
+		return true;
+	}
+
+	if (ylonger) {
+		A = sqr(m) + 1;
+		B = 2 * (m * (b - x) - y);
+		C = sqr(b - x) + sqr(y) - r2;
+		D = sqr(B) - 4 * A * C;
+	} else {
+		A = sqr(m) + 1;
+		B = 2 * (m * (b - y) - x);
+		C = sqr(b - y) + sqr(x) - r2;
+		D = sqr(B) - 4 * A * C;
+	}
+
+	if (ylonger) {
+		if (D > EPSILON) {
+			// ket megoldas
+			double ry = (-B + sqrt(D)) / (2 * A);
+			double rx = m * ry + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+			ry = (-B - sqrt(D)) / (2 * A);
+			rx = m * ry + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+		} else if (fabs(D) < EPSILON) {
+			// egy megoldas
+			double ry = -B / (2 * A);
+			double rx = m * ry + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+		} else {
+			// nincs megoldas
+			return false;
+		}
+	} else {
+		if (D > EPSILON) {
+			// ket megoldas
+			double rx = (-B + sqrt(D)) / (2 * A);
+			double ry = m * rx + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+			rx = (-B - sqrt(D)) / (2 * A);
+			ry = m * rx + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+		} else if (fabs(D) < EPSILON) {
+			// egy megoldas
+			double rx = -B / (2 * A);
+			double ry = m * rx + b;
+			if (rx >= minx && rx <= maxx && ry >= miny && ry <= maxy) {
+				return true;
+			}
+		} else {
+			// nincs megoldas
+			return false;
+		}
+	}
+	return false;
+}
+
+bool Line::Intersect(Obstacle* obstacle) {
+	return obstacle->Intersect(minx, miny, maxx, maxy);
 }
 
 Line::~Line() {

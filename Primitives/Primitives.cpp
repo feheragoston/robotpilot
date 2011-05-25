@@ -13,6 +13,7 @@ Primitives::Primitives(Config* config) {
 	mStartButton = false;
 	mStopButton = false;
 	mRobotColor = false;
+	mPawnInGripper = false;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -176,8 +177,8 @@ bool Primitives::Wait(long int useconds) {
 	return true;
 }
 
-bool Primitives::PawnInGripper(void){
-	return false;
+bool Primitives::PawnInGripper(void) {
+	return mPawnInGripper;
 }
 
 bool Primitives::GetStartButton() {

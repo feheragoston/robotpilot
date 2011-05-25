@@ -17,46 +17,46 @@ repeat Control(); until (RefreshPawnPositions() ~= 0);
 repeat Control(); until (Go(100) ~= 0);
 
 function go1()
-	while (TurnTo(350, Offset + Ori * 800) == 0) do Control(); end;
-	while (GoTo(350, Offset + Ori * 800) == 0) do Control(); end;
+	while (TurnToSafe(350, Offset + Ori * 800) == 0) do Control(); end;
+	while (GoToSafe(350, Offset + Ori * 800) == 0) do Control(); end;
 end
 function go2()
-	while (TurnTo(350, Offset + Ori * 2200) == 0) do Control(); end;
-	while (GoTo(350, Offset + Ori * 2200) == 0) do Control(); end;
+	while (TurnToSafe(350, Offset + Ori * 2200) == 0) do Control(); end;
+	while (GoToSafe(350, Offset + Ori * 2200) == 0) do Control(); end;
 end
 function go3()
-	while (TurnTo(1600, Offset + Ori * 2200) == 0) do Control(); end;
-	while (GoTo(1600, Offset + Ori * 2200) == 0) do Control(); end;
+	while (TurnToSafe(1600, Offset + Ori * 2200) == 0) do Control(); end;
+	while (GoToSafe(1600, Offset + Ori * 2200) == 0) do Control(); end;
 end
 function go4()
-	while (TurnTo(1600, Offset + Ori * 800) == 0) do Control(); end;
-	while (GoTo(1600, Offset + Ori * 800) == 0) do Control(); end;
+	while (TurnToSafe(1600, Offset + Ori * 800) == 0) do Control(); end;
+	while (GoToSafe(1600, Offset + Ori * 800) == 0) do Control(); end;
 end
 
 function resolveDeadpos1()
-	while (Go(-1000) == 0) do Control(); end;
+	while (GoSafe(-1000) == 0) do Control(); end;
 end
 
 function resolveDeadpos2()
-	while (Go(600) == 0) do Control(); end;
+	while (GoSafe(600) == 0) do Control(); end;
 end
 
 function resolveDeadpos3()
-	while (Go(-100) == 0) do Control(); end;
+	while (GoSafe(-100) == 0) do Control(); end;
 end
 
 function resolveDeadpos4()
-	while (Go(150) == 0) do Control(); end;
+	while (GoSafe(150) == 0) do Control(); end;
 end
 
 function resolveDeadpos5()
-	while (Turn(PI/2) == 0) do Control(); end;
-	while (Go(300) == 0) do Control(); end;
+	while (TurnSafe(PI/2) == 0) do Control(); end;
+	while (GoSafe(300) == 0) do Control(); end;
 end
 
 function resolveDeadpos6()
-	while (Turn(-PI/2) == 0) do Control(); end;
-	while (Go(300) == 0) do Control(); end;
+	while (TurnSafe(-PI/2) == 0) do Control(); end;
+	while (GoSafe(300) == 0) do Control(); end;
 end
 
 repeat

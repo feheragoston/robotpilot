@@ -23,6 +23,8 @@ public:
 	double Distance(double x, double y, double r, double xr, double yr, double omega);
 	
 	bool Intersect(double x1, double y1, double x2, double y2);
+	bool Intersect(double x, double y, double r);
+	bool Intersect(Obstacle* obstacle);
 
 	double minx, miny, maxx, maxy;
 protected:

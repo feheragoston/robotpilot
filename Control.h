@@ -51,8 +51,12 @@ protected:
 	static msgpawns* pawns;
 
 	static std::list<Obstacle*> obstacles;
+	static double robotBody[][2];
 	static Circle* opponent;
 	static double angry;
+	static int deployFields[30];
+
+	static bool simulate;
 
 	lua_State *L;
 
@@ -99,6 +103,7 @@ protected:
 	static int LuaGetStartButton(lua_State *L);
 	static int LuaGetStopButton(lua_State *L);
 	static int LuaGetMyColor(lua_State *L);
+	static int LuaPawnInGripper(lua_State *L);
 	static int LuaMotorSupply(lua_State *L);
 
 	static int LuaCalibrateDeadreckoning(lua_State *L);
@@ -122,6 +127,7 @@ protected:
 	static int LuaRefreshPawnPositions(lua_State *L);
 	static int LuaFindPawn(lua_State *L);
 	static int LuaGetDeployPoint(lua_State *L);
+	static int LuaSetDeployPointPriority(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

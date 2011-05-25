@@ -280,6 +280,11 @@ protected:
 	bool mStopButton;
 
 	/**
+	 * a parasztkapcsolo allapotat tarolja
+	 */
+	bool mPawnInGripper;
+
+	/**
 	 * a robot es az ellenfel pozicioja
 	 */
 	position robot, opponent;
