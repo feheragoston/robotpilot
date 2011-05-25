@@ -49,6 +49,7 @@ typedef struct msgstatus {
 	bool stopButton;
 	bool color;
 	bool pawnInGripper;
+	bool motorSupply;
 } msgstatus;
 
 typedef struct msgpawn {

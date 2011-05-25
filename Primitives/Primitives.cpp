@@ -197,6 +197,10 @@ int Primitives::MotorSupply(bool powered) {
 	return 1;
 }
 
+bool Primitives::GetMotorSupply() {
+	return true;
+}
+
 int Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 200;
 	robot.y = 200;

@@ -248,6 +248,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		response.pawnInGripper = mPrimitives->PawnInGripper();
+		response.motorSupply = mPrimitives->GetMotorSupply();
 		mServer->Send(n, &response, sizeof(msgstatus));
 	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
 		mServer->Send(n, pawns, sizeof(msgpawns));
@@ -431,6 +432,7 @@ int Control::LuaWait(lua_State *L) {
 	/* statusz ellenorzesek */
 	if (mPrimitives->GetStopButton()) {
 		exitControl = true;
+		mPrimitives->MotorSupply(false);
 		return luaL_error(L, "Stop button, exiting");
 	}
 
