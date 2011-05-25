@@ -323,7 +323,7 @@ bool Control::obstacleCollision() {
 			message.d2 = y1;
 			message.d3 = x2;
 			message.d4 = y2;
-			mServer->Send(0, &message, sizeof(msgd4));
+			//mServer->Send(0, &message, sizeof(msgd4));
 		}
 
 		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
@@ -605,7 +605,7 @@ int Control::LuaPawnInGripper(lua_State *L) {
 int Control::LuaGetDistances(lua_State *L) {
 	double dist[6];
 	mPrimitives->GetDistances(dist);
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 6; i++) {
 		lua_pushnumber(L, dist[i]);
 	}
 	return 6;
@@ -885,8 +885,8 @@ int Control::LuaFindPawn(lua_State *L) {
 			double angle = atan2f(y - py, x - px);
 			lua_pushnumber(L, px);
 			lua_pushnumber(L, py);
-			lua_pushnumber(L, px + cos(angle) * ROBOT_FRONT_PAWN);
-			lua_pushnumber(L, py + sin(angle) * ROBOT_FRONT_PAWN);
+			lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
+			lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
 			return 4;
 		} else {
 			lua_pushnumber(L, px);
@@ -939,7 +939,6 @@ int Control::LuaGetDeployPoint(lua_State *L) {
 		for (int i = 0; i < 30; i++) {
 			int d = (i / 6 + i % 6) % 2;
 			if ((color && d == 0) || (!color && d == 1)) {
-				cout << i << " " << d << endl;
 				if (deployFields[i] < min) {
 					min = deployFields[i];
 					target = i;
@@ -983,6 +982,10 @@ int Control::LuaSetDeployPointPriority(lua_State *L) {
 				deployFields[i] -= 1;
 			}
 		}
+	} else if (priority == 1) {
+		double x = target / 6 * 350 + 175;
+		double y = target % 6 * 350 + 175 + 450;
+		obstacles.push_back(new Circle(x, y, 100));
 	}
 	deployFields[target] = priority;
 
