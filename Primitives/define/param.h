@@ -2,163 +2,102 @@
 #define PARAM_H_
 
 
+
+
+
 #include <math.h>
 
 
 
 
-#define SEND_START_ACTUATOR_IN_INIT				1
 
-
-
-
-#define PING_REPLY_MAX_WAIT_TIME_SEC			1
-#define INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC		1
-
-
+//----- konstans -----
 #define SERVO_COUNT							6
-
 
 #define MAGNET_COUNT						2
 
-#define MAGNET_POLARITY_p24V				0x01	//01: +24V
-#define MAGNET_POLARITY_0V					0x00	//00: 0V
-#define MAGNET_POLARITY_m24V				0xFF	//FF: -24V
-
-#define MAGNET_PUSH							MAGNET_POLARITY_p24V
-#define MAGNET_OFF							MAGNET_POLARITY_0V
-#define MAGNET_PULL							MAGNET_POLARITY_m24V
-
-
-
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
-
 
 #define ACT_INPROGRESS						1
 #define ACT_FINISHED						0
 #define ACT_ERROR							-1
 
-
 #define COLOR_RED							false
 #define COLOR_BLUE							true
 
+#define MAGNET_POLARITY_p24V				0x01	//01: +24V
+#define MAGNET_POLARITY_0V					0x00	//00: 0V
+#define MAGNET_POLARITY_m24V				0xFF	//FF: -24V
 
-
-#define MAGNET_LEFT_INDEX									0
-#define MAGNET_RIGHT_INDEX									1
-
-
-
-
-
-#define INPUT_DIGITAL_START_BUTTON_INDEX					6
-#define INPUT_DIGITAL_COLOR_BUTTON_INDEX					7
-#define INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX			9
-#define INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX		8
-#define INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX					2
-#define INPUT_DIGITAL_PLUS_0_INDEX							4
-#define INPUT_DIGITAL_PLUS_1_INDEX							5
-#define INPUT_DIGITAL_PLUS_2_INDEX							0
-#define INPUT_DIGITAL_PLUS_3_INDEX							1
-#define INPUT_DIGITAL_PLUS_4_INDEX							3
-
-
-#define INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL				1
-#define INPUT_DIGITAL_COLOR_BUTTON_ACTIVE_LEVEL				0	//aktiv a kek
-#define INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL	0
-#define INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL	0
-#define INPUT_DIGITAL_PAWN_IN_GRIPPER_ACTIVE_LEVEL			0
-#define INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL					0
-#define INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL					0
-#define INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL					0
-#define INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL					0
-#define INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL					0
-
-
-
-
-#define INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX		0
-#define INPUT_ANALOG_LEFT_LOW_SHARP_INDEX		1
-#define INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX		2
-#define INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX		3
-#define INPUT_ANALOG_PLUS_0_INDEX				4
-#define INPUT_ANALOG_PLUS_1_INDEX				5
-#define INPUT_ANALOG_PLUS_2_INDEX				6
+#define AREA_LENGTH_X						2100
+#define AREA_LENGTH_Y						3000
 
 
 
 
 
-
-
-#define SERVO_GRIPPER_MAX_SPEED						1000	//deg/s
-#define SERVO_GRIPPER_MAX_ACC						1000	//deg/s^2
-
-
-
-
-
-#define AREA_LENGTH_X							2100
-#define AREA_LENGTH_Y							3000
-//#define ROBOT_DISTANCE_ON_FRONT_WALL			200
-//#define ROBOT_DISTANCE_ON_REAR_WALL				150
-
-//#define DEADRECK_CALIB_SPEED_ABS				0.1
-//#define DEADRECK_CALIB_OMEGA_ABS				0.2
-//#define DEADRECK_CALIB_BETA_ABS					0.08
-
-//az Y falra kell rasimitani
-//az Y falhoz kozelebbi kapcsolot kell benyomni
-#define DEADRECK_CALIB_DISTANCE_X				((double)167.4)
-#define DEADRECK_CALIB_DISTANCE_Y				((double)174)
-#define DEADRECK_CALIB_PHI						((double)53.75 * M_PI / 180)
-
-
-//#define DEADRECK_START_DISTANCE_X				250
-//#define DEADRECK_START_DISTANCE_Y				250
+//----- macro -----
+//kesobb:
+//AAA_BBB_CCC_X0:		AAA node-nal a BBB-CCC fuggveny X0, Y0, X1, Y1 pontjai, hogy egy egyenest ket ponttal adjunk meg
+//AAA_BBB_CCC_GRAD:		AAA node-nal a BBB-CCC fuggveny meredeksege (dCCC / dBBB)
+#define GET_GRAD(X0, Y0, X1, Y1)			( ((double)(Y1) - (double)(Y0)) / ((double)(X1) - (double)(X0)) )
 
 
 
 
 
+//----- atszamitas -----
+#define MESV_TO_ANALOG(mesv)					((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
+#define ANALOG_TO_MESV(analog)					((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
+
+
+#define POWER_V_TO_MESV(v)						((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
+#define POWER_A_TO_MESV(a)						((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
+
+#define POWER_MESV_TO_V(mesv)					((float)(mesv) * (10 + 100) / 10)			//feszultsegmeresekhez 10k-100k leosztas
+#define POWER_MESV_TO_A(mesv)					((float)(mesv) * (-30/2.5) + 30)			//2.5V -> 0A, 0V -> 30A
+
+#define POWER_V_TO_ANALOG(v)					MESV_TO_ANALOG(POWER_V_TO_MESV(v))
+#define POWER_A_TO_ANALOG(a)					MESV_TO_ANALOG(POWER_A_TO_MESV(a))
+
+#define POWER_ANALOG_TO_V(analog)				POWER_MESV_TO_V(ANALOG_TO_MESV(analog))
+#define POWER_ANALOG_TO_A(analog)				POWER_MESV_TO_A(ANALOG_TO_MESV(analog))
+
+
+#define INPUT_MESV_TO_V(mesv)					((float)(mesv) * (22 + 22) / 22)			//feszultsegmeresekhez 22k-22k leosztas
+#define INPUT_V_TO_MESV(v)						((float)(v) * 22 / (22 + 22))				//feszultsegmeresekhez 22k-22k leosztas
+
+#define INPUT_V_TO_ANALOG(v)					MESV_TO_ANALOG(INPUT_V_TO_MESV(v))
+#define INPUT_ANALOG_TO_V(analog)				INPUT_MESV_TO_V(ANALOG_TO_MESV(analog))
 
 
 
 
+
+//----- valtoztathato -----
+#define SEND_START_ACTUATOR_IN_INIT				0
 
 #define INIT_RETURN_FALSE_IF_ERROR				false
 
+#define PING_REPLY_MAX_WAIT_TIME_SEC			1
+#define INIT_PARAM_REPLY_MAX_WAIT_TIME_SEC		1
 
 
 
 
 
-#define CONSOLE_ON_CANB							1
-#define DEADRECK_ON_CANB						1
-#define BDC_ON_CANB								1
-#define INPUT_ON_CANB							1
-#define MAGNET_ON_CANB							1
-#define SERVO_ON_CANB							1
-#define SONAR_ON_CANB							1
-#define POWER_ON_CANB							1
-
-
-
+//----- can -----
 #define KEEP_ALIVE_PERIOD_MS					100
-
 
 
 #define BROADCAST_KEEP_ALIVE_MS					500
 #define BROADCAST_SEND_PERIOD_TO_PC_MS			100
 #define BROADCAST_SEND_PERIOD_TO_NODE_MS		10
 
-
 #define USE_BROADCAST_KEEP_ALIVE_MS				true
 #define USE_BROADCAST_SEND_PERIOD_TO_PC_MS		false
 #define USE_BROADCAST_SEND_PERIOD_TO_NODE_MS	false
-
-
 
 
 #define GATEWAY_KEEP_ALIVE_MS					1000
@@ -171,7 +110,7 @@
 
 #define DEADRECK_KEEP_ALIVE_MS					1000
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
-#define DEADRECK_SEND_PERIOD_TO_NODE_MS			1	//10
+#define DEADRECK_SEND_PERIOD_TO_NODE_MS			2	//10
 
 #define BDC_KEEP_ALIVE_MS						1000
 #define BDC_SEND_PERIOD_TO_PC_MS				100
@@ -201,68 +140,79 @@
 
 
 
+//----- gateway -----
+#define CONSOLE_ON_CANB							1
+#define DEADRECK_ON_CANB						1
+#define BDC_ON_CANB								1
+#define INPUT_ON_CANB							1
+#define MAGNET_ON_CANB							1
+#define SERVO_ON_CANB							1
+#define SONAR_ON_CANB							1
+#define POWER_ON_CANB							1
 
 
 
 
 
+//----- magnet -----
+#define MAGNET_PUSH							MAGNET_POLARITY_p24V
+#define MAGNET_OFF							MAGNET_POLARITY_0V
+#define MAGNET_PULL							MAGNET_POLARITY_m24V
 
-
-
-
-#define GET_GRAD(X0, Y0, X1, Y1)			( ((double)(Y1) - (double)(Y0)) / ((double)(X1) - (double)(X0)) )
-
-
-
-//AAA_BBB_CCC_X0:		AAA node-nal a BBB-CCC fuggveny X0, Y0, X1, Y1 pontjai, hogy egy egyenest ket ponttal adjunk meg
-//AAA_BBB_CCC_GRAD:		AAA node-nal a BBB-CCC fuggveny meredeksege (dCCC / dBBB)
-#define CONSOLE_INCR_MM_X0					1
-#define CONSOLE_INCR_MM_Y0					100
-#define CONSOLE_INCR_MM_X1					2
-#define CONSOLE_INCR_MM_Y1					200
-#define CONSOLE_INCR_MM_GRAD				GET_GRAD(CONSOLE_INCR_MM_X0, CONSOLE_INCR_MM_Y0, CONSOLE_INCR_MM_X1, CONSOLE_INCR_MM_Y1)
-
-#define CONSOLE_MM_TO_INCR(mm)				((u32)(((double)(mm) - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0)));
-#define CONSOLE_INCR_TO_MM(incr)			(((double)(incr) - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0)
-
-
-
-//---------- atszamitas ELEJE ----------
-#define MESV_TO_ANALOG(mesv)					((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
-#define ANALOG_TO_MESV(analog)					((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
-
-#define POWER_V_TO_MESV(v)						((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
-#define POWER_A_TO_MESV(a)						((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
-
-#define POWER_MESV_TO_V(mesv)					((float)(mesv) * (10 + 100) / 10)			//feszultsegmeresekhez 10k-100k leosztas
-#define POWER_MESV_TO_A(mesv)					((float)(mesv) * (-30/2.5) + 30)			//2.5V -> 0A, 0V -> 30A
-
-#define POWER_V_TO_ANALOG(v)					MESV_TO_ANALOG(POWER_V_TO_MESV(v))
-#define POWER_A_TO_ANALOG(a)					MESV_TO_ANALOG(POWER_A_TO_MESV(a))
-
-#define POWER_ANALOG_TO_V(analog)				POWER_MESV_TO_V(ANALOG_TO_MESV(analog))
-#define POWER_ANALOG_TO_A(analog)				POWER_MESV_TO_A(ANALOG_TO_MESV(analog))
-
-#define INPUT_MESV_TO_V(mesv)					((float)(mesv) * (22 + 22) / 22)			//feszultsegmeresekhez 22k-22k leosztas
-#define INPUT_V_TO_MESV(v)						((float)(v) * 22 / (22 + 22))				//feszultsegmeresekhez 22k-22k leosztas
-
-
-#define INPUT_V_TO_ANALOG(v)					MESV_TO_ANALOG(INPUT_V_TO_MESV(v))
-#define INPUT_ANALOG_TO_V(analog)				INPUT_MESV_TO_V(ANALOG_TO_MESV(analog))
-//---------- atszamitas VEGE ----------
+#define MAGNET_LEFT_INDEX									0
+#define MAGNET_RIGHT_INDEX									1
 
 
 
 
 
+//----- input -----
+#define INPUT_DIGITAL_START_BUTTON_INDEX					6
+#define INPUT_DIGITAL_COLOR_BUTTON_INDEX					7
+#define INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX			1
+#define INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX		8
+#define INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX					9
+#define INPUT_DIGITAL_PLUS_0_INDEX							4
+#define INPUT_DIGITAL_PLUS_1_INDEX							5
+#define INPUT_DIGITAL_PLUS_2_INDEX							0
+#define INPUT_DIGITAL_PLUS_3_INDEX							2
+#define INPUT_DIGITAL_PLUS_4_INDEX							3
 
-#define SERVO_GRIPPER_LEFT_INDEX						1
-#define SERVO_GRIPPER_RIGHT_INDEX						0
-#define SERVO_LEFT_ARM_INDEX							3
-#define SERVO_RIGHT_ARM_INDEX							2
+#define INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL				1
+#define INPUT_DIGITAL_COLOR_BUTTON_ACTIVE_LEVEL				0	//aktiv a kek
+#define INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL	0
+#define INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL	0
+#define INPUT_DIGITAL_PAWN_IN_GRIPPER_ACTIVE_LEVEL			0
+#define INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL					0
+
+
+#define INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX		3
+#define INPUT_ANALOG_LEFT_LOW_SHARP_INDEX		4
+#define INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX		0
+#define INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX		1
+#define INPUT_ANALOG_PLUS_0_INDEX				2
+#define INPUT_ANALOG_PLUS_1_INDEX				5
+#define INPUT_ANALOG_PLUS_2_INDEX				7
+
+
+
+
+
+//----- servo -----
+#define SERVO_GRIPPER_MAX_SPEED						1000	//deg/s
+#define SERVO_GRIPPER_MAX_ACC						1000	//deg/s^2
+
+
+#define SERVO_GRIPPER_LEFT_INDEX						3
+#define SERVO_GRIPPER_RIGHT_INDEX						2
+#define SERVO_LEFT_ARM_INDEX							1
+#define SERVO_RIGHT_ARM_INDEX							0
 #define SERVO_PLUS_0_INDEX								4
 #define SERVO_PLUS_1_INDEX								5
-
 
 
 #define SERVO_GRIPPER_LEFT_DEG_INCR_X0					0
@@ -311,17 +261,34 @@
 
 
 
+//----- deadreck -----
+//az Y falra kell rasimitani
+//az Y falhoz kozelebbi kapcsolot kell benyomni
+#define DEADRECK_CALIB_DISTANCE_X				((double)167.4)	//[mm]
+#define DEADRECK_CALIB_DISTANCE_Y				((double)174)	//[mm]
+#define DEADRECK_CALIB_PHI						((double)53.75 * M_PI / 180)	//[rad]
+
+#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 261.274198830535)
+#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
+#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
+#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0
+#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1
+#define DEADRECK_IS_LEFT_EQEP1						0
 
 
 
 
-#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							20
+
+//----- power -----
+#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							5
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_FALLING_TIME_US				100
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_RISING_TIME_US				20000
 
 #define POWER_MAIN_CURRENT_SHUTDOWN_LEVEL							3
 #define POWER_ACT_CURRENT_SHUTDOWN_LEVEL							8
+#define POWER_MAIN_HIGH_CURRENT_TIME_MS								3
+#define POWER_ACT_HIGH_CURRENT_TIME_MS								3
 
 #define POWER_ACCU_VOLTAGE_OK_LEVEL									23
 
@@ -332,16 +299,10 @@
 
 
 
-
-
-
-
-
-
+//----- bdc -----
 #define BDC_GEARBOX									66
 #define BDC_INCR_PER_MOTORROT						3000
 #define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
-
 
 #define BDC_INCR_PER_MM								((double)494317 / 400)
 #define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
@@ -351,7 +312,6 @@
 
 #define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10)
 #define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
-
 
 #define BDC_SEC_PER_MIN								60
 
@@ -368,39 +328,28 @@
 //#define BDC_CONV_DIST(dist)							((s32)BDC_CONV_MM_TO_INCR(dist))
 
 
-
-
 #define BDC_IS_LEFT_MOTOR1							0
 #define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
 #define BDC_PRE_BRAKE_TIME							0.3	//sec
-#define BDC_OE_CONTROL_P							100
-#define BDC_OE_CONTROL_I							15
+#define BDC_OE_CONTROL_P							0
+#define BDC_OE_CONTROL_I							0
 
 
 
 
 
+//----- console -----
+#define CONSOLE_INCR_MM_X0					1
+#define CONSOLE_INCR_MM_Y0					100
+#define CONSOLE_INCR_MM_X1					2
+#define CONSOLE_INCR_MM_Y1					200
+#define CONSOLE_INCR_MM_GRAD				GET_GRAD(CONSOLE_INCR_MM_X0, CONSOLE_INCR_MM_Y0, CONSOLE_INCR_MM_X1, CONSOLE_INCR_MM_Y1)
 
-
-
-#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 261.274198830535)
-#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
-#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
-#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0
-#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1
-#define DEADRECK_IS_LEFT_EQEP1						1
-
-
-
-
-
-
-
-
-
+#define CONSOLE_MM_TO_INCR(mm)				((u32)(((double)(mm) - CONSOLE_INCR_MM_Y0) / CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_X0)));
+#define CONSOLE_INCR_TO_MM(incr)			(((double)(incr) - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0)
 
 
 #define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		200
@@ -414,7 +363,6 @@
 #define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			1
 #define CONSOLE_IS_ENC_EQEP1						1
 #define CONSOLE_MOTOR_PLUS_CW						1
-
 
 
 
