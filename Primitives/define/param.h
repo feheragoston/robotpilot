@@ -19,8 +19,8 @@
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 
-#define ACT_INPROGRESS						1
-#define ACT_FINISHED						0
+#define ACT_INPROGRESS						0
+#define ACT_FINISHED						1
 #define ACT_ERROR							-1
 
 #define COLOR_RED							false
