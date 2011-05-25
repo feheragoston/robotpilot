@@ -18,8 +18,8 @@ node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar", SONAR_KEEP_ALIVE_MS,
 
 
 	//----- valtozo init ELEJE -----
-	SonarPosX = 0;
-	SonarPosY = 0;
+	SonarPosX = -1000;
+	SonarPosY = -1000;
 	//----- valtozo init VEGE -----
 
 
