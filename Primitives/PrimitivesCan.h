@@ -117,6 +117,8 @@ private:
 	double deadreckCheckX;
 	double deadreckCheckY;
 	double deadreckCheckPhi;
+
+	double T33WS[3][3];	//World-Sonar transzformacios matrix
 	//----- valtozo VEGE -----
 
 
@@ -128,7 +130,7 @@ private:
 
 	void detectActChange(void);
 
-
+	void Calibrate_Unsafe(void);
 	int DeadreckoningResetPos_Unsafe(void);
 
 	void ConvRobotToWorld(double xr, double yr, double phir, double* xw, double* yw, double* phiw);
@@ -141,6 +143,15 @@ private:
 	bool GetMyColor_Unsafe(void);
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
 	void SetRobotPos_Unsafe(double x, double y, double phi);
+
+	//----- TO ELEJE -----
+	struct timeval moveStart;
+	long int moveTOsec;
+	long int moveTOusec;
+	void setMoveTO(double s, double v, double a);
+	bool readyMoveTO(void);
+	void TimeMeasure(struct timeval *time_start, struct timeval *time_elapsed);
+	//----- TO VEGE -----
 
 
 };

@@ -51,21 +51,24 @@ void node_Console::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:
-				stop.done = GET_BOOL(&(msg->data[0]), 0);
-				stop.inProgress = false;
-				stop.finished = true;
+				Stop.done = GET_BOOL(&(msg->data[0]), 0);
+				Stop.inProgress = false;
+				Stop.finished = true;
+				cout << name << "\t___recv STOP___:\t" << (Stop.done?"1":"0") << endl;
 				break;
 
 			case MSG_CONSOLE_SET_POS_REPLY:
-				move.done = GET_BOOL(&(msg->data[0]), 0);
-				move.inProgress = false;
-				move.finished = true;
+				SetPos.done = GET_BOOL(&(msg->data[0]), 0);
+				SetPos.inProgress = false;
+				SetPos.finished = true;
+				cout << name << "\t___recv SETPOS___:\t" << (Stop.done?"1":"0") << endl;
 				break;
 
 			case MSG_CONSOLE_CALIBRATE_REPLY:
-				calibrate.done = GET_BOOL(&(msg->data[0]), 0);
-				calibrate.inProgress = false;
-				calibrate.finished = true;
+				Calibrate.done = GET_BOOL(&(msg->data[0]), 0);
+				Calibrate.inProgress = false;
+				Calibrate.finished = true;
+				cout << name << "\t___recv CALIB___:\t" << (Stop.done?"1":"0") << endl;
 				break;
 
 			default:
@@ -89,8 +92,10 @@ void node_Console::CONSOLE_STOP(void){
 
 	UDPdriver::send(&msg);
 
-	stop.inProgress = true;
-	stop.finished = false;
+	Stop.inProgress = true;
+	Stop.finished = false;
+
+	cout << name << "\t___send STOP___" << endl;
 
 }
 
@@ -109,8 +114,10 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 
 	UDPdriver::send(&msg);
 
-	move.inProgress = true;
-	move.finished = false;
+	SetPos.inProgress = true;
+	SetPos.finished = false;
+
+	cout << name << "\t___send SETPOS___:\t" << CONSOLE_INCR_TO_MM(pos) << "\t" << CONSOLE_INCR_TO_MM(speed) << "\t" << CONSOLE_INCR_TO_MM(acc) << endl;
 
 }
 
@@ -125,8 +132,10 @@ void node_Console::CONSOLE_CALIBRATE(void){
 
 	UDPdriver::send(&msg);
 
-	calibrate.inProgress = true;
-	calibrate.finished = false;
+	Calibrate.inProgress = true;
+	Calibrate.finished = false;
+
+	cout << name << "\t___send CALIB___" << endl;
 
 }
 

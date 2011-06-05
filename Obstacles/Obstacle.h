@@ -48,6 +48,8 @@ class Obstacle {
 		 */
 		virtual bool Intersect(Obstacle* obstacle);
 
+		virtual void Print();
+
 		int getShapeType() const { return m_shapeType; }
 
 	protected:

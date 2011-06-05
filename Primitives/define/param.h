@@ -110,7 +110,7 @@
 
 #define DEADRECK_KEEP_ALIVE_MS					1000
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
-#define DEADRECK_SEND_PERIOD_TO_NODE_MS			2	//10
+#define DEADRECK_SEND_PERIOD_TO_NODE_MS			5	//10
 
 #define BDC_KEEP_ALIVE_MS						1000
 #define BDC_SEND_PERIOD_TO_PC_MS				100
@@ -171,11 +171,11 @@
 #define INPUT_DIGITAL_COLOR_BUTTON_INDEX					7
 #define INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX			1
 #define INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX		8
-#define INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX					9
+#define INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX					2
 #define INPUT_DIGITAL_PLUS_0_INDEX							4
 #define INPUT_DIGITAL_PLUS_1_INDEX							5
 #define INPUT_DIGITAL_PLUS_2_INDEX							0
-#define INPUT_DIGITAL_PLUS_3_INDEX							2
+#define INPUT_DIGITAL_PLUS_3_INDEX							9
 #define INPUT_DIGITAL_PLUS_4_INDEX							3
 
 #define INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL				1
@@ -263,7 +263,6 @@
 
 //----- deadreck -----
 //az Y falra kell rasimitani
-//az Y falhoz kozelebbi kapcsolot kell benyomni
 #define DEADRECK_CALIB_DISTANCE_X				((double)167.4)	//[mm]
 #define DEADRECK_CALIB_DISTANCE_Y				((double)174)	//[mm]
 #define DEADRECK_CALIB_PHI						((double)53.75 * M_PI / 180)	//[rad]
@@ -280,9 +279,9 @@
 
 
 //----- power -----
-#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							5
+#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							20
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3
-#define POWER_MAIN_VOLTAGE_STOPBUTTON_FALLING_TIME_US				100
+#define POWER_MAIN_VOLTAGE_STOPBUTTON_FALLING_TIME_US				10000
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_RISING_TIME_US				20000
 
 #define POWER_MAIN_CURRENT_SHUTDOWN_LEVEL							3
@@ -313,6 +312,8 @@
 #define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10)
 #define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
 
+#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
+
 #define BDC_SEC_PER_MIN								60
 
 #define BDC_CONV_INCR_TO_MM(incr)					((double)(incr) / BDC_INCR_PER_MM)
@@ -323,19 +324,25 @@
 #define BDC_CONV_MMS_TO_RPM(mms)					((double)(mms) * BDC_SEC_PER_MIN * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
 #define BDC_CONV_MMS2_TO_MOTORROTS2(mms2)			((double)(mms2) * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
 
+#define BDC_CONV_RADS_TO_RPM(rads)					((double)(rads) * BDC_WHEEL_DISTANCE / 2 / BDC_CONV_RPM_TO_MMS(1))
+#define BDC_CONV_RADS2_TO_MOTORROTS2(rads2)			((double)(rads2) * BDC_WHEEL_DISTANCE / 2 / BDC_CONV_RPM_TO_MMS(1) / 60)
+
 #define BDC_CONV_ACC(acc)							((u16)BDC_CONV_MMS2_TO_MOTORROTS2(acc))
 #define BDC_CONV_SPEED(speed)						((u16)BDC_CONV_MMS_TO_RPM(speed))
 //#define BDC_CONV_DIST(dist)							((s32)BDC_CONV_MM_TO_INCR(dist))
 
+#define BDC_CONV_BETA(beta)							((u16)BDC_CONV_RADS2_TO_MOTORROTS2(beta))
+#define BDC_CONV_OMEGA(omega)						((u16)BDC_CONV_RADS_TO_RPM(omega))
+
 
 #define BDC_IS_LEFT_MOTOR1							0
-#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
+//#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
 #define BDC_PRE_BRAKE_TIME							0.3	//sec
-#define BDC_OE_CONTROL_P							0
-#define BDC_OE_CONTROL_I							0
+#define BDC_OE_CONTROL_P							6000
+#define BDC_OE_CONTROL_I							5
 
 
 
@@ -363,6 +370,19 @@
 #define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			1
 #define CONSOLE_IS_ENC_EQEP1						1
 #define CONSOLE_MOTOR_PLUS_CW						1
+
+
+
+
+
+//----- sonar -----
+#define SONAR_TX_BLUE		2202.0
+#define SONAR_TY_BLUE		3102.0
+#define SONAR_ALPHA_BLUE	M_PI
+
+#define SONAR_TX_RED		-102.0
+#define SONAR_TY_RED		-102.0
+#define SONAR_ALPHA_RED		0.0
 
 
 

@@ -47,18 +47,38 @@ void node_BDC::evalMsg(UDPmsg* msg){
 
 			case MSG_BDC_STOP_REPLY:
 			case MSG_BDC_HARD_STOP_REPLY:
-				stop.done = GET_BOOL(&(msg->data[0]), 0);
-				stop.inProgress = false;
-				stop.finished = true;
+				AnyStop.done = GET_BOOL(&(msg->data[0]), 0);
+				AnyStop.inProgress = false;
+				AnyStop.finished = true;
+				cout << name << "\t___recv ANYSTOP:\t" << (AnyStop.done?"1":"0") << endl;
 				break;
 
 			case MSG_BDC_GO_REPLY:
+				Go.done = GET_BOOL(&(msg->data[0]), 0);
+				Go.inProgress = false;
+				Go.finished = true;
+				cout << name << "\t___recv GO:\t" << (Go.done?"1":"0") << endl;
+				break;
+
 			case MSG_BDC_GOTO_REPLY:
+				GoTo.done = GET_BOOL(&(msg->data[0]), 0);
+				GoTo.inProgress = false;
+				GoTo.finished = true;
+				cout << name << "\t___recv GOTO:\t" << (GoTo.done?"1":"0") << endl;
+				break;
+
 			case MSG_BDC_TURN_REPLY:
+				Turn.done = GET_BOOL(&(msg->data[0]), 0);
+				Turn.inProgress = false;
+				Turn.finished = true;
+				cout << name << "\t___recv TURN:\t" << (Turn.done?"1":"0") << endl;
+				break;
+
 			case MSG_BDC_SET_SPEED_REPLY:
-				move.done = GET_BOOL(&(msg->data[0]), 0);
-				move.inProgress = false;
-				move.finished = true;
+				SetSpeed.done = GET_BOOL(&(msg->data[0]), 0);
+				SetSpeed.inProgress = false;
+				SetSpeed.finished = true;
+				cout << name << "\t___recv SETSPEED:\t" << (SetSpeed.done?"1":"0") << endl;
 				break;
 
 			default:
@@ -83,8 +103,10 @@ void node_BDC::BDC_STOP(double acc){
 
 	UDPdriver::send(&msg);
 
-	stop.inProgress = true;
-	stop.finished = false;
+	AnyStop.inProgress = true;
+	AnyStop.finished = false;
+
+	cout << name << "\t___send STOP___:\t" << BDC_CONV_ACC(acc) << endl;
 
 }
 
@@ -99,8 +121,10 @@ void node_BDC::BDC_HARD_STOP(void){
 
 	UDPdriver::send(&msg);
 
-	stop.inProgress = true;
-	stop.finished = false;
+	AnyStop.inProgress = true;
+	AnyStop.finished = false;
+
+	cout << name << "\t___send HARDSTOP___\t" << endl;
 
 }
 
@@ -118,8 +142,10 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
 	UDPdriver::send(&msg);
 
-	move.inProgress = true;
-	move.finished = false;
+	Go.inProgress = true;
+	Go.finished = false;
+
+	cout << name << "\t___send GO___:\t" << distance << "\t" << BDC_CONV_SPEED(max_speed) << "\t" << BDC_CONV_ACC(max_acc) << endl;
 
 }
 
@@ -138,10 +164,10 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
 	UDPdriver::send(&msg);
 
-	move.inProgress = true;
-	move.finished = false;
+	GoTo.inProgress = true;
+	GoTo.finished = false;
 
-	cout << name << "\tGOTO\t" << endl;
+	cout << name << "\t___send GOTO___:\t" << x << "\t" << y << "\t" << BDC_CONV_SPEED(max_speed) << "\t" << BDC_CONV_ACC(max_acc) << endl;
 
 }
 
@@ -154,13 +180,15 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 	msg.function	= CMD_BDC_TURN;
 	msg.length		= 8;
 	SET_FLOAT(&(msg.data[0]), angle);
-	SET_U16(&(msg.data[4]), BDC_CONV_SPEED(max_speed));
-	SET_U16(&(msg.data[6]), BDC_CONV_ACC(max_acc));
+	SET_U16(&(msg.data[4]), BDC_CONV_OMEGA(max_speed));
+	SET_U16(&(msg.data[6]), BDC_CONV_BETA(max_acc));
 
 	UDPdriver::send(&msg);
 
-	move.inProgress = true;
-	move.finished = false;
+	Turn.inProgress = true;
+	Turn.finished = false;
+
+	cout << name << "\t___send TURN___:\t" << angle << "\t" << BDC_CONV_OMEGA(max_speed) << "\t" << BDC_CONV_BETA(max_acc) << endl;
 
 }
 
@@ -173,19 +201,21 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 	msg.function	= CMD_BDC_SET_SPEED;
 	msg.length		= 4;
 
-	double r = v / w;			//w = v / r
-	double t = 2 * r * M_PI / v;	//v = 2*r*Pi / t
-	double dr = BDC_WHEEL_DISTANCE / 2;
-	s16 vLeft	= 2 * (r - dr) * M_PI / t;
-	s16 vRight	= 2 * (r + dr) * M_PI / t;
+	//v = (vLeft + vRight) / 2
+	//w = (vRight - vLeft) / BDC_WHEEL_DISTANCEyy
+	s16 vLeft	= (s16)(v - w * BDC_WHEEL_DISTANCE / 2);
+	s16 vRight	= (s16)(v - w * BDC_WHEEL_DISTANCE / 2);
 
-	SET_S16(&(msg.data[0]), (BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : vRight);
-	SET_S16(&(msg.data[2]), (BDC_IS_LEFT_MOTOR1 != 0) ? vRight : vLeft);
+	//bal motornak meg kell forditani a sebesseget
+	SET_S16(&(msg.data[0]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight));
+	SET_S16(&(msg.data[2]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft));
 
 	UDPdriver::send(&msg);
 
-	move.inProgress = true;
-	move.finished = false;
+	SetSpeed.inProgress = true;
+	SetSpeed.finished = false;
+
+	cout << name << "\t___send SETSPEED___:\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
 
 }
 

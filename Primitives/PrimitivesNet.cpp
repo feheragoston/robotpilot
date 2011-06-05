@@ -30,7 +30,7 @@ bool PrimitivesNet::Init() {
 
 bool PrimitivesNet::CameraInit() {
 	if (strlen(mConfig->NetIp) == 0 || !netConnection->ConnectToHost(13000, mConfig->NetIp)) {
-		if (!netConnection->ConnectToHost(13000, "127.0.0.1")) {
+		if (!netConnection->ConnectToHost(13000, "192.168.24.57")) {
 			std::cerr << "Hiba a halozati kapcsolodaskor" << std::endl;
 			return false;
 		}
@@ -75,6 +75,10 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		mStopButton = data->stopButton;
 		mRobotColor = data->color;
 		mPawnInGripper = data->pawnInGripper;
+		gripperPos = data->gripperPos;
+		consolePos = data->consolePos;
+		leftArmPos = data->leftArmPos;
+		rightArmPos = data->rightArmPos;
 	} else if (*function == MSG_CALIBRATEPOS && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
 		if (data->b1 && calibrateDeadreckoning.inprogress) {
@@ -116,6 +120,15 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 			leftArmMove.finished = true;
 		} else if (rightArmMove.inprogress) {
 			rightArmMove.finished = true;
+		}
+	} else if (*function == MSG_POSREFINE && size == sizeof(msgd3)) {
+		msgd3* data = (msgd3*) buffer;
+		refineDelta.x = data->d1;
+		refineDelta.y = data->d2;
+		refineDelta.phi = data->d3;
+		printf("POSREFINE: %f %f %f\n", refineDelta.x, refineDelta.y, refineDelta.phi);
+		if (posRefine.inprogress) {
+			posRefine.finished = true;
 		}
 	} else if (*function == MSG_PAWNS && size == sizeof(msgpawns)) {
 		msgpawns* data = (msgpawns*) buffer;
@@ -334,7 +347,32 @@ int PrimitivesNet::Magnet(bool left, int polarity) {
 	return 1;
 }
 
-int PrimitivesNet::RefreshPawnPositions(msgpawns* pawns) {
+int PrimitivesNet::RefineDeadreckoning(double x, double y, double phi, double* dx, double* dy, double* dphi) {
+	if (posRefine.inprogress) {
+		if (posRefine.finished) {
+			posRefine.inprogress = false;
+			posRefine.finished = false;
+			*dx = refineDelta.x;
+			*dy = refineDelta.y;
+			*dphi = refineDelta.phi;
+			return 1;
+		}
+	} else {
+		msgd3 message;
+		message.function = MSG_POSREFINE;
+		message.d1 = x;
+		message.d2 = y;
+		message.d3 = phi;
+		netConnection->Send(&message, sizeof(msgd3));
+		posRefine.inprogress = true;
+	}
+	*dx = 0;
+	*dy = 0;
+	*dphi = 0;
+	return 0;
+}
+
+int PrimitivesNet::RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi) {
 	this->pawns = pawns;
 	if (pawnRefresh.inprogress) {
 		if (pawnRefresh.finished) {
@@ -343,10 +381,12 @@ int PrimitivesNet::RefreshPawnPositions(msgpawns* pawns) {
 			return 1;
 		}
 	} else {
-		msgb1 message;
+		msgd3 message;
 		message.function = MSG_PAWNS;
-		message.b1 = true;
-		netConnection->Send(&message, sizeof(msgb1));
+		message.d1 = x;
+		message.d2 = y;
+		message.d3 = phi;
+		netConnection->Send(&message, sizeof(msgd3));
 		pawnRefresh.inprogress = true;
 	}
 	return 0;

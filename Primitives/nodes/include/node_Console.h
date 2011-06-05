@@ -39,9 +39,9 @@ public:
 	void CONSOLE_CALIBRATE(void);
 
 
-	progress_t stop;
-	progress_t move;
-	progress_t calibrate;
+	progress_t Stop;
+	progress_t SetPos;
+	progress_t Calibrate;
 
 
 	double GET_POS(void);

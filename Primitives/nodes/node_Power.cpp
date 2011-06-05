@@ -55,13 +55,15 @@ void node_Power::evalMsg(UDPmsg* msg){
 				PowerAccuVoltageOk = GET_BOOL(&(msg->data[2]), 0);
 				PowerStopButton = GET_BOOL(&(msg->data[2]), 1);
 				PowerActOn = GET_BOOL(&(msg->data[2]), 2);
+
 				break;
 
 			case MSG_POWER_ACT_ON_REPLY:
 			case MSG_POWER_ACT_OFF_REPLY:
-				act_on_off.done = GET_BOOL(&(msg->data[0]), 0);
-				act_on_off.inProgress = false;
-				act_on_off.finished = true;
+				ActOnOff.done = GET_BOOL(&(msg->data[0]), 0);
+				ActOnOff.inProgress = false;
+				ActOnOff.finished = true;
+				cout << name << "\t___recv ACTONOFF___:\t" << (ActOnOff.done?"1":"0") << endl;
 				break;
 
 			default:
@@ -85,8 +87,10 @@ void node_Power::POWER_ACT_ON(void){
 
 	UDPdriver::send(&msg);
 
-	act_on_off.inProgress = true;
-	act_on_off.finished = false;
+	ActOnOff.inProgress = true;
+	ActOnOff.finished = false;
+
+	cout << name << "\t___send ACTON___" << endl;
 
 }
 
@@ -101,8 +105,10 @@ void node_Power::POWER_ACT_OFF(void){
 
 	UDPdriver::send(&msg);
 
-	act_on_off.inProgress = true;
-	act_on_off.finished = false;
+	ActOnOff.inProgress = true;
+	ActOnOff.finished = false;
+
+	cout << name << "\t___send ACTOFF___" << endl;
 
 }
 
@@ -116,6 +122,8 @@ void node_Power::POWER_MAIN_OFF(void){
 	msg.length		= 0;
 
 	UDPdriver::send(&msg);
+
+	cout << name << "\t___send MAINOFF___" << endl;
 
 }
 

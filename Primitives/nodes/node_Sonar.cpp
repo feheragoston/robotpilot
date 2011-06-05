@@ -48,8 +48,17 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
-				SonarPosX	= GET_FLOAT(&(msg->data[0]));
-				SonarPosY	= GET_FLOAT(&(msg->data[4]));
+				//ASCII-ban kuldi
+				SonarPosX = 0;
+				for(u8 i=0 ; i<4 ; i++){
+					SonarPosX *= 10;
+					SonarPosX += GET_U8(&(msg->data[i])) - '0';
+				}
+				SonarPosY = 0;
+				for(u8 i=0 ; i<4 ; i++){
+					SonarPosY *= 10;
+					SonarPosY += GET_U8(&(msg->data[i+4])) - '0';
+				}
 				break;
 
 			default:

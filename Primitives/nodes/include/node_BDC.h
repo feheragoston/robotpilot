@@ -42,8 +42,11 @@ public:
 	void BDC_SET_SPEED(double v, double w);
 
 
-	progress_t stop;
-	progress_t move;
+	progress_t AnyStop;
+	progress_t Go;
+	progress_t GoTo;
+	progress_t Turn;
+	progress_t SetSpeed;
 
 
 };

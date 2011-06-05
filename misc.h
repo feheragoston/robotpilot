@@ -31,6 +31,7 @@
 #define		ROBOT_FRONT_PAWN	170		// paraszt felszedeshez a paraszt kozepetol valo tavolsag [mm]
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 
+#define		PAWN_RADIUS			100		// paraszt sugara [mm]
 /////////////////
 // Robot szine
 

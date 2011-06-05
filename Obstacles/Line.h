@@ -26,6 +26,8 @@ public:
 	bool Intersect(double x, double y, double r);
 	bool Intersect(Obstacle* obstacle);
 
+	void Print();
+
 	double minx, miny, maxx, maxy;
 protected:
 	double m, b;

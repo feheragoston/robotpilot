@@ -135,3 +135,7 @@ bool Circle::Intersect(Obstacle* obstacle) {
 
 Circle::~Circle() {
 }
+
+void Circle::Print() {
+	printf("Circle %f %f %f\n", x, y, r);
+}

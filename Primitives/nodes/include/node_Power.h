@@ -38,7 +38,7 @@ public:
 	void POWER_ACT_OFF();
 	void POWER_MAIN_OFF();
 
-	progress_t act_on_off;
+	progress_t ActOnOff;
 
 
 	double GET_MAIN_VOLTAGE(void);

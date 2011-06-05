@@ -43,7 +43,7 @@ public:
 	static void serverMessageCallback(int n, const void* message, msglen_t size);
 
 protected:
-	Config* mConfig;
+	static Config* mConfig;
 	static Primitives* mPrimitives;
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
@@ -51,18 +51,21 @@ protected:
 	static msgpawns* pawns;
 
 	static std::list<Obstacle*> obstacles;
+	static std::list<Obstacle*> dynObstacles;
 	static double robotBody[][2];
 	static Circle* opponent;
 	static double angry;
-	static int deployFields[30];
+	static int deployFields[36];
 
 	static bool simulate;
 
 	lua_State *L;
 
-	struct timeval runStart; // Run indulasanak ideje
-	struct timeval initStart; // Init indulasanak ideje
-	struct timeval matchStart; // Start gomb megnyomasanak ideje
+	static struct timeval runStart; // Run indulasanak ideje
+	static struct timeval initStart; // Init indulasanak ideje
+	static struct timeval matchStart; // Start gomb megnyomasanak ideje
+	static struct timeval sleepCalled; // utolso Sleep hivas ideje
+	static long int timeToSleep;
 	static bool matchStarted; // Meccs elkezdodott
 	static bool exitControl;
 
@@ -71,6 +74,26 @@ protected:
 	static void refreshOpponent();
 	static bool opponentTooClose();
 	static bool obstacleCollision();
+	static void removeCollidingDynamicObstacles(Obstacle* obstacle);
+	static void addDynamicObstacle(Obstacle* obstacle);
+	static bool pawnOnOurColor(double x, double y);
+
+	/**
+	 * futasido ezredmasodpercben
+	 * @return [ms]
+	 */
+	static unsigned int RunTime();
+	/**
+	 * Init ota eltelt ido
+	 * @return [ms]
+	 */
+	static unsigned int InitTime();
+	/**
+	 * Meccs kezdes ota eltelt ido vagy 0 ha nincs meccs
+	 * @return [ms]
+	 */
+	static unsigned int MatchTime();
+
 	/**
 	 * Szakasz utkozesenek tesztelese ellenfellel es akadalyokkal
 	 * @param x1
@@ -98,6 +121,7 @@ protected:
 	static int LuaRunParallel(lua_State *L);
 	static int LuaSimulate(lua_State *L);
 	static int LuaPrint(lua_State *L);
+	static int LuaSleep(lua_State *L);
 	static int LuaTest(lua_State *L);
 
 	static int LuaGetStartButton(lua_State *L);
@@ -108,6 +132,7 @@ protected:
 	static int LuaMotorSupply(lua_State *L);
 
 	static int LuaCalibrateDeadreckoning(lua_State *L);
+	static int LuaRefineDeadreckoning(lua_State *L);
 	static int LuaSetSpeed(lua_State *L);
 	static int LuaGo(lua_State *L);
 	static int LuaGoTo(lua_State *L);
@@ -115,6 +140,7 @@ protected:
 	static int LuaTurnTo(lua_State *L);
 	static int LuaMotionStop(lua_State *L);
 	static int LuaGetRobotPos(lua_State *L);
+	static int LuaSetRobotPos(lua_State *L);
 	static int LuaGetOpponentPos(lua_State *L);
 
 	static int LuaSetGripperPos(lua_State *L);
@@ -125,6 +151,7 @@ protected:
 	static int LuaSetArmPos(lua_State *L);
 	static int LuaMagnet(lua_State *L);
 
+	static int LuaStartMatch(lua_State *L);
 	static int LuaRefreshPawnPositions(lua_State *L);
 	static int LuaFindPawn(lua_State *L);
 	static int LuaGetDeployPoint(lua_State *L);

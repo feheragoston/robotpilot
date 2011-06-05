@@ -50,6 +50,13 @@ public:
 	virtual bool Wait(long int useconds);
 
 	/**
+	 * varakozas adott ideig
+	 * @param useconds varakozasi ido microsecundumban
+	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 */
+	virtual int Sleep(long int useconds);
+
+	/**
 	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
 	 * @return igaz, ha van benn paraszt
 	 */
@@ -208,10 +215,16 @@ public:
 
 	/**
 	 * elso megfogo szogenek beallitasa
-	 * @param pos [deg]
+	 * @param pos [deg], 0 zart helyzet, 90 nyitott helyzet
 	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
 	 */
 	virtual int SetGripperPos(double pos);
+
+	/**
+	 * elso megfogo szogenek lekerdezese
+	 * @return [mm], zart helyzet 0
+	 */
+	virtual double GetGripperPos();
 
 	///////////////////////////////////////////////////////////////////////
 	// CONSOLE
@@ -259,6 +272,13 @@ public:
 	virtual int SetArmPos(bool left, double pos, double max_speed, double max_acc);
 
 	/**
+	 * Kar poziciojanak lekerdezese
+	 * @param left bal/jobb kar
+	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
+	 */
+	virtual double GetArmPos(bool left);
+
+	/**
 	 * Magnes polaritasanak valtoztatasa
 	 * @param left bal/jobb magnes
 	 * @param polarity 1: vonzas, 0: kikapcsolt, -1: taszitas
@@ -271,6 +291,10 @@ protected:
 	 * konfiguraciot tartalmazo objektum
 	 */
 	Config* mConfig;
+
+	progress sleep;
+	struct timeval sleepStart;
+	long int timeToSleep;
 
 	/**
 	 * a szinkapcsolo allasat tarolja
@@ -307,8 +331,11 @@ protected:
 	progress motionStop;
 
 	progress gripperMove;
+	double gripperPos;
 	progress consoleMove;
+	double consolePos;
 	progress leftArmMove, rightArmMove;
+	double leftArmPos, rightArmPos;
 
 };
 

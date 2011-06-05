@@ -50,9 +50,10 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 
 			case MSG_MAGNET_SET_POLARITY_REPLY:
 				num = GET_U8(&(msg->data[0]));
-				set_polarity[num].done = GET_BOOL(&(msg->data[1]), 0);
-				set_polarity[num].inProgress = false;
-				set_polarity[num].finished = true;
+				SetPolarity[num].done = GET_BOOL(&(msg->data[1]), 0);
+				SetPolarity[num].inProgress = false;
+				SetPolarity[num].finished = true;
+				cout << name << "\t___recv SETPOLARITY [" << (u32)num << "]___:\t" << (SetPolarity[num].done?"1":"0") << endl;
 				break;
 
 			default:
@@ -78,8 +79,10 @@ void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 
 	UDPdriver::send(&msg);
 
-	set_polarity[num].inProgress = true;
-	set_polarity[num].finished = false;
+	SetPolarity[num].inProgress = true;
+	SetPolarity[num].finished = false;
+
+	cout << name << "\t___send SETPOLARITY [" << (u32)num << "]___:\t" << (s32)polarity << endl;
 
 }
 

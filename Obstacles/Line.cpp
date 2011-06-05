@@ -285,3 +285,7 @@ bool Line::Intersect(Obstacle* obstacle) {
 
 Line::~Line() {
 }
+
+void Line::Print() {
+	printf("Line %f %f %f %f\n", minx, miny, maxx, maxy);
+}

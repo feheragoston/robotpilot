@@ -98,9 +98,10 @@ void node_Servo::evalMsg(UDPmsg* msg){
 
 			case MSG_SERVO_SET_POS_REPLY:
 				num = GET_U8(&(msg->data[0]));
-				move[num].done = GET_BOOL(&(msg->data[1]), 0);
-				move[num].inProgress = false;
-				move[num].finished = true;
+				Setpos[num].done = GET_BOOL(&(msg->data[1]), 0);
+				Setpos[num].inProgress = false;
+				Setpos[num].finished = true;
+				cout << name << "\t___recv SETPOS [" << (u32)num << "]___:\t" << (Setpos[num].done?"1":"0") << endl;
 				break;
 
 			default:
@@ -129,8 +130,10 @@ void node_Servo::SERVO_SET_POS(u8 num, double pos, double speed, double acc){
 
 	UDPdriver::send(&msg);
 
-	move[num].inProgress = true;
-	move[num].finished = false;
+	Setpos[num].inProgress = true;
+	Setpos[num].finished = false;
+
+	cout << name << "\t___send SETPOS [" << (u32)num << "]___:\t" << SERVO_CONV_POS(num, pos) << "\t" << SERVO_CONV_SPEED(num, speed) << "\t" << SERVO_CONV_ACC(num, acc) << endl;
 
 }
 

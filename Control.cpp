@@ -9,6 +9,7 @@
 
 using namespace std;
 
+Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
@@ -16,16 +17,23 @@ bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
+std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
 Circle* Control::opponent = NULL;
 double Control::angry = 0.;
 bool Control::simulate = false;
-int Control::deployFields[30] = {
-		  0, -12,   0, -14,   0, -15,
-		-11,   0, -10,   0, -13,   0,
-		  0,  -2,   0,  -1,   0,  -8,
-		 -4,   0,  -3,   0,  -7,   0,
-		  0,  -5,   0,  -6,   0,  -9
+int Control::deployFields[36] = {
+		-15, -12, -14, -14, -12, -15,
+		-11, -13, -10, -10, -13, -11,
+		 -8,  -2,  -1,  -1,  -2,  -8,
+		 -4,  -7,  -3,  -3,  -7,  -4,
+		 -9,  -5,  -6,  -6,  -5,  -9,
+		-18, -16, -17, -17, -16, -18
 };
+struct timeval Control::runStart = {0, 0};
+struct timeval Control::initStart = {0, 0};
+struct timeval Control::matchStart = {0, 0};
+struct timeval Control::sleepCalled = {0, 0};
+long int Control::timeToSleep = 0;
 
 #define ROBOT_POINT_NUM 6
 double Control::robotBody[][2] = {
@@ -54,6 +62,7 @@ Control::Control(Config* config) {
 	lua_register(L, "RunParallel", LuaRunParallel);
 	lua_register(L, "Simulate", LuaSimulate);
 	lua_register(L, "Print", LuaPrint);
+	lua_register(L, "Sleep", LuaSleep);
 	lua_register(L, "Test", LuaTest);
 	lua_register(L, "Test1", LuaTest);
 	lua_register(L, "Test2", LuaTest);
@@ -66,6 +75,7 @@ Control::Control(Config* config) {
 	lua_register(L, "MotorSupply", LuaMotorSupply);
 
 	lua_register(L, "CalibrateDeadreckoning", LuaCalibrateDeadreckoning);
+	lua_register(L, "RefineDeadreckoning", LuaRefineDeadreckoning);
 	lua_register(L, "SetSpeed", LuaSetSpeed);
 	lua_register(L, "Go", LuaGo);
 	lua_register(L, "GoSafe", LuaGo);
@@ -77,6 +87,7 @@ Control::Control(Config* config) {
 	lua_register(L, "TurnToSafe", LuaTurnTo);
 	lua_register(L, "MotionStop", LuaMotionStop);
 	lua_register(L, "GetRobotPos", LuaGetRobotPos);
+	lua_register(L, "SetRobotPos", LuaSetRobotPos);
 	lua_register(L, "GetOpponentPos", LuaGetOpponentPos);
 
 	lua_register(L, "SetGripperPos", LuaSetGripperPos);
@@ -87,10 +98,26 @@ Control::Control(Config* config) {
 	lua_register(L, "SetArmPos", LuaSetArmPos);
 	lua_register(L, "Magnet", LuaMagnet);
 
+	lua_register(L, "StartMatch", LuaStartMatch);
 	lua_register(L, "RefreshPawnPositions", LuaRefreshPawnPositions);
 	lua_register(L, "FindPawn", LuaFindPawn);
 	lua_register(L, "GetDeployPoint", LuaGetDeployPoint);
 	lua_register(L, "SetDeployPointPriority", LuaSetDeployPointPriority);
+
+	lua_pushnumber(L, ROBOT_RADIUS);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_RADIUS");
+	lua_pushnumber(L, ROBOT_WIDTH);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_WIDTH");
+	lua_pushnumber(L, ROBOT_FRONT);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT");
+	lua_pushnumber(L, ROBOT_FRONT_MAX);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT_MAX");
+	lua_pushnumber(L, ROBOT_FRONT_PAWN);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT_PAWN");
+	lua_pushnumber(L, ROBOT_BACK);
+	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_BACK");
+	lua_pushnumber(L, PAWN_RADIUS);
+	lua_setfield(L, LUA_GLOBALSINDEX, "PAWN_RADIUS");
 
 	matchStarted = false;
 	exitControl = false;
@@ -134,6 +161,17 @@ Control::~Control() {
 		delete mServer;
 	}
 	lua_close(L);
+
+	while (!obstacles.empty()) {
+		delete obstacles.front();
+		obstacles.pop_front();
+	}
+	while (!dynObstacles.empty()) {
+		delete dynObstacles.front();
+		dynObstacles.pop_front();
+	}
+
+	delete opponent;
 }
 
 bool Control::Init() {
@@ -152,9 +190,9 @@ bool Control::Init() {
 	if (mPrimitives->Init()) {
 		mCamera = new PrimitivesNet(mConfig);
 		if (mCamera->CameraInit()) {
-			cout << "Connected to camera" << endl;
+			cout << "(Control) Connected to camera" << endl;
 		} else {
-			cout << "Error connecting to camera" << endl;
+			cout << "(Control) Error connecting to camera" << endl;
 			delete mCamera;
 			mCamera = NULL;
 		}
@@ -183,7 +221,7 @@ void Control::Run() {
 			}
 			report_errors(L, s);
 
-			std::cout << "Finished running " << mConfig->LuaFile << std::endl;
+			std::cout << "(Control) Finished running " << mConfig->LuaFile << std::endl;
 		}
 
 		fd_set rfd;
@@ -249,11 +287,27 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.color = mPrimitives->GetMyColor();
 		response.pawnInGripper = mPrimitives->PawnInGripper();
 		response.motorSupply = mPrimitives->GetMotorSupply();
+		response.gripperPos = mPrimitives->GetGripperPos();
+		response.consolePos = mPrimitives->GetConsolePos();
+		response.leftArmPos = mPrimitives->GetArmPos(true);
+		response.rightArmPos = mPrimitives->GetArmPos(false);
 		mServer->Send(n, &response, sizeof(msgstatus));
+
+		msgdeploypriority message;
+		message.function = MSG_DEPLOYPRIORITY;
+		for (int i = 0; i < 36; i++) {
+			message.priority[i] = deployFields[i];
+		}
+		mServer->Send(n, &message, sizeof(msgdeploypriority));
 	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
 		mServer->Send(n, pawns, sizeof(msgpawns));
+	} else if (*function == MSG_VISIONTEST && size == 1) {
+		msgd3 response;
+		response.function = MSG_VISIONTEST;
+		mPrimitives->GetRobotPos(&(response.d1), &(response.d2), &(response.d3));
+		mServer->Send(n, &response, sizeof(msgd3));
 	} else {
-		std::cout << "Unknown or invalid function: " << (int)*function << " size: " << (int)size << std::endl;
+		std::cout << "(Control) Unknown or invalid function: " << (int)*function << " size: " << (int)size << std::endl;
 	}
 }
 
@@ -270,6 +324,10 @@ bool Control::opponentTooClose() {
 	double x, y, phi, v, w;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
+
+	/////////////////////////////
+	v = 500;
+	/////////////////////////////
 
 	refreshOpponent();
 
@@ -298,7 +356,7 @@ bool Control::opponentTooClose() {
 		if (angry < ROBOT_RADIUS) {
 			angry += 5.;
 		}
-		//std::cout << "Opponent too close! angry: " << angry << std::endl;
+		//std::cout << "(Control) Opponent too close! angry: " << angry << std::endl;
 		return true;
 	}
 	if (angry > 0) {
@@ -310,13 +368,28 @@ bool Control::opponentTooClose() {
 bool Control::obstacleCollision() {
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
+	double gripperPos = mPrimitives->GetGripperPos();
 
 	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
-		double x1 = cos(phi) * robotBody[j][0] - sin(phi) * robotBody[j][1] + x;
-		double y1 = sin(phi) * robotBody[j][0] + cos(phi) * robotBody[j][1] + y;
-		double x2 = cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] - sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + x;
-		double y2 = sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] + cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + y;
+		int j2 = (j+1)%ROBOT_POINT_NUM;
+		double rx1 = robotBody[j][0];
+		double ry1 = robotBody[j][1];
+		double rx2 = robotBody[j2][0];
+		double ry2 = robotBody[j2][1];
 
+		if (j == 0 || j == ROBOT_POINT_NUM) {
+			rx1 += sin(gripperPos) * 105;
+		}
+		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
+			rx2 += sin(gripperPos) * 105;
+		}
+
+		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
+		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
+		double x2 = cos(phi) * rx2 - sin(phi) * ry2 + x;
+		double y2 = sin(phi) * rx2 + cos(phi) * ry2 + y;
+
+		/*
 		if (j == 0) {
 			msgd4 message;
 			message.function = MSG_GO;
@@ -324,11 +397,19 @@ bool Control::obstacleCollision() {
 			message.d2 = y1;
 			message.d3 = x2;
 			message.d4 = y2;
-			//mServer->Send(0, &message, sizeof(msgd4));
+			mServer->Send(0, &message, sizeof(msgd4));
 		}
+		*/
 
 		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				(*i)->Print();
+				return true;
+			}
+		}
+		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				(*i)->Print();
 				return true;
 			}
 		}
@@ -336,11 +417,108 @@ bool Control::obstacleCollision() {
 	return false;
 }
 
+void Control::removeCollidingDynamicObstacles(Obstacle* obstacle) {
+	std::list<Obstacle*>::iterator i = dynObstacles.begin();
+	while (i != dynObstacles.end()) {
+		if ((*i)->Intersect(obstacle)) {
+			delete(*i);
+			i = dynObstacles.erase(i);
+			//cout << "(Control) Dynamic obstacle removed" << endl;
+		} else {
+			i++;
+		}
+	}
+}
+
+void Control::addDynamicObstacle(Obstacle* obstacle) {
+	removeCollidingDynamicObstacles(obstacle);
+
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+
+	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
+		double x1 = cos(phi) * robotBody[j][0] - sin(phi) * robotBody[j][1] + x;
+		double y1 = sin(phi) * robotBody[j][0] + cos(phi) * robotBody[j][1] + y;
+		double x2 = cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] - sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + x;
+		double y2 = sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] + cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + y;
+		if (obstacle->Intersect(x1, y1, x2, y2)) {
+			delete obstacle;
+			return;
+		}
+	}
+	dynObstacles.push_back(obstacle);
+	//cout << "(Control) Number of dynamic obstacles: " << dynObstacles.size() << endl;
+}
+
+bool Control::pawnOnOurColor(double x, double y) {
+	if (y > 550 && y < 2450) {
+		bool color = mPrimitives->GetMyColor();
+		int mx = (int)x;
+		int my = (int)y - 450;
+		mx = mx % 700;
+		my = my % 700;
+
+		if (color) {
+			mx = 700 - mx;
+		}
+		if (mx > 100 && mx < 250 && my > 450 && my < 600) {
+			return true;
+		}
+		if (mx > 450 && mx < 600 && my > 100 && my < 250) {
+			return true;
+		}
+	}
+	return false;
+}
+
+unsigned int Control::RunTime() {
+	struct timeval operateTime;
+	struct timeval timeDiff;
+	unsigned int runTime;
+
+	gettimeofday(&operateTime, NULL);
+	tools::timeval_subtract(&timeDiff, &operateTime, &runStart);
+	runTime = (timeDiff.tv_usec / 1000) + timeDiff.tv_sec * 1000;
+	return runTime;
+}
+
+unsigned int Control::InitTime() {
+	struct timeval operateTime;
+	struct timeval timeDiff;
+	unsigned int runTime;
+
+	gettimeofday(&operateTime, NULL);
+	tools::timeval_subtract(&timeDiff, &operateTime, &initStart);
+	runTime = (timeDiff.tv_usec / 1000) + timeDiff.tv_sec * 1000;
+	return runTime;
+}
+
+unsigned int Control::MatchTime() {
+	if (!matchStarted) {
+		return 0;
+	}
+	struct timeval operateTime;
+	struct timeval timeDiff;
+	unsigned int runTime;
+
+	gettimeofday(&operateTime, NULL);
+
+	tools::timeval_subtract(&timeDiff, &operateTime, &matchStart);
+
+	runTime = (timeDiff.tv_usec / 1000) + timeDiff.tv_sec * 1000;
+	return runTime;
+}
+
 bool Control::checkLine(double x1, double y1, double x2, double y2) {
 	if (opponent->Intersect(x1, y1, x2, y2)) {
 		return false;
 	}
 	for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+		if ((*i)->Intersect(x1, y1, x2, y2)) {
+			return false;
+		}
+	}
+	for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 		if ((*i)->Intersect(x1, y1, x2, y2)) {
 			return false;
 		}
@@ -405,7 +583,7 @@ int Control::newtry(lua_State *L) {
 
 int Control::LuaExit(lua_State *L) {
 	exitControl = true;
-	luaL_error(L, "Exit() called, exiting\n");
+	luaL_error(L, "(Control) Exit() called, exiting\n");
 	return 0;
 }
 
@@ -415,11 +593,11 @@ int Control::LuaWait(lua_State *L) {
 	/* Primitives statuszfrissitest varunk */
 	if (!mPrimitives->Wait(useconds)) {
 		exitControl = true;
-		return luaL_error(L, "Primitives->Wait failed, exiting\n");
+		return luaL_error(L, "(Control) Primitives->Wait failed, exiting\n");
 	}
 	if (mCamera) {
 		if (!mCamera->Wait(0)) {
-			cout << "Camera disconnected" << endl;
+			cout << "(Control) Camera disconnected" << endl;
 			delete mCamera;
 			mCamera = NULL;
 		}
@@ -433,8 +611,20 @@ int Control::LuaWait(lua_State *L) {
 	if (mPrimitives->GetStopButton()) {
 		exitControl = true;
 		mPrimitives->MotorSupply(false);
-		return luaL_error(L, "Stop button, exiting");
+		return luaL_error(L, "(Control) Stop button, exiting");
+	} else if (MatchTime() > 90000) {
+		//exitControl = true;
+		matchStarted = false;
+		mPrimitives->MotorSupply(false);
+		cout << "(Control) Meccs ido letelt, kilepunk" << endl;
+		return luaL_error(L, "(Control) Match over, exiting");
 	}
+
+	double ox, oy;
+	mPrimitives->GetOpponentPos(&ox, &oy);
+	Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
+	removeCollidingDynamicObstacles(opp);
+	delete opp;
 
 	return 0;
 }
@@ -490,7 +680,7 @@ int Control::LuaRunParallel(lua_State *L) {
 			if (exit == LUA_YIELD) {
 				threads.push_back(N);
 			} else if (exit != 0) {
-				std::cout << "Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
+				std::cout << "(Control) Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
 				/* hibakereses
 				 std::cout << "utana: " << lua_status(N) << std::endl;
 				 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
@@ -519,11 +709,18 @@ int Control::LuaSimulate(lua_State *L) {
 	// letrehozzuk a szimulalo primitivest allapot masolassal
 	mPrimitives = new Primitives(realPrimitives);
 	mPrimitives->Init();
+
+	double x, y, phi;
+	realPrimitives->GetRobotPos(&x, &y, &phi);
+	mPrimitives->SetRobotPos(x, y, phi);
+	realPrimitives->GetOpponentPos(&x, &y);
+	mPrimitives->SetOpponentPos(x, y);
+
 	// meghivjuk a parameterul kapott fuggvenyt
 	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
 	if (s != 0) {
 		// nem sikerult a szimulacio
-		std::cout << "Simulation failed: " << lua_tostring(L, -1) << std::endl;
+		std::cout << "(Control) Simulation failed: " << lua_tostring(L, -1) << std::endl;
 		lua_pop(L, 1); // remove error message
 		lua_pushboolean(L, false);
 	} else {
@@ -563,14 +760,36 @@ int Control::LuaPrint(lua_State *L) {
 	return 0;
 }
 
+int Control::LuaSleep(lua_State *L) {
+	if (timeToSleep > 0) {
+		struct timeval operateTime;
+		struct timeval timeDiff;
+
+		gettimeofday(&operateTime, NULL);
+
+		tools::timeval_subtract(&timeDiff, &operateTime, &sleepCalled);
+
+		timeToSleep -= timeDiff.tv_usec + timeDiff.tv_sec * 1000 * 1000;
+	} else {
+		timeToSleep = lua_tointeger(L, 1);
+	}
+	gettimeofday(&sleepCalled, NULL);
+	if (timeToSleep < 0) {
+		lua_pushinteger(L, 1);
+	} else {
+		lua_pushinteger(L, 0);
+	}
+	return 1;
+}
+
 int Control::LuaTest(lua_State *L) {
-	std::cout << "test status: " << lua_status(L) << std::endl;
+	std::cout << "(Control) test status: " << lua_status(L) << std::endl;
 	return 0;
 
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	std::cout << "name: " << ar.name << " what: " << ar.what << " namewhat: " << ar.namewhat;
+	std::cout << "(Control) name: " << ar.name << " what: " << ar.what << " namewhat: " << ar.namewhat;
 
 	int i = lua_pushthread(L);
 	lua_pop(L, 1);
@@ -627,6 +846,29 @@ int Control::LuaCalibrateDeadreckoning(lua_State *L) {
 	return 1;
 }
 
+int Control::LuaRefineDeadreckoning(lua_State *L) {
+	if (!mCamera) {
+		mCamera = new PrimitivesNet(mConfig);
+		if (mCamera->CameraInit()) {
+			cout << "(Control) Connected to camera" << endl;
+		} else {
+			cout << "(Control) Error connecting to camera" << endl;
+			delete mCamera;
+			mCamera = NULL;
+			lua_pushinteger(L, -1);
+			return 1;
+		}
+	}
+	double x, y, phi, dx, dy, dphi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	int ret = mCamera->RefineDeadreckoning(x, y, phi, &dx, &dy, &dphi);
+	if (ret == 1) {
+		mPrimitives->SetRobotPos(x + dx, y + dy, phi + dphi);
+	}
+	lua_pushinteger(L, ret);
+	return 1;
+}
+
 int Control::LuaSetSpeed(lua_State *L) {
 	double v = luaL_optnumber(L, 1, 0);
 	double w = luaL_optnumber(L, 2, 0);
@@ -639,21 +881,25 @@ int Control::LuaGo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (ar.name == NULL || strcmp("GoSafe", ar.name) == 0) {
+	bool safe = (ar.name == NULL || strcmp("GoSafe", ar.name) == 0);
+	if (safe) {
 		if (opponentTooClose()) {
-			return luaL_error(L, "Opponent too close");
+			return luaL_error(L, "(Control) Opponent too close");
 		}
 		if (simulate) {
 			if (obstacleCollision()) {
-				return luaL_error(L, "Obstacle collision");
+				return luaL_error(L, "(Control) Obstacle collision");
 			}
 		}
 	}
 
 	double distance = luaL_optnumber(L, 1, 1000);
-	double speed = luaL_optnumber(L, 2, 1000);
-	double acc = luaL_optnumber(L, 3, 500);
+	double speed = luaL_optnumber(L, 2, 500);
+	double acc = luaL_optnumber(L, 3, 200);
 	int i = mPrimitives->Go(distance, speed, acc);
+	if (safe && i == -1) {
+		return luaL_error(L, "(Control) GoSafe failed");
+	}
 	lua_pushinteger(L, i);
 	return 1;
 }
@@ -662,22 +908,26 @@ int Control::LuaGoTo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (ar.name == NULL || strcmp("GoToSafe", ar.name) == 0) {
+	bool safe = (ar.name == NULL || strcmp("GoToSafe", ar.name) == 0);
+	if (safe) {
 		if (opponentTooClose()) {
-			return luaL_error(L, "Opponent too close");
+			return luaL_error(L, "(Control) Opponent too close");
 		}
 		if (simulate) {
 			if (obstacleCollision()) {
-				return luaL_error(L, "Obstacle collision");
+				return luaL_error(L, "(Control) Obstacle collision");
 			}
 		}
 	}
 
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
-	double speed = luaL_optnumber(L, 3, 1000);
-	double acc = luaL_optnumber(L, 4, 500);
+	double speed = luaL_optnumber(L, 3, 500);
+	double acc = luaL_optnumber(L, 4, 200);
 	int i = mPrimitives->GoTo(x, y, speed, acc);
+	if (safe && i == -1) {
+		return luaL_error(L, "(Control) GoToSafe failed");
+	}
 	lua_pushinteger(L, i);
 	return 1;
 }
@@ -686,13 +936,14 @@ int Control::LuaTurn(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (ar.name == NULL || strcmp("TurnSafe", ar.name) == 0) {
+	bool safe = (ar.name == NULL || strcmp("TurnSafe", ar.name) == 0);
+	if (safe) {
 		if (opponentTooClose()) {
-			return luaL_error(L, "Opponent too close");
+			return luaL_error(L, "(Control) Opponent too close");
 		}
 		if (simulate) {
 			if (obstacleCollision()) {
-				return luaL_error(L, "Obstacle collision");
+				return luaL_error(L, "(Control) Obstacle collision");
 			}
 		}
 	}
@@ -700,13 +951,10 @@ int Control::LuaTurn(lua_State *L) {
 	double angle = luaL_optnumber(L, 1, M_PI_2);
 	double speed = luaL_optnumber(L, 2, 2);
 	double acc = luaL_optnumber(L, 3, 2);
-	while (angle > M_PI) {
-		angle -= M_PI * 2;
-	}
-	while (angle < -M_PI) {
-		angle += M_PI * 2;
-	}
 	int i = mPrimitives->Turn(angle, speed, acc);
+	if (safe && i == -1) {
+		return luaL_error(L, "(Control) TurnSafe failed");
+	}
 	lua_pushinteger(L, i);
 	return 1;
 }
@@ -715,13 +963,14 @@ int Control::LuaTurnTo(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
-	if (ar.name == NULL || strcmp("TurnToSafe", ar.name) == 0) {
+	bool safe = (ar.name == NULL || strcmp("TurnToSafe", ar.name) == 0);
+	if (safe) {
 		if (opponentTooClose()) {
-			return luaL_error(L, "Opponent too close");
+			return luaL_error(L, "(Control) Opponent too close");
 		}
 		if (simulate) {
 			if (obstacleCollision()) {
-				return luaL_error(L, "Obstacle collision");
+				return luaL_error(L, "(Control) Obstacle collision");
 			}
 		}
 	}
@@ -743,6 +992,9 @@ int Control::LuaTurnTo(lua_State *L) {
 		angle += M_PI * 2;
 	}
 	int i = mPrimitives->Turn(angle, speed, acc);
+	if (safe && i == -1) {
+		return luaL_error(L, "(Control) TurnSafe failed");
+	}
 	lua_pushinteger(L, i);
 	return 1;
 }
@@ -761,6 +1013,14 @@ int Control::LuaGetRobotPos(lua_State *L) {
 	lua_pushnumber(L, y);
 	lua_pushnumber(L, phi);
 	return 3;
+}
+
+int Control::LuaSetRobotPos(lua_State *L) {
+	double x = lua_tonumber(L, 1);
+	double y = lua_tonumber(L, 2);
+	double phi = lua_tonumber(L, 3);
+	mPrimitives->SetRobotPos(x, y, phi);
+	return 0;
 }
 
 int Control::LuaGetOpponentPos(lua_State *L) {
@@ -823,13 +1083,61 @@ int Control::LuaMagnet(lua_State *L) {
 	return 1;
 }
 
-int Control::LuaRefreshPawnPositions(lua_State *L) {
-	if (mCamera) {
-		int i = mCamera->RefreshPawnPositions(pawns);
-		lua_pushinteger(L, i);
-		return 1;
+int Control::LuaStartMatch(lua_State *L) {
+	gettimeofday(&matchStart, NULL);
+	matchStarted = true;
+
+	bool color = mPrimitives->GetMyColor();
+
+	for (int i = 0; i < 36; i++) {
+		int d = (i / 6 + i % 6) % 2;
+		if ((color && d == 1) || (!color && d == 0)) {
+			deployFields[i] = 0;
+		}
 	}
+
+	int dir = 1;
+	int offset = 0;
+	if (color) {
+		dir = -1;
+		offset = 3000;
+	}
+
+	obstacles.push_back(new Circle(1885, offset + dir * 900, PAWN_RADIUS));
+	obstacles.push_back(new Circle(1885, offset + dir * 2300, PAWN_RADIUS));
+
 	return 0;
+}
+
+int Control::LuaRefreshPawnPositions(lua_State *L) {
+	if (!mCamera) {
+		mCamera = new PrimitivesNet(mConfig);
+		if (mCamera->CameraInit()) {
+			cout << "(Control) Connected to camera" << endl;
+		} else {
+			cout << "(Control) Error connecting to camera" << endl;
+			delete mCamera;
+			mCamera = NULL;
+			lua_pushinteger(L, -1);
+			return 1;
+		}
+	}
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	int ret = mCamera->RefreshPawnPositions(pawns, x, y, phi);
+	if (ret == 1) {
+		for (int i = 0; i < pawns->num; i++) {
+			if (pawnOnOurColor(pawns->pawns[i].x, pawns->pawns[i].y)) {
+				addDynamicObstacle(new Circle(pawns->pawns[i].x, pawns->pawns[i].y, PAWN_RADIUS));
+			} else {
+				Circle* pawn = new Circle(pawns->pawns[i].x, pawns->pawns[i].y, PAWN_RADIUS);
+				removeCollidingDynamicObstacles(pawn);
+				delete pawn;
+			}
+		}
+	}
+	lua_pushinteger(L, ret);
+	return 1;
 }
 
 /**
@@ -842,40 +1150,25 @@ int Control::LuaRefreshPawnPositions(lua_State *L) {
  */
 int Control::LuaFindPawn(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
+	double ignoreRadius = luaL_optnumber(L, 2, ROBOT_FRONT_MAX);
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	bool color = mPrimitives->GetMyColor();
 	double minDist;
 	int closest = pawns->num;
 	for (int i = 0; i < pawns->num; i++) {
 		msgpawn* pawn = &(pawns->pawns[i]);
 		if (pawn->type == FIG_PAWN) {
-			if (checkLine(x, y, pawn->x, pawn->y)) {
-				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
-				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
-				if (dist > ROBOT_FRONT_MAX) {
-					if (closest == pawns->num || dist < minDist) {
-						// megnezzuk, hogy a mi mezonkon van-e
-						if (pawn->y > 550 && pawn->y < 2450) {
-							int mx = (int)pawn->x;
-							int my = (int)pawn->y - 450;
-							mx = mx % 700;
-							my = my % 700;
-
-							if (color) {
-								mx = 700 - mx;
-							}
-							if (mx > 100 && mx < 250 && my > 450 && my < 600) {
-								continue;
-							}
-							if (mx > 450 && mx < 600 && my > 100 && my < 250) {
-								continue;
-							}
-						}
-
-						minDist = dist;
-						closest = i;
+			double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+			// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
+			if (dist > ignoreRadius) {
+				if (closest == pawns->num || dist < minDist) {
+					// megnezzuk, hogy a mi mezonkon van-e
+					if (pawnOnOurColor(pawn->x, pawn->y)) {
+						continue;
 					}
+
+					minDist = dist;
+					closest = i;
 				}
 			}
 		}
@@ -889,11 +1182,12 @@ int Control::LuaFindPawn(lua_State *L) {
 			lua_pushnumber(L, py);
 			lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
 			lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
-			return 4;
+			lua_pushnumber(L, minDist);
+			return 5;
 		} else {
 			lua_pushnumber(L, px);
 			lua_pushnumber(L, py);
-			lua_pushinteger(L, closest);
+			lua_pushnumber(L, minDist);
 			return 3;
 		}
 	} else {
@@ -938,7 +1232,7 @@ int Control::LuaGetDeployPoint(lua_State *L) {
 		int min = 1;
 		int target = -1;
 
-		for (int i = 0; i < 30; i++) {
+		for (int i = 0; i < 36; i++) {
 			int d = (i / 6 + i % 6) % 2;
 			if ((color && d == 0) || (!color && d == 1)) {
 				if (deployFields[i] < min) {
@@ -951,6 +1245,11 @@ int Control::LuaGetDeployPoint(lua_State *L) {
 		if (target != -1) {
 			double x = target / 6 * 350 + 175;
 			double y = target % 6 * 350 + 175 + 450;
+
+			// vedett helyek keskenyebbek, nem a kozepukre rakunk
+			if (target == 30 || target == 31 || target == 34 || target == 35) {
+				x -= 40;
+			}
 
 			double deployDistance = ROBOT_FRONT_PAWN;
 
@@ -979,24 +1278,23 @@ int Control::LuaSetDeployPointPriority(lua_State *L) {
 		return 0;
 	}
 	if (priority < 1) {
-		for (int i = 0; i < 30; i++) {
+		for (int i = 0; i < 36; i++) {
 			if (deployFields[i] <= priority) {
 				deployFields[i] -= 1;
 			}
 		}
+		deployFields[target] = priority;
 	} else if (priority == 1) {
 		double x = target / 6 * 350 + 175;
 		double y = target % 6 * 350 + 175 + 450;
-		obstacles.push_back(new Circle(x, y, 100));
+		if (target == 30 || target == 31 || target == 34 || target == 35) {
+			// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
+			x -= 40;
+			obstacles.push_back(new Circle(x, y, 100));
+		} else {
+			addDynamicObstacle(new Circle(x, y, 100));
+		}
 	}
-	deployFields[target] = priority;
-
-	msgdeploypriority message;
-	message.function = MSG_DEPLOYPRIORITY;
-	for (int i = 0; i < 30; i++) {
-		message.priority[i] = deployFields[i];
-	}
-	mServer->Send(0, &message, sizeof(msgdeploypriority));
 
 	return 0;
 }

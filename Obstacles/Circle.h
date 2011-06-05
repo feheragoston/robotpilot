@@ -21,6 +21,8 @@ class Circle: public Obstacle {
 		bool Intersect(double x, double y, double r);
 		bool Intersect(Obstacle* obstacle);
 
+		void Print();
+
 		double x, y, r;
 	protected:
 };

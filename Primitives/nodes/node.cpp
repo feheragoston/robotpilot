@@ -57,6 +57,8 @@ void node::START_ACTUATOR(void){
 
 	UDPdriver::send(&msg);
 
+	cout << name << "\t___send START_ACTUATOR___" << endl;
+
 }
 
 
@@ -69,6 +71,8 @@ void node::STOP_ACTUATOR(void){
 	msg.length		= 0;
 
 	UDPdriver::send(&msg);
+
+	cout << name << "\t___send STOP_ACTUATOR___" << endl;
 
 }
 

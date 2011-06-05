@@ -37,7 +37,7 @@ public:
 	void SERVO_SET_POS(u8 num, double pos, double speed, double acc);
 
 
-	progress_t move[SERVO_COUNT];
+	progress_t Setpos[SERVO_COUNT];
 
 
 private:

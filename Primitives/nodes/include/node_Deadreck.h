@@ -39,7 +39,7 @@ public:
 
 	void GET_POS(double* x, double* y, double* phi);
 
-	progress_t reset_pos;
+	progress_t ResetPos;
 
 
 private:

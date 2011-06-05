@@ -49,19 +49,20 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_DEADRECK_RESET_POS_REPLY:
-				reset_pos.done = GET_BOOL(&(msg->data[0]), 0);
-				reset_pos.inProgress = false;
-				reset_pos.finished = true;
-				if(reset_pos.done){
+				ResetPos.done = GET_BOOL(&(msg->data[0]), 0);
+				ResetPos.inProgress = false;
+				ResetPos.finished = true;
+				if(ResetPos.done){
 					DeadreckPosX	= 0;
 					DeadreckPosY	= 0;
 					DeadreckPosPhi	= 0;
 				}
+				cout << name << "\t___recv RESETPOS___:\t" << (ResetPos.done?"1":"0") << endl;
 				break;
 
 			case MSG_PERIODIC_TO_PC:
 				//csak akkor taroljuk el a fogadott poziciokat, ha nincs folyamatban reset_pos
-				if(!reset_pos.inProgress){
+				if(!ResetPos.inProgress){
 					DeadreckPosX	= GET_FLOAT(&(msg->data[0]));
 					DeadreckPosY	= GET_FLOAT(&(msg->data[4]));
 					DeadreckPosPhi	= GET_FLOAT(&(msg->data[8]));
@@ -89,8 +90,10 @@ void node_Deadreck::DEADRECK_RESET_POS(void){
 
 	UDPdriver::send(&msg);
 
-	reset_pos.inProgress = true;
-	reset_pos.finished = false;
+	ResetPos.inProgress = true;
+	ResetPos.finished = false;
+
+	cout << name << "\t___send RESETPOS___" << endl;
 
 }
 

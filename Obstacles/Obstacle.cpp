@@ -25,3 +25,7 @@ bool Obstacle::Intersect(double x, double y, double r) {
 bool Obstacle::Intersect(Obstacle* obstacle) {
 	return false;
 }
+
+void Obstacle::Print() {
+	printf("Obstacle\n");
+}

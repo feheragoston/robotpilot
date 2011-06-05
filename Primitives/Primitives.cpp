@@ -14,6 +14,11 @@ Primitives::Primitives(Config* config) {
 	mStopButton = false;
 	mRobotColor = false;
 	mPawnInGripper = false;
+
+	gripperPos = 0;
+	consolePos = 0;
+	leftArmPos = 0;
+	rightArmPos = 0;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -177,6 +182,21 @@ bool Primitives::Wait(long int useconds) {
 	return true;
 }
 
+int Primitives::Sleep(long int useconds) {
+	if (sleep.inprogress) {
+
+		if (sleep.finished) {
+			sleep.inprogress = false;
+			sleep.finished = false;
+			return 1;
+		}
+	} else {
+		timeToSleep = useconds;
+		sleep.inprogress = true;
+	}
+	return 0;
+}
+
 bool Primitives::PawnInGripper(void) {
 	return mPawnInGripper;
 }
@@ -316,17 +336,27 @@ void Primitives::SetOpponentPos(double x, double y) {
 }
 
 void Primitives::GetDistances(double distance[6]) {
+	for (int i = 0; i < 6; i++) {
+		distance[i] = 400;
+	}
 }
 
 int Primitives::SetGripperPos(double pos) {
+	gripperPos = pos;
 	return 1;
 }
 
+double Primitives::GetGripperPos() {
+	return gripperPos;
+}
+
 int Primitives::CalibrateConsole() {
+	consolePos = 0.;
 	return 1;
 }
 
 int Primitives::SetConsolePos(double pos, double max_speed, double max_acc) {
+	consolePos = pos;
 	return 1;
 }
 
@@ -335,11 +365,23 @@ int Primitives::ConsoleStop() {
 }
 
 double Primitives::GetConsolePos() {
-	return 0;
+	return consolePos;
 }
 
 int Primitives::SetArmPos(bool left, double pos, double max_speed, double max_acc) {
+	if (left) {
+		leftArmPos = pos;
+	} else {
+		rightArmPos = pos;
+	}
 	return 1;
+}
+
+double Primitives::GetArmPos(bool left) {
+	if (left) {
+		return leftArmPos;
+	}
+	return rightArmPos;
 }
 
 int Primitives::Magnet(bool left, int polarity) {

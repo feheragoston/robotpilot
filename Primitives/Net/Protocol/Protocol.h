@@ -24,6 +24,8 @@
 #define MSG_MAGNET 13
 #define MSG_PAWNS 14
 #define MSG_DEPLOYPRIORITY 15
+#define MSG_VISIONTEST 16
+#define MSG_POSREFINE 17
 
 #define FIG_NOTHING 0
 #define FIG_PAWN 1
@@ -50,6 +52,10 @@ typedef struct msgstatus {
 	bool color;
 	bool pawnInGripper;
 	bool motorSupply;
+	double gripperPos;
+	double consolePos;
+	double leftArmPos;
+	double rightArmPos;
 } msgstatus;
 
 typedef struct msgpawn {
@@ -113,7 +119,7 @@ typedef struct msgmagnet {
 
 typedef struct msgdeploypriority {
 	function_t function;
-	int8_t priority[30];
+	int8_t priority[36];
 } msgdeploypriority;
 
 #pragma pack()

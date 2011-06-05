@@ -37,7 +37,8 @@ public:
 	int SetArmPos(bool left, double pos, double max_speed, double max_acc);
 	int Magnet(bool left, int polarity);
 
-	int RefreshPawnPositions(msgpawns* pawns);
+	int RefineDeadreckoning(double x, double y, double phi, double* dx, double* dy, double* dphi);
+	int RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi);
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa
@@ -45,6 +46,9 @@ protected:
 
 	Net* netConnection;
 
+	progress posRefine;
+	position refineDelta;
+	double dx, dy, dphi;
 	progress pawnRefresh;
 	msgpawns* pawns;
 };

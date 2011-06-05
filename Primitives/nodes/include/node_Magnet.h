@@ -36,7 +36,7 @@ public:
 	void MAGNET_SET_POLARITY(u8 num, u8 polarity);
 
 
-	progress_t set_polarity[MAGNET_COUNT];
+	progress_t SetPolarity[MAGNET_COUNT];
 
 
 };
