@@ -37,12 +37,12 @@ long int Control::timeToSleep = 0;
 
 #define ROBOT_POINT_NUM 6
 double Control::robotBody[][2] = {
-		{ 140,  140},
-		{-105,  140},
+		{ 140,  140 + 15},
+		{-105,  140 + 15},
 		{-160,   65},
 		{-160,  -65},
-		{-105, -140},
-		{ 140, -140}
+		{-105, -140 - 15},
+		{ 140, -140 - 15}
 };
 
 Control::Control(Config* config) {
@@ -124,7 +124,17 @@ Control::Control(Config* config) {
 
 	pawns = new msgpawns();
 	pawns->function = MSG_PAWNS;
-	pawns->num = 0;
+	pawns->num = 10;
+	for (int i = 0; i < 10; i++) {
+		if (i < 5) {
+			pawns->pawns[i].x = 690 + i * 280;
+			pawns->pawns[i].y = 300;
+		} else {
+			pawns->pawns[i].x = 690 + (i - 5) * 280;
+			pawns->pawns[i].y = 2700;
+		}
+		pawns->pawns[i].type = 1;
+	}
 
 	if (obstacles.empty()) {
 		// Akadalyok definialasa
@@ -314,10 +324,11 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 void Control::log() {
 }
 
-void Control::refreshOpponent() {
+long int Control::refreshOpponent() {
 	double ox, oy;
-	mPrimitives->GetOpponentPos(&ox, &oy);
+	long int validity = mPrimitives->GetOpponentPos(&ox, &oy);
 	opponent->Set(ox, oy, ROBOT_RADIUS * 2.5 - angry);
+	return validity;
 }
 
 bool Control::opponentTooClose() {
@@ -325,11 +336,10 @@ bool Control::opponentTooClose() {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
 
-	/////////////////////////////
-	v = 500;
-	/////////////////////////////
-
-	refreshOpponent();
+	if (refreshOpponent() > SONAR_TIMEOUT) {
+		cout << "(Control) Sonar timeout!" << endl;
+		return true;
+	}
 
 	if (fabs(v) < 0.01) {
 		return false;
@@ -613,18 +623,19 @@ int Control::LuaWait(lua_State *L) {
 		mPrimitives->MotorSupply(false);
 		return luaL_error(L, "(Control) Stop button, exiting");
 	} else if (MatchTime() > 90000) {
-		//exitControl = true;
-		matchStarted = false;
-		mPrimitives->MotorSupply(false);
+		if (mPrimitives->MotorSupply(false) == 1) {
+			exitControl = true;
+		}
 		cout << "(Control) Meccs ido letelt, kilepunk" << endl;
 		return luaL_error(L, "(Control) Match over, exiting");
 	}
 
 	double ox, oy;
-	mPrimitives->GetOpponentPos(&ox, &oy);
-	Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
-	removeCollidingDynamicObstacles(opp);
-	delete opp;
+	if (mPrimitives->GetOpponentPos(&ox, &oy) < SONAR_TIMEOUT) {
+		Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
+		removeCollidingDynamicObstacles(opp);
+		delete opp;
+	}
 
 	return 0;
 }
@@ -1145,6 +1156,7 @@ int Control::LuaRefreshPawnPositions(lua_State *L) {
  * 1: koordinatak gripperes felszedeshez
  * 2: koordinatak bal karhoz
  * 3: koordinatak jobb karhoz
+ * 4: koordinatak oldalso parasztokhoz
  * @param L
  * @return
  */
@@ -1182,6 +1194,17 @@ int Control::LuaFindPawn(lua_State *L) {
 			lua_pushnumber(L, py);
 			lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
 			lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
+			lua_pushnumber(L, minDist);
+			return 5;
+		} else if (target == 4) {
+			lua_pushnumber(L, px);
+			lua_pushnumber(L, py);
+			lua_pushnumber(L, px);
+			if (py > 1500) {
+				lua_pushnumber(L, py - 400);
+			} else {
+				lua_pushnumber(L, py + 400);
+			}
 			lua_pushnumber(L, minDist);
 			return 5;
 		} else {

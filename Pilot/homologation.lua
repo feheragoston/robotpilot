@@ -7,7 +7,7 @@ GripperGrab = 67;
 repeat Control(); until (MotorSupply(true) ~= 0);
 Print("Motortap bekapcsolva");
 
---repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
+repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
 repeat Control(); until (GetStartButton());
 Print("Startgomb lenyomva felvesszuk a kezdopoziciot");
 
@@ -101,14 +101,16 @@ repeat
 		errorNum = errorNum + 1;
 		if (errorNum == 5) then
 			errorNum = 0;
-			Print("Motor power cycle skip");
-			--Print("Motortap kikapcsolas");
-			--repeat Control(); until (MotorSupply(false) ~= 0);
-			--repeat Control(); until (Sleep(5 * 1000 * 1000) ~= 0);
-			--Print("Motortap bekapcsolas");
-			--repeat Control(); until (MotorSupply(true) ~= 0);
-			--repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-			--Print("Motor powercycle vege");
+			Print("Motor powercycle kihagyas");
+			--[[
+			Print("Motortap kikapcsolas");
+			repeat Control(); until (MotorSupply(false) ~= 0);
+			repeat Control(); until (Sleep(5 * 1000 * 1000) ~= 0);
+			Print("Motortap bekapcsolas");
+			repeat Control(); until (MotorSupply(true) ~= 0);
+			repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
+			Print("Motor powercycle vege");
+			]]
 		end
 		while (MotionStop(2000) == 0) do Control(); end;
 	end

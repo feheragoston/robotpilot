@@ -21,6 +21,9 @@ node_Deadreck::node_Deadreck(void) : node(DEADRECK_ID, "node_Deadreck", DEADRECK
 	DeadreckPosX = 0;
 	DeadreckPosY = 0;
 	DeadreckPosPhi = 0;
+	DeadreckV = 0;
+	DeadreckW = 0;
+	gettimeofday(&prevMsgTime, NULL);
 	//----- valtozo init VEGE -----
 
 
@@ -56,6 +59,8 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 					DeadreckPosX	= 0;
 					DeadreckPosY	= 0;
 					DeadreckPosPhi	= 0;
+					DeadreckV = 0;
+					DeadreckW = 0;
 				}
 				cout << name << "\t___recv RESETPOS___:\t" << (ResetPos.done?"1":"0") << endl;
 				break;
@@ -63,9 +68,37 @@ void node_Deadreck::evalMsg(UDPmsg* msg){
 			case MSG_PERIODIC_TO_PC:
 				//csak akkor taroljuk el a fogadott poziciokat, ha nincs folyamatban reset_pos
 				if(!ResetPos.inProgress){
-					DeadreckPosX	= GET_FLOAT(&(msg->data[0]));
-					DeadreckPosY	= GET_FLOAT(&(msg->data[4]));
-					DeadreckPosPhi	= GET_FLOAT(&(msg->data[8]));
+
+					struct timeval timeElapsed;
+					TimeMeasure(&prevMsgTime, &timeElapsed);
+					gettimeofday(&prevMsgTime, NULL);
+					double dt = (double)timeElapsed.tv_sec + (double)timeElapsed.tv_usec/1000000;
+
+					double tmpX =  GET_FLOAT(&(msg->data[0]));
+					double tmpY =  GET_FLOAT(&(msg->data[4]));
+					double tmpPhi	= GET_FLOAT(&(msg->data[8]));
+
+					double dx = tmpX - DeadreckPosX;
+					double dy = tmpY - DeadreckPosY;
+					double dphi = AngleDist(tmpPhi, DeadreckPosPhi);
+					double ds = sqrt(dx*dx + dy*dy);
+
+					double alfa = atan2(dy, dx);
+					double direction = fabs(AngleDist(alfa, tmpPhi));
+
+					if (direction > M_PI_2) {
+						ds *= -1.;
+					}
+
+
+					DeadreckV = ds / dt;
+					DeadreckW = dphi / dt;
+
+					DeadreckPosX	= tmpX;
+					DeadreckPosY	= tmpY;
+					DeadreckPosPhi	= tmpPhi;
+
+
 				}
 				break;
 
@@ -123,5 +156,13 @@ void node_Deadreck::GET_POS(double* x, double* y, double* phi){
 	*x = DeadreckPosX;
 	*y = DeadreckPosY;
 	*phi = DeadreckPosPhi;
+
+}
+
+
+void node_Deadreck::GET_SPEED(double* v, double* w){
+
+	*v = DeadreckV;
+	*w = DeadreckW;
 
 }

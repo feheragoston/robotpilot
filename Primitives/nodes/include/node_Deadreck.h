@@ -38,6 +38,7 @@ public:
 
 
 	void GET_POS(double* x, double* y, double* phi);
+	void GET_SPEED(double* v, double* w);
 
 	progress_t ResetPos;
 
@@ -47,6 +48,9 @@ private:
 	double DeadreckPosX;
 	double DeadreckPosY;
 	double DeadreckPosPhi;
+	double DeadreckV;
+	double DeadreckW;
+	struct timeval prevMsgTime;
 
 
 };

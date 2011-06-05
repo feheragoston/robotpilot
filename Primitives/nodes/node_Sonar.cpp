@@ -20,6 +20,7 @@ node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar", SONAR_KEEP_ALIVE_MS,
 	//----- valtozo init ELEJE -----
 	SonarPosX = -1000;
 	SonarPosY = -1000;
+	gettimeofday(&prevMsgTime, NULL);
 	//----- valtozo init VEGE -----
 
 
@@ -59,6 +60,7 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 					SonarPosY *= 10;
 					SonarPosY += GET_U8(&(msg->data[i+4])) - '0';
 				}
+				gettimeofday(&prevMsgTime, NULL);
 				break;
 
 			default:
@@ -86,9 +88,15 @@ void node_Sonar::INIT_PARAM(void){
 }
 
 
-void node_Sonar::GET_POS(double* x, double* y){
+long int node_Sonar::GET_POS(double* x, double* y){
+
+	struct timeval timeElapsed;
 
 	*x = SonarPosX;
 	*y = SonarPosY;
+
+	TimeMeasure(&prevMsgTime, &timeElapsed);
+
+	return ((double)timeElapsed.tv_sec*1000 + (double)timeElapsed.tv_usec/1000);
 
 }

@@ -30,7 +30,7 @@ bool PrimitivesNet::Init() {
 
 bool PrimitivesNet::CameraInit() {
 	if (strlen(mConfig->NetIp) == 0 || !netConnection->ConnectToHost(13000, mConfig->NetIp)) {
-		if (!netConnection->ConnectToHost(13000, "192.168.24.57")) {
+		if (!netConnection->ConnectToHost(13000, "127.0.0.1")) {
 			std::cerr << "Hiba a halozati kapcsolodaskor" << std::endl;
 			return false;
 		}

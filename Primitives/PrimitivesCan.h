@@ -27,7 +27,6 @@
 
 #include <fstream>
 
-#include <sys/time.h>
 #include <math.h>
 
 #include "Primitives.h"
@@ -68,7 +67,8 @@ public:
 	bool GetStopButton(void);
 	bool GetMyColor(void);
 	void GetRobotPos(double* x, double* y, double* phi);
-	void GetOpponentPos(double* x, double* y);
+	long int GetOpponentPos(double* x, double* y);
+	void GetSpeed(double* v, double* w);
 	void SetRobotPos(double x, double y, double phi);
 	void GetDistances(double distance[6]);
 	bool GetMotorSupply(void);
@@ -150,7 +150,6 @@ private:
 	long int moveTOusec;
 	void setMoveTO(double s, double v, double a);
 	bool readyMoveTO(void);
-	void TimeMeasure(struct timeval *time_start, struct timeval *time_elapsed);
 	//----- TO VEGE -----
 
 

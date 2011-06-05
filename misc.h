@@ -32,6 +32,8 @@
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
+
+#define		SONAR_TIMEOUT		2000	// sonartol kapott ertek ervenyessegi limitje
 /////////////////
 // Robot szine
 

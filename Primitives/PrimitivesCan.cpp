@@ -538,7 +538,6 @@ int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
 
 				//ha megvolt a reset
 				if((ret = DeadreckoningResetPos_Unsafe()) == ACT_FINISHED){
-					cout << "BENN" << endl;
 					Calibrate_Unsafe();
 					deadreckCalibPhase = 0;
 				}
@@ -957,20 +956,35 @@ void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 
 
 // ellenfel poziciojanak lekerdezese
-void PrimitivesCan::GetOpponentPos(double* x, double* y){
+long int PrimitivesCan::GetOpponentPos(double* x, double* y){
 
 	EnterCritical();
+
+	long int ret;
 
 	double sonarpos_S[3];	// Szonar pozicioadat
 	double sonarpos_W[3];	// Szonar pozicioadat vilagkoordinatakban
 
-	sonar->GET_POS((&sonarpos_S[0]), (&sonarpos_S[1]));
+	ret = sonar->GET_POS((&sonarpos_S[0]), (&sonarpos_S[1]));
 	sonarpos_S[2] = 1.0;
 
 	M33V3Mult(T33WS, sonarpos_S, sonarpos_W);
 
 	*x = sonarpos_W[0];
 	*y = sonarpos_W[1];
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+void PrimitivesCan::GetSpeed(double* v, double* w){
+
+	EnterCritical();
+
+	deadreck->GET_SPEED(v, w);
 
 	ExitCritical();
 
@@ -1338,6 +1352,11 @@ int PrimitivesCan::MotionStop_Unsafe(double dec){
 	//ha most vegzett
 	else if(bdc->AnyStop.finished){
 
+		// ha MotionStop vegez, kilojuk a tobbi mozgas vegzeset ami esetleg kozben jott
+		bdc->Go.finished = false;
+		bdc->GoTo.finished = false;
+		bdc->Turn.finished = false;
+
 		//hiba volt-e
 		if(bdc->AnyStop.done)	ret = ACT_FINISHED;
 		else					ret = ACT_ERROR;
@@ -1354,6 +1373,10 @@ int PrimitivesCan::MotionStop_Unsafe(double dec){
 	//ha most nem vegzett, es nincs is folyamatban
 	else{
 
+		// MotionStop hivasnal az osszes tobbi mozgast leallitjuk
+		bdc->Go.inProgress = false;
+		bdc->GoTo.inProgress = false;
+		bdc->Turn.inProgress = false;
 		if(dec != 0)	bdc->BDC_STOP(dec);
 		else			bdc->BDC_HARD_STOP();
 
@@ -1446,43 +1469,4 @@ bool PrimitivesCan::readyMoveTO(void){
 
 	return false;
 
-}
-
-
-///////////////////////////////////////////////////////////////////
-void PrimitivesCan::TimeMeasure(struct timeval *time_start, struct timeval *time_elapsed) {
-			// Eltelt ido meresere szolgalo fuggveny.
-			// Megmeri, hogy mennyi ido telt el time_start ota,
-			// es beleirja time_elapsed-be.
-			// Legegyszerubb hasznalata a kovetkezo:
-			//
-			//	struct timeval time_start, time_elapsed;
-			//	gettimeofday(&time_start, NULL) {
-			//  TimeMeasure(&time_start, &time_elapsed) {
-			//
-
-	struct timeval	time_now;
-	struct timeval	time_temp;
-
-	time_temp.tv_sec = time_start->tv_sec;
-	time_temp.tv_usec = time_start->tv_usec;
-
-	gettimeofday(&time_now, NULL);
-
-
-	// Perform the carry for the later subtraction by updating time_start.
-	if (time_now.tv_usec < time_temp.tv_usec) {
-	int nsec = (time_temp.tv_usec - time_temp.tv_usec) / 1000000 + 1;
-	time_temp.tv_usec -= 1000000 * nsec;
-	time_temp.tv_sec += nsec;
-	}
-	if (time_now.tv_usec - time_temp.tv_usec > 1000000) {
-	int nsec = (time_now.tv_usec - time_temp.tv_usec) / 1000000;
-	time_temp.tv_usec += 1000000 * nsec;
-	time_temp.tv_sec -= nsec;
-	}
-
-	// Compute the time remaining to wait. tv_usec is certainly positive.
-	time_elapsed->tv_sec = time_now.tv_sec - time_temp.tv_sec;
-	time_elapsed->tv_usec = time_now.tv_usec - time_temp.tv_usec;
 }

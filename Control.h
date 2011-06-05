@@ -71,7 +71,7 @@ protected:
 
 	static void log();
 
-	static void refreshOpponent();
+	static long int refreshOpponent();
 	static bool opponentTooClose();
 	static bool obstacleCollision();
 	static void removeCollidingDynamicObstacles(Obstacle* obstacle);

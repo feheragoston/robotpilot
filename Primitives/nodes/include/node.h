@@ -21,6 +21,9 @@
 #include "../../define/function.h"
 #include "../../define/id.h"
 #include "../../define/param.h"
+
+#include "time.h"
+#include "../../../geom.h"
 //------------------------------ include VEGE ------------------------------
 
 

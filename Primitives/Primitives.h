@@ -50,13 +50,6 @@ public:
 	virtual bool Wait(long int useconds);
 
 	/**
-	 * varakozas adott ideig
-	 * @param useconds varakozasi ido microsecundumban
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
-	 */
-	virtual int Sleep(long int useconds);
-
-	/**
 	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
 	 * @return igaz, ha van benn paraszt
 	 */
@@ -178,8 +171,9 @@ public:
 	 * ellenfel poziciojanak lekerdezese
 	 * @param x [mm]
 	 * @param y [mm]
+	 * @return utolso frissites ota eltelt ido [ms]
 	 */
-	virtual void GetOpponentPos(double * x, double* y);
+	virtual long int GetOpponentPos(double * x, double* y);
 
 	/**
 	 * sebessegertekek lekerdezese
@@ -291,10 +285,6 @@ protected:
 	 * konfiguraciot tartalmazo objektum
 	 */
 	Config* mConfig;
-
-	progress sleep;
-	struct timeval sleepStart;
-	long int timeToSleep;
 
 	/**
 	 * a szinkapcsolo allasat tarolja
