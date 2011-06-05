@@ -26,6 +26,7 @@
 #define MSG_DEPLOYPRIORITY 15
 #define MSG_VISIONTEST 16
 #define MSG_POSREFINE 17
+#define MSG_PRINT 18
 
 #define FIG_NOTHING 0
 #define FIG_PAWN 1
@@ -121,6 +122,11 @@ typedef struct msgdeploypriority {
 	function_t function;
 	int8_t priority[36];
 } msgdeploypriority;
+
+typedef struct msgprint {
+	function_t function;
+	char text[254];
+} msgprint;
 
 #pragma pack()
 

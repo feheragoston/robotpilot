@@ -538,8 +538,13 @@ bool Control::checkLine(double x1, double y1, double x2, double y2) {
 
 void Control::report_errors(lua_State *L, int status) {
 	if (status != 0) {
-		std::cerr << "-- " << lua_tostring(L, -1) << std::endl;
-		lua_pop(L, 1); // remove error message
+		//std::cerr << "-- " << lua_tostring(L, -1) << std::endl;
+		//lua_pop(L, 1); // remove error message
+		lua_getfield(L, LUA_GLOBALSINDEX, "Print");
+		lua_insert(L, -2);
+		lua_pushstring(L, "-- lua error:");
+		lua_insert(L, -2);
+		lua_pcall(L, 2, 0, 0);
 	}
 }
 
@@ -593,7 +598,7 @@ int Control::newtry(lua_State *L) {
 
 int Control::LuaExit(lua_State *L) {
 	exitControl = true;
-	luaL_error(L, "(Control) Exit() called, exiting\n");
+	luaL_error(L, "(Control) Exit() called, exiting");
 	return 0;
 }
 
@@ -603,7 +608,7 @@ int Control::LuaWait(lua_State *L) {
 	/* Primitives statuszfrissitest varunk */
 	if (!mPrimitives->Wait(useconds)) {
 		exitControl = true;
-		return luaL_error(L, "(Control) Primitives->Wait failed, exiting\n");
+		return luaL_error(L, "(Control) Primitives->Wait failed, exiting");
 	}
 	if (mCamera) {
 		if (!mCamera->Wait(0)) {
@@ -750,24 +755,49 @@ int Control::LuaSimulate(lua_State *L) {
 
 int Control::LuaPrint(lua_State *L) {
 	int argc = lua_gettop(L);
+	msgprint message;
+	message.function = MSG_PRINT;
+	int msgpos = 0;
+	message.text[msgpos] = 0;
 	for (int n = 1; n <= argc; ++n) {
 		if (n > 1) {
 			std::cout << " ";
+			if (msgpos < 254) {
+				message.text[msgpos] = ' ';
+				msgpos++;
+				message.text[msgpos] = 0;
+			}
 		}
 		if (!strcmp(luaL_typename(L, n), "string")) {
 			const char* s = lua_tostring(L, n);
 			std::cout << s;
+			if (msgpos + strlen(s) < 254) {
+				strcpy(message.text+msgpos, s);
+			}
 		} else if (!strcmp(luaL_typename(L, n), "number")) {
 			double x = lua_tonumber(L, n);
 			std::cout << x;
+			if (msgpos < 240) {
+				sprintf(message.text+msgpos, "%.3f", x);
+			}
 		} else if (!strcmp(luaL_typename(L, n), "boolean")) {
 			bool b = lua_toboolean(L, n);
-			std::cout << b;
+			if (b) {
+				std::cout << "true";
+				strcpy(message.text+msgpos, "true");
+			} else {
+				std::cout << "false";
+				strcpy(message.text+msgpos, "false");
+			}
 		} else {
 			std::cout << luaL_typename(L, n);
+			strcpy(message.text+msgpos, luaL_typename(L, n));
 		}
+		msgpos += strlen(message.text+msgpos);
 	}
 	std::cout << std::endl;
+	message.text[msgpos] = 0;
+	mServer->Send(0, &message, msgpos + 1 + sizeof(function_t));
 	return 0;
 }
 
