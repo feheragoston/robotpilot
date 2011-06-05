@@ -117,7 +117,7 @@ bool Server::Process() {
 					}
 					if (size_read < 1 || strncmp("quit", buffer, 4) == 0) {
 						// disconnect
-						std::cout << i << " disconnected" << std::endl;
+						//std::cout << i << " disconnected" << std::endl;
 						if (m_messageCallback != 0) {
 							(*m_messageCallback)(i, buffer, 0);
 						}
@@ -138,7 +138,7 @@ bool Server::Process() {
 		 */
 		if (FD_ISSET(sockfd, &rfd)) {
 			client_num++;
-			std::cout << "Incoming connection: " << client_num << std::endl;
+			//std::cout << "Incoming connection: " << client_num << std::endl;
 			//alapbol az utolso, fenntartott helyre csatlakoztatjuk
 			int next_client = MAX_CONNECTIONS - 1;
 			// keresunk egy szabad helyet neki

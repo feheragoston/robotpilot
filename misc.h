@@ -13,7 +13,7 @@
 #define MISC_H_
 
 
-#define DEBUG_SIMULATION
+//#define DEBUG_SIMULATION
 
 ///////////////////////
 // Palya adatai (mm)

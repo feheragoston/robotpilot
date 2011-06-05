@@ -316,7 +316,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.function = MSG_VISIONTEST;
 		mPrimitives->GetRobotPos(&(response.d1), &(response.d2), &(response.d3));
 		mServer->Send(n, &response, sizeof(msgd3));
-	} else {
+	} else if (size != 0) {
 		std::cout << "(Control) Unknown or invalid function: " << (int)*function << " size: " << (int)size << std::endl;
 	}
 }

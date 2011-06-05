@@ -20,11 +20,13 @@ function GoToNextPawn(x, y, px, py)
 	while (SetGripperPos(90) == 0) do Control(); end;
 	while (GoToSafe(px, py) == 0) do Control(); end;
 	if (PawnInGripper()) then
-		while (SetGripperPos(65) == 0) do Control(); end;
+		while (SetGripperPos(GripperGrab) == 0) do Control(); end;
+		while (GoSafe(-250) == 0) do Control(); end;
 	end
 end
 
 function DeployPawn(x1, y1, x2, y2)
+	while (SetGripperPos(GripperGrab) == 0) do Control(); end;
 	while (TurnToSafe(x1, y1) == 0) do Control(); end;
 	while (GoToSafe(x1, y1) == 0) do Control(); end;
 	while (TurnToSafe(x2, y2) == 0) do Control(); end;
@@ -71,20 +73,24 @@ end
 
 repeat Control(); until (GoTo(250, Offset + Ori * 800) ~= 0);
 
+local stuck = 0;
 repeat
 	local status, err = pcall(function()
 		Print("KEZDUNK");
 		local deadpos = true;
+		stuck = stuck + 1;
 		--repeat Control(); until (RefreshPawnPositions() ~= 0);
 		
 		local ignoreRadius = ROBOT_FRONT_MAX + PAWN_RADIUS;
 		while (not PawnInGripper()) do
+			Print("Paraszt keresese");
 			--repeat Control(); until (RefreshPawnPositions() ~= 0);
 			px, py, x, y, ignoreRadius = FindPawn(4, ignoreRadius);
 			if (x) then
 				if (Simulate(GoToNextPawn, x, y, px, py)) then
 					deadpos = false;
 					GoToNextPawn(x, y, px, py);
+					stuck = 0;
 				else
 					ignoreRadius = ignoreRadius + 1;
 				end
@@ -97,12 +103,14 @@ repeat
 		local priorityChange = 1; -- ennyivel kell modositanunk a prioritast
 		local priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
 		while (PawnInGripper()) do
+			Print("Paraszt uritese");
 			x1, y1, x2, y2, target, priority = GetDeployPoint();
 			if (x1) then
 				if (Simulate(DeployPawn, x1, y1, x2, y2)) then
 					deadpos = false;
 					DeployPawn(x1, y1, x2, y2);
 					SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
+					stuck = 0;
 				else
 					SetDeployPointPriority(target, priority + priorityChange);
 					if (priorityChange == priorityChanged) then
@@ -126,9 +134,15 @@ repeat
 			end
 		end;
 		
+		if (stuck > 5) then
+			deadpos = true;
+			stuck = 0;
+		end;
+		
 		if (deadpos) then
 			local deadPosResolved = false;
 			repeat
+				Print("Beragadas feloldasa");
 				--repeat Control(); until (RefreshPawnPositions() ~= 0);
 				local turn = 0;
 				if (math.random() > 0.3) then
@@ -136,8 +150,8 @@ repeat
 				end
 				local go = math.random(-1000, 1000);
 				if (Simulate(resolveDeadpos, turn, go)) then
-					deadPosResolved = true;
 					resolveDeadpos(turn, go);
+					deadPosResolved = true;
 				end
 			until (deadPosResolved);
 		end
