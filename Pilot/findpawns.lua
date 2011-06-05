@@ -2,6 +2,7 @@ PI = 3.141592;
 Offset = 0;
 Ori = 1;
 GripperGrab = 67;
+pawnInGripper = false;
 
 -- Beszorulas feloldasa
 function resolveDeadpos(turn, go)
@@ -21,6 +22,7 @@ function GoToNextPawn(x, y, px, py)
 	while (GoToSafe(px, py) == 0) do Control(); end;
 	if (PawnInGripper()) then
 		while (SetGripperPos(GripperGrab) == 0) do Control(); end;
+		pawnInGripper = true;
 		while (GoSafe(-250) == 0) do Control(); end;
 	end
 end
@@ -31,6 +33,7 @@ function DeployPawn(x1, y1, x2, y2)
 	while (GoToSafe(x1, y1) == 0) do Control(); end;
 	while (TurnToSafe(x2, y2) == 0) do Control(); end;
 	while (SetGripperPos(90) == 0) do Control(); end;
+	pawnInGripper = false;
 	while (GoSafe(-250) == 0) do Control(); end;
 end
 
@@ -82,7 +85,7 @@ repeat
 		--repeat Control(); until (RefreshPawnPositions() ~= 0);
 		
 		local ignoreRadius = ROBOT_FRONT_MAX + PAWN_RADIUS;
-		while (not PawnInGripper()) do
+		while (not pawnInGripper) do
 			Print("Paraszt keresese");
 			--repeat Control(); until (RefreshPawnPositions() ~= 0);
 			px, py, x, y, ignoreRadius = FindPawn(4, ignoreRadius);
@@ -102,7 +105,7 @@ repeat
 		
 		local priorityChange = 1; -- ennyivel kell modositanunk a prioritast
 		local priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
-		while (PawnInGripper()) do
+		while (pawnInGripper) do
 			Print("Paraszt uritese");
 			x1, y1, x2, y2, target, priority = GetDeployPoint();
 			if (x1) then
