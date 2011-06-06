@@ -47,7 +47,8 @@ void node_Console::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
-				ConsolePos	= GET_U32(&(msg->data[0]));
+				//ConsolePos	= GET_U32(&(msg->data[0]));
+				ConsolePos	= GET_FLOAT(&(msg->data[0]));	//!!! ha Zoli frissítette, akkor u32-ként fogadni !!!
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:
@@ -61,14 +62,14 @@ void node_Console::evalMsg(UDPmsg* msg){
 				SetPos.done = GET_BOOL(&(msg->data[0]), 0);
 				SetPos.inProgress = false;
 				SetPos.finished = true;
-				cout << name << "\t___recv SETPOS___:\t" << (Stop.done?"1":"0") << endl;
+				cout << name << "\t___recv SETPOS___:\t" << (SetPos.done?"1":"0") << endl;
 				break;
 
 			case MSG_CONSOLE_CALIBRATE_REPLY:
 				Calibrate.done = GET_BOOL(&(msg->data[0]), 0);
 				Calibrate.inProgress = false;
 				Calibrate.finished = true;
-				cout << name << "\t___recv CALIB___:\t" << (Stop.done?"1":"0") << endl;
+				cout << name << "\t___recv CALIB___:\t" << (Calibrate.done?"1":"0") << endl;
 				break;
 
 			default:
@@ -108,16 +109,16 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 	msg.function	= CMD_CONSOLE_SET_POS;
 	msg.length		= 12;
 
-	SET_U32(&(msg.data[0]), CONSOLE_INCR_TO_MM(pos));
-	SET_U32(&(msg.data[4]), CONSOLE_INCR_TO_MM(speed));
-	SET_U32(&(msg.data[8]), CONSOLE_INCR_TO_MM(acc));
+	SET_U32(&(msg.data[0]), CONSOLE_CONV_MM_TO_INCR(pos));
+	SET_U32(&(msg.data[4]), CONSOLE_CONV_MMS_TO_INCRS(speed));
+	SET_U32(&(msg.data[8]), CONSOLE_CONV_MMS2_TO_INCRS2(acc));
 
 	UDPdriver::send(&msg);
 
 	SetPos.inProgress = true;
 	SetPos.finished = false;
 
-	cout << name << "\t___send SETPOS___:\t" << CONSOLE_INCR_TO_MM(pos) << "\t" << CONSOLE_INCR_TO_MM(speed) << "\t" << CONSOLE_INCR_TO_MM(acc) << endl;
+	cout << name << "\t___send SETPOS___:\t" << CONSOLE_CONV_MM_TO_INCR(pos) << "\t" << CONSOLE_CONV_MMS_TO_INCRS(speed) << "\t" << CONSOLE_CONV_MMS2_TO_INCRS2(acc) << endl;
 
 }
 
@@ -158,7 +159,8 @@ void node_Console::INIT_PARAM(void){
 	SET_U8(&(msg.data[28]), CONSOLE_PWM_MODE);
 	SET_BOOL(&(msg.data[29]), 0, (CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH != 0) ? true : false);
 	SET_BOOL(&(msg.data[29]), 1, (CONSOLE_IS_ENC_EQEP1 != 0) ? true : false);
-	SET_BOOL(&(msg.data[29]), 2, (CONSOLE_MOTOR_PLUS_CW != 0) ? true : false);
+	SET_BOOL(&(msg.data[29]), 2, (CONSOLE_MOTOR_PLUS_UP != 0) ? true : false);
+	SET_BOOL(&(msg.data[29]), 3, (CONSOLE_ENC_IS_ROTATE_DIR_A != 0) ? true : false);
 
 	UDPdriver::send(&msg);
 
@@ -167,6 +169,6 @@ void node_Console::INIT_PARAM(void){
 
 double node_Console::GET_POS(void){
 
-	return CONSOLE_INCR_TO_MM(ConsolePos);
+	return CONSOLE_CONV_INCR_TO_MM(ConsolePos);
 
 }

@@ -1109,8 +1109,8 @@ int Control::LuaGetConsolePos(lua_State *L) {
 int Control::LuaSetArmPos(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	double pos = luaL_optnumber(L, 2, 0);
-	double speed = luaL_optnumber(L, 3, 2);
-	double acc = luaL_optnumber(L, 4, 10);
+	double speed = luaL_optnumber(L, 3, 1000);
+	double acc = luaL_optnumber(L, 4, 100);
 	int i = mPrimitives->SetArmPos(left, pos, speed, acc);
 	lua_pushinteger(L, i);
 	return 1;
