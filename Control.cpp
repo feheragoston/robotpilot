@@ -1218,17 +1218,23 @@ int Control::LuaFindPawn(lua_State *L) {
 	if (closest < pawns->num) {
 		double px = pawns->pawns[closest].x;
 		double py = pawns->pawns[closest].y;
+		lua_pushnumber(L, px);
+		lua_pushnumber(L, py);
 		if (target == 1) {
 			double angle = atan2f(y - py, x - px);
-			lua_pushnumber(L, px);
-			lua_pushnumber(L, py);
 			lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
 			lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
 			lua_pushnumber(L, minDist);
 			return 5;
+		} else if (target == 2) {
+			double c2 = sqr(x - px) + sqr(y - py);
+			double dx = cos(atan2(py, px) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
+			double dy = sin(atan2(py, px) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+			lua_pushnumber(L, dx);
+			lua_pushnumber(L, dy);
+			lua_pushnumber(L, minDist);
+			return 5;
 		} else if (target == 4) {
-			lua_pushnumber(L, px);
-			lua_pushnumber(L, py);
 			lua_pushnumber(L, px);
 			if (py > 1500) {
 				lua_pushnumber(L, py - 400);
@@ -1238,8 +1244,6 @@ int Control::LuaFindPawn(lua_State *L) {
 			lua_pushnumber(L, minDist);
 			return 5;
 		} else {
-			lua_pushnumber(L, px);
-			lua_pushnumber(L, py);
 			lua_pushnumber(L, minDist);
 			return 3;
 		}
@@ -1249,8 +1253,16 @@ int Control::LuaFindPawn(lua_State *L) {
 	}
 }
 
+/**
+ * 0: lerakohely koordinatainak visszaadasa
+ * 1: koordinatak gripperes lerakashoz
+ * 2: koordinatak bal karhoz
+ * 3: koordinatak jobb karhoz
+ * @param L
+ * @return
+ */
 int Control::LuaGetDeployPoint(lua_State *L) {
-	static int n = 3;
+	int target = luaL_optinteger(L, 1, 0);
 
 	bool color = mPrimitives->GetMyColor();
 
@@ -1260,52 +1272,31 @@ int Control::LuaGetDeployPoint(lua_State *L) {
 		dir = -1;
 		offset = 3000;
 	}
-	if (n == 0) {
-		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, offset + dir * 625);
-		lua_pushnumber(L, 1885);
-		lua_pushnumber(L, offset + dir * 625);
-		lua_pushinteger(L, -1);
-		lua_pushinteger(L, -1);
-	} else if (n == 1) {
-		lua_pushnumber(L, 1925 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, offset + dir * 1325);
-		lua_pushnumber(L, 1925);
-		lua_pushnumber(L, offset + dir * 1325);
-		lua_pushinteger(L, -1);
-		lua_pushinteger(L, -1);
-	} else if (n == 2) {
-		lua_pushnumber(L, 1885 - ROBOT_FRONT_PAWN);
-		lua_pushnumber(L, offset + dir * 2025);
-		lua_pushnumber(L, 1885);
-		lua_pushnumber(L, offset + dir * 2025);
-		lua_pushinteger(L, -1);
-		lua_pushinteger(L, -1);
-	} else {
-		int min = 1;
-		int target = -1;
 
-		for (int i = 0; i < 36; i++) {
-			int d = (i / 6 + i % 6) % 2;
-			if ((color && d == 0) || (!color && d == 1)) {
-				if (deployFields[i] < min) {
-					min = deployFields[i];
-					target = i;
-				}
+	int min = 1;
+	int field = -1;
+
+	for (int i = 0; i < 36; i++) {
+		int d = (i / 6 + i % 6) % 2;
+		if ((color && d == 0) || (!color && d == 1)) {
+			if (deployFields[i] < min) {
+				min = deployFields[i];
+				field = i;
 			}
 		}
+	}
 
-		if (target != -1) {
-			double x = target / 6 * 350 + 175;
-			double y = target % 6 * 350 + 175 + 450;
+	if (field != -1) {
+		double x = field / 6 * 350 + 175;
+		double y = field % 6 * 350 + 175 + 450;
 
-			// vedett helyek keskenyebbek, nem a kozepukre rakunk
-			if (target == 30 || target == 31 || target == 34 || target == 35) {
-				x -= 40;
-			}
+		// vedett helyek keskenyebbek, nem a kozepukre rakunk
+		if (field == 30 || field == 31 || field == 34 || field == 35) {
+			x -= 40;
+		}
 
+		if (target == 1) {
 			double deployDistance = ROBOT_FRONT_PAWN;
-
 			if (x < 1050) {
 				deployDistance = -ROBOT_FRONT_PAWN;
 			}
@@ -1313,14 +1304,27 @@ int Control::LuaGetDeployPoint(lua_State *L) {
 			lua_pushnumber(L, y);
 			lua_pushnumber(L, x);
 			lua_pushnumber(L, y);
-			lua_pushinteger(L, target);
-			lua_pushinteger(L, deployFields[target]);
+		} else if (target == 2) {
+			double deployDistance = MAGNET_POS;
+			if (x < 1050) {
+				deployDistance = -MAGNET_POS;
+			}
+			lua_pushnumber(L, x - deployDistance);
+			lua_pushnumber(L, y);
+			lua_pushnumber(L, x);
+			lua_pushnumber(L, AREA_LENGTH);
 		} else {
-			lua_pushboolean(L, false);
-			return 1;
+			lua_pushnumber(L, x);
+			lua_pushnumber(L, y);
+			lua_pushnumber(L, x);
+			lua_pushnumber(L, y);
 		}
+		lua_pushinteger(L, field);
+		lua_pushinteger(L, deployFields[field]);
+	} else {
+		lua_pushboolean(L, false);
+		return 1;
 	}
-	n++;
 	return 6;
 }
 
