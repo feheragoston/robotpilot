@@ -1228,8 +1228,8 @@ int Control::LuaFindPawn(lua_State *L) {
 			return 5;
 		} else if (target == 2) {
 			double c2 = sqr(x - px) + sqr(y - py);
-			double dx = cos(atan2(py, px) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
-			double dy = sin(atan2(py, px) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+			double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
+			double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
 			lua_pushnumber(L, dx);
 			lua_pushnumber(L, dy);
 			lua_pushnumber(L, minDist);
