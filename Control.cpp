@@ -1234,6 +1234,14 @@ int Control::LuaFindPawn(lua_State *L) {
 			lua_pushnumber(L, dy);
 			lua_pushnumber(L, minDist);
 			return 5;
+		} else if (target == 3) {
+			double c2 = sqr(x - px) + sqr(y - py);
+			double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
+			double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+			lua_pushnumber(L, dx);
+			lua_pushnumber(L, dy);
+			lua_pushnumber(L, minDist);
+			return 5;
 		} else if (target == 4) {
 			lua_pushnumber(L, px);
 			if (py > 1500) {
