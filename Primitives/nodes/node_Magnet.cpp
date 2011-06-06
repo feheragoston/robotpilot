@@ -73,7 +73,7 @@ void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 
 	msg.node_id		= id;
 	msg.function	= CMD_MAGNET_SET_POLARITY;
-	msg.length		= 1;
+	msg.length		= 2;
 	SET_U8(&(msg.data[0]), num);
 	SET_U8(&(msg.data[1]), polarity);
 
