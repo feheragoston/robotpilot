@@ -8,6 +8,8 @@
 #ifndef PROTOCOL_H_
 #define PROTOCOL_H_
 
+#include <stdint.h>
+
 #define MSG_UNKNOWN 0
 #define MSG_REFRESHSTATUS 1
 #define MSG_CALIBRATEPOS 2
@@ -27,6 +29,7 @@
 #define MSG_VISIONTEST 16
 #define MSG_POSREFINE 17
 #define MSG_PRINT 18
+#define MSG_OBSTACLES 19
 
 #define FIG_NOTHING 0
 #define FIG_PAWN 1
@@ -48,6 +51,7 @@ typedef struct msgstatus {
 	double w;
 	double ox;
 	double oy;
+	double oradius;
 	bool startButton;
 	bool stopButton;
 	bool color;
@@ -127,6 +131,17 @@ typedef struct msgprint {
 	function_t function;
 	char text[254];
 } msgprint;
+
+typedef struct msgobstacle {
+	uint8_t type;
+	float d[4];
+} msgobstacle;
+
+typedef struct msgobstacles {
+	function_t function;
+	uint8_t num;
+	msgobstacle obstacles[14];
+} msgobstacles;
 
 #pragma pack()
 

@@ -18,6 +18,7 @@ bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
+bool Control::sendDynObstacles = false;
 Circle* Control::opponent = NULL;
 double Control::angry = 0.;
 bool Control::simulate = false;
@@ -292,6 +293,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
 		mPrimitives->GetSpeed(&(response.v), &(response.w));
 		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
+		response.oradius = opponent->getRadius();
 		response.startButton = mPrimitives->GetStartButton();
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
@@ -309,6 +311,23 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			message.priority[i] = deployFields[i];
 		}
 		mServer->Send(n, &message, sizeof(msgdeploypriority));
+
+		if (sendDynObstacles) {
+			msgobstacles obstacles;
+			obstacles.function = MSG_OBSTACLES;
+			obstacles.num = 14;
+			if (dynObstacles.size() < 14) {
+				obstacles.num = dynObstacles.size();
+			}
+			std::list<Obstacle*>::iterator o = dynObstacles.begin();
+			for (int i = 0; i < obstacles.num; i++) {
+				(*o)->getObstacle(&obstacles.obstacles[i]);
+				o++;
+			}
+			mServer->Send(n, &obstacles, sizeof(msgobstacles));
+			sendDynObstacles = false;
+		}
+
 	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
 		mServer->Send(n, pawns, sizeof(msgpawns));
 	} else if (*function == MSG_VISIONTEST && size == 1) {
@@ -369,7 +388,7 @@ bool Control::opponentTooClose() {
 		//std::cout << "(Control) Opponent too close! angry: " << angry << std::endl;
 		return true;
 	}
-	if (angry > 0) {
+	if (!simulate && angry > 0) {
 		angry -= 0.5;
 	}
 	return false;
@@ -433,6 +452,7 @@ void Control::removeCollidingDynamicObstacles(Obstacle* obstacle) {
 		if ((*i)->Intersect(obstacle)) {
 			delete(*i);
 			i = dynObstacles.erase(i);
+			sendDynObstacles = true;
 			//cout << "(Control) Dynamic obstacle removed" << endl;
 		} else {
 			i++;
@@ -457,6 +477,7 @@ void Control::addDynamicObstacle(Obstacle* obstacle) {
 		}
 	}
 	dynObstacles.push_back(obstacle);
+	sendDynObstacles = true;
 	//cout << "(Control) Number of dynamic obstacles: " << dynObstacles.size() << endl;
 }
 

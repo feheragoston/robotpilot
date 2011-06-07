@@ -289,3 +289,11 @@ Line::~Line() {
 void Line::Print() {
 	printf("Line %f %f %f %f\n", minx, miny, maxx, maxy);
 }
+
+void Line::getObstacle(msgobstacle* obstacle) {
+	Obstacle::getObstacle(obstacle);
+	obstacle->d[0] = minx;
+	obstacle->d[1] = miny;
+	obstacle->d[2] = maxx;
+	obstacle->d[3] = maxy;
+}

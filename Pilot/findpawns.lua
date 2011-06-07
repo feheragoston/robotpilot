@@ -135,7 +135,7 @@ repeat
 		
 		while (pawnInLeftArm) do
 			Print("Paraszt uritese bal karbol");
-			x1, y1, x2, y2, target, priority = GetDeployPoint();
+			x1, y1, x2, y2, target, priority = GetDeployPoint(2);
 			if (x1) then
 				if (Simulate(DeployPawnFromArm, x1, y1, x2, y2, true)) then
 					deadpos = false;

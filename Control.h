@@ -52,6 +52,7 @@ protected:
 
 	static std::list<Obstacle*> obstacles;
 	static std::list<Obstacle*> dynObstacles;
+	static bool sendDynObstacles;
 	static double robotBody[][2];
 	static Circle* opponent;
 	static double angry;

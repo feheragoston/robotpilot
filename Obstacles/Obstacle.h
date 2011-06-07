@@ -11,6 +11,8 @@
 #include "../misc.h"
 #include "../geom.h"
 
+#include "../Primitives/Net/Protocol/Protocol.h"
+
 enum ShapeTypes {
 	SHAPE_OBSTACLE,
 	SHAPE_CIRCLE,
@@ -51,6 +53,8 @@ class Obstacle {
 		virtual void Print();
 
 		int getShapeType() const { return m_shapeType; }
+
+		virtual void getObstacle(msgobstacle* obstacle);
 
 	protected:
 		int m_shapeType;

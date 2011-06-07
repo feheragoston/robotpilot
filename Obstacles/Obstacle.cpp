@@ -29,3 +29,10 @@ bool Obstacle::Intersect(Obstacle* obstacle) {
 void Obstacle::Print() {
 	printf("Obstacle\n");
 }
+
+void Obstacle::getObstacle(msgobstacle* obstacle) {
+	obstacle->type = m_shapeType;
+	for (int i = 0; i < 4; i++) {
+		obstacle->d[i] = 0;
+	}
+}

@@ -23,8 +23,13 @@ class Circle: public Obstacle {
 
 		void Print();
 
-		double x, y, r;
+		void getObstacle(msgobstacle* obstacle);
+		double getRadius() {
+			return r;
+		}
+
 	protected:
+		double x, y, r;
 };
 
 #endif /* CIRCLE_H_ */

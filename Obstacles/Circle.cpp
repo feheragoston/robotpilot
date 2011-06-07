@@ -139,3 +139,10 @@ Circle::~Circle() {
 void Circle::Print() {
 	printf("Circle %f %f %f\n", x, y, r);
 }
+
+void Circle::getObstacle(msgobstacle* obstacle) {
+	Obstacle::getObstacle(obstacle);
+	obstacle->d[0] = x;
+	obstacle->d[1] = y;
+	obstacle->d[2] = r;
+}

@@ -28,6 +28,8 @@ public:
 
 	void Print();
 
+	void getObstacle(msgobstacle* obstacle);
+
 	double minx, miny, maxx, maxy;
 protected:
 	double m, b;
