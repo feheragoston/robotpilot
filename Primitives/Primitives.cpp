@@ -199,9 +199,9 @@ bool Primitives::Wait(long int useconds) {
 		}
 	}
 
-#ifdef DEBUG_SIMULATION
-	usleep(useconds / 2);
-#endif
+	if (mConfig->DebugSimulation) {
+		usleep(useconds / 2);
+	}
 	return true;
 }
 

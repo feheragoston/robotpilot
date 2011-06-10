@@ -8,6 +8,8 @@ Config::Config() {
 
 	PrimitivesCan = true;
 	PrimitivesNet = false;
+
+	DebugSimulation = false;
 }
 
 bool Config::Parse(int argc, char *argv[]) {
@@ -17,17 +19,20 @@ bool Config::Parse(int argc, char *argv[]) {
 			case 'h': // help
 				std::cout << "Command line parameters:" << std::endl;
 				std::cout << "	-h	This message" << std::endl;
-				std::cout << "	-s Sim Mode" << std::endl;
+				std::cout << "	-s	Sim Mode" << std::endl;
 				std::cout << "	-c [ip_address]	CAN Mode" << std::endl;
 				std::cout << "	-n [ip_address]	Net Mode" << std::endl;
 				std::cout << "	-l <lua/file.lua>	lua file to run" << std::endl;
 				std::cout << "	-b <ip_address>	Bind server on ip" << std::endl;
+				std::cout << "	-ds	Debug simulation" << std::endl;
 				return false;
 				break;
 			case 's':
 				std::cout << "Sim Mode" << std::endl;
 				PrimitivesCan = false;
 				PrimitivesNet = false;
+
+				DebugSimulation = true;
 				break;
 			case 'c':
 				std::cout << "CAN Mode";
@@ -83,6 +88,14 @@ bool Config::Parse(int argc, char *argv[]) {
 				} else {
 					std::cout << "Error: no bind ip specified" << std::endl;
 					return false;
+				}
+				break;
+			case 'd':
+				if (strlen(argv[i]) == 3) {
+					if (argv[i][2] == 's') {
+						DebugSimulation = true;
+						std::cout << "Simulation with debug delay!" << std::endl;
+					}
 				}
 				break;
 			default:

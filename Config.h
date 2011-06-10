@@ -15,6 +15,8 @@ public:
 	bool PrimitivesCan;
 	bool PrimitivesNet;
 
+	bool DebugSimulation;
+
 	Config();
 	virtual ~Config();
 
