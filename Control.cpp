@@ -202,7 +202,7 @@ bool Control::Init() {
 	gettimeofday(&matchStart, NULL);
 
 	if (mConfig->PrimitivesCan) {
-		//mPrimitives = new PrimitivesCan(mConfig);
+		mPrimitives = new PrimitivesCan(mConfig);
 	} else if (mConfig->PrimitivesNet) {
 		mPrimitives = new PrimitivesNet(mConfig);
 	} else {

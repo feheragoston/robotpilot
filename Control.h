@@ -20,7 +20,7 @@ extern "C" {
 
 #include "Config.h"
 #include "Primitives/Primitives.h"
-//#include "Primitives/PrimitivesCan.h"
+#include "Primitives/PrimitivesCan.h"
 #include "Primitives/PrimitivesNet.h"
 #include "Server.h"
 #include "Primitives/Net/Protocol/Protocol.h"
