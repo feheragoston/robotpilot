@@ -20,7 +20,7 @@ extern "C" {
 
 #include "Config.h"
 #include "Primitives/Primitives.h"
-#include "Primitives/PrimitivesCan.h"
+//#include "Primitives/PrimitivesCan.h"
 #include "Primitives/PrimitivesNet.h"
 #include "Server.h"
 #include "Primitives/Net/Protocol/Protocol.h"
@@ -59,6 +59,7 @@ protected:
 	static int deployFields[36];
 
 	static bool simulate;
+	static bool safeMotion;
 
 	lua_State *L;
 
@@ -72,6 +73,7 @@ protected:
 
 	static void log();
 
+	static void setSafeMotion(lua_State *L);
 	static long int refreshOpponent();
 	static bool opponentTooClose();
 	static bool obstacleCollision();
@@ -108,55 +110,58 @@ protected:
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
 
-	// lua exception handling
-	// http://lua-users.org/wiki/FinalizedExceptions
-	static int safecall(lua_State *L);
-	static int protect(lua_State *L);
-	static int finalize(lua_State *L);
-	static int do_nothing(lua_State *L);
-	static int newtry(lua_State *L);
+	static int c_gettimeofday(lua_State *L);
+	static int c_getelapsedtime(lua_State *L);
 
-	static int LuaExit(lua_State *L);
-	static int LuaWait(lua_State *L);
-	static int LuaControl(lua_State *L);
-	static int LuaRunParallel(lua_State *L);
-	static int LuaSimulate(lua_State *L);
-	static int LuaPrint(lua_State *L);
-	static int LuaSleep(lua_State *L);
-	static int LuaTest(lua_State *L);
+	static int c_exit(lua_State *L);
+	static int c_wait(lua_State *L);
+	static int c_process(lua_State *L);
+	static int c_runparallel(lua_State *L);
+	static int c_simulate(lua_State *L);
+	static int c_print(lua_State *L);
 
-	static int LuaGetStartButton(lua_State *L);
-	static int LuaGetStopButton(lua_State *L);
-	static int LuaGetMyColor(lua_State *L);
-	static int LuaPawnInGripper(lua_State *L);
-	static int LuaGetDistances(lua_State *L);
-	static int LuaMotorSupply(lua_State *L);
+	static int GetStartButton(lua_State *L);
+	static int GetStopButton(lua_State *L);
+	static int GetMyColor(lua_State *L);
+	static int PawnInGripper(lua_State *L);
+	static int GetDistances(lua_State *L);
+	static int SetMotorSupply(lua_State *L);
 
-	static int LuaCalibrateDeadreckoning(lua_State *L);
-	static int LuaRefineDeadreckoning(lua_State *L);
-	static int LuaSetSpeed(lua_State *L);
-	static int LuaGo(lua_State *L);
-	static int LuaGoTo(lua_State *L);
-	static int LuaTurn(lua_State *L);
-	static int LuaTurnTo(lua_State *L);
-	static int LuaMotionStop(lua_State *L);
-	static int LuaGetRobotPos(lua_State *L);
-	static int LuaSetRobotPos(lua_State *L);
-	static int LuaGetOpponentPos(lua_State *L);
+	static int CalibrateDeadreckoning(lua_State *L);
+	static int RefineDeadreckoning(lua_State *L);
+	static int SetSpeed(lua_State *L);
+	static int Go(lua_State *L);
+	static int GoTo(lua_State *L);
+	static int Turn(lua_State *L);
+	static int TurnTo(lua_State *L);
+	static int MotionInProgress(lua_State *L);
+	static int GetMotionError(lua_State *L);
+	static int MotionStop(lua_State *L);
+	static int MotionStopInProgress(lua_State *L);
+	static int GetRobotPos(lua_State *L);
+	static int SetRobotPos(lua_State *L);
+	static int GetOpponentPos(lua_State *L);
 
-	static int LuaSetGripperPos(lua_State *L);
-	static int LuaCalibrateConsole(lua_State *L);
-	static int LuaSetConsolePos(lua_State *L);
-	static int LuaConsoleStop(lua_State *L);
-	static int LuaGetConsolePos(lua_State *L);
-	static int LuaSetArmPos(lua_State *L);
-	static int LuaMagnet(lua_State *L);
+	static int GripperMove(lua_State *L);
+	static int GripperMoveInProgress(lua_State *L);
+	static int CalibrateConsole(lua_State *L);
+	static int ConsoleMove(lua_State *L);
+	static int ConsoleMoveInProgress(lua_State *L);
+	static int ConsoleStop(lua_State *L);
+	static int ConsoleStopInProgress(lua_State *L);
+	static int GetConsolePos(lua_State *L);
+	static int ArmMove(lua_State *L);
+	static int ArmMoveInProgress(lua_State *L);
+	static int Magnet(lua_State *L);
+	static int MagnetInProgress(lua_State *L);
 
-	static int LuaStartMatch(lua_State *L);
-	static int LuaRefreshPawnPositions(lua_State *L);
-	static int LuaFindPawn(lua_State *L);
-	static int LuaGetDeployPoint(lua_State *L);
-	static int LuaSetDeployPointPriority(lua_State *L);
+	static int StartMatch(lua_State *L);
+	static int RefreshPawnPositions(lua_State *L);
+	static int RefreshPawnPositionsInProgress(lua_State *L);
+	static int RefreshPawnPositionsFinished(lua_State *L);
+	static int FindPawn(lua_State *L);
+	static int GetDeployPoint(lua_State *L);
+	static int SetDeployPointPriority(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

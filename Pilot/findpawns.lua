@@ -92,7 +92,7 @@ repeat Control(); until (TurnTo(x, 1500) ~= 0);
 repeat Control(); until (Sleep(1 * 1000 * 1000) ~= 0);
 
 repeat Control(); until (GetStartButton());
-StartMatch();
+StartMatch(false);
 Print("Meccs elkezdodott");
 
 if (GetMyColor()) then
@@ -115,6 +115,7 @@ repeat
 		
 		local ignoreRadius = ROBOT_FRONT_MAX + PAWN_RADIUS;
 		
+		--[[
 		while (not pawnInLeftArm) do
 			Print("Paraszt keresese bal karba");
 			repeat Control(); until (RefreshPawnPositions() ~= 0);
@@ -152,6 +153,7 @@ repeat
 				break;
 			end
 		end;
+		]]
 		
 		while (not pawnInGripper) do
 			Print("Paraszt keresese");

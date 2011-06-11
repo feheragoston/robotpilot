@@ -50,12 +50,6 @@ public:
 	virtual bool Wait(long int useconds);
 
 	/**
-	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
-	 * @return igaz, ha van benn paraszt
-	 */
-	virtual bool PawnInGripper();
-
-	/**
 	 * Start gomb allapotanak lekerdezese
 	 * @return igaz, ha le van nyomva
 	 */
@@ -74,11 +68,23 @@ public:
 	virtual bool GetMyColor();
 
 	/**
+	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
+	 * @return igaz, ha van benn paraszt
+	 */
+	virtual bool PawnInGripper();
+
+	/**
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int MotorSupply(bool powered);
+	virtual bool SetMotorSupply(bool powered);
+
+	/**
+	 * motortap valtoztatas allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool SetMotorSupplyInProgress();
 
 	/**
 	 * motortap allapotanak lekerdezese
@@ -93,26 +99,38 @@ public:
 	/**
 	 * kalibracio vegrehajtasa
 	 * @param simulate true eseten nem mozog, csak beallitja a kezdopoziciot
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int CalibrateDeadreckoning(bool simulate = false);
+	virtual bool CalibrateDeadreckoning(bool simulate = false);
+
+	/**
+	 * kalibracio allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool CalibrateDeadreckoningInProgress();
 
 	/**
 	 * sebessegertekek beallitasa
 	 * @param v [mm/s]
 	 * @param w [rad/s]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int SetSpeed(double v, double w);
+	virtual bool SetSpeed(double v, double w);
+
+	/**
+	 * SetSpeed allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool SetSpeedInProgress();
 
 	/**
 	 * egyenes haladas
 	 * @param distance [mm]
 	 * @param max_speed [mm/s]
 	 * @param max_acc [mm/s^2]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int Go(double distance, double max_speed, double max_acc);
+	virtual bool Go(double distance, double max_speed, double max_acc);
 
 	/**
 	 * egyenes haladas x,y pontba
@@ -120,25 +138,43 @@ public:
 	 * @param y a celpont y koordinataja [mm]
 	 * @param max_speed [mm/s]
 	 * @param max_acc [mm/s^2]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int GoTo(double x, double y, double max_speed, double max_acc);
+	virtual bool GoTo(double x, double y, double max_speed, double max_acc);
 
 	/**
 	 * helyben fordulas
 	 * @param angle [rad]
 	 * @param max_speed [rad/s]
 	 * @param max_acc [rad/s^2]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int Turn(double angle, double max_speed, double max_acc);
+	virtual bool Turn(double angle, double max_speed, double max_acc);
+
+	/**
+	 * mozgasok (Go, GoTo, Turn) allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool MotionInProgress();
+
+	/**
+	 * legutobbi mozgas (Go, GoTo, Turn) hibajanak lekerdezese
+	 * @return 0: nem tortent hiba, 1: ...
+	 */
+	virtual int GetMotionError();
 
 	/**
 	 * mozgas megszakitasa
 	 * @param dec maximalis lassulas merteke [mm/s^2], 0 eseten hard stop
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int MotionStop(double dec = 0.0);
+	virtual bool MotionStop(double dec = 0.0);
+
+	/**
+	 * megallas allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool MotionStopInProgress();
 
 	/**
 	 * A robot aktualis poziciojat es orientaciojat adja vissza
@@ -208,11 +244,17 @@ public:
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * elso megfogo szogenek beallitasa
+	 * elso megfogo mozgatasa
 	 * @param pos [deg], 0 zart helyzet, 90 nyitott helyzet
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int SetGripperPos(double pos);
+	virtual bool GripperMove(double pos);
+
+	/**
+	 * elso megfogo mozgatas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool GripperMoveInProgress();
 
 	/**
 	 * elso megfogo szogenek lekerdezese
@@ -226,24 +268,42 @@ public:
 
 	/**
 	 * Konzol kalibralas
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int CalibrateConsole();
+	virtual bool CalibrateConsole();
+
+	/**
+	 * CalibrateConsole allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool CalibrateConsoleInProgress();
 
 	/**
 	 * konzol mozgatas
 	 * @param pos abszolut pozicio [mm], also pozicio 0
 	 * @param max_speed [mm/s]
 	 * @param max_acc [mm/s^2]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int SetConsolePos(double pos, double max_speed, double max_acc);
+	virtual bool ConsoleMove(double pos, double max_speed, double max_acc);
+
+	/**
+	 * konzol mozgatas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ConsoleMoveInProgress();
 
 	/**
 	 * Konzol mozgatas leallitasa
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int ConsoleStop();
+	virtual bool ConsoleStop();
+
+	/**
+	 * ConsoleStop allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ConsoleStopInProgress();
 
 	/**
 	 * Konzol pozicio lekerdezese
@@ -256,14 +316,21 @@ public:
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Kar poziciojanak beallitasa
+	 * Kar mozgatasa
 	 * @param left bal/jobb kar mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int SetArmPos(bool left, double pos, double max_speed, double max_acc);
+	virtual bool ArmMove(bool left, double pos, double max_speed, double max_acc);
+
+	/**
+	 * Kar mozgatas allapota
+	 * @param left bal/jobb kar allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ArmMoveInProgress(bool left);
 
 	/**
 	 * Kar poziciojanak lekerdezese
@@ -276,9 +343,16 @@ public:
 	 * Magnes polaritasanak valtoztatasa
 	 * @param left bal/jobb magnes
 	 * @param polarity 1: vonzas, 0: kikapcsolt, -1: taszitas
-	 * @return 0: folyamatban, 1: sikeres, -1: sikertelen
+	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual int Magnet(bool left, int polarity);
+	virtual bool Magnet(bool left, int polarity);
+
+	/**
+	 * Magnes polaritas valtas allapota
+	 * @param left bal/jobb magnes
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool MagnetInProgress(bool left);
 
 protected:
 	/**

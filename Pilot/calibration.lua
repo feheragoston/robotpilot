@@ -1,29 +1,26 @@
+-- CALIBRATE
+c.SetMotorSupply(true)
+c.print("Motortap bekapcsolva");
 
-PI = 3.141592;
-Offset = 0;
-Ori = 1;
-GripperGrab = 67;
+p.sleep(2000)
+repeat c.process() until (c.GetStartButton());
+c.print("Startgomb lenyomva felvesszuk a kezdopoziciot");
 
-repeat Control(); until (MotorSupply(true) ~= 0);
-Print("Motortap bekapcsolva");
+p.ArmMove(true, 0)
+c.print("Balkar behajtva");
+p.ArmMove(false, 0)
+c.print("Jobbkar behajtva");
+p.GripperMove(0)
+c.print("Gripper behajtva");
 
-repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-repeat Control(); until (GetStartButton());
-Print("Startgomb lenyomva felvesszuk a kezdopoziciot");
+c.CalibrateDeadreckoning()
+c.print("Deadreckoning beallitva");
+p.sleep(1000)
 
-repeat Control(); until (SetArmPos(true, 0) ~= 0);
-Print("Balkar behajtva");
-repeat Control(); until (SetArmPos(false, 0) ~= 0);
-Print("Jobbkar behajtva");
-repeat Control(); until (SetGripperPos(0) ~= 0);
-Print("Gripper behajtva");
+p.Go(30)
+x, y, phi = c.GetRobotPos();
+p.TurnTo(x, 1500)
 
-repeat Control(); until (CalibrateDeadreckoning() ~= 0);
-Print("Calibrate finished");
-repeat Control(); until (Sleep(1 * 1000 * 1000) ~= 0);
-
-repeat Control(); until (Go(30) ~= 0);
-x, y, phi = GetRobotPos();
-repeat Control(); until (TurnTo(x, 1500) ~= 0);
-
-repeat Control(); until (Sleep(1 * 1000 * 1000) ~= 0);
+p.sleep(1000)
+c.print("Calibrate finished");
+-- CALIBRATE END

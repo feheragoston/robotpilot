@@ -155,7 +155,7 @@ bool Primitives::Wait(long int useconds) {
 		}
 
 		if (robot.v == 0. && robot.w == 0.) {
-			motionStop.finished = true;
+			motionStop.inprogress = false;
 		}
 	}
 
@@ -167,7 +167,7 @@ bool Primitives::Wait(long int useconds) {
 		if (goTo.inprogress) {
 			if (gotodist - fabs(dist) < 3e-10) {
 				dist = gotodist;
-				goTo.finished = true;
+				goTo.inprogress = false;
 				robot.v = 0;
 				robot.w = 0;
 			}
@@ -175,14 +175,14 @@ bool Primitives::Wait(long int useconds) {
 		if (go.inprogress) {
 			if (fabs(godist) - fabs(dist) < 3e-10) {
 				dist = godist;
-				go.finished = true;
+				go.inprogress = false;
 				robot.v = 0;
 			}
 		}
 		if (turn.inprogress) {
 			if (fabs(turnAngle) - fabs(angle) < 10e-5) {
 				angle = turnAngle;
-				turn.finished = true;
+				turn.inprogress = false;
 				robot.w = 0;
 			}
 		}
@@ -221,109 +221,100 @@ bool Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
-int Primitives::MotorSupply(bool powered) {
-	return 1;
+bool Primitives::SetMotorSupply(bool powered) {
+	return true;
+}
+
+bool Primitives::SetMotorSupplyInProgress() {
+	return false;
 }
 
 bool Primitives::GetMotorSupply() {
 	return true;
 }
 
-int Primitives::CalibrateDeadreckoning(bool simulate) {
+bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 200;
 	robot.y = 200;
 	robot.phi = M_PI / 2;
 
 	opponent.x = 200;
 	opponent.y = 2800;
-	return 1;
+	return true;
 }
 
-int Primitives::SetSpeed(double v, double w) {
+bool Primitives::CalibrateDeadreckoningInProgress() {
+	return false;
+}
+
+bool Primitives::SetSpeed(double v, double w) {
 	robot.v = v;
 	robot.w = w;
-	return 1;
+	return true;
 }
 
-int Primitives::Go(double distance, double max_speed, double max_acc) {
-	if (goTo.inprogress || turn.inprogress || motionStop.inprogress) {
-		return -1;
+bool Primitives::SetSpeedInProgress() {
+	return false;
+}
+
+bool Primitives::Go(double distance, double max_speed, double max_acc) {
+	if (MotionInProgress() || MotionStopInProgress()) {
+		return false;
 	}
-	if (go.inprogress) {
-		if (go.finished) {
-			go.inprogress = false;
-			go.finished = false;
-			return 1;
-		}
-	} else {
-		target.x = robot.x + cos(robot.phi) * distance;
-		target.y = robot.y + sin(robot.phi) * distance;
-		target.v = max_speed;
-		target.a = max_acc;
-		go.inprogress = true;
+	target.x = robot.x + cos(robot.phi) * distance;
+	target.y = robot.y + sin(robot.phi) * distance;
+	target.v = max_speed;
+	target.a = max_acc;
+	go.inprogress = true;
+	return true;
+}
+
+bool Primitives::GoTo(double x, double y, double max_speed, double max_acc) {
+	if (MotionInProgress() || MotionStopInProgress()) {
+		return false;
 	}
+	target.x = x;
+	target.y = y;
+	target.v = max_speed;
+	target.a = max_acc;
+	goTo.inprogress = true;
+	return true;
+}
+
+bool Primitives::Turn(double angle, double max_speed, double max_acc) {
+	if (MotionInProgress() || MotionStopInProgress()) {
+		return false;
+	}
+	target.phi = robot.phi + angle;
+	target.w = max_speed;
+	target.a = max_acc;
+	turn.inprogress = true;
+	return true;
+}
+
+bool Primitives::MotionInProgress() {
+	return go.inprogress || goTo.inprogress || turn.inprogress;
+}
+
+int Primitives::GetMotionError() {
 	return 0;
 }
 
-int Primitives::GoTo(double x, double y, double max_speed, double max_acc) {
-	if (go.inprogress || turn.inprogress || motionStop.inprogress) {
-		return -1;
-	}
-	if (goTo.inprogress) {
-		if (goTo.finished) {
-			goTo.inprogress = false;
-			goTo.finished = false;
-			return 1;
-		}
-	} else {
-		target.x = x;
-		target.y = y;
-		target.v = max_speed;
-		target.a = max_acc;
-		goTo.inprogress = true;
-	}
-	return 0;
-}
-
-int Primitives::Turn(double angle, double max_speed, double max_acc) {
-	if (go.inprogress || goTo.inprogress || motionStop.inprogress) {
-		return -1;
-	}
-	if (turn.inprogress) {
-		if (turn.finished) {
-			turn.inprogress = false;
-			turn.finished = false;
-			return 1;
-		}
-	} else {
-		target.phi = robot.phi + angle;
-		target.w = max_speed;
-		target.a = max_acc;
-		turn.inprogress = true;
-	}
-	return 0;
-}
-
-int Primitives::MotionStop(double dec) {
+bool Primitives::MotionStop(double dec) {
 	if (motionStop.inprogress) {
-		if (motionStop.finished) {
-			motionStop.inprogress = false;
-			motionStop.finished = false;
-
-			goTo.finished = false;
-			goTo.inprogress = false;
-			go.finished = false;
-			return 1;
-		}
-	} else {
-		target.a = dec;
-		motionStop.inprogress = true;
-
-		go.inprogress = false;
-		turn.finished = false;
-		turn.inprogress = false;
+		return false;
 	}
-	return 0;
+	target.a = dec;
+	motionStop.inprogress = true;
+
+	go.inprogress = false;
+	goTo.inprogress = false;
+	turn.inprogress = false;
+	return true;
+}
+
+bool Primitives::MotionStopInProgress() {
+	return motionStop.inprogress;
 }
 
 void Primitives::GetRobotPos(double* x, double* y, double* phi) {
@@ -360,40 +351,60 @@ void Primitives::GetDistances(double distance[6]) {
 	}
 }
 
-int Primitives::SetGripperPos(double pos) {
+bool Primitives::GripperMove(double pos) {
 	gripperPos = pos;
-	return 1;
+	return true;
+}
+
+bool Primitives::GripperMoveInProgress() {
+	return false;
 }
 
 double Primitives::GetGripperPos() {
 	return gripperPos;
 }
 
-int Primitives::CalibrateConsole() {
+bool Primitives::CalibrateConsole() {
 	consolePos = 0.;
-	return 1;
+	return true;
 }
 
-int Primitives::SetConsolePos(double pos, double max_speed, double max_acc) {
+bool Primitives::CalibrateConsoleInProgress() {
+	return false;
+}
+
+bool Primitives::ConsoleMove(double pos, double max_speed, double max_acc) {
 	consolePos = pos;
-	return 1;
+	return true;
 }
 
-int Primitives::ConsoleStop() {
-	return 1;
+bool Primitives::ConsoleMoveInProgress() {
+	return false;
+}
+
+bool Primitives::ConsoleStop() {
+	return true;
+}
+
+bool Primitives::ConsoleStopInProgress() {
+	return false;
 }
 
 double Primitives::GetConsolePos() {
 	return consolePos;
 }
 
-int Primitives::SetArmPos(bool left, double pos, double max_speed, double max_acc) {
+bool Primitives::ArmMove(bool left, double pos, double max_speed, double max_acc) {
 	if (left) {
 		leftArmPos = pos;
 	} else {
 		rightArmPos = pos;
 	}
-	return 1;
+	return true;
+}
+
+bool Primitives::ArmMoveInProgress(bool left) {
+	return false;
 }
 
 double Primitives::GetArmPos(bool left) {
@@ -403,6 +414,10 @@ double Primitives::GetArmPos(bool left) {
 	return rightArmPos;
 }
 
-int Primitives::Magnet(bool left, int polarity) {
-	return 1;
+bool Primitives::Magnet(bool left, int polarity) {
+	return true;
+}
+
+bool Primitives::MagnetInProgress(bool left) {
+	return false;
 }

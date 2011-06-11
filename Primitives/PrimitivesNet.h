@@ -22,23 +22,31 @@ public:
 
 	bool Wait(long int useconds);
 
-	int CalibrateDeadreckoning(bool simulate);
-	int SetSpeed(double v, double w);
-	int Go(double distance, double max_speed, double max_acc);
-	int GoTo(double x, double y, double max_speed, double max_acc);
-	int Turn(double angle, double max_speed, double max_acc);
-	int MotionStop(double dec);
+	bool CalibrateDeadreckoning(bool simulate);
+	bool CalibrateDeadreckoningInProgress();
+	bool SetSpeed(double v, double w);
+	bool Go(double distance, double max_speed, double max_acc);
+	bool GoTo(double x, double y, double max_speed, double max_acc);
+	bool Turn(double angle, double max_speed, double max_acc);
+	bool MotionStop(double dec);
 
-	int SetGripperPos(double pos);
-	int CalibrateConsole();
-	int SetConsolePos(double pos, double max_speed, double max_acc);
-	int ConsoleStop();
+	bool GripperMove(double pos);
+	bool GripperMoveInProgress();
+	bool CalibrateConsole();
+	bool ConsoleMove(double pos, double max_speed, double max_acc);
+	bool ConsoleMoveInProgress();
+	bool ConsoleStop();
 	double GetConsolePos();
-	int SetArmPos(bool left, double pos, double max_speed, double max_acc);
-	int Magnet(bool left, int polarity);
+	bool ArmMove(bool left, double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress(bool left);
+	bool Magnet(bool left, int polarity);
 
-	int RefineDeadreckoning(double x, double y, double phi, double* dx, double* dy, double* dphi);
-	int RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi);
+	bool RefineDeadreckoning(double x, double y, double phi);
+	bool RefineDeadreckoningInProgress();
+	void GetRefineData(double* dx, double* dy, double* dphi);
+	bool RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi);
+	bool RefreshPawnPositionsInProgress();
+	bool RefreshPawnPositionsFinished();
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa
