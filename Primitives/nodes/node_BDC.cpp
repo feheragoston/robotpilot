@@ -54,24 +54,24 @@ void node_BDC::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_BDC_GO_REPLY:
-				Go.done = GET_BOOL(&(msg->data[0]), 0);
-				Go.inProgress = false;
-				Go.finished = true;
-				cout << name << "\t___recv GO:\t" << (Go.done?"1":"0") << endl;
+				AnyMotion.done = GET_BOOL(&(msg->data[0]), 0);
+				AnyMotion.inProgress = false;
+				AnyMotion.finished = true;
+				cout << name << "\t___recv GO:\t" << (AnyMotion.done?"1":"0") << endl;
 				break;
 
 			case MSG_BDC_GOTO_REPLY:
-				GoTo.done = GET_BOOL(&(msg->data[0]), 0);
-				GoTo.inProgress = false;
-				GoTo.finished = true;
-				cout << name << "\t___recv GOTO:\t" << (GoTo.done?"1":"0") << endl;
+				AnyMotion.done = GET_BOOL(&(msg->data[0]), 0);
+				AnyMotion.inProgress = false;
+				AnyMotion.finished = true;
+				cout << name << "\t___recv GOTO:\t" << (AnyMotion.done?"1":"0") << endl;
 				break;
 
 			case MSG_BDC_TURN_REPLY:
-				Turn.done = GET_BOOL(&(msg->data[0]), 0);
-				Turn.inProgress = false;
-				Turn.finished = true;
-				cout << name << "\t___recv TURN:\t" << (Turn.done?"1":"0") << endl;
+				AnyMotion.done = GET_BOOL(&(msg->data[0]), 0);
+				AnyMotion.inProgress = false;
+				AnyMotion.finished = true;
+				cout << name << "\t___recv TURN:\t" << (AnyMotion.done?"1":"0") << endl;
 				break;
 
 			case MSG_BDC_SET_SPEED_REPLY:
@@ -142,8 +142,8 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 
 	UDPdriver::send(&msg);
 
-	Go.inProgress = true;
-	Go.finished = false;
+	AnyMotion.inProgress = true;
+	AnyMotion.finished = false;
 
 	cout << name << "\t___send GO___:\t" << distance << "\t" << BDC_CONV_SPEED(max_speed) << "\t" << BDC_CONV_ACC(max_acc) << endl;
 
@@ -164,8 +164,8 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
 	UDPdriver::send(&msg);
 
-	GoTo.inProgress = true;
-	GoTo.finished = false;
+	AnyMotion.inProgress = true;
+	AnyMotion.finished = false;
 
 	cout << name << "\t___send GOTO___:\t" << x << "\t" << y << "\t" << BDC_CONV_SPEED(max_speed) << "\t" << BDC_CONV_ACC(max_acc) << endl;
 
@@ -185,8 +185,8 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 
 	UDPdriver::send(&msg);
 
-	Turn.inProgress = true;
-	Turn.finished = false;
+	AnyMotion.inProgress = true;
+	AnyMotion.finished = false;
 
 	cout << name << "\t___send TURN___:\t" << angle << "\t" << BDC_CONV_OMEGA(max_speed) << "\t" << BDC_CONV_BETA(max_acc) << endl;
 

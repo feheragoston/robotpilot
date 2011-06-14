@@ -69,9 +69,14 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	//---------- valtozo ELEJE ----------
 	strcpy(CanIp, config->CanIp);
 
+	bdcMotionError		= false;
+
 	deadreckCheckX		= 0;
 	deadreckCheckY		= 0;
 	deadreckCheckPhi	= 0;
+
+	sonarXOffset		= 0;
+	sonarYOffset		= 0;
 
 	deadreckCalibPhase		= 0;
 	goToWallPhase			= 0;
@@ -205,8 +210,8 @@ bool PrimitivesCan::Init(void){
 
 
 	//aktuator tap alapbol be- vagy kikapcsolva
-	if(SEND_START_ACTUATOR_IN_INIT)		broadcast->START_ACTUATOR();
-	else								broadcast->STOP_ACTUATOR();
+	if(START_ACTUATOR_IN_INIT)		broadcast->START_ACTUATOR();
+	else							broadcast->STOP_ACTUATOR();
 
 
 
@@ -265,646 +270,6 @@ void PrimitivesCan::ExitCritical(void){
 }
 
 
-//distance [mm]
-//max_speed [mm/s]
-//max_acc [mm/s^2]
-int PrimitivesCan::Go(double distance, double max_speed, double max_acc){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->GoTo.inProgress ||
-		bdc->Turn.inProgress ||
-		bdc->SetSpeed.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->Go.finished){
-
-		//hiba volt-e
-		if(bdc->Go.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->Go.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->Go.inProgress){
-
-		//ha lejart a megbeszelt timeout
-		if(readyMoveTO()){
-			bdc->Go.inProgress = false;
-			ret = ACT_ERROR;
-		}
-
-		//ha utkozes van
-		else if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-					input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-				ret = ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		bdc->BDC_GO(distance, max_speed, max_acc);
-		setMoveTO(distance, max_speed, max_acc);	//megbeszelt TO
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
-
-	EnterCritical();
-
-	int ret;
-	double xr, yr, phir;
-	double xw, yw, phiw;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->Go.inProgress ||
-		bdc->Turn.inProgress ||
-		bdc->SetSpeed.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->GoTo.finished){
-
-		//hiba volt-e
-		if(bdc->GoTo.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->GoTo.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->GoTo.inProgress){
-
-		//ha lejart a megbeszelt timeout
-		if(readyMoveTO()){
-			bdc->GoTo.inProgress = false;
-			ret = ACT_ERROR;
-		}
-
-		//ha utkozes van
-		else if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-					input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-				ret =  ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		ConvWorldToRobot(x, y, 0, &xr, &yr, &phir);
-		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
-		GetRobotPos_Unsafe(&xw, &yw, &phiw);
-		setMoveTO(sqrt((x-xw)*(x-xw) + (y-yw)*(y-yw)), max_speed, max_acc);	//megbeszelt TO
-		ret =  ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//angle [rad]
-//max_speed [rad/s]
-//max_acc [rad/s^2]
-int PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
-
-	EnterCritical();
-
-	int ret = Turn_Unsafe(angle, max_speed, max_acc);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//v [mm/s]
-//w [rad/s]
-int PrimitivesCan::SetSpeed(double v, double w){
-
-	EnterCritical();
-
-	int ret = SetSpeed_Unsafe(v, w);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//dec = 0 => hard stop
-//dec [mm/s^2]
-int PrimitivesCan::MotionStop(double dec = 0){
-
-	EnterCritical();
-
-	int ret = MotionStop_Unsafe(dec);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::DeadreckoningResetPos_Unsafe(void){
-
-	int ret;
-
-
-	//ha most vegzett
-	if(deadreck->ResetPos.finished){
-
-		//hiba volt-e
-		if(deadreck->ResetPos.done)		ret = ACT_FINISHED;
-		else							ret = ACT_ERROR;
-
-		deadreck->ResetPos.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(deadreck->ResetPos.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		deadreck->DEADRECK_RESET_POS();
-		ret =  ACT_INPROGRESS;
-	}
-
-
-	return ret;
-
-}
-
-
-void PrimitivesCan::Calibrate_Unsafe(void){
-
-	//red
-	if(GetMyColor_Unsafe() == COLOR_RED){
-		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
-		deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
-		deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
-		TM33Build(SONAR_TX_RED, SONAR_TY_RED, SONAR_ALPHA_RED, T33WS);
-	}
-
-	//blue
-	else{
-		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
-		deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
-		deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
-		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
-	}
-
-}
-
-
-
-//simulate = true => nem mozog, csak beallitja a kezdopoziciot
-int PrimitivesCan::CalibrateDeadreckoning(bool simulate = false){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha csak szimulacio
-	if(simulate){
-		Calibrate_Unsafe();
-		ret = ACT_FINISHED;
-	}
-
-
-	//ha nem csak szimulacio
-	else{
-
-		switch(deadreckCalibPhase){
-
-			//start
-			case 0:
-				deadreckCalibPhase = 1;
-				ret = ACT_INPROGRESS;
-				break;
-
-			//varunk az egyik kapcsolora
-			case 1:
-
-				//ha megvan valamelyik utkozeskapcsolo
-				if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-					input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-					deadreckCalibPhase = 2;
-
-				ret = ACT_INPROGRESS;
-
-				break;
-
-			//varunk a reset-re
-			case 2:
-
-				//ha megvolt a reset
-				if((ret = DeadreckoningResetPos_Unsafe()) == ACT_FINISHED){
-					Calibrate_Unsafe();
-					deadreckCalibPhase = 0;
-				}
-
-				break;
-
-
-		}
-
-
-	}
-
-
-	//cout << "dp\t" << deadreckCalibPhase << endl;
-
-
-	//ha hiba
-	if(ret == ACT_ERROR)
-		deadreckCalibPhase = 0;
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//motortap be/ki kapcsolasa
-int PrimitivesCan::MotorSupply(bool powered){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha most vegzett
-	if(power->ActOnOff.finished){
-
-		//hiba volt-e
-		if(power->ActOnOff.done)	ret = ACT_FINISHED;
-		else						ret = ACT_ERROR;
-
-		power->ActOnOff.finished = false;
-
-	}
-
-	//ha most nem vegzet, es folyamatban
-	else if(power->ActOnOff.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-
-		if(powered)	power->POWER_ACT_ON();
-		else		power->POWER_ACT_OFF();
-
-		ret = ACT_INPROGRESS;
-
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//pos [deg]
-int PrimitivesCan::SetGripperPos(double pos){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha most vegzett mindegyik szervo
-	if(servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].finished && servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].finished){
-
-		//hiba volt-e
-		if(	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].done &&
-			servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].done){
-			//lementjuk Totinak a poziciot
-			gripperPos = pos;
-			ret = ACT_FINISHED;
-		}
-		else
-			ret = ACT_ERROR;
-
-		servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].finished = false;
-		servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].finished = false;
-
-	}
-
-	//ha most nem vegzett mindegyik, valamelyik folyamatban
-	else if(	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].inProgress ||
-				servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett mindegyik, es nincs is folyamatban semelyik sem
-	else{
-		servo->SERVO_SET_POS(SERVO_GRIPPER_LEFT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
-		servo->SERVO_SET_POS(SERVO_GRIPPER_RIGHT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//pos [mm], absolute, 0 also pozicio
-//speed [mm/s]
-//acc [mm/s^2]
-int PrimitivesCan::SetConsolePos(double pos, double speed, double acc){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(console->Calibrate.inProgress || console->Stop.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(console->SetPos.finished){
-
-		//hiba volt-e
-		if(console->SetPos.done)	ret = ACT_FINISHED;
-		else						ret = ACT_ERROR;
-
-		console->SetPos.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(console->SetPos.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		console->CONSOLE_SET_POS(pos, speed, acc);
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::CalibrateConsole(void){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(console->SetPos.inProgress || console->Stop.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(console->Calibrate.finished){
-
-		//hiba volt-e
-		if(console->Calibrate.done)	ret = ACT_FINISHED;
-		else						ret = ACT_ERROR;
-
-		console->Calibrate.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(console->Calibrate.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		console->CONSOLE_CALIBRATE();
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::ConsoleStop(void){
-
-	EnterCritical();
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(false){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(console->Stop.finished){
-
-		//hiba volt-e
-		if(console->Stop.done)	ret = ACT_FINISHED;
-		else					ret = ACT_ERROR;
-
-		console->Stop.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(console->Stop.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		console->CONSOLE_STOP();
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//[mm]
-double PrimitivesCan::GetConsolePos(void){
-
-	EnterCritical();
-
-	double ret = console->GET_POS();
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//left [bool]
-//pos [deg], 0 alaphelyzet (fuggoleges), lefele no
-//speed [deg/s]
-//acc [deg/s^2]
-int PrimitivesCan::SetArmPos(bool left, double pos, double speed, double acc){
-
-	EnterCritical();
-
-
-	int ret;
-	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
-
-
-	//ha most vegzett
-	if(servo->Setpos[num].finished){
-
-		//hiba volt-e
-		if(servo->Setpos[num].done){
-			//lementjuk Totinak a poziciot
-			if(left)	leftArmPos = pos;
-			else		rightArmPos = pos;
-			ret = ACT_FINISHED;
-		}
-		else
-			ret = ACT_ERROR;
-
-		servo->Setpos[num].finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(servo->Setpos[num].inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		servo->SERVO_SET_POS(num, pos, speed, acc);
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-//left [bool]
-//polarity - 1 vonzas
-//           0 kikapcsolt
-//          -1 taszitas
-int PrimitivesCan::Magnet(bool left, int polarity){
-
-	EnterCritical();
-
-
-	int ret;
-	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
-
-
-	//ha most vegzett
-	if(magnet->SetPolarity[num].finished){
-
-		//hiba volt-e
-		if(magnet->SetPolarity[num].done)	ret = ACT_FINISHED;
-		else								ret = ACT_ERROR;
-
-		magnet->SetPolarity[num].finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(magnet->SetPolarity[num].inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		if(polarity == 1)		magnet->MAGNET_SET_POLARITY(num, MAGNET_PULL);
-		else if(polarity == 0)	magnet->MAGNET_SET_POLARITY(num, MAGNET_OFF);
-		else if(polarity == -1)	magnet->MAGNET_SET_POLARITY(num, MAGNET_PUSH);
-		ret = ACT_INPROGRESS;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::PawnInGripper(void){
-
-	EnterCritical();
-
-	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
 bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
@@ -944,6 +309,388 @@ bool PrimitivesCan::GetMyColor(void){
 }
 
 
+bool PrimitivesCan::PawnInGripper(void){
+
+	EnterCritical();
+
+	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetMotorSupply(bool powered){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(power->ActOnOff.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+
+		if(powered)	power->POWER_ACT_ON();
+		else		power->POWER_ACT_OFF();
+
+		ret = ACT_STARTED;
+
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetMotorSupplyInProgress(void){
+
+	EnterCritical();
+
+	bool ret = power->ActOnOff.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetMotorSupply(void){
+
+	EnterCritical();
+
+	bool ret;
+
+	power->GET_ACT_ON(&ret);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CalibrateDeadreckoning(bool simulate){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha csak szimulacio
+	if(simulate){
+		Calibrate_Unsafe();
+		ret = true;
+	}
+
+
+	//ha nem csak szimulacio
+	else{
+
+		//ha folyamatban van valami, amire ezt nem indithatjuk el
+		if(deadreckCalibPhase != 0){
+			ret = ACT_START_ERROR;
+		}
+
+		//ha elindithatjuk
+		else{
+			deadreckCalibPhase = 1;
+			ret = ACT_STARTED;
+		}
+
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CalibrateDeadreckoningInProgress(void){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	switch(deadreckCalibPhase){
+
+		//varunk az egyik kapcsolora
+		case 1:
+
+			//ha megvan valamelyik utkozeskapcsolo
+			if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
+				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
+				deadreckCalibPhase = 2;
+
+			ret = true;
+
+			break;
+
+		//reset
+		case 2:
+			deadreck->DEADRECK_RESET_POS();
+			break;
+
+		//varunk a reset-re
+		case 3:
+
+			//ha folyamatban van a reset
+			if(deadreck->ResetPos.inProgress)
+				ret = true;
+
+			//ha megvolt a reset
+			else{
+				Calibrate_Unsafe();
+				deadreckCalibPhase = 0;
+				ret = false;
+			}
+
+			break;
+
+		//ilyen nem lehet, azt mondjuk, hogy folyamatban van
+		default:
+			deadreckCalibPhase = 0;
+			ret = true;
+			break;
+
+
+	}
+
+
+	//cout << "dp\t" << deadreckCalibPhase << endl;
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetSpeed(double v, double w){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress ||
+		bdc->AnyMotion.inProgress ||
+		bdc->SetSpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		bdc->BDC_SET_SPEED(v, w);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = bdc->SetSpeed.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress ||
+		bdc->AnyMotion.inProgress ||
+		bdc->SetSpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		bdc->BDC_GO(distance, max_speed, max_acc);
+		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		setMoveTO(distance, max_speed, max_acc);	//megbeszelt TO
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	double xr, yr, phir;
+	double xw, yw, phiw;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress ||
+		bdc->AnyMotion.inProgress ||
+		bdc->SetSpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		ConvWorldToRobot(x, y, 0, &xr, &yr, &phir);
+		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
+		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		GetRobotPos_Unsafe(&xw, &yw, &phiw);
+		setMoveTO(sqrt((x-xw)*(x-xw) + (y-yw)*(y-yw)), max_speed, max_acc);	//megbeszelt TO
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress ||
+		bdc->AnyMotion.inProgress ||
+		bdc->SetSpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		bdc->BDC_TURN(angle, max_speed, max_acc);
+		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		setMoveTO(angle, max_speed, max_acc);	//megbeszelt TO
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::MotionInProgress(void){
+
+	EnterCritical();
+
+	bool ret = bdc->AnyMotion.inProgress;
+
+	//ha folyamatban van
+	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
+				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)))
+		bdcMotionError = MOTION_ERROR;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+int PrimitivesCan::GetMotionError(void){
+
+	EnterCritical();
+
+	int ret = (bdcMotionError ? MOTION_ERROR : MOTION_NO_ERROR);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::MotionStop(double dec){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+
+		//MotionStop hivasnal az osszes tobbi mozgast leallitjuk
+		bdc->AnyMotion.inProgress = false;
+
+		if(dec != 0)	bdc->BDC_STOP(dec);
+		else			bdc->BDC_HARD_STOP();
+
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::MotionStopInProgress(void){
+
+	EnterCritical();
+
+	bool ret = bdc->AnyStop.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 
 	EnterCritical();
@@ -955,23 +702,11 @@ void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 }
 
 
-// ellenfel poziciojanak lekerdezese
-long int PrimitivesCan::GetOpponentPos(double* x, double* y){
+long int PrimitivesCan::GetOpponentPos(double * x, double* y){
 
 	EnterCritical();
 
-	long int ret;
-
-	double sonarpos_S[3];	// Szonar pozicioadat
-	double sonarpos_W[3];	// Szonar pozicioadat vilagkoordinatakban
-
-	ret = sonar->GET_POS((&sonarpos_S[0]), (&sonarpos_S[1]));
-	sonarpos_S[2] = 1.0;
-
-	M33V3Mult(T33WS, sonarpos_S, sonarpos_W);
-
-	*x = sonarpos_W[0];
-	*y = sonarpos_W[1];
+	long int ret = GetOpponentPos_Unsafe(x, y);
 
 	ExitCritical();
 
@@ -991,7 +726,6 @@ void PrimitivesCan::GetSpeed(double* v, double* w){
 }
 
 
-// robot poziciojanak beallitasa
 void PrimitivesCan::SetRobotPos(double x, double y, double phi){
 
 	EnterCritical();
@@ -1003,7 +737,22 @@ void PrimitivesCan::SetRobotPos(double x, double y, double phi){
 }
 
 
-// Visszaadja a tavolsagerzekelok erteket mm-ben
+void PrimitivesCan::SetOpponentPos(double x, double y){
+
+	EnterCritical();
+
+	double tmpX, tmpY;
+
+	GetOpponentPos_Unsafe(&tmpX, &tmpY);
+
+	sonarXOffset = x - tmpX;
+	sonarYOffset = y - tmpY;
+
+	ExitCritical();
+
+}
+
+
 void PrimitivesCan::GetDistances(double distance[6]){
 
 	EnterCritical();
@@ -1016,13 +765,285 @@ void PrimitivesCan::GetDistances(double distance[6]){
 }
 
 
-bool PrimitivesCan::GetMotorSupply(void){
+bool PrimitivesCan::GripperMove(double pos){
 
 	EnterCritical();
 
 	bool ret;
 
-	power->GET_ACT_ON(&ret);
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].inProgress ||
+		servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(SERVO_GRIPPER_LEFT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
+		servo->SERVO_SET_POS(SERVO_GRIPPER_RIGHT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GripperMoveInProgress(void){
+
+	EnterCritical();
+
+	bool ret =	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].inProgress ||
+				servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetGripperPos(void){
+
+	EnterCritical();
+
+	double ret = (servo->GET_POS(SERVO_GRIPPER_LEFT_INDEX) + servo->GET_POS(SERVO_GRIPPER_RIGHT_INDEX)) / 2;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CalibrateConsole(void){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	console->Calibrate.inProgress ||
+		console->SetPos.inProgress ||
+		console->Stop.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		console->CONSOLE_CALIBRATE();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CalibrateConsoleInProgress(void){
+
+	EnterCritical();
+
+	bool ret = console->Calibrate.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ConsoleMove(double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	console->Calibrate.inProgress ||
+		console->SetPos.inProgress ||
+		console->Stop.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		console->CONSOLE_SET_POS(pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ConsoleMoveInProgress(void){
+
+	EnterCritical();
+
+	bool ret = console->SetPos.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ConsoleStop(void){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	console->Calibrate.inProgress ||
+		console->SetPos.inProgress ||
+		console->Stop.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		console->CONSOLE_STOP();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ConsoleStopInProgress(void){
+
+	EnterCritical();
+
+	bool ret = console->Stop.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetConsolePos(void){
+
+	EnterCritical();
+
+	double ret = console->GET_POS();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ArmMove(bool left, double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ArmMoveInProgress(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetArmPos(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::Magnet(bool left, int polarity){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(magnet->SetPolarity[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		magnet->MAGNET_SET_POLARITY(num, polarity);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::MagnetInProgress(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
+	bool ret = magnet->SetPolarity[num].inProgress;
 
 	ExitCritical();
 
@@ -1128,272 +1149,23 @@ void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* 
 }
 
 
-int PrimitivesCan::GoToWall(double speedSigned, double omegaAbs){
+void PrimitivesCan::Calibrate_Unsafe(void){
 
-	int ret;
-
-	switch(goToWallPhase){
-
-		//start
-		case 0:
-			goToWallPhase++;
-			ret = ACT_INPROGRESS;
-			break;
-
-		//beallitjuk a sebesseget, amivel megyunk
-		case 1:
-			//ha beallitotta a sebesseget
-			if((ret = SetSpeed_Unsafe(speedSigned, 0)) == ACT_FINISHED){
-				goToWallPhase++;
-				ret = ACT_INPROGRESS;
-			}
-			break;
-
-		//varunk az utkozesre
-		case 2:
-			//ha bal utkozes
-			if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX))
-				goToWallPhase = 3;
-			else if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-				goToWallPhase = 4;
-			ret = ACT_INPROGRESS;
-			break;
-
-		//bal utkozes volt, megallunk
-		case 3:
-			//ha megalltunk
-			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
-				goToWallPhase = 5;
-				ret = ACT_INPROGRESS;
-			}
-			break;
-
-		//jobb utkozes volt, megallunk
-		case 4:
-			//ha megalltunk
-			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
-				goToWallPhase = 6;
-				ret = ACT_INPROGRESS;
-			}
-			break;
-
-		//bal utkozes volt, megalltunk, rafordulunk a falra
-		case 5:
-			//ha beallitotta a sebesseget
-			if((ret = SetSpeed_Unsafe(speedSigned / 2, omegaAbs)) == ACT_FINISHED){
-				goToWallPhase = 7;
-				ret = ACT_INPROGRESS;
-			}
-			break;
-
-		//jobb utkozes volt, megalltunk, rafordulunk a falra
-		case 6:
-			//ha beallitotta a sebesseget
-			if((ret = SetSpeed_Unsafe(speedSigned / 2, -omegaAbs)) == ACT_FINISHED){
-				goToWallPhase = 7;
-				ret = ACT_INPROGRESS;
-			}
-			break;
-
-		//mindket utkozeskapcsolora varunk
-		case 7:
-			//ha mindket utkozeskapcsolo jelez
-			if(input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) && input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-				goToWallPhase = 8;
-			ret = ACT_INPROGRESS;
-			break;
-
-		//rajta vagyunk a falon, megallunk
-		case 8:
-			//ha megalltunk, ACT_FINISHED
-			if((ret = MotionStop_Unsafe(0)) == ACT_FINISHED){
-				goToWallPhase = 0;
-				ret = ACT_FINISHED;
-			}
-			break;
-
-		//nem lehet, hiba
-		default:
-			ret = ACT_ERROR;
-			break;
-
+	//red
+	if(GetMyColor_Unsafe() == COLOR_RED){
+		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+		deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
+		deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
+		TM33Build(SONAR_TX_RED, SONAR_TY_RED, SONAR_ALPHA_RED, T33WS);
 	}
 
-
-	cout << "gp\t" << goToWallPhase << endl;
-
-
-	//ha hiba
-	if(ret == ACT_ERROR)
-		goToWallPhase = 0;
-
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::Turn_Unsafe(double angle, double max_speed, double max_acc){
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->Go.inProgress ||
-		bdc->GoTo.inProgress ||
-		bdc->SetSpeed.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->Turn.finished){
-
-		//hiba volt-e
-		if(bdc->Turn.done)	ret = ACT_FINISHED;
-		else				ret = ACT_ERROR;
-
-		bdc->Turn.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->Turn.inProgress){
-
-		//ha lejart a megbeszelt timeout
-		if(readyMoveTO()){
-			bdc->Turn.inProgress = false;
-			ret = ACT_ERROR;
-		}
-
-		//ha utkozes van
-		else if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-					input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
-				ret = ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
+	//blue
 	else{
-		bdc->BDC_TURN(angle, max_speed, max_acc);
-		setMoveTO(angle, max_speed, max_acc);	//megbeszelt TO
-		ret = ACT_INPROGRESS;
+		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
+		deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
+		deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
+		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
 	}
-
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::SetSpeed_Unsafe(double v, double w){
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->Go.inProgress ||
-		bdc->GoTo.inProgress ||
-		bdc->Turn.inProgress){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->SetSpeed.finished){
-
-		//hiba volt-e
-		if(bdc->SetSpeed.done)	ret = ACT_FINISHED;
-		else					ret = ACT_ERROR;
-
-		bdc->SetSpeed.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->SetSpeed.inProgress){
-
-		//ha utkozes van
-		if(false)
-			ret = ACT_ERROR;
-
-		//ha nincs utkozes
-		else
-			ret = ACT_INPROGRESS;
-
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-		bdc->BDC_SET_SPEED(v, w);
-		ret = ACT_INPROGRESS;
-	}
-
-
-	return ret;
-
-}
-
-
-int PrimitivesCan::MotionStop_Unsafe(double dec){
-
-	int ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(false){
-		ret = ACT_ERROR;
-	}
-
-	//ha most vegzett
-	else if(bdc->AnyStop.finished){
-
-		// ha MotionStop vegez, kilojuk a tobbi mozgas vegzeset ami esetleg kozben jott
-		bdc->Go.finished = false;
-		bdc->GoTo.finished = false;
-		bdc->Turn.finished = false;
-
-		//hiba volt-e
-		if(bdc->AnyStop.done)	ret = ACT_FINISHED;
-		else					ret = ACT_ERROR;
-
-		bdc->AnyStop.finished = false;
-
-	}
-
-	//ha most nem vegzett, es folyamatban
-	else if(bdc->AnyStop.inProgress){
-		ret = ACT_INPROGRESS;
-	}
-
-	//ha most nem vegzett, es nincs is folyamatban
-	else{
-
-		// MotionStop hivasnal az osszes tobbi mozgast leallitjuk
-		bdc->Go.inProgress = false;
-		bdc->GoTo.inProgress = false;
-		bdc->Turn.inProgress = false;
-		if(dec != 0)	bdc->BDC_STOP(dec);
-		else			bdc->BDC_HARD_STOP();
-
-		ret = ACT_INPROGRESS;
-	}
-
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::GetMyColor_Unsafe(void){
-
-	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
-
-	return ret;
 
 }
 
@@ -1409,6 +1181,30 @@ void PrimitivesCan::GetRobotPos_Unsafe(double* x, double* y, double* phi){
 }
 
 
+long int PrimitivesCan::GetOpponentPos_Unsafe(double* x, double* y){
+
+	long int ret;
+
+	double sonarpos_S[3];	// Szonar pozicioadat
+	double sonarpos_W[3];	// Szonar pozicioadat vilagkoordinatakban
+
+	ret = sonar->GET_POS((&sonarpos_S[0]), (&sonarpos_S[1]));
+	sonarpos_S[2] = 1.0;
+
+	M33V3Mult(T33WS, sonarpos_S, sonarpos_W);
+
+	*x = sonarpos_W[0];
+	*y = sonarpos_W[1];
+
+	//offset hizzaadasa
+	*x += sonarXOffset;
+	*y += sonarYOffset;
+
+	return ret;
+
+}
+
+
 void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 	double tmpX, tmpY, tmpPhi;
@@ -1418,6 +1214,15 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 	deadreckCheckX		+= 	x	- tmpX;
 	deadreckCheckY		+= 	y	- tmpY;
 	deadreckCheckPhi	+= 	phi	- tmpPhi;
+
+}
+
+
+bool PrimitivesCan::GetMyColor_Unsafe(void){
+
+	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
+
+	return ret;
 
 }
 
@@ -1454,6 +1259,7 @@ void PrimitivesCan::setMoveTO(double s, double v, double a){
 	gettimeofday(&moveStart, NULL);
 
 }
+
 
 bool PrimitivesCan::readyMoveTO(void){
 

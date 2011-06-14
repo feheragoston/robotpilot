@@ -18,6 +18,13 @@ node_Magnet::node_Magnet(void) : node(MAGNET_ID, "node_Magnet", MAGNET_KEEP_ALIV
 
 
 	//----- valtozo init ELEJE -----
+	Magnet_Voltage_Pull[MAGNET_LEFT_INDEX]		=	(MAGNET_LEFT_PULL_IS_p24V ? MAGNET_p24V : MAGNET_m24V);
+	Magnet_Voltage_Off[MAGNET_LEFT_INDEX]		=	MAGNET_0V;
+	Magnet_Voltage_Push[MAGNET_LEFT_INDEX]		=	(MAGNET_LEFT_PULL_IS_p24V ? MAGNET_m24V : MAGNET_p24V);
+
+	Magnet_Voltage_Pull[MAGNET_RIGHT_INDEX]		=	(MAGNET_RIGHT_PULL_IS_p24V ? MAGNET_p24V : MAGNET_m24V);
+	Magnet_Voltage_Off[MAGNET_RIGHT_INDEX]		=	MAGNET_0V;
+	Magnet_Voltage_Push[MAGNET_RIGHT_INDEX]		=	(MAGNET_RIGHT_PULL_IS_p24V ? MAGNET_m24V : MAGNET_p24V);
 	//----- valtozo init VEGE -----
 
 
@@ -71,11 +78,17 @@ void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 
 	UDPmsg msg;
 
+	u8 voltage;
+
+	if(polarity == MAGNET_PUSH)			voltage = Magnet_Voltage_Push[num];
+	else if(polarity == MAGNET_OFF)		voltage = Magnet_Voltage_Off[num];
+	else if(polarity == MAGNET_PULL)	voltage = Magnet_Voltage_Pull[num];
+
 	msg.node_id		= id;
 	msg.function	= CMD_MAGNET_SET_POLARITY;
 	msg.length		= 2;
 	SET_U8(&(msg.data[0]), num);
-	SET_U8(&(msg.data[1]), polarity);
+	SET_U8(&(msg.data[1]), voltage);
 
 	UDPdriver::send(&msg);
 

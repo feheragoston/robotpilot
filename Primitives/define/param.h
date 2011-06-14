@@ -19,16 +19,14 @@
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 
-#define ACT_INPROGRESS						0
-#define ACT_FINISHED						1
-#define ACT_ERROR							-1
+#define ACT_STARTED							true
+#define ACT_START_ERROR						false
+
+#define MOTION_NO_ERROR						0
+#define MOTION_ERROR						1
 
 #define COLOR_RED							false
 #define COLOR_BLUE							true
-
-#define MAGNET_POLARITY_m24V				0x01	//01: -24V
-#define MAGNET_POLARITY_0V					0x00	//00: 0V
-#define MAGNET_POLARITY_p24V				0xFF	//FF: +24V
 
 #define AREA_LENGTH_X						2100
 #define AREA_LENGTH_Y						3000
@@ -76,7 +74,7 @@
 
 
 //----- valtoztathato -----
-#define SEND_START_ACTUATOR_IN_INIT				0
+#define START_ACTUATOR_IN_INIT					0
 
 #define INIT_RETURN_FALSE_IF_ERROR				false
 
@@ -155,12 +153,19 @@
 
 
 //----- magnet -----
-#define MAGNET_PUSH							MAGNET_POLARITY_p24V
-#define MAGNET_OFF							MAGNET_POLARITY_0V
-#define MAGNET_PULL							MAGNET_POLARITY_m24V
+#define MAGNET_PUSH							-1
+#define MAGNET_OFF							0
+#define MAGNET_PULL							1
 
 #define MAGNET_LEFT_INDEX									0
 #define MAGNET_RIGHT_INDEX									1
+
+#define MAGNET_m24V							0x01	//01: -24V
+#define MAGNET_0V							0x00	//00: 0V
+#define MAGNET_p24V							0xFF	//FF: +24V
+
+#define MAGNET_LEFT_PULL_IS_p24V			1
+#define MAGNET_RIGHT_PULL_IS_p24V			0
 
 
 

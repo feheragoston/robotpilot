@@ -43,9 +43,7 @@ public:
 
 
 	progress_t AnyStop;
-	progress_t Go;
-	progress_t GoTo;
-	progress_t Turn;
+	progress_t AnyMotion;
 	progress_t SetSpeed;
 
 

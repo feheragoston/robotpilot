@@ -47,8 +47,7 @@ void node_Console::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
-				//ConsolePos	= GET_U32(&(msg->data[0]));
-				ConsolePos	= GET_FLOAT(&(msg->data[0]));	//!!! ha Zoli frissítette, akkor u32-ként fogadni !!!
+				ConsolePos	= GET_U32(&(msg->data[0]));
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:

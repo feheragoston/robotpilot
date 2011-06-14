@@ -66,6 +66,11 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Deg_Incr_grad[SERVO_PLUS_1_INDEX]					= SERVO_GET_GRAD(SERVO_PLUS_1_INDEX);
 	Servo_Limit_Low_Pos_Incr[SERVO_PLUS_1_INDEX]			= SERVO_PLUS_1_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_PLUS_1_INDEX]			= SERVO_PLUS_1_LIMIT_HIGH_POS_INCR;
+
+	for(u8 i=0 ; i<SERVO_COUNT ; i++){
+		Servo_Pos_Incr[i]		= 1500;
+		Servo_CmdPos_Incr[i]	= 1500;
+	}
 	//----- valtozo init VEGE -----
 
 
@@ -98,10 +103,17 @@ void node_Servo::evalMsg(UDPmsg* msg){
 
 			case MSG_SERVO_SET_POS_REPLY:
 				num = GET_U8(&(msg->data[0]));
+				Servo_Pos_Incr[num] = Servo_CmdPos_Incr[num];
 				Setpos[num].done = GET_BOOL(&(msg->data[1]), 0);
 				Setpos[num].inProgress = false;
 				Setpos[num].finished = true;
+
+				//ha sikeresen vegbement a mozgas
+				if(Setpos[num].done)
+					Servo_Pos_Incr[num] = Servo_CmdPos_Incr[num];
+
 				cout << name << "\t___recv SETPOS [" << (u32)num << "]___:\t" << (Setpos[num].done?"1":"0") << endl;
+
 				break;
 
 			default:
@@ -119,12 +131,14 @@ void node_Servo::SERVO_SET_POS(u8 num, double pos, double speed, double acc){
 
 	UDPmsg msg;
 
+	Servo_CmdPos_Incr[num] = SERVO_CONV_POS(num, pos);
+
 	msg.node_id		= id;
 	msg.function	= CMD_SERVO_SET_POS;
 	msg.length		= 7;
 
 	SET_U8(&(msg.data[0]), num);
-	SET_U16(&(msg.data[1]), SERVO_CONV_POS(num, pos));
+	SET_U16(&(msg.data[1]), Servo_CmdPos_Incr[num]);
 	SET_U16(&(msg.data[3]), SERVO_CONV_SPEED(num, speed));
 	SET_U16(&(msg.data[5]), SERVO_CONV_ACC(num, acc));
 
@@ -177,18 +191,27 @@ double node_Servo::SERVO_GET_GRAD(u8 num){
 }
 
 
-double node_Servo::SERVO_DEG_TO_INCR(u8 num, double deg){
+u16 node_Servo::SERVO_DEG_TO_INCR(u8 num, double deg){
 
 	//grad = (y - y0) / (x - x0)
 	//y = (x - x0) * grad + y0
-	return (deg - Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num];
+	return (u16)((deg - Servo_Deg_Incr_x0[num]) * Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_y0[num]);
+
+}
+
+
+double node_Servo::SERVO_INCR_TO_DEG(u8 num, u16 incr){
+
+	//grad = (y - y0) / (x - x0)
+	//x = (y - y0) / grad + x0
+	return ((double)incr - Servo_Deg_Incr_y0[num]) / Servo_Deg_Incr_grad[num] + Servo_Deg_Incr_x0[num];
 
 }
 
 
 u16 node_Servo::SERVO_CONV_POS(u8 num, double pos){
 
-	return (u16)SERVO_DEG_TO_INCR(num, pos);
+	return SERVO_DEG_TO_INCR(num, pos);
 
 }
 
@@ -207,5 +230,12 @@ u16 node_Servo::SERVO_CONV_ACC(u8 num, double acc){
 	//grad = dy / dx
 	//dy = dx * grad
 	return (u16)fabs(acc * Servo_Deg_Incr_grad[num]);
+
+}
+
+
+double node_Servo::GET_POS(u8 num){
+
+	return SERVO_INCR_TO_DEG(num, Servo_Pos_Incr[num]);
 
 }
