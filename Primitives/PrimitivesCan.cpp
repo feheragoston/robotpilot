@@ -442,6 +442,8 @@ bool PrimitivesCan::CalibrateDeadreckoningInProgress(void){
 		//reset
 		case 2:
 			deadreck->DEADRECK_RESET_POS();
+			deadreckCalibPhase = 3;
+			ret = true;
 			break;
 
 		//varunk a reset-re

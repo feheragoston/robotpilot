@@ -74,7 +74,7 @@ void node_Magnet::evalMsg(UDPmsg* msg){
 }
 
 
-void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
+void node_Magnet::MAGNET_SET_POLARITY(u8 num, s8 polarity){
 
 	UDPmsg msg;
 
@@ -95,7 +95,7 @@ void node_Magnet::MAGNET_SET_POLARITY(u8 num, u8 polarity){
 	SetPolarity[num].inProgress = true;
 	SetPolarity[num].finished = false;
 
-	cout << name << "\t___send SETPOLARITY [" << (u32)num << "]___:\t" << (s32)polarity << endl;
+	cout << name << "\t___send SETPOLARITY [" << (u32)num << "]___:\t" << (u32)voltage << endl;
 
 }
 

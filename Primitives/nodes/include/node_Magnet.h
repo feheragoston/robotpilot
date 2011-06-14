@@ -33,7 +33,7 @@ public:
 
 	void INIT_PARAM(void);
 
-	void MAGNET_SET_POLARITY(u8 num, u8 polarity);
+	void MAGNET_SET_POLARITY(u8 num, s8 polarity);
 
 
 	progress_t SetPolarity[MAGNET_COUNT];
