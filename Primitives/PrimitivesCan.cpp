@@ -621,9 +621,15 @@ bool PrimitivesCan::MotionInProgress(void){
 
 	EnterCritical();
 
+	//ha lejart a megbeszelt timeout
+	if(readyMoveTO()){
+		bdc->AnyMotion.inProgress = false;
+		bdcMotionError = MOTION_ERROR;
+	}
+
 	bool ret = bdc->AnyMotion.inProgress;
 
-	//ha folyamatban van
+	//ha utkozes kovetkezett be
 	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)))
 		bdcMotionError = MOTION_ERROR;
