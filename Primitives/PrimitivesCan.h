@@ -160,8 +160,6 @@ private:
 
 	//----- deadreckCalib ELEJE -----
 	unsigned int deadreckCalibPhase;
-	int GoToWall(double speed, double omega);
-	unsigned int goToWallPhase;
 	//----- deadreckCalib VEGE -----
 
 	void detectActChange(void);
@@ -177,14 +175,6 @@ private:
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
 	long int GetOpponentPos_Unsafe(double* x, double* y);
 	void SetRobotPos_Unsafe(double x, double y, double phi);
-
-	//----- TO ELEJE -----
-	struct timeval moveStart;
-	long int moveTOsec;
-	long int moveTOusec;
-	void setMoveTO(double s, double v, double a);
-	bool readyMoveTO(void);
-	//----- TO VEGE -----
 
 
 };

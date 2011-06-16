@@ -79,7 +79,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	sonarYOffset		= 0;
 
 	deadreckCalibPhase		= 0;
-	goToWallPhase			= 0;
 	//---------- valtozo VEGE ----------
 
 
@@ -541,7 +540,6 @@ bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	else{
 		bdc->BDC_GO(distance, max_speed, max_acc);
 		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
-		setMoveTO(distance, max_speed, max_acc);	//megbeszelt TO
 		ret = ACT_STARTED;
 	}
 
@@ -575,7 +573,6 @@ bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
 		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
 		GetRobotPos_Unsafe(&xw, &yw, &phiw);
-		setMoveTO(sqrt((x-xw)*(x-xw) + (y-yw)*(y-yw)), max_speed, max_acc);	//megbeszelt TO
 		ret = ACT_STARTED;
 	}
 
@@ -605,7 +602,6 @@ bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 	else{
 		bdc->BDC_TURN(angle, max_speed, max_acc);
 		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
-		setMoveTO(angle, max_speed, max_acc);	//megbeszelt TO
 		ret = ACT_STARTED;
 	}
 
@@ -620,12 +616,6 @@ bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 bool PrimitivesCan::MotionInProgress(void){
 
 	EnterCritical();
-
-	//ha lejart a megbeszelt timeout
-	if(readyMoveTO()){
-		bdc->AnyMotion.inProgress = false;
-		bdcMotionError = MOTION_ERROR;
-	}
 
 	bool ret = bdc->AnyMotion.inProgress;
 
@@ -1231,56 +1221,5 @@ bool PrimitivesCan::GetMyColor_Unsafe(void){
 	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
 
 	return ret;
-
-}
-
-
-void PrimitivesCan::setMoveTO(double s, double v, double a){
-
-	double t;
-
-	/*
-		﻿Ha s_kiadott <= v_max^2/a_max
-
-		akkor háromszög
-		t = 2*sqrt(s_kiadott/a_max)
-
-		egyébként trapéz
-		t = v_max/a_max + s_kiadott/v_max
-	 */
-
-	s = fabs(s);
-	a = a/3;
-
-	if(s <= v*v / a)
-		t = 2 * sqrt(s/a);
-	else
-		t = v/a + s/v;
-
-	u32 tu = (u32)(t*1000000 * 1.2);	//felulbecsuljuk
-
-	//u32 tu = (u32)5000000;
-
-	moveTOsec	= tu / 1000000;
-	moveTOusec	= tu % 1000000;
-
-	gettimeofday(&moveStart, NULL);
-
-}
-
-
-bool PrimitivesCan::readyMoveTO(void){
-
-	struct timeval elapsed;
-
-	TimeMeasure(&moveStart, &elapsed);
-
-	//ha lejart a megbeszelt timeout
-	if((elapsed.tv_sec > moveTOsec) || ((elapsed.tv_sec == moveTOsec) && (elapsed.tv_usec > moveTOusec))){
-		cout << "--- readyMoveTO ---" << endl;
-		return true;
-	}
-
-	return false;
 
 }
