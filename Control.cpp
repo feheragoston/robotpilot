@@ -52,7 +52,7 @@ Control::Control(Config* config) {
 	mConfig = config;
 
 	if (strlen(mConfig->LogFile)) {
-		logfile = open(mConfig->LogFile, O_WRONLY | O_CREAT, 0664);
+		logfile = open(mConfig->LogFile, O_WRONLY | O_CREAT | O_TRUNC, 0664);
 
 		if (logfile < 0) {
 			cerr << "Error opening logfile: " << mConfig->LogFile << " " << logfile << endl;
@@ -375,22 +375,47 @@ void Control::log() {
 		time = MatchTime();
 		write(logfile, &time, sizeof(unsigned int));
 
-		msgstatus response;
-		response.function = MSG_REFRESHSTATUS;
-		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
-		mPrimitives->GetSpeed(&(response.v), &(response.w));
-		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
-		response.oradius = opponent->getRadius();
-		response.startButton = mPrimitives->GetStartButton();
-		response.stopButton = mPrimitives->GetStopButton();
-		response.color = mPrimitives->GetMyColor();
-		response.pawnInGripper = mPrimitives->PawnInGripper();
-		response.motorSupply = mPrimitives->GetMotorSupply();
-		response.gripperPos = mPrimitives->GetGripperPos();
-		response.consolePos = mPrimitives->GetConsolePos();
-		response.leftArmPos = mPrimitives->GetArmPos(true);
-		response.rightArmPos = mPrimitives->GetArmPos(false);
-		if (write(logfile, &response, sizeof(msgstatus)) < 0) {
+		msgstatus status;
+		status.function = MSG_REFRESHSTATUS;
+		mPrimitives->GetRobotPos(&(status.x), &(status.y), &(status.phi));
+		mPrimitives->GetSpeed(&(status.v), &(status.w));
+		mPrimitives->GetOpponentPos(&(status.ox), &(status.oy));
+		status.oradius = opponent->getRadius();
+		status.startButton = mPrimitives->GetStartButton();
+		status.stopButton = mPrimitives->GetStopButton();
+		status.color = mPrimitives->GetMyColor();
+		status.pawnInGripper = mPrimitives->PawnInGripper();
+		status.motorSupply = mPrimitives->GetMotorSupply();
+		status.gripperPos = mPrimitives->GetGripperPos();
+		status.consolePos = mPrimitives->GetConsolePos();
+		status.leftArmPos = mPrimitives->GetArmPos(true);
+		status.rightArmPos = mPrimitives->GetArmPos(false);
+		write(logfile, &status, sizeof(msgstatus));
+
+		msgdeploypriority priority;
+		priority.function = MSG_DEPLOYPRIORITY;
+		for (int i = 0; i < 36; i++) {
+			priority.priority[i] = deployFields[i];
+		}
+		write(logfile, &priority, sizeof(msgdeploypriority));
+
+		msgobstacles obstacles;
+		obstacles.function = MSG_OBSTACLES;
+		obstacles.num = 14;
+		if (dynObstacles.size() < 14) {
+			obstacles.num = dynObstacles.size();
+		}
+		std::list<Obstacle*>::iterator o = dynObstacles.begin();
+		for (int i = 0; i < obstacles.num; i++) {
+			(*o)->getObstacle(&obstacles.obstacles[i]);
+			o++;
+		}
+		write(logfile, &obstacles, sizeof(msgobstacles));
+
+		write(logfile, &pawns, sizeof(msgpawns));
+
+		function_t stop = 0xFF;
+		if (write(logfile, &stop, sizeof(function_t)) < 0) {
 			cerr << "Error writing log, closing log" << endl;
 			close(logfile);
 			logfile = NULL;
@@ -694,13 +719,17 @@ int Control::c_wait(lua_State *L) {
 
 	/* statusz ellenorzesek */
 	if (mPrimitives->GetStopButton()) {
-		mPrimitives->SetMotorSupply(false);
+		if (mPrimitives->GetMotorSupply()) {
+			mPrimitives->SetMotorSupply(false);
+		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
 		}
 		return luaL_error(L, "(Control) Stop button, exiting");
 	} else if (MatchTime() > 90000) {
-		mPrimitives->SetMotorSupply(false);
+		if (mPrimitives->GetMotorSupply()) {
+			mPrimitives->SetMotorSupply(false);
+		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
 		}
