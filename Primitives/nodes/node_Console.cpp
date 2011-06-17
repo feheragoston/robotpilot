@@ -47,8 +47,7 @@ void node_Console::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
-				//ConsolePos	= GET_U32(&(msg->data[0]));
-				ConsolePos	= GET_FLOAT(&(msg->data[0]));	//!!! ha Zoli frissítette, akkor u32-ként fogadni !!!
+				ConsolePos	= GET_U32(&(msg->data[0]));
 				break;
 
 			case MSG_CONSOLE_STOP_REPLY:
@@ -110,8 +109,9 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 	msg.length		= 12;
 
 	SET_U32(&(msg.data[0]), CONSOLE_CONV_MM_TO_INCR(pos));
-	SET_U32(&(msg.data[4]), CONSOLE_CONV_MMS_TO_INCRS(speed));
-	SET_U32(&(msg.data[8]), CONSOLE_CONV_MMS2_TO_INCRS2(acc));
+	SET_U32(&(msg.data[4]), CONSOLE_CONV_MMS_TO_INCRS(speed) / 100);	//incr/10ms
+	//SET_U32(&(msg.data[8]), CONSOLE_CONV_MMS2_TO_INCRS2(acc));
+	SET_U32(&(msg.data[8]), acc);	//1..50
 
 	UDPdriver::send(&msg);
 

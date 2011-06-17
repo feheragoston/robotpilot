@@ -33,10 +33,17 @@ public:
 
 	void INIT_PARAM(void);
 
-	void MAGNET_SET_POLARITY(u8 num, u8 polarity);
+	void MAGNET_SET_POLARITY(u8 num, s8 polarity);
 
 
 	progress_t SetPolarity[MAGNET_COUNT];
+
+
+private:
+
+	u8 Magnet_Voltage_Pull[MAGNET_COUNT];
+	u8 Magnet_Voltage_Off[MAGNET_COUNT];
+	u8 Magnet_Voltage_Push[MAGNET_COUNT];
 
 
 };

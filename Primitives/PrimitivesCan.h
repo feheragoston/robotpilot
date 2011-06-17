@@ -44,34 +44,65 @@ public:
 	PrimitivesCan(Config* config);
 	~PrimitivesCan();
 
+	//----- Primitives ELEJE -----
 	bool Init(void);
 
 	bool Wait(long int useconds);
 
-	int Go(double distance, double max_speed, double max_acc);
-	int GoTo(double x, double y, double max_speed, double max_acc);
-	int Turn(double angle, double max_speed, double max_acc);
-	int SetSpeed(double v, double w);
-	int MotionStop(double dec);
-	int CalibrateDeadreckoning(bool simulate);
-	int MotorSupply(bool powered);
-	int SetGripperPos(double pos);
-	int SetConsolePos(double pos, double speed, double acc);
-	int CalibrateConsole(void);
-	int ConsoleStop(void);
-	double GetConsolePos(void);
-	int SetArmPos(bool left, double pos, double speed, double acc);
-	int Magnet(bool left, int polarity);
-	bool PawnInGripper(void);
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	bool GetMyColor(void);
+	bool PawnInGripper(void);
+
+	bool SetMotorSupply(bool powered);
+	bool SetMotorSupplyInProgress(void);
+	bool GetMotorSupply(void);
+
+	bool CalibrateDeadreckoning(bool simulate = false);
+	bool CalibrateDeadreckoningInProgress(void);
+
+	bool SetSpeed(double v, double w);
+	bool SetSpeedInProgress(void);
+
+	bool Go(double distance, double max_speed, double max_acc);
+	bool GoTo(double x, double y, double max_speed, double max_acc);
+	bool Turn(double angle, double max_speed, double max_acc);
+	bool MotionInProgress(void);
+	int GetMotionError(void);
+
+	bool MotionStop(double dec = 0.0);
+	bool MotionStopInProgress(void);
+
 	void GetRobotPos(double* x, double* y, double* phi);
-	long int GetOpponentPos(double* x, double* y);
+	long int GetOpponentPos(double * x, double* y);
 	void GetSpeed(double* v, double* w);
 	void SetRobotPos(double x, double y, double phi);
+	void SetOpponentPos(double x, double y);
+
 	void GetDistances(double distance[6]);
-	bool GetMotorSupply(void);
+
+	bool GripperMove(double pos);
+	bool GripperMoveInProgress(void);
+	double GetGripperPos(void);
+
+	bool CalibrateConsole(void);
+	bool CalibrateConsoleInProgress(void);
+
+	bool ConsoleMove(double pos, double max_speed, double max_acc);
+	bool ConsoleMoveInProgress(void);
+
+	bool ConsoleStop(void);
+	bool ConsoleStopInProgress(void);
+	double GetConsolePos(void);
+
+	bool ArmMove(bool left, double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress(bool left);
+	double GetArmPos(bool left);
+
+	bool Magnet(bool left, int polarity);
+	bool MagnetInProgress(bool left);
+	//----- Primitives VEGE -----
+
 
 
 	void EnterCritical(void);
@@ -114,9 +145,14 @@ private:
 	//----- valtozo ELEJE -----
 	char CanIp[16];
 
+	bool bdcMotionError;
+
 	double deadreckCheckX;
 	double deadreckCheckY;
 	double deadreckCheckPhi;
+
+	double sonarXOffset;
+	double sonarYOffset;
 
 	double T33WS[3][3];	//World-Sonar transzformacios matrix
 	//----- valtozo VEGE -----
@@ -124,8 +160,6 @@ private:
 
 	//----- deadreckCalib ELEJE -----
 	unsigned int deadreckCalibPhase;
-	int GoToWall(double speed, double omega);
-	unsigned int goToWallPhase;
 	//----- deadreckCalib VEGE -----
 
 	void detectActChange(void);
@@ -137,20 +171,10 @@ private:
 	void ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir);
 
 
-	int Turn_Unsafe(double angle, double max_speed, double max_acc);
-	int SetSpeed_Unsafe(double v, double w);
-	int MotionStop_Unsafe(double dec);
 	bool GetMyColor_Unsafe(void);
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
+	long int GetOpponentPos_Unsafe(double* x, double* y);
 	void SetRobotPos_Unsafe(double x, double y, double phi);
-
-	//----- TO ELEJE -----
-	struct timeval moveStart;
-	long int moveTOsec;
-	long int moveTOusec;
-	void setMoveTO(double s, double v, double a);
-	bool readyMoveTO(void);
-	//----- TO VEGE -----
 
 
 };
