@@ -208,8 +208,8 @@
 
 
 //----- servo -----
-#define SERVO_GRIPPER_MAX_SPEED						360000	//deg/s
-#define SERVO_GRIPPER_MAX_ACC						360000	//deg/s^2
+#define SERVO_GRIPPER_MAX_SPEED						1000	//deg/s
+#define SERVO_GRIPPER_MAX_ACC						1000	//deg/s^2
 
 
 #define SERVO_GRIPPER_LEFT_INDEX						1
