@@ -1167,6 +1167,7 @@ int Control::GetDistance(lua_State *L) {
 	} else {
 		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
 		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
+	}
 	return 2;
 }
 
