@@ -25,12 +25,12 @@
 #define		BLUE_ORIENTATION	-1				// koordinatak iranya
 
 #define		ROBOT_RADIUS		175		// a robot fordulasahoz szugseges sugar [mm]
-#define		ROBOT_WIDTH			140		// a robot szelessege / 2 [mm]
+#define		ROBOT_WIDTH			150		// a robot szelessege / 2 [mm]
 #define		ROBOT_FRONT			140		// a robot elejenek tavolsaga a kozeppontbol [mm]
 #define		ROBOT_FRONT_MAX		240		// a robot elejenek tavolsaga nyitott megfogoval [mm]
 #define		ROBOT_FRONT_PAWN	170		// paraszt felszedeshez a paraszt kozepetol valo tavolsag [mm]
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
-#define		MAGNET_POS			280		// a magnesek tavolsaga a kozeppontbol kihajtott karral [mm]
+#define		MAGNET_POS			265		// a magnesek tavolsaga a kozeppontbol kihajtott karral [mm]
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 

@@ -1379,6 +1379,9 @@ int Control::FindPawn(lua_State *L) {
 			double c2 = sqr(x - px) + sqr(y - py);
 			double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
 			double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+			double alpha = atan2(y - dy, x - dx);
+			dx += 20 * cos(alpha);
+			dy += 20 * sin(alpha);
 			lua_pushnumber(L, dx);
 			lua_pushnumber(L, dy);
 			lua_pushnumber(L, minDist);
@@ -1387,6 +1390,9 @@ int Control::FindPawn(lua_State *L) {
 			double c2 = sqr(x - px) + sqr(y - py);
 			double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
 			double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+			double alpha = atan2(dy - y, dx - x);
+			dx += 20 * cos(alpha);
+			dy += 20 * sin(alpha);
 			lua_pushnumber(L, dx);
 			lua_pushnumber(L, dy);
 			lua_pushnumber(L, minDist);

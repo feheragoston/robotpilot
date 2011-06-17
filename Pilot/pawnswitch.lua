@@ -34,7 +34,7 @@ function()
 end)
 
 if (pawnInGripper) then
-	p.GoSafe(-200)
+	p.GoSafe(-150)
 	p.GripperMove(0)
 	p.TurnSafe(math.pi / 2, 10, 20)
 	p.ArmMove(false, 125)

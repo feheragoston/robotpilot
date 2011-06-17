@@ -27,7 +27,7 @@ p.Go(30)
 x, y, phi = c.GetRobotPos();
 p.TurnTo(x, 1500)
 
-p.Go(100)
+p.Go(60)
 
 p.sleep(1000)
 c.print("Calibrate finished");
