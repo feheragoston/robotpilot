@@ -5,6 +5,7 @@ Config::Config() {
 	strcpy(NetIp, "");
 	strcpy(BindIp, "");
 	strcpy(LuaFile, "");
+	strcpy(LogFile, "");
 
 	PrimitivesCan = true;
 	PrimitivesNet = false;
@@ -22,9 +23,10 @@ bool Config::Parse(int argc, char *argv[]) {
 				std::cout << "	-s	Sim Mode" << std::endl;
 				std::cout << "	-c [ip_address]	CAN Mode" << std::endl;
 				std::cout << "	-n [ip_address]	Net Mode" << std::endl;
-				std::cout << "	-l <lua/file.lua>	lua file to run" << std::endl;
+				std::cout << "	-l <Pilot/file.lua>	lua file to run" << std::endl;
 				std::cout << "	-b <ip_address>	Bind server on ip" << std::endl;
 				std::cout << "	-ds	Debug simulation" << std::endl;
+				std::cout << "	-dl <logfile>	Log to file" << std::endl;
 				return false;
 				break;
 			case 's':
@@ -95,6 +97,16 @@ bool Config::Parse(int argc, char *argv[]) {
 					if (argv[i][2] == 's') {
 						DebugSimulation = true;
 						std::cout << "Simulation with debug delay!" << std::endl;
+					}
+					if (argv[i][2] == 'l') {
+						if (i + 1 < argc) {
+							strcpy(LogFile, argv[i + 1]);
+							i++;
+							std::cout << "Log file: " << LogFile << std::endl;
+						} else {
+							std::cout << "Error: no log file specified" << std::endl;
+							return false;
+						}
 					}
 				}
 				break;

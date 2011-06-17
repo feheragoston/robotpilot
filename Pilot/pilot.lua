@@ -96,17 +96,17 @@ function ConsoleStop(...)
 	end
 end
 
-function ArmMove(...)
-	if (control.ArmMove(...)) then
-		while (control.ArmMoveInProgress()) do
+function ArmMove(left, ...)
+	if (control.ArmMove(left, ...)) then
+		while (control.ArmMoveInProgress(left)) do
 			control.process()
 		end
 	end
 end
 
-function Magnet(...)
-	if (control.Magnet(...)) then
-		while (control.MagnetInProgress()) do
+function Magnet(left, ...)
+	if (control.Magnet(left, ...)) then
+		while (control.MagnetInProgress(left)) do
 			control.process()
 		end
 	end

@@ -48,6 +48,8 @@ protected:
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
 
+	static int logfile;
+
 	static msgpawns* pawns;
 
 	static std::list<Obstacle*> obstacles;

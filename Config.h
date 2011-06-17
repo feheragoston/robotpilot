@@ -11,6 +11,7 @@ public:
 	char NetIp[16];
 	char BindIp[16];
 	char LuaFile[128];
+	char LogFile[128];
 
 	bool PrimitivesCan;
 	bool PrimitivesNet;

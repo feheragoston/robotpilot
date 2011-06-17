@@ -13,6 +13,7 @@ Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
+int Control::logfile = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
@@ -49,6 +50,16 @@ double Control::robotBody[][2] = {
 
 Control::Control(Config* config) {
 	mConfig = config;
+
+	if (strlen(mConfig->LogFile)) {
+		logfile = open(mConfig->LogFile, O_WRONLY | O_CREAT, 0664);
+
+		if (logfile < 0) {
+			cerr << "Error opening logfile: " << mConfig->LogFile << " " << logfile << endl;
+			logfile = NULL;
+		}
+	}
+
 	this->L = luaL_newstate();
 	luaL_openlibs(L);
 
@@ -173,6 +184,10 @@ Control::Control(Config* config) {
 }
 
 Control::~Control() {
+	if (logfile) {
+		close(logfile);
+		logfile = NULL;
+	}
 	if (mPrimitives) {
 		delete mPrimitives;
 	}
@@ -354,6 +369,33 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 }
 
 void Control::log() {
+	if (logfile) {
+		unsigned int time = InitTime();
+		write(logfile, &time, sizeof(unsigned int));
+		time = MatchTime();
+		write(logfile, &time, sizeof(unsigned int));
+
+		msgstatus response;
+		response.function = MSG_REFRESHSTATUS;
+		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
+		mPrimitives->GetSpeed(&(response.v), &(response.w));
+		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
+		response.oradius = opponent->getRadius();
+		response.startButton = mPrimitives->GetStartButton();
+		response.stopButton = mPrimitives->GetStopButton();
+		response.color = mPrimitives->GetMyColor();
+		response.pawnInGripper = mPrimitives->PawnInGripper();
+		response.motorSupply = mPrimitives->GetMotorSupply();
+		response.gripperPos = mPrimitives->GetGripperPos();
+		response.consolePos = mPrimitives->GetConsolePos();
+		response.leftArmPos = mPrimitives->GetArmPos(true);
+		response.rightArmPos = mPrimitives->GetArmPos(false);
+		if (write(logfile, &response, sizeof(msgstatus)) < 0) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = NULL;
+		}
+	}
 }
 
 void Control::setSafeMotion(lua_State *L) {
@@ -652,11 +694,14 @@ int Control::c_wait(lua_State *L) {
 
 	/* statusz ellenorzesek */
 	if (mPrimitives->GetStopButton()) {
-		exitControl = true;
 		mPrimitives->SetMotorSupply(false);
+		if (!mPrimitives->SetMotorSupplyInProgress()) {
+			exitControl = true;
+		}
 		return luaL_error(L, "(Control) Stop button, exiting");
 	} else if (MatchTime() > 90000) {
-		if (mPrimitives->SetMotorSupply(false) == 1) {
+		mPrimitives->SetMotorSupply(false);
+		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
 		}
 		cout << "(Control) Meccs ido letelt, kilepunk" << endl;
@@ -1095,8 +1140,8 @@ int Control::CalibrateConsole(lua_State *L) {
 
 int Control::ConsoleMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
-	double speed = luaL_optnumber(L, 35, 2);
-	double acc = luaL_optnumber(L, 10, 10);
+	double speed = luaL_optnumber(L, 2, 35);
+	double acc = luaL_optnumber(L, 3, 10);
 	lua_pushboolean(L, mPrimitives->ConsoleMove(pos, speed, acc));
 	return 1;
 }
