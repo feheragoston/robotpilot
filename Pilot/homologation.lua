@@ -92,4 +92,4 @@ repeat
 		end
 		p.MotionStop(2000)
 	end
-until (homologated);
+until (homologated or c.GetStopButton());
