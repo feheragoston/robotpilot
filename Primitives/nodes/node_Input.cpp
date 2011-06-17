@@ -26,6 +26,14 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	for(u8 i=0 ; i<INPUT_DIGITAL_COUNT ; i++)
 		digital[i] = false;
 
+	analog_has_long_sharp[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]		= true;
+	analog_has_long_sharp[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]		= true;
+	analog_has_long_sharp[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]		= false;
+	analog_has_long_sharp[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]		= false;
+	analog_has_long_sharp[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]		= false;
+	analog_has_long_sharp[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]		= false;
+	analog_has_long_sharp[INPUT_ANALOG_PLUS_0_INDEX]				= false;
+
 	digital_active_level[INPUT_DIGITAL_START_BUTTON_INDEX]				= ((INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_COLOR_BUTTON_INDEX]				= ((INPUT_DIGITAL_COLOR_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
@@ -140,8 +148,13 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 
 double node_Input::GET_DISTANCE(u8 num){
 
+	//long
+	if(analog_has_long_sharp[num])
+		return (GET_SHARP_MM(analog[num], LONG_SHARP_MM_V, LONG_SHARP_TABLE_SIZE));
+
 	//short
-	return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
+	else
+		return (GET_SHARP_MM(analog[num], SHORT_SHARP_MM_V, SHORT_SHARP_TABLE_SIZE));
 
 }
 
