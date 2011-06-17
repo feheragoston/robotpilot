@@ -4,77 +4,55 @@ Offset = 0;
 Ori = 1;
 GripperGrab = 67;
 
-repeat Control(); until (MotorSupply(true) ~= 0);
-Print("Motortap bekapcsolva");
+dofile("Pilot/calibration.lua")
 
-repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-repeat Control(); until (GetStartButton());
-Print("Startgomb lenyomva felvesszuk a kezdopoziciot");
-
-repeat Control(); until (SetArmPos(true, 0) ~= 0);
-Print("Balkar behajtva");
-repeat Control(); until (SetArmPos(false, 0) ~= 0);
-Print("Jobbkar behajtva");
-repeat Control(); until (SetGripperPos(0) ~= 0);
-Print("Gripper behajtva");
-
-repeat Control(); until (CalibrateDeadreckoning() ~= 0);
-Print("Calibrate finished");
-repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-
-repeat Control(); until (Go(30) ~= 0);
-x, y, phi = GetRobotPos();
-repeat Control(); until (TurnTo(x, 1500) ~= 0);
-
-repeat Control(); until (Sleep(5 * 1000 * 1000) ~= 0);
-
-repeat Control(); until (GetStartButton());
-StartMatch();
-Print("Meccs elkezdodott");
+repeat c.process() until (c.GetStartButton());
+c.StartMatch();
+c.print("Meccs elkezdodott");
 
 homologated = false;
 
-if (GetMyColor()) then
-	Print("Kekek vagyunk");
+if (c.GetMyColor()) then
+	c.print("Kekek vagyunk");
 	Offset = 3000;
 	Ori = -1;
 end
 
-repeat Control(); until (GoTo(250, Offset + Ori * 800) ~= 0);
+p.GoTo(250, Offset + Ori * 800)
 
 -- Beszorulas feloldasa
 function resolveDeadpos(turn, go)
 	if (turn ~= 0) then
-		while (TurnSafe(turn) == 0) do Control(); end;
+		p.TurnSafe(turn)
 	end;
-	while (GoSafe(go) == 0) do Control(); end;
+	p.GoSafe(go)
 end
 -- Beszorulas feloldasa
 
 function homologate()
-	repeat Control(); until (TurnToSafe(1250, Offset + Ori * 800) ~= 0);
-	repeat Control(); until (GoToSafe(1250, Offset + Ori * 800) ~= 0);
-	repeat Control(); until (TurnToSafe(1250, Offset + Ori * 300) ~= 0);
-	repeat Control(); until (SetGripperPos(90) ~= 0);
-	repeat Control(); until (GoToSafe(1250, Offset + Ori * 300) ~= 0);
+	p.TurnToSafe(1250, Offset + Ori * 800)
+	p.GoToSafe(1250, Offset + Ori * 800)
+	p.TurnToSafe(1250, Offset + Ori * 300)
+	p.GripperMove(90)
+	p.GoToSafe(1250, Offset + Ori * 300)
 	
-	if (PawnInGripper()) then
-		Print("Van paraszt!");
+	if (c.PawnInGripper()) then
+		c.print("Van paraszt!");
 	end
-	repeat Control(); until (SetGripperPos(GripperGrab) ~= 0);
-	x, y, phi = GetRobotPos();
-	repeat Control(); until (GoSafe(-500) ~= 0);
-	repeat Control(); until (SetGripperPos(90) ~= 0);
-	repeat Control(); until (GoSafe(-300) ~= 0);
+	p.GripperMove(GripperGrab)
+	x, y, phi = c.GetRobotPos();
+	p.GoSafe(-500)
+	p.GripperMove(90)
+	p.GoSafe(-300)
 end
 
 local errorNum = 0;
 repeat
 	local status, err = pcall(function()
-		Print("KEZDUNK");
+		c.print("KEZDUNK");
 		local deadpos = true;
 
-		if (Simulate(homologate)) then
+		if (c.simulate(homologate)) then
 			deadpos = false;
 			homologate();
 			homologated = true;
@@ -88,7 +66,7 @@ repeat
 					turn = (math.random() - 0.5) * math.pi * 2;
 				end
 				local go = math.random(-1000, 1000);
-				if (Simulate(resolveDeadpos, turn, go)) then
+				if (c.simulate(resolveDeadpos, turn, go)) then
 					deadPosResolved = true;
 					resolveDeadpos(turn, go);
 				end
@@ -97,21 +75,21 @@ repeat
 		
 	end);
 	if (not status) then
-		Print("Hiba", err);
+		c.print("Hiba", err);
 		errorNum = errorNum + 1;
 		if (errorNum == 5) then
 			errorNum = 0;
-			Print("Motor powercycle kihagyas");
+			c.print("Motor powercycle kihagyas");
 			--[[
-			Print("Motortap kikapcsolas");
-			repeat Control(); until (MotorSupply(false) ~= 0);
-			repeat Control(); until (Sleep(5 * 1000 * 1000) ~= 0);
-			Print("Motortap bekapcsolas");
-			repeat Control(); until (MotorSupply(true) ~= 0);
-			repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-			Print("Motor powercycle vege");
+			c.print("Motortap kikapcsolas");
+			c.MotorSupply(false)
+			p.sleep(5 * 1000 * 1000)
+			c.print("Motortap bekapcsolas");
+			c.MotorSupply(true)
+			p.sleep(2 * 1000 * 1000)
+			c.print("Motor powercycle vege");
 			]]
 		end
-		while (MotionStop(2000) == 0) do Control(); end;
+		p.MotionStop(2000)
 	end
 until (homologated);
