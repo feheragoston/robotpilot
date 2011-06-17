@@ -118,7 +118,7 @@ void node_Console::CONSOLE_SET_POS(double pos, double speed, double acc){
 	SetPos.inProgress = true;
 	SetPos.finished = false;
 
-	cout << name << "\t___send SETPOS___:\t" << CONSOLE_CONV_MM_TO_INCR(pos) << "\t" << CONSOLE_CONV_MMS_TO_INCRS(speed) << "\t" << CONSOLE_CONV_MMS2_TO_INCRS2(acc) << endl;
+	cout << name << "\t___send SETPOS___:\t" << CONSOLE_CONV_MM_TO_INCR(pos) << "\t" << (CONSOLE_CONV_MMS_TO_INCRS(speed) / 100) << "\t" << CONSOLE_CONV_MMS2_TO_INCRS2(acc) << endl;
 
 }
 
