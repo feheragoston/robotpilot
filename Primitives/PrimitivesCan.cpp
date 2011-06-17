@@ -908,9 +908,7 @@ bool PrimitivesCan::ConsoleStop(void){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	console->Calibrate.inProgress ||
-		console->SetPos.inProgress ||
-		console->Stop.inProgress){
+	if(	console->Stop.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
