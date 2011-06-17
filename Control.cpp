@@ -726,15 +726,19 @@ int Control::c_runparallel(lua_State *L) {
 			if (exit == LUA_YIELD) {
 				threads.push_back(N);
 			} else if (exit != 0) {
-				std::cout << "(Control) Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
-				/* hibakereses
-				 std::cout << "utana: " << lua_status(N) << std::endl;
-				 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
-				 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
-				 std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
-				 }
-				 }
-				 */
+				if (strcmp(luaL_optstring(N, -1, "-"), "cannot resume non-suspended coroutine") == 0) {
+					std::cout << "(Control) Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
+					/* hibakereses
+					 std::cout << "utana: " << lua_status(N) << std::endl;
+					 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
+					 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
+					 std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
+					 }
+					 }
+					 */
+				} else {
+					luaL_error(L, luaL_optstring(N, -1, "-"));
+				}
 			} else {
 				//lua_close(N);
 			}
@@ -1091,8 +1095,8 @@ int Control::CalibrateConsole(lua_State *L) {
 
 int Control::ConsoleMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
-	double speed = luaL_optnumber(L, 2, 2);
-	double acc = luaL_optnumber(L, 3, 10);
+	double speed = luaL_optnumber(L, 35, 2);
+	double acc = luaL_optnumber(L, 10, 10);
 	lua_pushboolean(L, mPrimitives->ConsoleMove(pos, speed, acc));
 	return 1;
 }

@@ -17,8 +17,15 @@ p.RefreshPawnPositions()
 p.Go(100)
 
 function go1()
-	p.TurnToSafe(350, Offset + Ori * 800)
-	p.GoToSafe(350, Offset + Ori * 800)
+	c.runparallel(
+	function()
+		p.TurnToSafe(350, Offset + Ori * 800)
+		p.GoToSafe(350, Offset + Ori * 800)
+	end,
+	function()
+		p.GripperMove(0)
+		p.GripperMove(90)
+	end)
 end
 function go2()
 	p.TurnToSafe(350, Offset + Ori * 2200)

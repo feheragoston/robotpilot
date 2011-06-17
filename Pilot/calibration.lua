@@ -1,4 +1,5 @@
 -- CALIBRATE
+p.sleep(1000)
 c.SetMotorSupply(true)
 c.print("Motortap bekapcsolva");
 
@@ -10,6 +11,9 @@ p.ArmMove(true, 0)
 c.print("Balkar behajtva");
 p.ArmMove(false, 0)
 c.print("Jobbkar behajtva");
+
+c.CalibrateConsole();
+
 p.GripperMove(0)
 c.print("Gripper behajtva");
 
