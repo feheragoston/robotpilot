@@ -17,6 +17,8 @@ c.CalibrateConsole();
 p.GripperMove(0)
 c.print("Gripper behajtva");
 
+c.music("calibrate")
+
 c.CalibrateDeadreckoning()
 c.print("Deadreckoning beallitva");
 p.sleep(1000)
@@ -24,6 +26,8 @@ p.sleep(1000)
 p.Go(30)
 x, y, phi = c.GetRobotPos();
 p.TurnTo(x, 1500)
+
+p.Go(100)
 
 p.sleep(1000)
 c.print("Calibrate finished");

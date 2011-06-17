@@ -72,6 +72,7 @@ Control::Control(Config* config) {
 		{"runparallel", c_runparallel},
 		{"simulate", c_simulate},
 		{"print", c_print},
+		{"music", c_music},
 
 		{"GetStartButton", GetStartButton},
 		{"GetStopButton", GetStopButton},
@@ -98,6 +99,7 @@ Control::Control(Config* config) {
 		{"GetRobotPos", GetRobotPos},
 		{"SetRobotPos", SetRobotPos},
 		{"GetOpponentPos", GetOpponentPos},
+		{"GetDistance", GetDistance},
 
 		{"GripperMove", GripperMove},
 		{"GripperMoveInProgress", GripperMoveInProgress},
@@ -913,6 +915,14 @@ int Control::c_print(lua_State *L) {
 	return 0;
 }
 
+int Control::c_music(lua_State *L) {
+	const char* s = lua_tostring(L, 1);
+	int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+	write(fp, s, strlen(s));
+	close(fp);
+	return 0;
+}
+
 int Control::GetStartButton(lua_State *L) {
 	bool b = mPrimitives->GetStartButton();
 	lua_pushboolean(L, b);
@@ -1141,6 +1151,22 @@ int Control::GetOpponentPos(lua_State *L) {
 	mPrimitives->GetOpponentPos(&x, &y);
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
+	return 2;
+}
+
+int Control::GetDistance(lua_State *L) {
+	const char* s = lua_tostring(L, 1);
+	double distance[6];
+	mPrimitives->GetDistances(distance);
+	if (strcmp(s, "left") == 0) {
+		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]);
+		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]);
+	} else if (strcmp(s, "right") == 0) {
+		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]);
+		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]);
+	} else {
+		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
+		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
 	return 2;
 }
 

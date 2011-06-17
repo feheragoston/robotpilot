@@ -4,6 +4,11 @@ Offset = 0;
 Ori = 1;
 GripperGrab = 53;
 
+GoSpeed = 750;
+GoAcc = 800;
+TurnSpeed = 6;
+TurnAcc = 16;
+
 dofile("Pilot/calibration.lua")
 
 repeat c.process() until (c.GetStartButton());
@@ -23,27 +28,27 @@ p.GoTo(250, Offset + Ori * 800)
 -- Beszorulas feloldasa
 function resolveDeadpos(turn, go)
 	if (turn ~= 0) then
-		p.TurnSafe(turn)
+		p.TurnSafe(turn, TurnSpeed, TurnAcc)
 	end;
-	p.GoSafe(go)
+	p.GoSafe(go, GoSpeed, GoAcc)
 end
 -- Beszorulas feloldasa
 
 function homologate()
-	p.TurnToSafe(1250, Offset + Ori * 800)
-	p.GoToSafe(1250, Offset + Ori * 800)
-	p.TurnToSafe(1250, Offset + Ori * 300)
+	p.TurnToSafe(1250, Offset + Ori * 800, TurnSpeed, TurnAcc)
+	p.GoToSafe(1250, Offset + Ori * 800, GoSpeed, GoAcc)
+	p.TurnToSafe(1250, Offset + Ori * 300, TurnSpeed, TurnAcc)
 	p.GripperMove(90)
-	p.GoToSafe(1250, Offset + Ori * 300)
+	p.GoToSafe(1250, Offset + Ori * 300, GoSpeed, GoAcc)
 	
 	if (c.PawnInGripper()) then
 		c.print("Van paraszt!");
 	end
 	p.GripperMove(GripperGrab)
 	x, y, phi = c.GetRobotPos();
-	p.GoSafe(-500)
+	p.GoSafe(-500, GoSpeed, GoAcc)
 	p.GripperMove(90)
-	p.GoSafe(-300)
+	p.GoSafe(-300, GoSpeed, GoAcc)
 end
 
 local errorNum = 0;

@@ -121,6 +121,7 @@ protected:
 	static int c_runparallel(lua_State *L);
 	static int c_simulate(lua_State *L);
 	static int c_print(lua_State *L);
+	static int c_music(lua_State *L);
 
 	static int GetStartButton(lua_State *L);
 	static int GetStopButton(lua_State *L);
@@ -143,6 +144,7 @@ protected:
 	static int GetRobotPos(lua_State *L);
 	static int SetRobotPos(lua_State *L);
 	static int GetOpponentPos(lua_State *L);
+	static int GetDistance(lua_State *L);
 
 	static int GripperMove(lua_State *L);
 	static int GripperMoveInProgress(lua_State *L);
