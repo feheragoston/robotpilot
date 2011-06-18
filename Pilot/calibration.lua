@@ -7,6 +7,8 @@ p.sleep(2000)
 repeat c.process() until (c.GetStartButton());
 c.print("Startgomb lenyomva felvesszuk a kezdopoziciot");
 
+p.Magnet(true, 0)
+p.Magnet(false, 0)
 p.ArmMove(true, 0)
 c.print("Balkar behajtva");
 p.ArmMove(false, 0)

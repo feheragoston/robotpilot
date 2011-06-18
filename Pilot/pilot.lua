@@ -21,7 +21,9 @@ function Go(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) Go hiba")
+		return false
 	end
+	return true
 end
 
 function GoSafe(...)
@@ -29,7 +31,9 @@ function GoSafe(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) GoSafe hiba")
+		return false
 	end
+	return true
 end
 
 function GoTo(...)
@@ -37,7 +41,9 @@ function GoTo(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) GoTo hiba")
+		return false
 	end
+	return true
 end
 
 function GoToSafe(...)
@@ -45,7 +51,9 @@ function GoToSafe(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) GoToSafe hiba")
+		return false
 	end
+	return true
 end
 
 function Turn(...)
@@ -53,7 +61,9 @@ function Turn(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) Turn hiba")
+		return false
 	end
+	return true
 end
 
 function TurnSafe(...)
@@ -61,7 +71,9 @@ function TurnSafe(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) TurnSafe hiba")
+		return false
 	end
+	return true
 end
 
 function TurnTo(...)
@@ -69,7 +81,9 @@ function TurnTo(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) TurnTo hiba")
+		return false
 	end
+	return true
 end
 
 function TurnToSafe(...)
@@ -77,7 +91,9 @@ function TurnToSafe(...)
 		MotionInProgress()
 	else
 		control.print("(pilot) TurnToSafe hiba")
+		return false
 	end
+	return true
 end
 
 function MotionStop(...)
@@ -87,7 +103,9 @@ function MotionStop(...)
 		end
 	else
 		control.print("(pilot) MotionStop hiba")
+		return false
 	end
+	return true
 end
 
 function GripperMove(...)
@@ -95,7 +113,11 @@ function GripperMove(...)
 		while (control.GripperMoveInProgress()) do
 			control.process()
 		end
+	else
+		control.print("(pilot) GripperMove hiba")
+		return false
 	end
+	return true
 end
 
 function ConsoleMove(...)
@@ -103,7 +125,11 @@ function ConsoleMove(...)
 		while (control.ConsoleMoveInProgress()) do
 			control.process()
 		end
+	else
+		control.print("(pilot) ConsoleMove hiba")
+		return false
 	end
+	return true
 end
 
 function ConsoleStop(...)
@@ -111,7 +137,11 @@ function ConsoleStop(...)
 		while (control.ConsoleStopInProgress()) do
 			control.process()
 		end
+	else
+		control.print("(pilot) ConsoleStop hiba")
+		return false
 	end
+	return true
 end
 
 function ArmMove(left, ...)
@@ -119,7 +149,11 @@ function ArmMove(left, ...)
 		while (control.ArmMoveInProgress(left)) do
 			control.process()
 		end
+	else
+		control.print("(pilot) ArmMove hiba")
+		return false
 	end
+	return true
 end
 
 function Magnet(left, ...)
@@ -127,7 +161,11 @@ function Magnet(left, ...)
 		while (control.MagnetInProgress(left)) do
 			control.process()
 		end
+	else
+		control.print("(pilot) Magnet hiba")
+		return false
 	end
+	return true
 end
 
 function RefreshPawnPositions(...)
@@ -136,6 +174,8 @@ function RefreshPawnPositions(...)
 			control.process()
 		end
 		return control.RefreshPawnPositionsFinished()
+	else
+		control.print("(pilot) RefreshPawnPositions hiba")
 	end
 	return false
 end

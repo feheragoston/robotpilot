@@ -743,6 +743,9 @@ int Control::c_wait(lua_State *L) {
 		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
+			int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+			write(fp, "stop", 4);
+			close(fp);
 		}
 		return luaL_error(L, "(Control) Stop button, exiting");
 	} else if (MatchTime() > 90000) {
@@ -751,6 +754,9 @@ int Control::c_wait(lua_State *L) {
 		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
+			int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+			write(fp, "matchover", 9);
+			close(fp);
 		}
 		cout << "(Control) Meccs ido letelt, kilepunk" << endl;
 		return luaL_error(L, "(Control) Match over, exiting");
@@ -929,17 +935,21 @@ int Control::c_print(lua_State *L) {
 		}
 		msgpos += strlen(message.text+msgpos);
 	}
-	std::cout << std::endl;
-	message.text[msgpos] = 0;
-	mServer->Send(0, &message, msgpos + 1 + sizeof(function_t));
+	if (argc > 0) {
+		std::cout << std::endl;
+		message.text[msgpos] = 0;
+		mServer->Send(0, &message, msgpos + 1 + sizeof(function_t));
+	}
 	return 0;
 }
 
 int Control::c_music(lua_State *L) {
-	const char* s = lua_tostring(L, 1);
-	int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
-	write(fp, s, strlen(s));
-	close(fp);
+	if (lua_isstring(L, 1)) {
+		const char* s = lua_tostring(L, 1);
+		int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+		write(fp, s, strlen(s));
+		close(fp);
+	}
 	return 0;
 }
 
@@ -1453,7 +1463,7 @@ int Control::l_FindPawn(lua_State *L) {
 		double c2 = sqr(x - px) + sqr(y - py);
 		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
 		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
-		double alpha = atan2(y - dy, x - dx);
+		double alpha = atan2(dy - y, dx - x);
 		dx += 20 * cos(alpha);
 		dy += 20 * sin(alpha);
 		lua_pushnumber(L, dx);
