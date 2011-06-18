@@ -1125,7 +1125,7 @@ int Control::MotionStop(lua_State *L) {
 }
 
 int Control::MotionStopInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->MotionInProgress());
+	lua_pushboolean(L, mPrimitives->MotionStopInProgress());
 	return 1;
 }
 
@@ -1155,20 +1155,25 @@ int Control::GetOpponentPos(lua_State *L) {
 }
 
 int Control::GetDistance(lua_State *L) {
-	const char* s = lua_tostring(L, 1);
-	double distance[6];
-	mPrimitives->GetDistances(distance);
-	if (strcmp(s, "left") == 0) {
-		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]);
-		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]);
-	} else if (strcmp(s, "right") == 0) {
-		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]);
-		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]);
+	if (lua_isstring(L, 1)) {
+		const char* s = lua_tostring(L, 1);
+		double distance[6];
+		mPrimitives->GetDistances(distance);
+		if (strcmp(s, "left") == 0) {
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]);
+		} else if (strcmp(s, "right") == 0) {
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]);
+		} else {
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
+		}
+		return 2;
 	} else {
-		lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
-		lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
+		lua_pushboolean(L, false);
+		return 1;
 	}
-	return 2;
 }
 
 int Control::GripperMove(lua_State *L) {
@@ -1331,88 +1336,111 @@ int Control::RefreshPawnPositionsFinished(lua_State *L) {
 }
 
 /**
+ * FindPawn(target)
+ * FindPawn(target, ignoreRadius)
+ * FindPawn(target, px, py)
+ *
+ * target:
  * 0: paraszt koordinatainak visszaadasa
  * 1: koordinatak gripperes felszedeshez
  * 2: koordinatak bal karhoz
  * 3: koordinatak jobb karhoz
  * 4: koordinatak oldalso parasztokhoz
+ *
+ * ignoreRadius: minimum tavolsag, ami folott keressuk
+ * a legkozelebbi babut
+ *
+ * px, py: babu koordinatai
  * @param L
  * @return
  */
 int Control::FindPawn(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
-	double ignoreRadius = luaL_optnumber(L, 2, ROBOT_FRONT_MAX);
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	double minDist;
-	int closest = pawns->num;
-	for (int i = 0; i < pawns->num; i++) {
-		msgpawn* pawn = &(pawns->pawns[i]);
-		if (pawn->type == FIG_PAWN) {
-			double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
-			// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
-			if (dist > ignoreRadius) {
-				if (closest == pawns->num || dist < minDist) {
-					// megnezzuk, hogy a mi mezonkon van-e
-					if (pawnOnOurColor(pawn->x, pawn->y)) {
-						continue;
-					}
+	int argc = lua_gettop(L);
 
-					minDist = dist;
-					closest = i;
+	double px;
+	double py;
+	double minDist;
+
+	if (argc < 3) {
+		double ignoreRadius = luaL_optnumber(L, 2, ROBOT_FRONT_MAX);
+		int closest = pawns->num;
+		for (int i = 0; i < pawns->num; i++) {
+			msgpawn* pawn = &(pawns->pawns[i]);
+			if (pawn->type == FIG_PAWN) {
+				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
+				if (dist > ignoreRadius) {
+					if (closest == pawns->num || dist < minDist) {
+						// megnezzuk, hogy a mi mezonkon van-e
+						if (pawnOnOurColor(pawn->x, pawn->y)) {
+							continue;
+						}
+
+						minDist = dist;
+						closest = i;
+					}
 				}
 			}
 		}
-	}
-	if (closest < pawns->num) {
-		double px = pawns->pawns[closest].x;
-		double py = pawns->pawns[closest].y;
-		lua_pushnumber(L, px);
-		lua_pushnumber(L, py);
-		if (target == 1) {
-			double angle = atan2f(y - py, x - px);
-			lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
-			lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
-			lua_pushnumber(L, minDist);
-			return 5;
-		} else if (target == 2) {
-			double c2 = sqr(x - px) + sqr(y - py);
-			double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
-			double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
-			double alpha = atan2(y - dy, x - dx);
-			dx += 20 * cos(alpha);
-			dy += 20 * sin(alpha);
-			lua_pushnumber(L, dx);
-			lua_pushnumber(L, dy);
-			lua_pushnumber(L, minDist);
-			return 5;
-		} else if (target == 3) {
-			double c2 = sqr(x - px) + sqr(y - py);
-			double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
-			double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
-			double alpha = atan2(dy - y, dx - x);
-			dx += 20 * cos(alpha);
-			dy += 20 * sin(alpha);
-			lua_pushnumber(L, dx);
-			lua_pushnumber(L, dy);
-			lua_pushnumber(L, minDist);
-			return 5;
-		} else if (target == 4) {
-			lua_pushnumber(L, px);
-			if (py > 1500) {
-				lua_pushnumber(L, py - 400);
-			} else {
-				lua_pushnumber(L, py + 400);
-			}
-			lua_pushnumber(L, minDist);
-			return 5;
+
+		if (closest >= pawns->num) {
+			lua_pushboolean(L, false);
+			return 1;
 		} else {
-			lua_pushnumber(L, minDist);
-			return 3;
+			px = pawns->pawns[closest].x;
+			py = pawns->pawns[closest].y;
 		}
 	} else {
-		lua_pushboolean(L, false);
-		return 1;
+		px = lua_tonumber(L, 2);
+		py = lua_tonumber(L, 3);
+		minDist = sqrt(sqr(px - x) + sqr(py - y));
+	}
+
+	lua_pushnumber(L, px);
+	lua_pushnumber(L, py);
+	if (target == 1) {
+		double angle = atan2f(y - py, x - px);
+		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
+		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
+		lua_pushnumber(L, minDist);
+		return 5;
+	} else if (target == 2) {
+		double c2 = sqr(x - px) + sqr(y - py);
+		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
+		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+		double alpha = atan2(y - dy, x - dx);
+		dx += 20 * cos(alpha);
+		dy += 20 * sin(alpha);
+		lua_pushnumber(L, dx);
+		lua_pushnumber(L, dy);
+		lua_pushnumber(L, minDist);
+		return 5;
+	} else if (target == 3) {
+		double c2 = sqr(x - px) + sqr(y - py);
+		double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
+		double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+		double alpha = atan2(dy - y, dx - x);
+		dx += 20 * cos(alpha);
+		dy += 20 * sin(alpha);
+		lua_pushnumber(L, dx);
+		lua_pushnumber(L, dy);
+		lua_pushnumber(L, minDist);
+		return 5;
+	} else if (target == 4) {
+		lua_pushnumber(L, px);
+		if (py > 1500) {
+			lua_pushnumber(L, py - 400);
+		} else {
+			lua_pushnumber(L, py + 400);
+		}
+		lua_pushnumber(L, minDist);
+		return 5;
+	} else {
+		lua_pushnumber(L, minDist);
+		return 3;
 	}
 }
 

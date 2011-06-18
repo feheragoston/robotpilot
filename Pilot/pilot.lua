@@ -19,48 +19,64 @@ end
 function Go(...)
 	if (control.Go(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) Go hiba")
 	end
 end
 
 function GoSafe(...)
 	if (control.GoSafe(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) GoSafe hiba")
 	end
 end
 
 function GoTo(...)
 	if (control.GoTo(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) GoTo hiba")
 	end
 end
 
 function GoToSafe(...)
 	if (control.GoToSafe(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) GoToSafe hiba")
 	end
 end
 
 function Turn(...)
 	if (control.Turn(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) Turn hiba")
 	end
 end
 
 function TurnSafe(...)
 	if (control.TurnSafe(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) TurnSafe hiba")
 	end
 end
 
 function TurnTo(...)
 	if (control.TurnTo(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) TurnTo hiba")
 	end
 end
 
 function TurnToSafe(...)
 	if (control.TurnToSafe(...)) then
 		MotionInProgress()
+	else
+		control.print("(pilot) TurnToSafe hiba")
 	end
 end
 
@@ -69,6 +85,8 @@ function MotionStop(...)
 		while (control.MotionStopInProgress()) do
 			control.process()
 		end
+	else
+		control.print("(pilot) MotionStop hiba")
 	end
 end
 

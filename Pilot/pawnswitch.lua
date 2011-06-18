@@ -16,29 +16,62 @@ end
 
 p.GoTo(250, Offset + Ori * 800)
 
-moveFinished = false;
+p.TurnToSafe(1700, Offset + Ori * 800, 10, 20)
+p.GripperMove(90)
+
 pawnInGripper = false;
-c.runparallel(
-function()
-	p.TurnToSafe(1500, Offset + Ori * 800, 10, 20)
-	p.GripperMove(90)
-	p.GoToSafe(1500, Offset + Ori * 800, 400, 500)
-	moveFinished = true;
-end,
-function()
-	repeat c.process() until (c.PawnInGripper() or moveFinished);
-	pawnInGripper = c.PawnInGripper()
-	if (not moveFinished) then
-		p.MotionStop(500);
-	end
-end)
+c.GoToSafe(1700, Offset + Ori * 800, 400, 500)
+repeat
+	c.process()
+until (c.PawnInGripper() or not c.MotionInProgress())
+pawnInGripper = c.PawnInGripper()
+if (c.MotionInProgress()) then
+	p.MotionStop(500)
+end
 
 if (pawnInGripper) then
-	p.GoSafe(-150)
+	x, y, phi = c.GetRobotPos()
+	p.GoSafe(-ROBOT_FRONT_MAX)
 	p.GripperMove(0)
-	p.TurnSafe(math.pi / 2, 10, 20)
-	p.ArmMove(false, 125)
+	x1, y1, x2, y2 = c.FindPawn(3, x + ROBOT_FRONT_PAWN, y)
+	c.print(x1, y1, x2, y2)
+	p.TurnTo(x2, y2)
+	p.GoTo(x2, y2)
+	p.ArmMove(false, 130)
 	p.Magnet(false, 1)
 	p.sleep(10)
 	p.ArmMove(false, 0)
 end
+
+x, y, phi = c.GetRobotPos()
+p.TurnToSafe(x, Offset + Ori * 800, 10, 20)
+p.GoToSafe(x, Offset + Ori * 800, 800, 800)
+
+pawnInGripper = false;
+p.TurnToSafe(1700, Offset + Ori * 800, 10, 20)
+p.GripperMove(90)
+
+pawnInGripper = false;
+c.GoToSafe(1700, Offset + Ori * 800, 400, 500)
+repeat
+	c.process()
+until (c.PawnInGripper() or not c.MotionInProgress())
+pawnInGripper = c.PawnInGripper()
+if (c.MotionInProgress()) then
+	p.MotionStop(500)
+end
+
+if (pawnInGripper) then
+	x, y, phi = c.GetRobotPos()
+	p.GoSafe(-ROBOT_FRONT_MAX)
+	p.GripperMove(0)
+	x1, y1, x2, y2 = c.FindPawn(2, x + ROBOT_FRONT_PAWN, y)
+	c.print(x1, y1, x2, y2)
+	p.TurnTo(x2, y2)
+	p.GoTo(x2, y2)
+	p.ArmMove(true, 130)
+	p.Magnet(true, 1)
+	p.sleep(10)
+	p.ArmMove(true, 0)
+end
+

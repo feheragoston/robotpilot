@@ -14,11 +14,11 @@ if (c.GetMyColor()) then
 end
 
 p.GoTo(225, Offset + Ori * (410 + ROBOT_WIDTH))
-p.TurnTo(1500, Offset + Ori * (410 + ROBOT_WIDTH))
+p.TurnTo(1700, Offset + Ori * (410 + ROBOT_WIDTH))
 
 c.runparallel(
 function()
-	p.GoTo(1500, Offset + Ori * (410 + ROBOT_WIDTH))
+	p.GoTo(1700, Offset + Ori * (410 + ROBOT_WIDTH), 200, 400)
 end,
 function()
 	repeat
