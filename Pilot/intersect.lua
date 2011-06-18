@@ -2,6 +2,11 @@
 Offset = 0;
 Ori = 1;
 
+GoSpeed = 800;
+GoAcc = 600;
+TurnSpeed = 6;
+TurnAcc = 6;
+
 -- CALIBRATE
 dofile("Pilot/calibration.lua")
 -- CALIBRATE END
@@ -17,27 +22,20 @@ p.RefreshPawnPositions()
 p.Go(100)
 
 function go1()
-	c.runparallel(
-	function()
-		p.TurnToSafe(350, Offset + Ori * 800)
-		p.GoToSafe(350, Offset + Ori * 800)
-	end,
-	function()
-		p.GripperMove(0)
-		p.GripperMove(90)
-	end)
+	p.TurnToSafe(350, Offset + Ori * 800, TurnSpeed, TurnAcc)
+	p.GoToSafe(350, Offset + Ori * 800, GoSpeed, GoAcc)
 end
 function go2()
-	p.TurnToSafe(350, Offset + Ori * 2200)
-	p.GoToSafe(350, Offset + Ori * 2200)
+	p.TurnToSafe(350, Offset + Ori * 2200, TurnSpeed, TurnAcc)
+	p.GoToSafe(350, Offset + Ori * 2200, GoSpeed, GoAcc)
 end
 function go3()
-	p.TurnToSafe(1600, Offset + Ori * 2200)
-	p.GoToSafe(1600, Offset + Ori * 2200)
+	p.TurnToSafe(1400, Offset + Ori * 2200, TurnSpeed, TurnAcc)
+	p.GoToSafe(1400, Offset + Ori * 2200, GoSpeed, GoAcc)
 end
 function go4()
-	p.TurnToSafe(1600, Offset + Ori * 800)
-	p.GoToSafe(1600, Offset + Ori * 800)
+	p.TurnToSafe(1400, Offset + Ori * 800, TurnSpeed, TurnAcc)
+	p.GoToSafe(1400, Offset + Ori * 800, GoSpeed, GoAcc)
 end
 
 function resolveDeadpos1()
@@ -69,7 +67,7 @@ end
 repeat
 	if (not pcall(function()
 		c.print("KEZDUNK");
-		p.RefreshPawnPositions()
+		--p.RefreshPawnPositions()
 		
 		deadpos = true;
 		
@@ -98,6 +96,8 @@ repeat
 			c.print("go4 kihagyas");
 		end
 		
+		c.music("axelfoley")
+		
 		if (deadpos) then
 			if (c.simulate(resolveDeadpos5)) then
 				resolveDeadpos5();
@@ -114,6 +114,6 @@ repeat
 			end
 		end
 	end)) then
-		p.MotionStop(2000)
+		p.MotionStop(MAX_DEC)
 	end
 until (c.GetStopButton());

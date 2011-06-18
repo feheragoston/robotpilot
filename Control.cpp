@@ -21,6 +21,8 @@ std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
 bool Control::sendDynObstacles = false;
 Circle* Control::opponent = NULL;
+double Control::opponent_x = -1100.;
+double Control::opponent_y = -1100.;
 double Control::angry = 0.;
 bool Control::simulate = false;
 bool Control::safeMotion = false;
@@ -74,53 +76,53 @@ Control::Control(Config* config) {
 		{"print", c_print},
 		{"music", c_music},
 
-		{"GetStartButton", GetStartButton},
-		{"GetStopButton", GetStopButton},
-		{"GetMyColor", GetMyColor},
-		{"PawnInGripper", PawnInGripper},
-		{"GetDistances", GetDistances},
-		{"SetMotorSupply", SetMotorSupply},
+		{"GetStartButton", l_GetStartButton},
+		{"GetStopButton", l_GetStopButton},
+		{"GetMyColor", l_GetMyColor},
+		{"PawnInGripper", l_PawnInGripper},
+		{"GetDistances", l_GetDistances},
+		{"SetMotorSupply", l_SetMotorSupply},
 
-		{"CalibrateDeadreckoning", CalibrateDeadreckoning},
-		{"RefineDeadreckoning", RefineDeadreckoning},
-		{"SetSpeed", SetSpeed},
-		{"Go", Go},
-		{"GoSafe", Go},
-		{"GoTo", GoTo},
-		{"GoToSafe", GoTo},
-		{"Turn", Turn},
-		{"TurnSafe", Turn},
-		{"TurnTo", TurnTo},
-		{"TurnToSafe", TurnTo},
-		{"MotionInProgress", MotionInProgress},
-		{"GetMotionError", GetMotionError},
-		{"MotionStop", MotionStop},
-		{"MotionStopInProgress", MotionStopInProgress},
-		{"GetRobotPos", GetRobotPos},
-		{"SetRobotPos", SetRobotPos},
-		{"GetOpponentPos", GetOpponentPos},
-		{"GetDistance", GetDistance},
+		{"CalibrateDeadreckoning", l_CalibrateDeadreckoning},
+		{"RefineDeadreckoning", l_RefineDeadreckoning},
+		{"SetSpeed", l_SetSpeed},
+		{"Go", l_Go},
+		{"GoSafe", l_Go},
+		{"GoTo", l_GoTo},
+		{"GoToSafe", l_GoTo},
+		{"Turn", l_Turn},
+		{"TurnSafe", l_Turn},
+		{"TurnTo", l_TurnTo},
+		{"TurnToSafe", l_TurnTo},
+		{"MotionInProgress", l_MotionInProgress},
+		{"GetMotionError", l_GetMotionError},
+		{"MotionStop", l_MotionStop},
+		{"MotionStopInProgress", l_MotionStopInProgress},
+		{"GetRobotPos", l_GetRobotPos},
+		{"SetRobotPos", l_SetRobotPos},
+		{"GetOpponentPos", l_GetOpponentPos},
+		{"GetDistance", l_GetDistance},
 
-		{"GripperMove", GripperMove},
-		{"GripperMoveInProgress", GripperMoveInProgress},
-		{"CalibrateConsole", CalibrateConsole},
-		{"ConsoleMove", ConsoleMove},
-		{"ConsoleMoveInProgress", ConsoleMoveInProgress},
-		{"ConsoleStop", ConsoleStop},
-		{"ConsoleStopInProgress", ConsoleStopInProgress},
-		{"GetConsolePos", GetConsolePos},
-		{"ArmMove", ArmMove},
-		{"ArmMoveInProgress", ArmMoveInProgress},
-		{"Magnet", Magnet},
-		{"MagnetInProgress", MagnetInProgress},
+		{"GripperMove", l_GripperMove},
+		{"GripperMoveInProgress", l_GripperMoveInProgress},
+		{"CalibrateConsole", l_CalibrateConsole},
+		{"ConsoleMove", l_ConsoleMove},
+		{"ConsoleMoveInProgress", l_ConsoleMoveInProgress},
+		{"ConsoleStop", l_ConsoleStop},
+		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
+		{"GetConsolePos", l_GetConsolePos},
+		{"ArmMove", l_ArmMove},
+		{"ArmMoveInProgress", l_ArmMoveInProgress},
+		{"Magnet", l_Magnet},
+		{"MagnetInProgress", l_MagnetInProgress},
 
-		{"StartMatch", StartMatch},
-		{"RefreshPawnPositions", RefreshPawnPositions},
-		{"RefreshPawnPositionsInProgress", RefreshPawnPositionsInProgress},
-		{"RefreshPawnPositionsFinished", RefreshPawnPositionsFinished},
-		{"FindPawn", FindPawn},
-		{"GetDeployPoint", GetDeployPoint},
-		{"SetDeployPointPriority", SetDeployPointPriority},
+		{"StartMatch", l_StartMatch},
+		{"RefreshPawnPositions", l_RefreshPawnPositions},
+		{"RefreshPawnPositionsInProgress", l_RefreshPawnPositionsInProgress},
+		{"RefreshPawnPositionsFinished", l_RefreshPawnPositionsFinished},
+		{"FindPawn", l_FindPawn},
+		{"GetDeployPoint", l_GetDeployPoint},
+		{"SetDeployPointPriority", l_SetDeployPointPriority},
 
 		{NULL, NULL}
 	};
@@ -141,6 +143,8 @@ Control::Control(Config* config) {
 	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_BACK");
 	lua_pushnumber(L, PAWN_RADIUS);
 	lua_setfield(L, LUA_GLOBALSINDEX, "PAWN_RADIUS");
+	lua_pushnumber(L, MAX_DEC);
+	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DEC");
 
 	luaL_dostring(L, "package.path = package.path .. \";./Pilot/?.lua\"; c = control; p = require(\"pilot\");");
 
@@ -322,7 +326,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.function = MSG_REFRESHSTATUS;
 		mPrimitives->GetRobotPos(&(response.x), &(response.y), &(response.phi));
 		mPrimitives->GetSpeed(&(response.v), &(response.w));
-		mPrimitives->GetOpponentPos(&(response.ox), &(response.oy));
+		Control::GetOpponentPos(&(response.ox), &(response.oy));
 		response.oradius = opponent->getRadius();
 		response.startButton = mPrimitives->GetStartButton();
 		response.stopButton = mPrimitives->GetStopButton();
@@ -381,7 +385,7 @@ void Control::log() {
 		status.function = MSG_REFRESHSTATUS;
 		mPrimitives->GetRobotPos(&(status.x), &(status.y), &(status.phi));
 		mPrimitives->GetSpeed(&(status.v), &(status.w));
-		mPrimitives->GetOpponentPos(&(status.ox), &(status.oy));
+		Control::GetOpponentPos(&(status.ox), &(status.oy));
 		status.oradius = opponent->getRadius();
 		status.startButton = mPrimitives->GetStartButton();
 		status.stopButton = mPrimitives->GetStopButton();
@@ -437,7 +441,7 @@ void Control::setSafeMotion(lua_State *L) {
 
 long int Control::refreshOpponent() {
 	double ox, oy;
-	long int validity = mPrimitives->GetOpponentPos(&ox, &oy);
+	long int validity = Control::GetOpponentPos(&ox, &oy);
 	opponent->Set(ox, oy, ROBOT_RADIUS * 2.5 - angry);
 	return validity;
 }
@@ -446,11 +450,6 @@ bool Control::opponentTooClose() {
 	double x, y, phi, v, w;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
-
-	if (refreshOpponent() > SONAR_TIMEOUT) {
-		cout << "(Control) Sonar timeout!" << endl;
-		return true;
-	}
 
 	if (fabs(v) < 0.01) {
 		return false;
@@ -462,6 +461,24 @@ bool Control::opponentTooClose() {
 		distance *= -1;
 	} else {
 		distance += ROBOT_FRONT;
+	}
+
+	if (refreshOpponent() > SONAR_TIMEOUT) {
+		if (distance > 0) {
+			distance += 100; // a tavolsagerzekelok hatrebb vannak
+			double distances[6];
+			mPrimitives->GetDistances(distances);
+			if (distances[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX] < distance ||
+					distances[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX] < distance) {
+				cout << "(Control) Sonar timeout, opponent too close!" << endl;
+				// elhelyezzuk az ellenfelet, hogy legkozelebb ne probaljunk erre menni
+				double ox = x + (distance + ROBOT_RADIUS * 2.5 - angry) * cos(phi);
+				double oy = y + (distance + ROBOT_RADIUS * 2.5 - angry) * sin(phi);
+				SetOpponentPos(ox, oy);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*
@@ -739,11 +756,14 @@ int Control::c_wait(lua_State *L) {
 		return luaL_error(L, "(Control) Match over, exiting");
 	}
 
-	double ox, oy;
-	if (mPrimitives->GetOpponentPos(&ox, &oy) < SONAR_TIMEOUT) {
-		Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
-		removeCollidingDynamicObstacles(opp);
-		delete opp;
+	if (!simulate) {
+		// kiszedjuk azokat a dinamikus akadalyokat, amin atment az ellenfel
+		double ox, oy;
+		if (mPrimitives->GetOpponentPos(&ox, &oy) < SONAR_TIMEOUT) {
+			Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
+			removeCollidingDynamicObstacles(opp);
+			delete opp;
+		}
 	}
 
 	return 0;
@@ -841,7 +861,7 @@ int Control::c_simulate(lua_State *L) {
 	double x, y, phi;
 	realPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->SetRobotPos(x, y, phi);
-	realPrimitives->GetOpponentPos(&x, &y);
+	Control::GetOpponentPos(&x, &y);
 	mPrimitives->SetOpponentPos(x, y);
 
 	// meghivjuk a parameterul kapott fuggvenyt
@@ -923,31 +943,31 @@ int Control::c_music(lua_State *L) {
 	return 0;
 }
 
-int Control::GetStartButton(lua_State *L) {
+int Control::l_GetStartButton(lua_State *L) {
 	bool b = mPrimitives->GetStartButton();
 	lua_pushboolean(L, b);
 	return 1;
 }
 
-int Control::GetStopButton(lua_State *L) {
+int Control::l_GetStopButton(lua_State *L) {
 	bool b = mPrimitives->GetStopButton();
 	lua_pushboolean(L, b);
 	return 1;
 }
 
-int Control::GetMyColor(lua_State *L) {
+int Control::l_GetMyColor(lua_State *L) {
 	bool b = mPrimitives->GetMyColor();
 	lua_pushboolean(L, b);
 	return 1;
 }
 
-int Control::PawnInGripper(lua_State *L) {
+int Control::l_PawnInGripper(lua_State *L) {
 	bool b = mPrimitives->PawnInGripper();
 	lua_pushboolean(L, b);
 	return 1;
 }
 
-int Control::GetDistances(lua_State *L) {
+int Control::l_GetDistances(lua_State *L) {
 	double dist[6];
 	mPrimitives->GetDistances(dist);
 	for (int i = 0; i < 6; i++) {
@@ -956,7 +976,7 @@ int Control::GetDistances(lua_State *L) {
 	return 6;
 }
 
-int Control::SetMotorSupply(lua_State *L) {
+int Control::l_SetMotorSupply(lua_State *L) {
 	bool powered = lua_toboolean(L, 1);
 	lua_settop(L, 0);
 	if (mPrimitives->SetMotorSupply(powered)) {
@@ -970,7 +990,7 @@ int Control::SetMotorSupply(lua_State *L) {
 	return 1;
 }
 
-int Control::CalibrateDeadreckoning(lua_State *L) {
+int Control::l_CalibrateDeadreckoning(lua_State *L) {
 	bool simulate = optbool(L, 1, false);
 	lua_settop(L, 0);
 	if (mPrimitives->CalibrateDeadreckoning(simulate)) {
@@ -984,7 +1004,7 @@ int Control::CalibrateDeadreckoning(lua_State *L) {
 	return 1;
 }
 
-int Control::RefineDeadreckoning(lua_State *L) {
+int Control::l_RefineDeadreckoning(lua_State *L) {
 	lua_settop(L, 0);
 	if (!mCamera) {
 		mCamera = new PrimitivesNet(mConfig);
@@ -1014,7 +1034,7 @@ int Control::RefineDeadreckoning(lua_State *L) {
 	return 1;
 }
 
-int Control::SetSpeed(lua_State *L) {
+int Control::l_SetSpeed(lua_State *L) {
 	double v = luaL_optnumber(L, 1, 0);
 	double w = luaL_optnumber(L, 2, 0);
 	lua_settop(L, 0);
@@ -1029,7 +1049,7 @@ int Control::SetSpeed(lua_State *L) {
 	return 1;
 }
 
-int Control::Go(lua_State *L) {
+int Control::l_Go(lua_State *L) {
 	double distance = luaL_optnumber(L, 1, 1000);
 	double speed = luaL_optnumber(L, 2, 500);
 	double acc = luaL_optnumber(L, 3, 200);
@@ -1042,7 +1062,7 @@ int Control::Go(lua_State *L) {
 	return 1;
 }
 
-int Control::GoTo(lua_State *L) {
+int Control::l_GoTo(lua_State *L) {
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 500);
@@ -1056,7 +1076,7 @@ int Control::GoTo(lua_State *L) {
 	return 1;
 }
 
-int Control::Turn(lua_State *L) {
+int Control::l_Turn(lua_State *L) {
 	double angle = luaL_optnumber(L, 1, M_PI_2);
 	double speed = luaL_optnumber(L, 2, 2);
 	double acc = luaL_optnumber(L, 3, 2);
@@ -1069,7 +1089,7 @@ int Control::Turn(lua_State *L) {
 	return 1;
 }
 
-int Control::TurnTo(lua_State *L) {
+int Control::l_TurnTo(lua_State *L) {
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 2);
@@ -1095,7 +1115,7 @@ int Control::TurnTo(lua_State *L) {
 	return 1;
 }
 
-int Control::MotionInProgress(lua_State *L) {
+int Control::l_MotionInProgress(lua_State *L) {
 	if (safeMotion) {
 		if (opponentTooClose()) {
 			return luaL_error(L, "(Control) Opponent too close");
@@ -1113,23 +1133,23 @@ int Control::MotionInProgress(lua_State *L) {
 	return 1;
 }
 
-int Control::GetMotionError(lua_State *L) {
+int Control::l_GetMotionError(lua_State *L) {
 	lua_pushinteger(L, mPrimitives->GetMotionError());
 	return 1;
 }
 
-int Control::MotionStop(lua_State *L) {
+int Control::l_MotionStop(lua_State *L) {
 	double dec = luaL_optnumber(L, 1, 0);
 	lua_pushboolean(L, mPrimitives->MotionStop(dec));
 	return 1;
 }
 
-int Control::MotionStopInProgress(lua_State *L) {
+int Control::l_MotionStopInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->MotionStopInProgress());
 	return 1;
 }
 
-int Control::GetRobotPos(lua_State *L) {
+int Control::l_GetRobotPos(lua_State *L) {
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	lua_pushnumber(L, x);
@@ -1138,7 +1158,7 @@ int Control::GetRobotPos(lua_State *L) {
 	return 3;
 }
 
-int Control::SetRobotPos(lua_State *L) {
+int Control::l_SetRobotPos(lua_State *L) {
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
 	double phi = lua_tonumber(L, 3);
@@ -1146,15 +1166,37 @@ int Control::SetRobotPos(lua_State *L) {
 	return 0;
 }
 
-int Control::GetOpponentPos(lua_State *L) {
+long int Control::GetOpponentPos(double* ox, double* oy) {
+	long int ret = mPrimitives->GetOpponentPos(ox, oy);
+	if (simulate || ret > SONAR_TIMEOUT || RunTime() < SONAR_TIMEOUT) {
+		/*
+		 * ha szimulalunk
+		 * vagy ha a szonar timeoutol
+		 * vagy ha meg nem telt el SONAR_TIMEOUT ido (ilyenkor a sonar 0,0-at ad, es ervenyes adatnak vennenk)
+		 * akkor nem frissitunk
+		 */
+		*ox = opponent_x;
+		*oy = opponent_y;
+	} else {
+		SetOpponentPos(*ox, *oy);
+	}
+	return ret;
+}
+
+void Control::SetOpponentPos(double ox, double oy) {
+	opponent_x = ox;
+	opponent_y = oy;
+}
+
+int Control::l_GetOpponentPos(lua_State *L) {
 	double x, y;
-	mPrimitives->GetOpponentPos(&x, &y);
+	Control::GetOpponentPos(&x, &y);
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	return 2;
 }
 
-int Control::GetDistance(lua_State *L) {
+int Control::l_GetDistance(lua_State *L) {
 	if (lua_isstring(L, 1)) {
 		const char* s = lua_tostring(L, 1);
 		double distance[6];
@@ -1176,18 +1218,18 @@ int Control::GetDistance(lua_State *L) {
 	}
 }
 
-int Control::GripperMove(lua_State *L) {
+int Control::l_GripperMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
 	lua_pushboolean(L, mPrimitives->GripperMove(pos));
 	return 1;
 }
 
-int Control::GripperMoveInProgress(lua_State *L) {
+int Control::l_GripperMoveInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->GripperMoveInProgress());
 	return 1;
 }
 
-int Control::CalibrateConsole(lua_State *L) {
+int Control::l_CalibrateConsole(lua_State *L) {
 	if (mPrimitives->CalibrateConsole()) {
 		while (mPrimitives->CalibrateConsoleInProgress()) {
 			c_wait(L);
@@ -1199,7 +1241,7 @@ int Control::CalibrateConsole(lua_State *L) {
 	return 1;
 }
 
-int Control::ConsoleMove(lua_State *L) {
+int Control::l_ConsoleMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
 	double speed = luaL_optnumber(L, 2, 35);
 	double acc = luaL_optnumber(L, 3, 10);
@@ -1207,28 +1249,28 @@ int Control::ConsoleMove(lua_State *L) {
 	return 1;
 }
 
-int Control::ConsoleMoveInProgress(lua_State *L) {
+int Control::l_ConsoleMoveInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->ConsoleMoveInProgress());
 	return 1;
 }
 
-int Control::ConsoleStop(lua_State *L) {
+int Control::l_ConsoleStop(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->ConsoleStop());
 	return 1;
 }
 
-int Control::ConsoleStopInProgress(lua_State *L) {
+int Control::l_ConsoleStopInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->ConsoleStopInProgress());
 	return 1;
 }
 
-int Control::GetConsolePos(lua_State *L) {
+int Control::l_GetConsolePos(lua_State *L) {
 	double pos = mPrimitives->GetConsolePos();
 	lua_pushnumber(L, pos);
 	return 1;
 }
 
-int Control::ArmMove(lua_State *L) {
+int Control::l_ArmMove(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	double pos = luaL_optnumber(L, 2, 0);
 	double speed = luaL_optnumber(L, 3, 1000);
@@ -1237,26 +1279,26 @@ int Control::ArmMove(lua_State *L) {
 	return 1;
 }
 
-int Control::ArmMoveInProgress(lua_State *L) {
+int Control::l_ArmMoveInProgress(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	lua_pushboolean(L, mPrimitives->ArmMoveInProgress(left));
 	return 1;
 }
 
-int Control::Magnet(lua_State *L) {
+int Control::l_Magnet(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	int polarity = luaL_optinteger(L, 2, 0);
 	lua_pushboolean(L, mPrimitives->Magnet(left, polarity));
 	return 1;
 }
 
-int Control::MagnetInProgress(lua_State *L) {
+int Control::l_MagnetInProgress(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	lua_pushboolean(L, mPrimitives->MagnetInProgress(left));
 	return 1;
 }
 
-int Control::StartMatch(lua_State *L) {
+int Control::l_StartMatch(lua_State *L) {
 	bool startTimer = optbool(L, 1, true);
 	if (startTimer) {
 		gettimeofday(&matchStart, NULL);
@@ -1285,7 +1327,7 @@ int Control::StartMatch(lua_State *L) {
 	return 0;
 }
 
-int Control::RefreshPawnPositions(lua_State *L) {
+int Control::l_RefreshPawnPositions(lua_State *L) {
 	if (!mCamera) {
 		mCamera = new PrimitivesNet(mConfig);
 		if (mCamera->CameraInit()) {
@@ -1304,7 +1346,7 @@ int Control::RefreshPawnPositions(lua_State *L) {
 	return 1;
 }
 
-int Control::RefreshPawnPositionsInProgress(lua_State *L) {
+int Control::l_RefreshPawnPositionsInProgress(lua_State *L) {
 	if (!mCamera) {
 		lua_pushboolean(L, false);
 		return 1;
@@ -1313,7 +1355,7 @@ int Control::RefreshPawnPositionsInProgress(lua_State *L) {
 	return 1;
 }
 
-int Control::RefreshPawnPositionsFinished(lua_State *L) {
+int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 	bool ret;
 	if (!mCamera) {
 		ret = false;
@@ -1354,7 +1396,7 @@ int Control::RefreshPawnPositionsFinished(lua_State *L) {
  * @param L
  * @return
  */
-int Control::FindPawn(lua_State *L) {
+int Control::l_FindPawn(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1452,7 +1494,7 @@ int Control::FindPawn(lua_State *L) {
  * @param L
  * @return
  */
-int Control::GetDeployPoint(lua_State *L) {
+int Control::l_GetDeployPoint(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
 
 	bool color = mPrimitives->GetMyColor();
@@ -1519,7 +1561,7 @@ int Control::GetDeployPoint(lua_State *L) {
 	return 6;
 }
 
-int Control::SetDeployPointPriority(lua_State *L) {
+int Control::l_SetDeployPointPriority(lua_State *L) {
 	int target = lua_tointeger(L, 1);
 	int priority = lua_tointeger(L, 2);
 	if (target < 0) {

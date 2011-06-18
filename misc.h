@@ -34,7 +34,7 @@
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 
-#define		SONAR_TIMEOUT		20000000	// sonartol kapott ertek ervenyessegi limitje [ms]
+#define		SONAR_TIMEOUT		2000	// sonartol kapott ertek ervenyessegi limitje [ms]
 /////////////////
 // Robot szine
 
@@ -79,6 +79,6 @@
 // EPSILON
 #define EPSILON 10e-5
 #define MAX_DISTANCE 1000000
-#define MAX_DEC 3000 // maximalis lassulas merteke [mm/s^2]
+#define MAX_DEC 2000 // maximalis lassulas merteke [mm/s^2]
 
 #endif /*MISC_H_*/
