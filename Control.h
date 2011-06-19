@@ -74,6 +74,9 @@ protected:
 	static bool matchStarted; // Meccs elkezdodott
 	static bool exitControl;
 
+	static bool logDeployFields;
+	static bool logDynObstacles;
+	static bool logPawns;
 	static void log();
 
 	static void setSafeMotion(lua_State *L);

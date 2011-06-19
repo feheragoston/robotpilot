@@ -40,6 +40,10 @@ struct timeval Control::matchStart = {0, 0};
 struct timeval Control::sleepCalled = {0, 0};
 long int Control::timeToSleep = 0;
 
+bool Control::logDeployFields = true;
+bool Control::logDynObstacles = true;
+bool Control::logPawns = true;
+
 #define ROBOT_POINT_NUM 6
 double Control::robotBody[][2] = {
 		{ 140,  140 + 15},
@@ -164,6 +168,7 @@ Control::Control(Config* config) {
 		}
 		pawns->pawns[i].type = 1;
 	}
+	logPawns = true;
 
 	if (obstacles.empty()) {
 		// Akadalyok definialasa
@@ -385,6 +390,8 @@ void Control::log() {
 		time = MatchTime();
 		write(logfile, &time, sizeof(unsigned int));
 
+		msglen_t size;
+
 		msgstatus status;
 		status.function = MSG_REFRESHSTATUS;
 		mPrimitives->GetRobotPos(&(status.x), &(status.y), &(status.phi));
@@ -401,29 +408,46 @@ void Control::log() {
 		status.leftArmPos = mPrimitives->GetArmPos(true);
 		status.rightArmPos = mPrimitives->GetArmPos(false);
 		mPrimitives->GetDistances(status.distances);
-		write(logfile, &status, sizeof(msgstatus));
+		size = sizeof(msgstatus);
+		write(logfile, &size, sizeof(msglen_t));
+		write(logfile, &status, size);
 
-		msgdeploypriority priority;
-		priority.function = MSG_DEPLOYPRIORITY;
-		for (int i = 0; i < 36; i++) {
-			priority.priority[i] = deployFields[i];
+		if (logDeployFields) {
+			logDeployFields = false;
+			msgdeploypriority priority;
+			priority.function = MSG_DEPLOYPRIORITY;
+			for (int i = 0; i < 36; i++) {
+				priority.priority[i] = deployFields[i];
+			}
+			size = sizeof(msgdeploypriority);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &priority, size);
 		}
-		write(logfile, &priority, sizeof(msgdeploypriority));
 
-		msgobstacles obstacles;
-		obstacles.function = MSG_OBSTACLES;
-		obstacles.num = 14;
-		if (dynObstacles.size() < 14) {
-			obstacles.num = dynObstacles.size();
+		if (logDynObstacles) {
+			logDynObstacles = false;
+			msgobstacles obstacles;
+			obstacles.function = MSG_OBSTACLES;
+			obstacles.num = 14;
+			if (dynObstacles.size() < 14) {
+				obstacles.num = dynObstacles.size();
+			}
+			std::list<Obstacle*>::iterator o = dynObstacles.begin();
+			for (int i = 0; i < obstacles.num; i++) {
+				(*o)->getObstacle(&obstacles.obstacles[i]);
+				o++;
+			}
+			size = sizeof(msgobstacles);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &obstacles, size);
 		}
-		std::list<Obstacle*>::iterator o = dynObstacles.begin();
-		for (int i = 0; i < obstacles.num; i++) {
-			(*o)->getObstacle(&obstacles.obstacles[i]);
-			o++;
-		}
-		write(logfile, &obstacles, sizeof(msgobstacles));
 
-		write(logfile, &pawns, sizeof(msgpawns));
+		if (logPawns) {
+			logPawns = false;
+			size = sizeof(msgpawns);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, pawns, size);
+		}
 
 		function_t stop = 0xFF;
 		if (write(logfile, &stop, sizeof(function_t)) < 0) {
@@ -566,6 +590,7 @@ void Control::removeCollidingDynamicObstacles(Obstacle* obstacle) {
 		if ((*i)->Intersect(obstacle)) {
 			delete(*i);
 			i = dynObstacles.erase(i);
+			logDynObstacles = true;
 			sendDynObstacles = true;
 			//cout << "(Control) Dynamic obstacle removed" << endl;
 		} else {
@@ -591,6 +616,7 @@ void Control::addDynamicObstacle(Obstacle* obstacle) {
 		}
 	}
 	dynObstacles.push_back(obstacle);
+	logDynObstacles = true;
 	sendDynObstacles = true;
 	//cout << "(Control) Number of dynamic obstacles: " << dynObstacles.size() << endl;
 }
@@ -1328,6 +1354,7 @@ int Control::l_StartMatch(lua_State *L) {
 			deployFields[i] = 0;
 		}
 	}
+	logDeployFields = true;
 
 	int dir = 1;
 	int offset = 0;
@@ -1372,6 +1399,7 @@ int Control::l_RefreshPawnPositionsInProgress(lua_State *L) {
 
 int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 	bool ret;
+	logPawns = true;
 	if (!mCamera) {
 		ret = false;
 	} else {
@@ -1582,6 +1610,7 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 	if (target < 0) {
 		return 0;
 	}
+	logDeployFields = true;
 	if (priority < 1) {
 		for (int i = 0; i < 36; i++) {
 			if (deployFields[i] <= priority) {
