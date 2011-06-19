@@ -81,6 +81,7 @@ Control::Control(Config* config) {
 		{"GetMyColor", l_GetMyColor},
 		{"PawnInGripper", l_PawnInGripper},
 		{"GetDistances", l_GetDistances},
+		{"GetDistance", l_GetDistance},
 		{"SetMotorSupply", l_SetMotorSupply},
 
 		{"CalibrateDeadreckoning", l_CalibrateDeadreckoning},
@@ -101,7 +102,6 @@ Control::Control(Config* config) {
 		{"GetRobotPos", l_GetRobotPos},
 		{"SetRobotPos", l_SetRobotPos},
 		{"GetOpponentPos", l_GetOpponentPos},
-		{"GetDistance", l_GetDistance},
 
 		{"GripperMove", l_GripperMove},
 		{"GripperMoveInProgress", l_GripperMoveInProgress},
@@ -986,6 +986,28 @@ int Control::l_GetDistances(lua_State *L) {
 	return 6;
 }
 
+int Control::l_GetDistance(lua_State *L) {
+	if (lua_isstring(L, 1)) {
+		const char* s = lua_tostring(L, 1);
+		double distance[6];
+		mPrimitives->GetDistances(distance);
+		if (strcmp(s, "left") == 0) {
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]);
+		} else if (strcmp(s, "right") == 0) {
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]);
+		} else {
+			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
+			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
+		}
+		return 2;
+	} else {
+		lua_pushboolean(L, false);
+		return 1;
+	}
+}
+
 int Control::l_SetMotorSupply(lua_State *L) {
 	bool powered = lua_toboolean(L, 1);
 	lua_settop(L, 0);
@@ -1204,28 +1226,6 @@ int Control::l_GetOpponentPos(lua_State *L) {
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
 	return 2;
-}
-
-int Control::l_GetDistance(lua_State *L) {
-	if (lua_isstring(L, 1)) {
-		const char* s = lua_tostring(L, 1);
-		double distance[6];
-		mPrimitives->GetDistances(distance);
-		if (strcmp(s, "left") == 0) {
-			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]);
-			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]);
-		} else if (strcmp(s, "right") == 0) {
-			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]);
-			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]);
-		} else {
-			lua_pushnumber(L, distance[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX]);
-			lua_pushnumber(L, distance[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]);
-		}
-		return 2;
-	} else {
-		lua_pushboolean(L, false);
-		return 1;
-	}
 }
 
 int Control::l_GripperMove(lua_State *L) {

@@ -129,6 +129,7 @@ protected:
 	static int l_GetMyColor(lua_State *L);
 	static int l_PawnInGripper(lua_State *L);
 	static int l_GetDistances(lua_State *L);
+	static int l_GetDistance(lua_State *L);
 	static int l_SetMotorSupply(lua_State *L);
 
 	static int l_CalibrateDeadreckoning(lua_State *L);
@@ -147,7 +148,6 @@ protected:
 	static long int GetOpponentPos(double* ox, double* oy);
 	static void SetOpponentPos(double ox, double oy);
 	static int l_GetOpponentPos(lua_State *L);
-	static int l_GetDistance(lua_State *L);
 
 	static int l_GripperMove(lua_State *L);
 	static int l_GripperMoveInProgress(lua_State *L);
