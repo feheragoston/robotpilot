@@ -231,6 +231,8 @@ bool Control::Init() {
 	}
 
 	if (mPrimitives->Init()) {
+		/*
+		 * alapbol nem inicializaljuk a kamerat
 		mCamera = new PrimitivesNet(mConfig);
 		if (mCamera->CameraInit()) {
 			cout << "(Control) Connected to camera" << endl;
@@ -239,6 +241,7 @@ bool Control::Init() {
 			delete mCamera;
 			mCamera = NULL;
 		}
+		*/
 
 		mServer = new Server();
 		mServer->setMessageCallback(serverMessageCallback);
