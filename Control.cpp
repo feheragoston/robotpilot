@@ -337,6 +337,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.consolePos = mPrimitives->GetConsolePos();
 		response.leftArmPos = mPrimitives->GetArmPos(true);
 		response.rightArmPos = mPrimitives->GetArmPos(false);
+		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
 
 		msgdeploypriority message;
@@ -396,6 +397,7 @@ void Control::log() {
 		status.consolePos = mPrimitives->GetConsolePos();
 		status.leftArmPos = mPrimitives->GetArmPos(true);
 		status.rightArmPos = mPrimitives->GetArmPos(false);
+		mPrimitives->GetDistances(status.distances);
 		write(logfile, &status, sizeof(msgstatus));
 
 		msgdeploypriority priority;

@@ -61,6 +61,7 @@ typedef struct msgstatus {
 	double consolePos;
 	double leftArmPos;
 	double rightArmPos;
+	double distances[6];
 } msgstatus;
 
 typedef struct msgpawn {

@@ -29,6 +29,7 @@ public:
 	bool GoTo(double x, double y, double max_speed, double max_acc);
 	bool Turn(double angle, double max_speed, double max_acc);
 	bool MotionStop(double dec);
+	void GetDistances(double distance[6]);
 
 	bool GripperMove(double pos);
 	bool GripperMoveInProgress();
@@ -59,6 +60,7 @@ protected:
 	double dx, dy, dphi;
 	progress pawnRefresh;
 	msgpawns* pawns;
+	double distances[6];
 };
 
 #endif /* PRIMITIVESNET_H_ */

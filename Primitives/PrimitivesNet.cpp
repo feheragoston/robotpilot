@@ -79,6 +79,9 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		consolePos = data->consolePos;
 		leftArmPos = data->leftArmPos;
 		rightArmPos = data->rightArmPos;
+		for (int i = 0; i < 6; i++) {
+			distances[i] = data->distances[i];
+		}
 	} else if (*function == MSG_CALIBRATEPOS && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
 		if (data->b1) {
@@ -228,6 +231,12 @@ bool PrimitivesNet::MotionStop(double dec) {
 	turn.inprogress = false;
 
 	return true;
+}
+
+void PrimitivesNet::GetDistances(double distance[6]) {
+	for (int i = 0; i < 6; i++) {
+		distance[i] = distances[i];
+	}
 }
 
 bool PrimitivesNet::GripperMove(double pos) {
