@@ -17,10 +17,10 @@ if (CALIBRATED == nil) then
 	p.ArmMove(false, 0)
 	c.print("Jobbkar behajtva");
 	
-	c.CalibrateConsole();
-	
 	p.GripperMove(0)
 	c.print("Gripper behajtva");
+	
+	c.CalibrateConsole();
 	
 	c.music("calibrate")
 	

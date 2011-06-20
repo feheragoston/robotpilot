@@ -156,7 +156,7 @@ repeat
 		while (pawnInGripper) do
 			c.print("Paraszt uritese");
 			x1, y1, x2, y2, target, priority = c.GetDeployPoint(1);
-			if (px) then
+			if (x1) then
 				if (c.simulate(DeployPawn, x1, y1, x2, y2)) then
 					deadpos = false;
 					DeployPawn(x1, y1, x2, y2);

@@ -26,6 +26,7 @@ double Control::opponent_y = -1100.;
 double Control::angry = 0.;
 bool Control::simulate = false;
 bool Control::safeMotion = false;
+/*
 int Control::deployFields[36] = {
 		-15, -12, -14, -14, -12, -15,
 		-11, -13, -10, -10, -13, -11,
@@ -33,6 +34,16 @@ int Control::deployFields[36] = {
 		 -4,  -7,  -3,  -3,  -7,  -4,
 		 -9,  -5,  -6,  -6,  -5,  -9,
 		-18, -16, -17, -17, -16, -18
+};
+	MOST NE MENJUNK AT A MASIK TERFELRE
+*/
+int Control::deployFields[36] = {
+		  0,  -7,   0,   0,  -7,   0,
+		 -6,   0,  -5,  -5,   0,  -6,
+		  0,  -1,   0,   0,  -1,   0,
+		 -3,   0,  -2,  -2,   0,  -3,
+		  0,  -4,   0,   0,  -4,   0,
+		 -9,   0,  -8,  -8,   0,  -9
 };
 struct timeval Control::runStart = {0, 0};
 struct timeval Control::initStart = {0, 0};
