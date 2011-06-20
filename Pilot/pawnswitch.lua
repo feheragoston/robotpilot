@@ -5,7 +5,7 @@ Ori = 1;
 dofile("Pilot/calibration.lua")
 
 repeat c.process() until (c.GetStartButton());
---c.StartMatch();
+c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 --c.print("Meccs elkezdodott");
 
 if (c.GetMyColor()) then
@@ -14,35 +14,52 @@ if (c.GetMyColor()) then
 	Ori = -1;
 end
 
-p.GoTo(250, Offset + Ori * 800)
+p.Go(100)
 
-p.TurnToSafe(1700, Offset + Ori * 800)
 p.GripperMove(90)
+p.TurnToSafe(350, Offset + Ori * 800)
 
-pawnInGripper = false;
-c.GoToSafe(1700, Offset + Ori * 800, 300, 500)
-repeat
-	c.process()
-until (c.PawnInGripper() or not c.MotionInProgress())
-pawnInGripper = c.PawnInGripper()
-if (c.MotionInProgress()) then
-	p.MotionStop(500)
-end
+pawnInGripper = false
+moveFinished = false
+c.runparallel(
+	function()
+		p.GoToSafe(350, Offset + Ori * 800)
+		if (not pawnInGripper) then
+			p.GripperMove(0)
+			p.TurnToSafe(1700, Offset + Ori * 800)
+			p.GripperMove(90)
+			p.GoToSafe(1700, Offset + Ori * 800, 300, 500)
+		end
+		moveFinished = true
+	end,
+	function()
+		repeat
+			c.process()
+		until (c.PawnInGripper() or moveFinished)
+		pawnInGripper = c.PawnInGripper()
+		if (c.MotionInProgress()) then
+			c.print("Parasztot talaltam!")
+			p.MotionStop(500)
+		end
+	end
+)
 
-p.sleep(1000)
+c.print("Varunk...")
+p.sleep(100)
 
 if (pawnInGripper) then
 	x, y, phi = c.GetRobotPos()
-	p.GoSafe(-ROBOT_FRONT_MAX)
+	c.print(x, y, phi)
+	p.GoSafe(-200)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(3, x + ROBOT_FRONT_PAWN, y)
+	x1, y1, x2, y2 = c.FindPawn(2, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
 	p.TurnTo(x2, y2)
 	p.GoTo(x2, y2)
-	p.Magnet(false, 1)
-	p.ArmMove(false, 130)
+	p.Magnet(true, 1)
+	p.ArmMove(true, 130)
 	p.sleep(10)
-	p.ArmMove(false, 0)
+	p.ArmMove(true, 0)
 end
 
 x, y, phi = c.GetRobotPos()
@@ -63,22 +80,23 @@ if (c.MotionInProgress()) then
 	p.MotionStop(500)
 end
 
-p.sleep(1000)
+p.sleep(100)
 
 if (pawnInGripper) then
 	x, y, phi = c.GetRobotPos()
 	p.GoSafe(-ROBOT_FRONT_MAX)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(2, x + ROBOT_FRONT_PAWN, y)
+	x1, y1, x2, y2 = c.FindPawn(3, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
 	p.TurnTo(x2, y2)
 	p.GoTo(x2, y2)
-	p.Magnet(true, 1)
-	p.ArmMove(true, 130)
+	p.Magnet(false, 1)
+	p.ArmMove(false, 130)
 	p.sleep(10)
-	p.ArmMove(true, 0)
+	p.ArmMove(false, 0)
 end
 
+--[[
 p.TurnTo(1200, 975)
 p.GoTo(1200, 975)
 p.TurnTo(0, 975)
@@ -93,6 +111,7 @@ function()
 	p.ArmMove(true, 130)
 	p.Magnet(true, -1)
 	p.ArmMove(true, 0)
-	p.Magnet(false, 0)
+	p.Magnet(true, 0)
 end
 )
+]]

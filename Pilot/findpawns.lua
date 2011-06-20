@@ -9,32 +9,32 @@ pawnInRightArm = false;
 -- Beszorulas feloldasa
 function resolveDeadpos(turn, go)
 	if (turn ~= 0) then
-		while (TurnSafe(turn) == 0) do Control(); end;
+		p.TurnSafe(turn)
 	end;
-	while (GoSafe(go) == 0) do Control(); end;
+	p.GoSafe(go)
 end
 -- Beszorulas feloldasa
 
 function GoToNextPawn(x, y, px, py)
-	while (SetGripperPos(0) == 0) do Control(); end;
-	while (TurnToSafe(x, y) == 0) do Control(); end;
-	while (GoToSafe(x, y) == 0) do Control(); end;
-	while (TurnToSafe(px, py) == 0) do Control(); end;
-	while (SetGripperPos(90) == 0) do Control(); end;
-	while (GoToSafe(px, py) == 0) do Control(); end;
-	if (PawnInGripper()) then
-		while (SetGripperPos(GripperGrab) == 0) do Control(); end;
+	p.GripperMove(0)
+	p.TurnToSafe(x, y)
+	p.GoToSafe(x, y)
+	p.TurnToSafe(px, py)
+	p.GripperMove(90)
+	p.GoToSafe(px, py)
+	if (c.PawnInGripper()) then
+		p.GripperMove(GripperGrab)
 		pawnInGripper = true;
-		while (GoSafe(-250) == 0) do Control(); end;
+		p.GoSafe(-250)
 	end
 end
 
 function PickNextPawnWithArm(x, y, left)
-	while (TurnToSafe(x, y) == 0) do Control(); end;
-	while (GoToSafe(x, y) == 0) do Control(); end;
-	while (SetArmPos(left, 90) == 0) do Control(); end;
-	while (Magnet(left, 1) == 0) do Control(); end;
-	while (SetArmPos(left, 0) == 0) do Control(); end;
+	p.TurnToSafe(x, y)
+	p.GoToSafe(x, y)
+	p.Magnet(left, 1)
+	p.ArmMove(left, 130)
+	p.ArmMove(left, 0)
 	if (left) then
 		pawnInLeftArm = true;
 	else
@@ -43,22 +43,23 @@ function PickNextPawnWithArm(x, y, left)
 end
 
 function DeployPawn(x1, y1, x2, y2)
-	while (SetGripperPos(GripperGrab) == 0) do Control(); end;
-	while (TurnToSafe(x1, y1) == 0) do Control(); end;
-	while (GoToSafe(x1, y1) == 0) do Control(); end;
-	while (TurnToSafe(x2, y2) == 0) do Control(); end;
-	while (SetGripperPos(90) == 0) do Control(); end;
+	p.GripperMove(GripperGrab)
+	p.TurnToSafe(x1, y1)
+	p.GoToSafe(x1, y1)
+	p.TurnToSafe(x2, y2)
+	p.GripperMove(90)
 	pawnInGripper = false;
-	while (GoSafe(-250) == 0) do Control(); end;
+	p.GoSafe(-250)
 end
 
 function DeployPawnFromArm(x1, y1, x2, y2, left)
-	while (TurnToSafe(x1, y1) == 0) do Control(); end;
-	while (GoToSafe(x1, y1) == 0) do Control(); end;
-	while (TurnToSafe(x2, y2) == 0) do Control(); end;
-	while (SetArmPos(left, 90) == 0) do Control(); end;
-	while (Magnet(left, -1) == 0) do Control(); end;
-	while (SetArmPos(left, 0) == 0) do Control(); end;
+	p.TurnToSafe(x1, y1)
+	p.GoToSafe(x1, y1)
+	p.TurnToSafe(x2, y2)
+	p.ArmMove(left, 130)
+	p.Magnet(left, -1)
+	p.ArmMove(left, 0)
+	p.Magnet(left, 0)
 	if (left) then
 		pawnInLeftArm = false;
 	else
@@ -66,62 +67,39 @@ function DeployPawnFromArm(x1, y1, x2, y2, left)
 	end
 end
 
+dofile("Pilot/calibration.lua")
 
-repeat Control(); until (MotorSupply(true) ~= 0);
-Print("Motortap bekapcsolva");
+repeat c.process() until (c.GetStartButton());
+c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
+--c.print("Meccs elkezdodott");
 
-repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-repeat Control(); until (GetStartButton());
-Print("Startgomb lenyomva felvesszuk a kezdopoziciot");
-
-repeat Control(); until (SetArmPos(true, 0) ~= 0);
-Print("Balkar behajtva");
-repeat Control(); until (SetArmPos(false, 0) ~= 0);
-Print("Jobbkar behajtva");
-repeat Control(); until (SetGripperPos(0) ~= 0);
-Print("Gripper behajtva");
-
-repeat Control(); until (CalibrateDeadreckoning() ~= 0);
-Print("Calibrate finished");
-repeat Control(); until (Sleep(2 * 1000 * 1000) ~= 0);
-
-repeat Control(); until (Go(30) ~= 0);
-x, y, phi = GetRobotPos();
-repeat Control(); until (TurnTo(x, 1500) ~= 0);
-
-repeat Control(); until (Sleep(1 * 1000 * 1000) ~= 0);
-
-repeat Control(); until (GetStartButton());
-StartMatch(false);
-Print("Meccs elkezdodott");
-
-if (GetMyColor()) then
-	Print("Kekek vagyunk");
+if (c.GetMyColor()) then
+	c.print("Kekek vagyunk");
 	Offset = 3000;
 	Ori = -1;
 end
 
-repeat Control(); until (RefreshPawnPositions() ~= 0);
+p.RefreshPawnPositions()
 
-repeat Control(); until (GoTo(250, Offset + Ori * 800) ~= 0);
+p.GoTo(250, Offset + Ori * 800)
 
 local stuck = 0;
 repeat
 	local status, err = pcall(function()
-		Print("KEZDUNK");
+		c.print("KEZDUNK");
 		local deadpos = true;
 		stuck = stuck + 1;
-		repeat Control(); until (RefreshPawnPositions() ~= 0);
+		p.RefreshPawnPositions()
 		
 		local ignoreRadius = ROBOT_FRONT_MAX + PAWN_RADIUS;
 		
 		--[[
 		while (not pawnInLeftArm) do
-			Print("Paraszt keresese bal karba");
-			repeat Control(); until (RefreshPawnPositions() ~= 0);
-			px, py, x, y, ignoreRadius = FindPawn(2, ignoreRadius);
+			c.print("Paraszt keresese bal karba");
+			p.RefreshPawnPositions()
+			px, py, x, y, ignoreRadius = c.FindPawn(2, ignoreRadius);
 			if (x) then
-				if (Simulate(PickNextPawnWithArm, x, y, true)) then
+				if (c.Simulate(PickNextPawnWithArm, x, y, true)) then
 					deadpos = false;
 					PickNextPawnWithArm(x, y, true);
 					stuck = 0;
@@ -129,38 +107,38 @@ repeat
 					ignoreRadius = ignoreRadius + 1;
 				end
 			else
-				Print("Nincs tobb paraszt bal karba");
+				c.print("Nincs tobb paraszt bal karba");
 				break;
 			end
 		end;
 		
 		while (pawnInLeftArm) do
-			Print("Paraszt uritese bal karbol");
-			x1, y1, x2, y2, target, priority = GetDeployPoint(2);
+			c.print("Paraszt uritese bal karbol");
+			x1, y1, x2, y2, target, priority = c.GetDeployPoint(2);
 			if (x1) then
-				if (Simulate(DeployPawnFromArm, x1, y1, x2, y2, true)) then
+				if (c.simulate(DeployPawnFromArm, x1, y1, x2, y2, true)) then
 					deadpos = false;
 					DeployPawnFromArm(x1, y1, x2, y2, true);
-					SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
+					c.SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
 					stuck = 0;
 				else
-					SetDeployPointPriority(target, -1);
+					c.SetDeployPointPriority(target, -1);
 					-- TODO
 				end
 			else
-				Print("Nincs tobb lerako pozicio bal karhoz")
-				Control();
+				c.print("Nincs tobb lerako pozicio bal karhoz")
+				c.process()
 				break;
 			end
 		end;
 		]]
 		
 		while (not pawnInGripper) do
-			Print("Paraszt keresese");
-			repeat Control(); until (RefreshPawnPositions() ~= 0);
-			px, py, x, y, ignoreRadius = FindPawn(1, ignoreRadius);
+			c.print("Paraszt keresese");
+			p.RefreshPawnPositions()
+			px, py, x, y, ignoreRadius = c.FindPawn(4, ignoreRadius);
 			if (x) then
-				if (Simulate(GoToNextPawn, x, y, px, py)) then
+				if (c.simulate(GoToNextPawn, x, y, px, py)) then
 					deadpos = false;
 					GoToNextPawn(x, y, px, py);
 					stuck = 0;
@@ -168,7 +146,7 @@ repeat
 					ignoreRadius = ignoreRadius + 1;
 				end
 			else
-				Print("Nincs tobb paraszt!");
+				c.print("Nincs tobb paraszt!");
 				break;
 			end
 		end;
@@ -176,23 +154,23 @@ repeat
 		local priorityChange = 1; -- ennyivel kell modositanunk a prioritast
 		local priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
 		while (pawnInGripper) do
-			Print("Paraszt uritese");
-			x1, y1, x2, y2, target, priority = GetDeployPoint(1);
+			c.print("Paraszt uritese");
+			x1, y1, x2, y2, target, priority = c.GetDeployPoint(1);
 			if (px) then
-				if (Simulate(DeployPawn, x1, y1, x2, y2)) then
+				if (c.simulate(DeployPawn, x1, y1, x2, y2)) then
 					deadpos = false;
 					DeployPawn(x1, y1, x2, y2);
-					SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
+					c.SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
 					stuck = 0;
 				else
-					SetDeployPointPriority(target, priority + priorityChange);
+					c.SetDeployPointPriority(target, priority + priorityChange);
 					if (priorityChange == priorityChanged) then
 						-- ha mar priorityChange+1 -szer modositottunk, noveljuk priorityChanget
 						priorityChange = priorityChange + 1;
 						if (priority + priorityChange >= 0) then
 							-- ha a prioritas elerne a 0-t, akkor korbeertunk, nem tudunk lerakni
-							Print("Nem tudunk egyik lerako poziciohoz sem odamenni");
-							Control();
+							c.print("Nem tudunk egyik lerako poziciohoz sem odamenni");
+							c.process();
 							break;
 						end
 						priorityChanged = 0;
@@ -201,8 +179,8 @@ repeat
 					end
 				end
 			else
-				Print("Nincs tobb lerako pozicio")
-				Control();
+				c.print("Nincs tobb lerako pozicio")
+				c.process();
 				break;
 			end
 		end;
@@ -215,14 +193,14 @@ repeat
 		if (deadpos) then
 			local deadPosResolved = false;
 			repeat
-				Print("Beragadas feloldasa");
-				repeat Control(); until (RefreshPawnPositions() ~= 0);
+				c.print("Beragadas feloldasa");
+				p.RefreshPawnPositions()
 				local turn = 0;
 				if (math.random() > 0.3) then
 					turn = (math.random() - 0.5) * math.pi * 2;
 				end
 				local go = math.random(-1000, 1000);
-				if (Simulate(resolveDeadpos, turn, go)) then
+				if (c.simulate(resolveDeadpos, turn, go)) then
 					resolveDeadpos(turn, go);
 					deadPosResolved = true;
 				end
@@ -231,8 +209,8 @@ repeat
 		
 	end);
 	if (not status) then
-		Print("Hiba", err);
-		while (MotionStop(2000) == 0) do Control(); end;
+		c.print("Hiba", err);
+		p.MotionStop(MAX_DEC)
 	end
-	Control();
-until (GetStopButton());
+	c.process()
+until (c.GetStopButton());
