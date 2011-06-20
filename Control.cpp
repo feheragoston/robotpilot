@@ -149,6 +149,8 @@ Control::Control(Config* config) {
 	lua_setfield(L, LUA_GLOBALSINDEX, "PAWN_RADIUS");
 	lua_pushnumber(L, MAX_DEC);
 	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DEC");
+	lua_pushnumber(L, GREEN_PAWN_Y);
+	lua_setfield(L, LUA_GLOBALSINDEX, "GREEN_PAWN_Y");
 
 	luaL_dostring(L, "package.path = package.path .. \";./Pilot/?.lua\"; c = control; p = require(\"pilot\");");
 
@@ -161,10 +163,10 @@ Control::Control(Config* config) {
 	for (int i = 0; i < 10; i++) {
 		if (i < 5) {
 			pawns->pawns[i].x = 690 + i * 280;
-			pawns->pawns[i].y = 300;
+			pawns->pawns[i].y = GREEN_PAWN_Y;
 		} else {
 			pawns->pawns[i].x = 690 + (i - 5) * 280;
-			pawns->pawns[i].y = 2700;
+			pawns->pawns[i].y = AREA_LENGTH - GREEN_PAWN_Y;
 		}
 		pawns->pawns[i].type = 1;
 	}
@@ -356,18 +358,24 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		mServer->Send(n, &message, sizeof(msgdeploypriority));
 
 		if (sendDynObstacles) {
-			msgobstacles obstacles;
-			obstacles.function = MSG_OBSTACLES;
-			obstacles.num = 14;
-			if (dynObstacles.size() < 14) {
-				obstacles.num = dynObstacles.size();
+			msgobstacles obs;
+			obs.function = MSG_OBSTACLES;
+			obs.num = 14;
+			if (dynObstacles.size() + obstacles.size() < 14) {
+				obs.num = dynObstacles.size() + obstacles.size();
 			}
-			std::list<Obstacle*>::iterator o = dynObstacles.begin();
-			for (int i = 0; i < obstacles.num; i++) {
-				(*o)->getObstacle(&obstacles.obstacles[i]);
-				o++;
+			std::list<Obstacle*>::iterator o = dynObstacles.end();
+			o--;
+			for (unsigned int i = 0; i < obs.num; i++) {
+				if (i == dynObstacles.size()) {
+					o = obstacles.end();
+					o--;
+				}
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o--;
 			}
-			mServer->Send(n, &obstacles, sizeof(msgobstacles));
+
+			mServer->Send(n, &obs, sizeof(msgobstacles));
 			sendDynObstacles = false;
 		}
 
@@ -1365,6 +1373,7 @@ int Control::l_StartMatch(lua_State *L) {
 
 	obstacles.push_back(new Circle(1885, offset + dir * 900, PAWN_RADIUS));
 	obstacles.push_back(new Circle(1885, offset + dir * 2300, PAWN_RADIUS));
+	sendDynObstacles = true;
 
 	return 0;
 }
@@ -1568,7 +1577,7 @@ int Control::l_GetDeployPoint(lua_State *L) {
 
 		// vedett helyek keskenyebbek, nem a kozepukre rakunk
 		if (field == 30 || field == 31 || field == 34 || field == 35) {
-			x -= 40;
+			x -= 50;
 		}
 
 		if (target == 1) {
@@ -1625,6 +1634,7 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 			// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
 			x -= 40;
 			obstacles.push_back(new Circle(x, y, 100));
+			sendDynObstacles = true;
 		} else {
 			addDynamicObstacle(new Circle(x, y, 100));
 		}

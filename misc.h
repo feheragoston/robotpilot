@@ -31,6 +31,7 @@
 #define		ROBOT_FRONT_PAWN	170		// paraszt felszedeshez a paraszt kozepetol valo tavolsag [mm]
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 #define		MAGNET_POS			265		// a magnesek tavolsaga a kozeppontbol kihajtott karral [mm]
+#define		GREEN_PAWN_Y		290		// a zold teruleten levo parasztok alapertelmezett Y koordinataja [mm]
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 
