@@ -504,11 +504,11 @@ void Control::setSafeMotion(lua_State *L) {
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
 	safeMotion = false;
-	if (ar.name != NULL) {
-		cout << "setSafeMotion: " << ar.name << endl;
-	} else {
-		cout << "setSafeMotion: NULL" << endl;
-	}
+//	if (ar.name != NULL) {
+//		cout << "setSafeMotion: " << ar.name << endl;
+//	} else {
+//		cout << "setSafeMotion: NULL" << endl;
+//	}
 	if (ar.name == NULL || strstr(ar.name, "Safe") != NULL) {
 		safeMotion = true;
 	}
@@ -1151,12 +1151,19 @@ int Control::l_RefineDeadreckoning(lua_State *L) {
 	double x, y, phi, dx, dy, dphi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	if (mCamera->RefineDeadreckoning(x, y, phi)) {
+		unsigned int time = InitTime();
 		while (mCamera->RefineDeadreckoningInProgress()) {
 			c_wait(L);
+			if (!mCamera) {
+				lua_pushboolean(L, false);
+				return 1;
+			}
 		}
+		time = InitTime() - time;
 		mCamera->GetRefineData(&dx, &dy, &dphi);
 		mPrimitives->GetRobotPos(&x, &y, &phi);
-		mPrimitives->SetRobotPos(x + dx, y + dy, phi + dphi);
+		mPrimitives->SetRobotPos(x - dx, y - dy, phi + dphi);
+		cout << "(Control) RefineDeadreckoning : " << dx << ", " << dy << ", " << dphi << ", " << time << "ms" << endl;
 		lua_pushboolean(L, true);
 		return 1;
 	}
