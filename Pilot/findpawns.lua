@@ -97,7 +97,7 @@ repeat
 		while (not pawnInLeftArm) do
 			c.print("Paraszt keresese bal karba");
 			p.RefreshPawnPositions()
-			px, py, x, y, ignoreRadius = c.FindPawn(2, 1, ignoreRadius);
+			px, py, x, y, ignoreRadius = c.FindPawn(STORAGE_LEFT, 1, ignoreRadius);
 			if (x) then
 				if (c.Simulate(PickNextPawnWithArm, x, y, true)) then
 					deadpos = false;
@@ -114,7 +114,7 @@ repeat
 		
 		while (pawnInLeftArm) do
 			c.print("Paraszt uritese bal karbol");
-			x1, y1, x2, y2, target, priority = c.GetDeployPoint(2);
+			x1, y1, x2, y2, target, priority = c.GetDeployPoint(STORAGE_LEFT);
 			if (x1) then
 				if (c.simulate(DeployPawnFromArm, x1, y1, x2, y2, true)) then
 					deadpos = false;
@@ -155,7 +155,7 @@ repeat
 		local priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
 		while (pawnInGripper) do
 			c.print("Paraszt uritese");
-			x1, y1, x2, y2, target, priority = c.GetDeployPoint(1);
+			x1, y1, x2, y2, target, priority = c.GetDeployPoint(STORAGE_GRIPPER);
 			if (x1) then
 				if (c.simulate(DeployPawn, x1, y1, x2, y2)) then
 					deadpos = false;

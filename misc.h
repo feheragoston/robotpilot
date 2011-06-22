@@ -30,8 +30,14 @@
 #define		ROBOT_FRONT_MAX		240		// a robot elejenek tavolsaga nyitott megfogoval [mm]
 #define		ROBOT_FRONT_PAWN	170		// paraszt felszedeshez a paraszt kozepetol valo tavolsag [mm]
 #define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
-#define		MAGNET_POS			265		// a magnesek tavolsaga a kozeppontbol kihajtott karral [mm]
+#define		MAGNET_POS_X		-20		// a magnesek eltolasa x tengely menten [mm]
+#define		MAGNET_POS_Y		265		// a magnesek tavolsaga a kozeppontbol kihajtott karral [mm]
 #define		GREEN_PAWN_Y		290		// a zold teruleten levo parasztok alapertelmezett Y koordinataja [mm]
+
+#define		STORAGE_NONE		0
+#define		STORAGE_GRIPPER		1
+#define		STORAGE_LEFT		2
+#define		STORAGE_RIGHT		3
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 

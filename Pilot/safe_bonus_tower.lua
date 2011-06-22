@@ -1,12 +1,12 @@
 
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
-
+--[[
 	goSpeed = 400
 	goAcc = 500
 	turnSpeed = 2
 	turnAcc = 2
-
+]]
 c.runparallel(
 function()
 	repeat
@@ -51,45 +51,62 @@ repeat
 			
 			if (not pawnInLeft) then
 				leftIR, leftPX, leftPY, leftX, leftY = SearchWithArmFromBoard(true, ignoreRadius)
+				c.print("Left:", leftIR, leftPX, leftPY, leftX, leftY)
 			end
 			if (not pawnInRight) then
 				rightIR, rightPX, rightPY, rightX, rightY = SearchWithArmFromBoard(false, ignoreRadius)
+				c.print("Right:", rightIR, rightPX, rightPY, rightX, rightY)
 			end
 			if (not pawnInGripper) then
 				ir = math.max(ignoreRadius, ROBOT_FRONT_MAX + PAWN_RADIUS)
 				if (safe1Deployed and bonus1Deployed) then
-					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, FIG_KING)
+					gripperPawnType = FIG_KING
+					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, gripperPawnType)
 				else
-					gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY = SearchWithGripperFromBoard(ir, FIG_PAWN)
-					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, FIG_PAWN)
+					gripperPawnType = FIG_PAWN
+					gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY = SearchWithGripperFromBoard(ir, gripperPawnType)
+					c.print("GripperB:", gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY)
+					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, gripperPawnType)
 				end
+				c.print("GripperG:", gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY)
 			end
 			
 			ignoreRadius = math.min(leftIR, rightIR, gripperGIR, gripperBIR)
+			c.print("ignoreRadius:", ignoreRadius)
 			if (ignoreRadius < MAX_DISTANCE) then
-				if (ignoreRadius == leftIR) then
+				if (math.abs(ignoreRadius - leftIR) < 10) then
+					c.print("Felszedes bal karral")
 					c.SetPawnType(leftPX, leftPY, FIG_WENT_OVER)
 					PickupWithArmFromBoard(true, leftX, leftY)
 					pawnInLeft = true
 					c.SetPawnType(leftPX, leftPY, FIG_PICKED_UP)
-				elseif (ignoreRadius == rightIR) then
+				elseif (math.abs(ignoreRadius - rightIR) < 10) then
+					c.print("Felszedes jobb karral")
 					c.SetPawnType(rightPX, rightPY, FIG_WENT_OVER)
 					PickupWithArmFromBoard(false, rightX, rightY)
 					pawnInRight = true
 					c.SetPawnType(rightPX, rightPY, FIG_PICKED_UP)
-				elseif (ignoreRadius == gripperBIR) then
+				elseif (math.abs(ignoreRadius - gripperBIR) < 10) then
+					c.print("Felszedes gripperrel tablarol")
 					c.SetPawnType(gripperBPX, gripperBPY, FIG_WENT_OVER)
 					if (PickupWithGripperFromBoard(gripperBX, gripperBY)) then
-						pawnInGripper = true;
+						pawnInGripper = gripperPawnType;
 						c.SetPawnType(gripperBPX, gripperBPY, FIG_PICKED_UP)
 					end
-				elseif (ignoreRadius == gripperGIR) then
+				elseif (math.abs(ignoreRadius - gripperGIR) < 10) then
+					c.print("Felszedes gripperrel zold mezorol")
 					c.SetPawnType(gripperGPX, gripperGPY, FIG_WENT_OVER)
 					if (PickupWithGripperFromSides(gripperGPX, gripperGPY, gripperGX, gripperGY)) then
-						pawnInGripper = true;
+						pawnInGripper = gripperPawnType;
 						c.SetPawnType(gripperGPX, gripperGPY, FIG_PICKED_UP)
 					end
+				end
+				if (c.simulate(function() p.GoSafe(-250, goSpeed, goAcc); end)) then
 					p.GoSafe(-250, goSpeed, goAcc)
+				elseif (c.simulate(function() p.GoSafe(-200, goSpeed, goAcc); end)) then
+					p.GoSafe(-200, goSpeed, goAcc)
+				elseif (c.simulate(function() p.GoSafe(-100, goSpeed, goAcc); end)) then
+					p.GoSafe(-100, goSpeed, goAcc)
 				end
 				ignoreRadius = ROBOT_RADIUS;
 			end
@@ -108,12 +125,12 @@ repeat
 	while (pawnInGripper) do
 		local status, err = pcall(function()
 			c.print("Paraszt uritese");
-			x1, y1, x2, y2, target, ignorePriority = c.GetDeployPoint(1, ignorePriority);
+			x1, y1, x2, y2, target, ignorePriority = c.GetDeployPoint(STORAGE_GRIPPER, ignorePriority);
 			if (x1) then
-				if (target > 29) then
+				if (gripperPawnType == FIG_PAWN) then
 					if (c.simulate(DeployFromGripper, x1, y1, x2, y2)) then
 						DeployFromGripper(x1, y1, x2, y2);
-						c.SetDeployPointPriority(target, 1); -- jeloljuk, hogy a mezo foglalt
+						c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- jeloljuk, hogy a mezo foglalt
 						pawnInGripper = false
 						if (target == 30 or target == 35) then
 							safe1Deployed = true
@@ -128,12 +145,12 @@ repeat
 					end
 				else
 					if (pawnInLeft) then
-						x1, y1, x2, y2, dist = c.FindPawn(2, 1, x2, y2)
+						x1, y1, x2, y2, dist = c.FindPawn(STORAGE_LEFT, 1, x2, y2)
 						if (x1) then
 							if (pawnInRight) then
 								if (c.simulate(DeployFullTower, x2, y2)) then
 									DeployFullTower(x2, y2)
-									c.SetDeployPointPriority(target, 1);
+									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
@@ -146,7 +163,7 @@ repeat
 							end
 						end
 					else
-						x1, y1, x2, y2, dist = c.FindPawn(3, 1, x2, y2)
+						x1, y1, x2, y2, dist = c.FindPawn(STORAGE_RIGHT, 1, x2, y2)
 						if (x1) then
 							--TODO
 						end

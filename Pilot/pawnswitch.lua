@@ -1,6 +1,6 @@
 
-arm1 = 2
-arm2 = 3
+arm1 = STORAGE_LEFT
+arm2 = STORAGE_RIGHT
 pawnInGripper = false;
 pawnInLeftArm = false;
 pawnInRightArm = false;
@@ -36,8 +36,8 @@ c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 --c.print("Meccs elkezdodott");
 
 if (c.GetMyColor()) then
-	arm1 = 3;
-	arm2 = 2;
+	arm1 = STORAGE_RIGHT;
+	arm2 = STORAGE_LEFT;
 end
 
 p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)
@@ -134,7 +134,7 @@ priorityChange = 1; -- ennyivel kell modositanunk a prioritast
 priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
 while (pawnInGripper) do
 	c.print("Paraszt uritese");
-	x1, y1, x2, y2, target, priority = c.GetDeployPoint(1);
+	x1, y1, x2, y2, target, priority = c.GetDeployPoint(STORAGE_GRIPPER);
 	if (x1) then
 		if (c.simulate(DeployPawn, x1, y1, x2, y2)) then
 			deadpos = false;
@@ -166,9 +166,9 @@ end;
 
 GoToNextPawn(1250, Offset + Ori * 690, 1250, Offset + Ori * 290)
 
-x1, y1, x2, y2, dist = c.FindPawn(2, 1, 1225, Offset + Ori * 650)
+x1, y1, x2, y2, dist = c.FindPawn(STORAGE_LEFT, 1, 1225, Offset + Ori * 650)
 if (not x1) then
-	x1, y1, x2, y2, dist = c.FindPawn(2, 1, 525, Offset + Ori * 650)
+	x1, y1, x2, y2, dist = c.FindPawn(STORAGE_LEFT, 1, 525, Offset + Ori * 650)
 end
 c.print(x1, y1, x2, y2, dist)
 p.TurnTo(x2, y2, turnSpeed, turnAcc)

@@ -27,6 +27,8 @@ extern "C" {
 #include "Obstacles/Circle.h"
 #include "Obstacles/Line.h"
 
+#define luaC_export(L,s)	lua_pushnumber(L, s); lua_setfield(L, LUA_GLOBALSINDEX, #s)
+
 class Control {
 public:
 	Control(Config* config);

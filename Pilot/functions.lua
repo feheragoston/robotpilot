@@ -19,7 +19,7 @@ end
 function SearchWithGripperFromBoard(ignoreRadius, type)
 	local px, py, x, y
 	while (true) do
-		px, py, x, y, ignoreRadius = c.FindPawn(1, type, ignoreRadius);
+		px, py, x, y, ignoreRadius = c.FindPawn(STORAGE_GRIPPER, type, ignoreRadius);
 		if (x) then
 			-- a zold mezokrol nem keresunk
 			if (py > 400 and py < 2600 and c.simulate(PickupWithGripperFromBoard, x, y)) then
@@ -74,10 +74,10 @@ function PickupWithArmFromBoard(left, x, y)
 end
 
 function SearchWithArmFromBoard(left, ignoreRadius)
-	local arm = 3
+	local arm = STORAGE_RIGHT
 	local px, py, x, y
 	if (left) then
-		arm = 2
+		arm = STORAGE_LEFT
 	end
 	while (true) do
 		px, py, x, y, ignoreRadius = c.FindPawn(arm, FIG_PAWN, ignoreRadius)
@@ -95,17 +95,17 @@ function SearchWithArmFromBoard(left, ignoreRadius)
 end
 
 function DeployFromArm(left)
-	p.ArmMove(left, 130, speed, acc)
+	p.ArmMove(left, 130)
 	p.Magnet(left, -1)
-	p.ArmMove(left, 0, speed, acc)
+	p.ArmMove(left, 0)
 	p.Magnet(left, 0)
 end
 
 function DeployFromGripper(x1, y1, x2, y2)
 	p.GripperMove(GripperGrab)
-	p.TurnToSafe(x1, y1)
-	p.GoToSafe(x1, y1)
-	p.TurnToSafe(x2, y2)
+	p.TurnToSafe(x1, y1, turnSpeed, turnAcc)
+	p.GoToSafe(x1, y1, goSpeed, goAcc)
+	p.TurnToSafe(x2, y2, turnSpeed, turnAcc)
 	p.GripperMove(90)
 end
 

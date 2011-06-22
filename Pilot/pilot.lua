@@ -23,7 +23,17 @@ local function Motion(motion, ...)
 		return false
 	end
 	MotionInProgress()
-	return not control.GetMotionError()
+	return (control.GetMotionError() == 0)
+end
+
+local function MotionSafe(motionSafe, ...)
+	if (not motionSafe(...)) then
+		control.music("error")
+		control.print("(pilot) MotionSafe hiba")
+		return false
+	end
+	MotionInProgress()
+	return (control.GetMotionError() == 0)
 end
 
 function Go(...)
@@ -31,7 +41,7 @@ function Go(...)
 end
 
 function GoSafe(...)
-	return Motion(control.GoSafe, ...)
+	return MotionSafe(control.GoSafe, ...)
 end
 
 function GoTo(...)
@@ -39,7 +49,7 @@ function GoTo(...)
 end
 
 function GoToSafe(...)
-	return Motion(control.GoToSafe, ...)
+	return MotionSafe(control.GoToSafe, ...)
 end
 
 function Turn(...)
@@ -47,7 +57,7 @@ function Turn(...)
 end
 
 function TurnSafe(...)
-	return Motion(control.TurnSafe, ...)
+	return MotionSafe(control.TurnSafe, ...)
 end
 
 function TurnTo(...)
@@ -55,7 +65,7 @@ function TurnTo(...)
 end
 
 function TurnToSafe(...)
-	return Motion(control.TurnToSafe, ...)
+	return MotionSafe(control.TurnToSafe, ...)
 end
 
 function MotionStop(...)

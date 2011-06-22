@@ -146,43 +146,30 @@ Control::Control(Config* config) {
 
 	luaL_register(L, "control", controllib);
 
-	lua_pushnumber(L, ROBOT_RADIUS);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_RADIUS");
-	lua_pushnumber(L, ROBOT_WIDTH);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_WIDTH");
-	lua_pushnumber(L, ROBOT_FRONT);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT");
-	lua_pushnumber(L, ROBOT_FRONT_MAX);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT_MAX");
-	lua_pushnumber(L, ROBOT_FRONT_PAWN);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_FRONT_PAWN");
-	lua_pushnumber(L, ROBOT_BACK);
-	lua_setfield(L, LUA_GLOBALSINDEX, "ROBOT_BACK");
-	lua_pushnumber(L, PAWN_RADIUS);
-	lua_setfield(L, LUA_GLOBALSINDEX, "PAWN_RADIUS");
-	lua_pushnumber(L, MAX_DEC);
-	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DEC");
-	lua_pushnumber(L, MAX_DISTANCE);
-	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DISTANCE");
-	lua_pushnumber(L, GREEN_PAWN_Y);
-	lua_setfield(L, LUA_GLOBALSINDEX, "GREEN_PAWN_Y");
+	luaC_export(L, ROBOT_RADIUS);
+	luaC_export(L, ROBOT_WIDTH);
+	luaC_export(L, ROBOT_FRONT);
+	luaC_export(L, ROBOT_FRONT_MAX);
+	luaC_export(L, ROBOT_FRONT_PAWN);
+	luaC_export(L, ROBOT_BACK);
+	luaC_export(L, PAWN_RADIUS);
+	luaC_export(L, MAX_DEC);
+	luaC_export(L, MAX_DISTANCE);
+	luaC_export(L, GREEN_PAWN_Y);
 
-	lua_pushnumber(L, FIG_NOTHING);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_NOTHING");
-	lua_pushnumber(L, FIG_PAWN);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PAWN");
-	lua_pushnumber(L, FIG_PPAWN);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PPAWN");
-	lua_pushnumber(L, FIG_KING);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_KING");
-	lua_pushnumber(L, FIG_PKING);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PKING");
-	lua_pushnumber(L, FIG_PPKING);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PPKING");
-	lua_pushnumber(L, FIG_WENT_OVER);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_WENT_OVER");
-	lua_pushnumber(L, FIG_PICKED_UP);
-	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PICKED_UP");
+	luaC_export(L, FIG_NOTHING);
+	luaC_export(L, FIG_PAWN);
+	luaC_export(L, FIG_PPAWN);
+	luaC_export(L, FIG_KING);
+	luaC_export(L, FIG_PKING);
+	luaC_export(L, FIG_PPKING);
+	luaC_export(L, FIG_WENT_OVER);
+	luaC_export(L, FIG_PICKED_UP);
+
+	luaC_export(L, STORAGE_NONE);
+	luaC_export(L, STORAGE_GRIPPER);
+	luaC_export(L, STORAGE_LEFT);
+	luaC_export(L, STORAGE_RIGHT);
 
 	luaL_dostring(L, "package.path = package.path .. \";./Pilot/?.lua\"; c = control; p = require(\"pilot\");");
 
@@ -475,20 +462,25 @@ void Control::log() {
 
 		if (logDynObstacles) {
 			logDynObstacles = false;
-			msgobstacles obstacles;
-			obstacles.function = MSG_OBSTACLES;
-			obstacles.num = 14;
-			if (dynObstacles.size() < 14) {
-				obstacles.num = dynObstacles.size();
+			msgobstacles obs;
+			obs.function = MSG_OBSTACLES;
+			obs.num = 14;
+			if (dynObstacles.size() + obstacles.size() < 14) {
+				obs.num = dynObstacles.size() + obstacles.size();
 			}
-			std::list<Obstacle*>::iterator o = dynObstacles.begin();
-			for (int i = 0; i < obstacles.num; i++) {
-				(*o)->getObstacle(&obstacles.obstacles[i]);
-				o++;
+			std::list<Obstacle*>::iterator o = dynObstacles.end();
+			o--;
+			for (unsigned int i = 0; i < obs.num; i++) {
+				if (i == dynObstacles.size()) {
+					o = obstacles.end();
+					o--;
+				}
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o--;
 			}
 			size = sizeof(msgobstacles);
 			write(logfile, &size, sizeof(msglen_t));
-			write(logfile, &obstacles, size);
+			write(logfile, &obs, size);
 		}
 
 		if (logPawns) {
@@ -512,6 +504,11 @@ void Control::setSafeMotion(lua_State *L) {
 	lua_getstack(L, 0, &ar);
 	lua_getinfo(L, "nS", &ar);
 	safeMotion = false;
+	if (ar.name != NULL) {
+		cout << "setSafeMotion: " << ar.name << endl;
+	} else {
+		cout << "setSafeMotion: NULL" << endl;
+	}
 	if (ar.name == NULL || strstr(ar.name, "Safe") != NULL) {
 		safeMotion = true;
 	}
@@ -1516,11 +1513,11 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
  * FindPawn(target, type, px, py)
  *
  * target:
- * 0: paraszt koordinatainak visszaadasa
- * 1: koordinatak gripperes felszedeshez
- * 2: koordinatak bal karhoz
- * 3: koordinatak jobb karhoz
- * 4: koordinatak oldalso parasztokhoz
+ * STORAGE_NONE: paraszt koordinatainak visszaadasa
+ * STORAGE_GRIPPER: koordinatak gripperes felszedeshez
+ * STORAGE_LEFT: koordinatak bal karhoz
+ * STORAGE_RIGHT: koordinatak jobb karhoz
+ * 4: koordinatak oldalso parasztok gripperes felszedesehez
  *
  * ignoreRadius: minimum tavolsag, ami folott keressuk
  * a legkozelebbi babut
@@ -1573,7 +1570,7 @@ int Control::l_FindPawn(lua_State *L) {
 		px = lua_tonumber(L, 3);
 		py = lua_tonumber(L, 4);
 		minDist = sqrt(sqr(px - x) + sqr(py - y));
-		if (minDist < MAGNET_POS) {
+		if (minDist < MAGNET_POS_Y) {
 			lua_pushboolean(L, false);
 			return 1;
 		}
@@ -1581,20 +1578,20 @@ int Control::l_FindPawn(lua_State *L) {
 
 	lua_pushnumber(L, px);
 	lua_pushnumber(L, py);
-	if (target == 1) {
+	if (target == STORAGE_GRIPPER) {
 		double angle = atan2f(y - py, x - px);
 		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, minDist);
 		return 5;
-	} else if (target == 2) {
-		double c2 = sqr(x - px) + sqr(y - py);
+	} else if (target == STORAGE_LEFT) {
+		double c2 = sqr(px - x) + sqr(py - y);
 		if (c2 < EPSILON) {
 			cout << "(Control) Tul kicsi tavolsag: " << c2 << endl;
 			c2 = EPSILON;
 		}
-		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
-		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + x;
+		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + y;
 		double alpha = atan2(dy - y, dx - x);
 		dx += 20 * cos(alpha);
 		dy += 20 * sin(alpha);
@@ -1602,13 +1599,13 @@ int Control::l_FindPawn(lua_State *L) {
 		lua_pushnumber(L, dy);
 		lua_pushnumber(L, minDist);
 		return 5;
-	} else if (target == 3) {
+	} else if (target == STORAGE_RIGHT) {
 		double c2 = sqr(x - px) + sqr(y - py);
-		double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
-		double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
+		double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + x;
+		double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + y;
 		double alpha = atan2(dy - y, dx - x);
-		dx += 20 * cos(alpha);
-		dy += 20 * sin(alpha);
+		dx += -MAGNET_POS_X * cos(alpha);
+		dy += -MAGNET_POS_X * sin(alpha);
 		lua_pushnumber(L, dx);
 		lua_pushnumber(L, dy);
 		lua_pushnumber(L, minDist);
@@ -1635,7 +1632,7 @@ int Control::l_SetPawnType(lua_State *L) {
 	for (int i = 0; i < pawns->num; i++) {
 		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
 				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
-			pawns->pawns[i].type = type;
+			pawns->pawns[i].type = pawns->pawns[i].type | type;
 		}
 	}
 	logPawns = true;
@@ -1643,10 +1640,10 @@ int Control::l_SetPawnType(lua_State *L) {
 }
 
 /**
- * 0: lerakohely koordinatainak visszaadasa
- * 1: koordinatak gripperes lerakashoz
- * 2: koordinatak bal karhoz
- * 3: koordinatak jobb karhoz
+ * STORAGE_NONE: lerakohely koordinatainak visszaadasa
+ * STORAGE_GRIPPER: koordinatak gripperes lerakashoz
+ * STORAGE_LEFT: koordinatak bal karhoz
+ * STORAGE_RIGHT: koordinatak jobb karhoz
  * @param L
  * @return
  */
@@ -1690,7 +1687,7 @@ int Control::l_GetDeployPoint(lua_State *L) {
 			}
 		}
 
-		if (target == 1) {
+		if (target == STORAGE_GRIPPER) {
 			double deployDistance = ROBOT_FRONT_PAWN;
 			if (x < 1050) {
 				deployDistance = -ROBOT_FRONT_PAWN;
@@ -1699,10 +1696,10 @@ int Control::l_GetDeployPoint(lua_State *L) {
 			lua_pushnumber(L, y);
 			lua_pushnumber(L, x);
 			lua_pushnumber(L, y);
-		} else if (target == 2) {
-			double deployDistance = MAGNET_POS;
+		} else if (target == STORAGE_LEFT) {
+			double deployDistance = MAGNET_POS_Y;
 			if (x < 1050) {
-				deployDistance = -MAGNET_POS;
+				deployDistance = -MAGNET_POS_Y;
 			}
 			lua_pushnumber(L, x - deployDistance);
 			lua_pushnumber(L, y);
@@ -1723,9 +1720,21 @@ int Control::l_GetDeployPoint(lua_State *L) {
 	return 6;
 }
 
+/**
+ * @param target lerakohely index
+ * @param priority uj prioritas ertek
+ * @param type lerakas tipusa:
+ * 		STORAGE_NONE: mezo kozepere
+ * 		STORAGE_GRIPPER: gripperes lerakas
+ * 		STORAGE_LEFT: bal karos lerakas
+ * 		STORAGE_RIGHT: jobb karos lerakas
+ * @param L
+ * @return
+ */
 int Control::l_SetDeployPointPriority(lua_State *L) {
 	int target = lua_tointeger(L, 1);
 	int priority = lua_tointeger(L, 2);
+	int type = luaL_optinteger(L, 3, 0);
 	if (target < 0) {
 		return 0;
 	}
@@ -1738,15 +1747,38 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 		}
 		deployFields[target] = priority;
 	} else if (priority == 1) {
-		double x = target / 6 * 350 + 175;
-		double y = target % 6 * 350 + 175 + 450;
+		double px, py;
+		double x, y, phi;
+		mPrimitives->GetRobotPos(&x, &y, &phi);
+		if (type == STORAGE_NONE) {
+			px = target / 6 * 350 + 175;
+			py = target % 6 * 350 + 175 + 450;
+			if (target == 30 || target == 31 || target == 34 || target == 35) {
+				// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
+				px -= 60;
+				if (target == 30 || target == 34) {
+					py += 60;
+				} else {
+					py -= 60;
+				}
+			}
+		} else if (type == STORAGE_GRIPPER) {
+			px = x + cos(phi) * ROBOT_FRONT_PAWN;
+			py = y + sin(phi) * ROBOT_FRONT_PAWN;
+		} else if (type == STORAGE_LEFT) {
+			px = x + cos(phi) * MAGNET_POS_X - sin(phi) * MAGNET_POS_Y;
+			py = y + sin(phi) * MAGNET_POS_X + cos(phi) * MAGNET_POS_Y;
+		} else if (type == STORAGE_RIGHT) {
+			px = x + cos(phi) * MAGNET_POS_X - sin(phi) * -MAGNET_POS_Y;
+			py = y + sin(phi) * MAGNET_POS_X + cos(phi) * -MAGNET_POS_Y;
+		}
+
 		if (target == 30 || target == 31 || target == 34 || target == 35) {
-			// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
-			x -= 40;
-			obstacles.push_back(new Circle(x, y, 100));
+			obstacles.push_back(new Circle(px, py, 100));
+			logDynObstacles = true;
 			sendDynObstacles = true;
 		} else {
-			addDynamicObstacle(new Circle(x, y, 100));
+			addDynamicObstacle(new Circle(px, py, 100));
 		}
 	}
 
