@@ -38,6 +38,8 @@
 #define FIG_KING 4
 #define FIG_PKING 5
 #define FIG_PPKING 6
+#define FIG_WENT_OVER 20
+#define FIG_PICKED_UP 21
 
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;

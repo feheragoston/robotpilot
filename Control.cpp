@@ -19,7 +19,7 @@ bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
-bool Control::sendDynObstacles = false;
+bool Control::sendDynObstacles = true;
 Circle* Control::opponent = NULL;
 double Control::opponent_x = -1100.;
 double Control::opponent_y = -1100.;
@@ -88,6 +88,7 @@ Control::Control(Config* config) {
 		{"process", c_process},
 		{"runparallel", c_runparallel},
 		{"simulate", c_simulate},
+		{"in_simulate", c_in_simulate},
 		{"print", c_print},
 		{"music", c_music},
 
@@ -136,6 +137,7 @@ Control::Control(Config* config) {
 		{"RefreshPawnPositionsInProgress", l_RefreshPawnPositionsInProgress},
 		{"RefreshPawnPositionsFinished", l_RefreshPawnPositionsFinished},
 		{"FindPawn", l_FindPawn},
+		{"SetPawnType", l_SetPawnType},
 		{"GetDeployPoint", l_GetDeployPoint},
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
 
@@ -160,8 +162,27 @@ Control::Control(Config* config) {
 	lua_setfield(L, LUA_GLOBALSINDEX, "PAWN_RADIUS");
 	lua_pushnumber(L, MAX_DEC);
 	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DEC");
+	lua_pushnumber(L, MAX_DISTANCE);
+	lua_setfield(L, LUA_GLOBALSINDEX, "MAX_DISTANCE");
 	lua_pushnumber(L, GREEN_PAWN_Y);
 	lua_setfield(L, LUA_GLOBALSINDEX, "GREEN_PAWN_Y");
+
+	lua_pushnumber(L, FIG_NOTHING);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_NOTHING");
+	lua_pushnumber(L, FIG_PAWN);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PAWN");
+	lua_pushnumber(L, FIG_PPAWN);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PPAWN");
+	lua_pushnumber(L, FIG_KING);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_KING");
+	lua_pushnumber(L, FIG_PKING);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PKING");
+	lua_pushnumber(L, FIG_PPKING);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PPKING");
+	lua_pushnumber(L, FIG_WENT_OVER);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_WENT_OVER");
+	lua_pushnumber(L, FIG_PICKED_UP);
+	lua_setfield(L, LUA_GLOBALSINDEX, "FIG_PICKED_UP");
 
 	luaL_dostring(L, "package.path = package.path .. \";./Pilot/?.lua\"; c = control; p = require(\"pilot\");");
 
@@ -976,6 +997,11 @@ int Control::c_simulate(lua_State *L) {
 	return 1;
 }
 
+int Control::c_in_simulate(lua_State *L) {
+	lua_pushboolean(L, simulate);
+	return 1;
+}
+
 int Control::c_print(lua_State *L) {
 	int argc = lua_gettop(L);
 	msgprint message;
@@ -1434,8 +1460,8 @@ int Control::l_StartMatch(lua_State *L) {
 		offset = 3000;
 	}
 
-	obstacles.push_back(new Circle(1885, offset + dir * 900, PAWN_RADIUS));
-	obstacles.push_back(new Circle(1885, offset + dir * 2300, PAWN_RADIUS));
+	obstacles.push_back(new Circle(1885, offset + dir * 975, PAWN_RADIUS));
+	obstacles.push_back(new Circle(1885, offset + dir * 2375, PAWN_RADIUS));
 	sendDynObstacles = true;
 
 	return 0;
@@ -1485,9 +1511,9 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 }
 
 /**
- * FindPawn(target)
- * FindPawn(target, ignoreRadius)
- * FindPawn(target, px, py)
+ * FindPawn(target, type)
+ * FindPawn(target, type, ignoreRadius)
+ * FindPawn(target, type, px, py)
  *
  * target:
  * 0: paraszt koordinatainak visszaadasa
@@ -1505,6 +1531,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
  */
 int Control::l_FindPawn(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
+	int type = luaL_optinteger(L, 2, 0);
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	int argc = lua_gettop(L);
@@ -1513,12 +1540,12 @@ int Control::l_FindPawn(lua_State *L) {
 	double py;
 	double minDist;
 
-	if (argc < 3) {
-		double ignoreRadius = luaL_optnumber(L, 2, ROBOT_FRONT_MAX);
+	if (argc < 4) {
+		double ignoreRadius = luaL_optnumber(L, 3, ROBOT_FRONT_MAX);
 		int closest = pawns->num;
 		for (int i = 0; i < pawns->num; i++) {
 			msgpawn* pawn = &(pawns->pawns[i]);
-			if (pawn->type == FIG_PAWN) {
+			if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
 				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
 				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
 				if (dist > ignoreRadius) {
@@ -1543,8 +1570,8 @@ int Control::l_FindPawn(lua_State *L) {
 			py = pawns->pawns[closest].y;
 		}
 	} else {
-		px = lua_tonumber(L, 2);
-		py = lua_tonumber(L, 3);
+		px = lua_tonumber(L, 3);
+		py = lua_tonumber(L, 4);
 		minDist = sqrt(sqr(px - x) + sqr(py - y));
 		if (minDist < MAGNET_POS) {
 			lua_pushboolean(L, false);
@@ -1556,8 +1583,8 @@ int Control::l_FindPawn(lua_State *L) {
 	lua_pushnumber(L, py);
 	if (target == 1) {
 		double angle = atan2f(y - py, x - px);
-		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 20));
-		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 20));
+		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
+		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, minDist);
 		return 5;
 	} else if (target == 2) {
@@ -1601,6 +1628,20 @@ int Control::l_FindPawn(lua_State *L) {
 	}
 }
 
+int Control::l_SetPawnType(lua_State *L) {
+	float x = lua_tonumber(L, 1);
+	float y = lua_tonumber(L, 2);
+	int type = luaL_optinteger(L, 3, -1);
+	for (int i = 0; i < pawns->num; i++) {
+		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
+				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
+			pawns->pawns[i].type = type;
+		}
+	}
+	logPawns = true;
+	return 0;
+}
+
 /**
  * 0: lerakohely koordinatainak visszaadasa
  * 1: koordinatak gripperes lerakashoz
@@ -1611,6 +1652,7 @@ int Control::l_FindPawn(lua_State *L) {
  */
 int Control::l_GetDeployPoint(lua_State *L) {
 	int target = luaL_optinteger(L, 1, 0);
+	int ignorePriority = luaL_optinteger(L, 2, -1000);
 
 	bool color = mPrimitives->GetMyColor();
 
@@ -1627,7 +1669,7 @@ int Control::l_GetDeployPoint(lua_State *L) {
 	for (int i = 0; i < 36; i++) {
 		int d = (i / 6 + i % 6) % 2;
 		if ((color && d == 0) || (!color && d == 1)) {
-			if (deployFields[i] < min) {
+			if (deployFields[i] < min && deployFields[i] > ignorePriority) {
 				min = deployFields[i];
 				field = i;
 			}
@@ -1641,6 +1683,11 @@ int Control::l_GetDeployPoint(lua_State *L) {
 		// vedett helyek keskenyebbek, nem a kozepukre rakunk
 		if (field == 30 || field == 31 || field == 34 || field == 35) {
 			x -= 60;
+			if (field == 30 || field == 34) {
+				y += 60;
+			} else {
+				y -= 60;
+			}
 		}
 
 		if (target == 1) {

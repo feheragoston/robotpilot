@@ -14,12 +14,14 @@ if (CALIBRATED == nil) then
 	GripperHold = 55
 
 	p.sleep(1000)
+	
+	repeat c.process() until (c.GetStartButton());
+	c.print("Startgomb lenyomva, elkezdjuk a kalibraciot");
+
 	c.SetMotorSupply(true)
 	c.print("Motortap bekapcsolva");
 	
 	p.sleep(2000)
-	repeat c.process() until (c.GetStartButton());
-	c.print("Startgomb lenyomva felvesszuk a kezdopoziciot");
 	
 	p.Magnet(true, 0)
 	p.Magnet(false, 0)

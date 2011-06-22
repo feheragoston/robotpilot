@@ -82,7 +82,7 @@ if (pawnInGripper) then
 	c.print(x, y, phi)
 	p.GoSafe(-200, goSpeed, goAcc)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(arm1, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
+	x1, y1, x2, y2 = c.FindPawn(arm1, 1, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
 	p.TurnToSafe(x2, y2, turnSpeed, turnAcc)
 	p.GoToSafe(x2, y2, goSpeed, goAcc)
@@ -117,7 +117,7 @@ if (pawnInGripper) then
 	x, y, phi = c.GetRobotPos()
 	p.GoSafe(-ROBOT_FRONT_MAX, goSpeed, goAcc)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(arm2, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
+	x1, y1, x2, y2 = c.FindPawn(arm2, 1, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
 	p.TurnTo(x2, y2, turnSpeed, turnAcc)
 	p.GoTo(x2, y2, goSpeed, goAcc)
@@ -166,9 +166,9 @@ end;
 
 GoToNextPawn(1250, Offset + Ori * 690, 1250, Offset + Ori * 290)
 
-x1, y1, x2, y2, dist = c.FindPawn(2, 1225, Offset + Ori * 650)
+x1, y1, x2, y2, dist = c.FindPawn(2, 1, 1225, Offset + Ori * 650)
 if (not x1) then
-	x1, y1, x2, y2, dist = c.FindPawn(2, 525, Offset + Ori * 650)
+	x1, y1, x2, y2, dist = c.FindPawn(2, 1, 525, Offset + Ori * 650)
 end
 c.print(x1, y1, x2, y2, dist)
 p.TurnTo(x2, y2, turnSpeed, turnAcc)
@@ -190,7 +190,7 @@ function()
 	p.Magnet(false, 0)
 end,
 function()
-	p.GripperMove(gripperHold)
+	p.GripperMove(GripperHold)
 	p.ConsoleMove(120)
 end)
 

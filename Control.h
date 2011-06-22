@@ -126,6 +126,7 @@ protected:
 	static int c_process(lua_State *L);
 	static int c_runparallel(lua_State *L);
 	static int c_simulate(lua_State *L);
+	static int c_in_simulate(lua_State *L);
 	static int c_print(lua_State *L);
 	static int c_music(lua_State *L);
 
@@ -172,6 +173,7 @@ protected:
 	static int l_RefreshPawnPositionsInProgress(lua_State *L);
 	static int l_RefreshPawnPositionsFinished(lua_State *L);
 	static int l_FindPawn(lua_State *L);
+	static int l_SetPawnType(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
 	static int l_SetDeployPointPriority(lua_State *L);
 };

@@ -31,7 +31,7 @@ end
 
 p.GoTo(250, Offset + Ori * 800)
 
-x1, y1, x2, y2 = c.FindPawn(3)
+x1, y1, x2, y2 = c.FindPawn(3, 1)
 p.TurnTo(x2, y2)
 p.GoTo(x2, y2)
 
