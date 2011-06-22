@@ -16,84 +16,54 @@ local function MotionInProgress()
 	end
 end
 
-function Go(...)
-	if (control.Go(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) Go hiba")
-		return false
+local function Motion(motion, ...)
+	if (not motion(...)) then
+		control.music("error")
+		pilot.sleep(100)
+		if (not motion(...)) then
+			control.music("error")
+			pilot.sleep(1000)
+			if (not motion(...)) then
+				control.music("error")
+				control.print("(pilot) Motion hiba")
+				return false
+			end
+		end
 	end
-	return true
+	MotionInProgress()
+	return not control.GetMotionError()
+end
+
+function Go(...)
+	return Motion(control.Go, ...)
 end
 
 function GoSafe(...)
-	if (control.GoSafe(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) GoSafe hiba")
-		return false
-	end
-	return true
+	return Motion(control.GoSafe, ...)
 end
 
 function GoTo(...)
-	if (control.GoTo(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) GoTo hiba")
-		return false
-	end
-	return true
+	return Motion(control.GoTo, ...)
 end
 
 function GoToSafe(...)
-	if (control.GoToSafe(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) GoToSafe hiba")
-		return false
-	end
-	return true
+	return Motion(control.GoToSafe, ...)
 end
 
 function Turn(...)
-	if (control.Turn(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) Turn hiba")
-		return false
-	end
-	return true
+	return Motion(control.Turn, ...)
 end
 
 function TurnSafe(...)
-	if (control.TurnSafe(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) TurnSafe hiba")
-		return false
-	end
-	return true
+	return Motion(control.TurnSafe, ...)
 end
 
 function TurnTo(...)
-	if (control.TurnTo(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) TurnTo hiba")
-		return false
-	end
-	return true
+	return Motion(control.TurnTo, ...)
 end
 
 function TurnToSafe(...)
-	if (control.TurnToSafe(...)) then
-		MotionInProgress()
-	else
-		control.print("(pilot) TurnToSafe hiba")
-		return false
-	end
-	return true
+	return Motion(control.TurnToSafe, ...)
 end
 
 function MotionStop(...)
@@ -174,8 +144,6 @@ function RefreshPawnPositions(...)
 			control.process()
 		end
 		return control.RefreshPawnPositionsFinished()
-	else
-		control.print("(pilot) RefreshPawnPositions hiba")
 	end
 	return false
 end

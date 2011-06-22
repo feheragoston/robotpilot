@@ -1,6 +1,7 @@
 #include "Net.h"
 
 Net::Net() {
+	s = 0;
 }
 
 Net::~Net() {
@@ -32,6 +33,7 @@ void Net::CloseConnection() {
 	//Close the socket if it exists
 	if (s > 0)
 		close(s);
+	s = 0;
 }
 
 bool Net::IsConnected() {

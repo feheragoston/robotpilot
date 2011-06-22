@@ -133,14 +133,16 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		posRefine.inprogress = false;
 	} else if (*function == MSG_PAWNS && size == sizeof(msgpawns)) {
 		msgpawns* data = (msgpawns*) buffer;
-		pawns->num = data->num;
-		for (int i = 0; i < data->num; i++) {
-			pawns->pawns[i].type = data->pawns[i].type;
-			pawns->pawns[i].x = data->pawns[i].x;
-			pawns->pawns[i].y = data->pawns[i].y;
+		if (pawns->num <= 19) {
+			pawns->num = data->num;
+			for (int i = 0; i < data->num; i++) {
+				pawns->pawns[i].type = data->pawns[i].type;
+				pawns->pawns[i].x = data->pawns[i].x;
+				pawns->pawns[i].y = data->pawns[i].y;
+			}
+			pawnRefresh.finished = true;
 		}
 		pawnRefresh.inprogress = false;
-		pawnRefresh.finished = true;
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
 		return false;
@@ -364,7 +366,8 @@ bool PrimitivesNet::RefreshPawnPositions(msgpawns* pawns, double x, double y, do
 		return false;
 	}
 	msgd3 message;
-	message.function = MSG_PAWNS;
+	//message.function = MSG_PAWNS;
+	message.function = MSG_PAWNS_AT_START;
 	message.d1 = x;
 	message.d2 = y;
 	message.d3 = phi;

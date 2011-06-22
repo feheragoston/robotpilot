@@ -8,6 +8,7 @@
 #include "Server.h"
 
 Server::Server() {
+	sockfd = 0;
 	m_messageCallback = 0;
 	listening = false;
 	for (int i = 0; i < MAX_CONNECTIONS; i++) {

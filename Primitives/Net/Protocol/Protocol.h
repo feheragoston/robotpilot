@@ -30,6 +30,7 @@
 #define MSG_POSREFINE 17
 #define MSG_PRINT 18
 #define MSG_OBSTACLES 19
+#define MSG_PAWNS_AT_START 20
 
 #define FIG_NOTHING 0
 #define FIG_PAWN 1

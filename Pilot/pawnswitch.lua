@@ -1,7 +1,6 @@
 
-Offset = 0;
-Ori = 1;
-GripperGrab = 67;
+arm1 = 2
+arm2 = 3
 pawnInGripper = false;
 pawnInLeftArm = false;
 pawnInRightArm = false;
@@ -10,26 +9,26 @@ dofile("Pilot/calibration.lua")
 
 function GoToNextPawn(x, y, px, py)
 	p.GripperMove(0)
-	p.TurnToSafe(x, y)
-	p.GoToSafe(x, y)
-	p.TurnToSafe(px, py)
+	p.TurnToSafe(x, y, turnSpeed, turnAcc)
+	p.GoToSafe(x, y, goSpeed, goAcc)
+	p.TurnToSafe(px, py, turnSpeed, turnAcc)
 	p.GripperMove(90)
-	p.GoToSafe(px, py)
+	p.GoToSafe(px, py, goSpeed, goAcc)
 	if (c.PawnInGripper()) then
 		p.GripperMove(GripperGrab)
 		pawnInGripper = true;
-		p.GoSafe(-250)
+		p.GoSafe(-250, goSpeed, goAcc)
 	end
 end
 
 function DeployPawn(x1, y1, x2, y2)
 	p.GripperMove(GripperGrab)
-	p.TurnToSafe(x1, y1)
-	p.GoToSafe(x1, y1)
-	p.TurnToSafe(x2, y2)
+	p.TurnToSafe(x1, y1, turnSpeed, turnAcc)
+	p.GoToSafe(x1, y1, goSpeed, goAcc)
+	p.TurnToSafe(x2, y2, turnSpeed, turnAcc)
 	p.GripperMove(90)
 	pawnInGripper = false;
-	p.GoSafe(-250)
+	p.GoSafe(-250, goSpeed, goAcc)
 end
 
 repeat c.process() until (c.GetStartButton());
@@ -37,24 +36,25 @@ c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 --c.print("Meccs elkezdodott");
 
 if (c.GetMyColor()) then
-	c.print("Kekek vagyunk");
-	Offset = 3000;
-	Ori = -1;
+	arm1 = 3;
+	arm2 = 2;
 end
 
-p.Go(100)
+p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)
+p.GoTo(200, Offset + Ori * 400, goSpeed, goAcc)
 
 p.GripperMove(90)
-p.TurnToSafe(350, Offset + Ori * 800)
+p.TurnToSafe(350, Offset + Ori * 800, turnSpeed, 4)
 
 pawnInGripper = false
 moveFinished = false
 c.runparallel(
+	1000,
 	function()
 		p.GoToSafe(350, Offset + Ori * 800)
 		if (not pawnInGripper) then
 			p.GripperMove(0)
-			p.TurnToSafe(1700, Offset + Ori * 800)
+			p.TurnToSafe(1700, Offset + Ori * 800, turnSpeed, turnAcc)
 			p.GripperMove(90)
 			p.GoToSafe(1700, Offset + Ori * 800, 300, 500)
 		end
@@ -65,8 +65,10 @@ c.runparallel(
 			c.process()
 		until (c.PawnInGripper() or moveFinished)
 		pawnInGripper = c.PawnInGripper()
-		if (c.MotionInProgress()) then
+		if (pawnInGripper) then
 			c.print("Parasztot talaltam!")
+		end
+		if (c.MotionInProgress()) then
 			p.MotionStop(500)
 		end
 	end
@@ -78,30 +80,31 @@ p.sleep(100)
 if (pawnInGripper) then
 	x, y, phi = c.GetRobotPos()
 	c.print(x, y, phi)
-	p.GoSafe(-200)
+	p.GoSafe(-200, goSpeed, goAcc)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(2, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
+	x1, y1, x2, y2 = c.FindPawn(arm1, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
-	p.TurnTo(x2, y2)
-	p.GoTo(x2, y2)
-	p.Magnet(true, 1)
-	p.ArmMove(true, 130)
+	p.TurnToSafe(x2, y2, turnSpeed, turnAcc)
+	p.GoToSafe(x2, y2, goSpeed, goAcc)
+	p.Magnet(not c.GetMyColor(), 1)
+	p.ArmMove(not c.GetMyColor(), 130)
 	p.sleep(10)
-	p.ArmMove(true, 0)
+	p.ArmMove(not c.GetMyColor(), 0)
+	p.Go(-100, goSpeed, goAcc)
 end
 
 x, y, phi = c.GetRobotPos()
-p.TurnToSafe(x, Offset + Ori * 800)
-p.GoToSafe(x, Offset + Ori * 800)
+p.TurnToSafe(x, Offset + Ori * 800, turnSpeed, turnAcc)
+p.GoToSafe(x, Offset + Ori * 800, goSpeed, goAcc)
 
 pawnInGripper = false;
-p.TurnToSafe(1700, Offset + Ori * 800)
+p.TurnToSafe(1700, Offset + Ori * 800, turnSpeed, turnAcc)
 p.GripperMove(90)
 
 pawnInGripper = false;
 c.GoToSafe(1700, Offset + Ori * 800, 300, 500)
 repeat
-	c.process()
+	c.process(1000)
 until (c.PawnInGripper() or not c.MotionInProgress())
 pawnInGripper = c.PawnInGripper()
 if (c.MotionInProgress()) then
@@ -112,19 +115,20 @@ p.sleep(100)
 
 if (pawnInGripper) then
 	x, y, phi = c.GetRobotPos()
-	p.GoSafe(-ROBOT_FRONT_MAX)
+	p.GoSafe(-ROBOT_FRONT_MAX, goSpeed, goAcc)
 	p.GripperMove(0)
-	x1, y1, x2, y2 = c.FindPawn(3, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
+	x1, y1, x2, y2 = c.FindPawn(arm2, x + ROBOT_FRONT_PAWN * math.cos(phi), y + ROBOT_FRONT_PAWN * math.sin(phi))
 	c.print(x1, y1, x2, y2)
-	p.TurnTo(x2, y2)
-	p.GoTo(x2, y2)
-	p.Magnet(false, 1)
-	p.ArmMove(false, 130)
+	p.TurnTo(x2, y2, turnSpeed, turnAcc)
+	p.GoTo(x2, y2, goSpeed, goAcc)
+	p.Magnet(c.GetMyColor(), 1)
+	p.ArmMove(c.GetMyColor(), 130)
 	p.sleep(10)
-	p.ArmMove(false, 0)
+	p.ArmMove(c.GetMyColor(), 0)
+	p.Go(-100, goSpeed, goAcc)
 end
 
-GoToNextPawn(1530, 690, 1530, 290)
+GoToNextPawn(1530, Offset + Ori * 690, 1530, Offset + Ori * 290)
 
 priorityChange = 1; -- ennyivel kell modositanunk a prioritast
 priorityChanged = 0; -- ennyiszer modositottunk mar adott priorityChange-el
@@ -160,31 +164,40 @@ while (pawnInGripper) do
 	end
 end;
 
-GoToNextPawn(1250, 690, 1250, 290)
+GoToNextPawn(1250, Offset + Ori * 690, 1250, Offset + Ori * 290)
 
-p.TurnToSafe(1200, 975)
-p.GoToSafe(1200, 975)
-p.TurnToSafe(0, 975)
+x1, y1, x2, y2, dist = c.FindPawn(2, 1225, Offset + Ori * 650)
+if (not x1) then
+	x1, y1, x2, y2, dist = c.FindPawn(2, 525, Offset + Ori * 650)
+end
+c.print(x1, y1, x2, y2, dist)
+p.TurnTo(x2, y2, turnSpeed, turnAcc)
+p.GoTo(x2, y2, goSpeed, goAcc)
 
-p.ArmMove(true, 130)
-p.Magnet(true, -1)
-p.ArmMove(true, 0)
-p.Magnet(true, 0)
+c.runparallel(
+function()
+	p.ArmMove(true, 130)
+	p.Magnet(true, -1)
+	p.ArmMove(true, 0)
+	p.Magnet(true, 0)
+	
+	p.TurnSafe(-math.pi, 4, 8)
+	p.GoSafe(30, goSpeed, goAcc)
 
-p.TurnSafe(-math.pi)
-p.GoSafe(30)
+	p.ArmMove(false, 90)
+	p.Magnet(false, -1)
+	p.ArmMove(false, 0)
+	p.Magnet(false, 0)
+end,
+function()
+	p.GripperMove(gripperHold)
+	p.ConsoleMove(120)
+end)
 
-p.ArmMove(false, 90)
-p.Magnet(false, -1)
-p.ArmMove(false, 0)
-p.Magnet(false, 0)
-
-p.GripperMove(60)
-p.ConsoleMove(110)
-p.TurnSafe(-math.pi / 2)
-p.GoSafe(130)
+p.TurnSafe(-math.pi / 2, 4, 8)
+p.GoSafe(130, goSpeed, goAcc)
 p.GripperMove(90)
-p.GoSafe(-200)
+p.GoSafe(-200, goSpeed, goAcc)
 
 --[[
 p.TurnTo(1200, 975)

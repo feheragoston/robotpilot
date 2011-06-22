@@ -1,15 +1,16 @@
-function armtest(left)
-	p.ArmMove(left, 130)
+
+function armtest(left, speed, acc)
+	p.ArmMove(left, 130, speed, acc)
 	p.Magnet(left, 1)
-	p.sleep(10)
-	p.ArmMove(left, 0)
+	--p.sleep(10)
+	p.ArmMove(left, 0, speed, acc)
 	
 	p.sleep(100)
-	p.ArmMove(left, 130)
+	p.ArmMove(left, 130, speed, acc)
 	p.Magnet(left, 0)
-	p.sleep(10)
+	--p.sleep(10)
 	p.Magnet(left, -1)
-	p.ArmMove(left, 0)
+	p.ArmMove(left, 0, speed, acc)
 	p.Magnet(left, 0)
 end
 
@@ -35,12 +36,12 @@ p.TurnTo(x2, y2)
 p.GoTo(x2, y2)
 
 c.music("starwars")
-armtest(false)
+armtest(false, 1000, 100)
 
 p.Turn(math.pi)
 p.Go(30)
 
-armtest(true)
+armtest(true, 1000, 100)
 
 
 --[[

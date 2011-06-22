@@ -2,6 +2,17 @@
 if (CALIBRATED == nil) then
 	CALIBRATED = true;
 	
+	Offset = 0
+	Ori = 1
+
+	goSpeed = 800
+	goAcc = 800
+	turnSpeed = 6
+	turnAcc = 10
+	
+	GripperGrab = 67
+	GripperHold = 55
+
 	p.sleep(1000)
 	c.SetMotorSupply(true)
 	c.print("Motortap bekapcsolva");
@@ -31,10 +42,22 @@ if (CALIBRATED == nil) then
 	p.Go(30)
 	x, y, phi = c.GetRobotPos();
 	p.TurnTo(x, 1500)
-	
-	p.Go(60)
-	
+
+	--p.Go(60)
+	if (c.GetMyColor()) then
+		p.Turn(0.4)
+	else
+		p.Turn(-0.4)
+	end
+
 	p.sleep(1000)
+
+	if (c.GetMyColor()) then
+		c.print("Kekek vagyunk");
+		Offset = 3000;
+		Ori = -1;
+	end
+
 	c.print("Calibrate finished");
 end
 -- CALIBRATE END

@@ -301,7 +301,7 @@ void Control::Run() {
 			lua_getfield(L, LUA_GLOBALSINDEX, "control");
 			lua_getfield(L, -1, "wait");
 			lua_remove(L, -2);
-			lua_pushinteger(L, 50000);
+			lua_pushinteger(L, PRIMITIVES_WAIT);
 			s = lua_pcall(L, 1, 0, 0);
 			report_errors(L, s);
 
@@ -391,7 +391,16 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		}
 
 	} else if (*function == MSG_PAWNS && size == sizeof(msgb1)) {
-		mServer->Send(n, pawns, sizeof(msgpawns));
+		msgb1* data = (msgb1*) message;
+		if (data->b1) {
+			if (connectCamera()) {
+				double x, y, phi;
+				mPrimitives->GetRobotPos(&x, &y, &phi);
+				mCamera->RefreshPawnPositions(pawns, x, y, phi);
+			}
+		} else {
+			mServer->Send(n, pawns, sizeof(msgpawns));
+		}
 	} else if (*function == MSG_VISIONTEST && size == 1) {
 		msgd3 response;
 		response.function = MSG_VISIONTEST;
@@ -737,6 +746,21 @@ bool Control::optbool(lua_State *L, int narg, bool d) {
 	return d;
 }
 
+bool Control::connectCamera() {
+	if (!mCamera) {
+		mCamera = new PrimitivesNet(mConfig);
+		if (mCamera->CameraInit()) {
+			cout << "(Control) Connected to camera" << endl;
+		} else {
+			cout << "(Control) Error connecting to camera" << endl;
+			delete mCamera;
+			mCamera = NULL;
+			return false;
+		}
+	}
+	return true;
+}
+
 int Control::c_gettimeofday(lua_State *L) {
 	gettimeofday((struct timeval*)lua_newuserdata(L, sizeof(struct timeval)), NULL);
 	return 1;
@@ -767,7 +791,7 @@ int Control::c_exit(lua_State *L) {
 }
 
 int Control::c_wait(lua_State *L) {
-	long int useconds = luaL_optinteger(L, 1, 50000);
+	long int useconds = luaL_optinteger(L, 1, PRIMITIVES_WAIT);
 
 	/* Primitives statuszfrissitest varunk */
 	if (!mPrimitives->Wait(useconds)) {
@@ -826,13 +850,16 @@ int Control::c_wait(lua_State *L) {
 }
 
 int Control::c_process(lua_State *L) {
+	long int useconds = luaL_optinteger(L, 1, PRIMITIVES_WAIT);
+
 	int i = lua_pushthread(L);
 	lua_pop(L, 1);
 	if (i == 1) {
 		lua_getfield(L, LUA_GLOBALSINDEX, "control");
 		lua_getfield(L, -1, "wait");
 		lua_remove(L, -2);
-		lua_call(L, 0, 0);
+		lua_pushinteger(L, useconds);
+		lua_call(L, 1, 0);
 		return 0;
 	} else {
 		return lua_yield(L, 0);
@@ -840,6 +867,7 @@ int Control::c_process(lua_State *L) {
 }
 
 int Control::c_runparallel(lua_State *L) {
+	long int useconds = PRIMITIVES_WAIT;
 	std::list<lua_State*> threads;
 	int argc = lua_gettop(L);
 	// parameterek sorrendjet megforditjuk
@@ -848,7 +876,11 @@ int Control::c_runparallel(lua_State *L) {
 	}
 	// vegigmegyunk a parametereken hatulrol (eredetiben elorol)
 	for (int n = 1; n <= argc; ++n) {
-		if (lua_isfunction(L, -1)) {
+		if (n == 1 &&  lua_isnumber(L, -1)) {
+			// ha az elso parameter szam, azt vesszuk varakozasnak
+			useconds = lua_tointeger(L, -1);
+			lua_pop(L, 1);
+		} else if (lua_isfunction(L, -1)) {
 			lua_State* N = lua_newthread(L); // ha funkcio, letrehozunk neki egy uj szalat
 			lua_pop(L, 1); // kiszedjuk a stackbol a letrehozott szalat
 			lua_xmove(L, N, 1); // atmozgatjuk a parameterul kapott funkciot a szalhoz
@@ -900,7 +932,8 @@ int Control::c_runparallel(lua_State *L) {
 			lua_getfield(L, LUA_GLOBALSINDEX, "control");
 			lua_getfield(L, -1, "process");
 			lua_remove(L, -2);
-			lua_call(L, 0, 0);
+			lua_pushinteger(L, useconds);
+			lua_call(L, 1, 0);
 		}
 	}
 	return 0;
@@ -1088,17 +1121,9 @@ int Control::l_CalibrateDeadreckoning(lua_State *L) {
 
 int Control::l_RefineDeadreckoning(lua_State *L) {
 	lua_settop(L, 0);
-	if (!mCamera) {
-		mCamera = new PrimitivesNet(mConfig);
-		if (mCamera->CameraInit()) {
-			cout << "(Control) Connected to camera" << endl;
-		} else {
-			cout << "(Control) Error connecting to camera" << endl;
-			delete mCamera;
-			mCamera = NULL;
-			lua_pushboolean(L, false);
-			return 1;
-		}
+	if (!connectCamera()) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
 	double x, y, phi, dx, dy, dphi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1135,6 +1160,13 @@ int Control::l_Go(lua_State *L) {
 	double distance = luaL_optnumber(L, 1, 1000);
 	double speed = luaL_optnumber(L, 2, 500);
 	double acc = luaL_optnumber(L, 3, 200);
+
+	if (isnan(distance)) {
+		cout << "(Control) Go(nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
 	if (mPrimitives->Go(distance, speed, acc)) {
 		setSafeMotion(L);
 		lua_pushboolean(L, true);
@@ -1149,6 +1181,13 @@ int Control::l_GoTo(lua_State *L) {
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 500);
 	double acc = luaL_optnumber(L, 4, 200);
+
+	if (isnan(x) || isnan(y)) {
+		cout << "(Control) GoTo(nan, nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
 	if (mPrimitives->GoTo(x, y, speed, acc)) {
 		setSafeMotion(L);
 		lua_pushboolean(L, true);
@@ -1162,6 +1201,13 @@ int Control::l_Turn(lua_State *L) {
 	double angle = luaL_optnumber(L, 1, M_PI_2);
 	double speed = luaL_optnumber(L, 2, 2);
 	double acc = luaL_optnumber(L, 3, 2);
+
+	if (isnan(angle)) {
+		cout << "(Control) Turn(nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
 	if (mPrimitives->Turn(angle, speed, acc)) {
 		setSafeMotion(L);
 		lua_pushboolean(L, true);
@@ -1176,6 +1222,12 @@ int Control::l_TurnTo(lua_State *L) {
 	double y = lua_tonumber(L, 2);
 	double speed = luaL_optnumber(L, 3, 2);
 	double acc = luaL_optnumber(L, 4, 2);
+
+	if (isnan(x) || isnan(y)) {
+		cout << "(Control) TurnTo(nan, nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
 
 	double mx, my, mphi;
 	mPrimitives->GetRobotPos(&mx, &my, &mphi);
@@ -1334,7 +1386,7 @@ int Control::l_ArmMove(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	double pos = luaL_optnumber(L, 2, 0);
 	double speed = luaL_optnumber(L, 3, 1000);
-	double acc = luaL_optnumber(L, 4, 100);
+	double acc = luaL_optnumber(L, 4, 850);
 	lua_pushboolean(L, mPrimitives->ArmMove(left, pos, speed, acc));
 	return 1;
 }
@@ -1390,17 +1442,9 @@ int Control::l_StartMatch(lua_State *L) {
 }
 
 int Control::l_RefreshPawnPositions(lua_State *L) {
-	if (!mCamera) {
-		mCamera = new PrimitivesNet(mConfig);
-		if (mCamera->CameraInit()) {
-			cout << "(Control) Connected to camera" << endl;
-		} else {
-			cout << "(Control) Error connecting to camera" << endl;
-			delete mCamera;
-			mCamera = NULL;
-			lua_pushboolean(L, false);
-			return 1;
-		}
+	if (!connectCamera()) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1502,6 +1546,10 @@ int Control::l_FindPawn(lua_State *L) {
 		px = lua_tonumber(L, 2);
 		py = lua_tonumber(L, 3);
 		minDist = sqrt(sqr(px - x) + sqr(py - y));
+		if (minDist < MAGNET_POS) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
 	}
 
 	lua_pushnumber(L, px);
@@ -1514,6 +1562,10 @@ int Control::l_FindPawn(lua_State *L) {
 		return 5;
 	} else if (target == 2) {
 		double c2 = sqr(x - px) + sqr(y - py);
+		if (c2 < EPSILON) {
+			cout << "(Control) Tul kicsi tavolsag: " << c2 << endl;
+			c2 = EPSILON;
+		}
 		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + x;
 		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS)) + y;
 		double alpha = atan2(dy - y, dx - x);
@@ -1588,7 +1640,7 @@ int Control::l_GetDeployPoint(lua_State *L) {
 
 		// vedett helyek keskenyebbek, nem a kozepukre rakunk
 		if (field == 30 || field == 31 || field == 34 || field == 35) {
-			x -= 50;
+			x -= 60;
 		}
 
 		if (target == 1) {

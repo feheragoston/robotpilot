@@ -19,7 +19,8 @@ end
 
 p.RefreshPawnPositions()
 
-p.Go(100)
+p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)
+p.GoTo(200, Offset + Ori * 400, goSpeed, goAcc)
 
 function go1()
 	p.TurnToSafe(350, Offset + Ori * 800, TurnSpeed, TurnAcc)

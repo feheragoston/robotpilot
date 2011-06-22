@@ -116,6 +116,8 @@ protected:
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
 
+	static bool connectCamera();
+
 	static int c_gettimeofday(lua_State *L);
 	static int c_getelapsedtime(lua_State *L);
 

@@ -30,7 +30,7 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	analog_has_long_sharp[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]		= true;
 	analog_has_long_sharp[INPUT_ANALOG_LEFT_HIGH_SHARP_INDEX]		= false;
 	analog_has_long_sharp[INPUT_ANALOG_LEFT_LOW_SHARP_INDEX]		= false;
-	analog_has_long_sharp[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]		= false;
+	analog_has_long_sharp[INPUT_ANALOG_RIGHT_HIGH_SHARP_INDEX]		= true;
 	analog_has_long_sharp[INPUT_ANALOG_RIGHT_LOW_SHARP_INDEX]		= false;
 	analog_has_long_sharp[INPUT_ANALOG_PLUS_0_INDEX]				= false;
 
