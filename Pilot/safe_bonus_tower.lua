@@ -139,7 +139,6 @@ repeat
 						elseif (target == 31 or target == 34) then
 							safe2Deployed = true
 						end
-						p.GoSafe(-250)
 					else
 						--
 					end
@@ -154,21 +153,43 @@ repeat
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
-									p.GoSafe(-200, goSpeed, goAcc)
-									p.GripperMove(0)
-									p.ConsoleMove(0)
 								end
 							else
-								--TODO
+								if (c.simulate(DeployHalfTower, true, x2, y2)) then
+									DeployHalfTower(true, x2, y2)
+									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									pawnInLeft = false;
+									pawnInGripper = false;
+								end
 							end
 						end
 					else
 						x1, y1, x2, y2, dist = c.FindPawn(STORAGE_RIGHT, 1, x2, y2)
 						if (x1) then
-							--TODO
+							if (c.simulate(DeployHalfTower, false, x2, y2)) then
+								DeployHalfTower(false, x2, y2)
+								c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+								pawnInRight = false;
+								pawnInGripper = false;
+							end
 						end
 					end
 				end
+				
+				c.runparallel(
+				function()
+					if (c.simulate(function() p.GoSafe(-250, goSpeed, goAcc); end)) then
+						p.GoSafe(-250, goSpeed, goAcc)
+					elseif (c.simulate(function() p.GoSafe(-200, goSpeed, goAcc); end)) then
+						p.GoSafe(-200, goSpeed, goAcc)
+					elseif (c.simulate(function() p.GoSafe(-100, goSpeed, goAcc); end)) then
+						p.GoSafe(-100, goSpeed, goAcc)
+					end
+					p.GripperMove(0)
+				end,
+				function()
+					p.ConsoleMove(0)
+				end)
 			else
 				c.print("Nincs tobb lerako pozicio")
 				c.process()

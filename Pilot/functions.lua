@@ -39,8 +39,15 @@ function PickupWithGripperFromSides(px, py, x, y)
 	p.GoToSafe(x, y, goSpeed, goAcc)
 	p.TurnToSafe(px, py, turnSpeed, turnAcc)
 	p.GripperMove(90)
-	p.GoToSafe(px, py, goSpeed, 500)
-	if (c.PawnInGripper()) then
+	c.GoToSafe(px, py, goSpeed, 500)
+	repeat
+		c.process()
+	until (c.PawnInGripper() or not c.MotionInProgress())
+	local pawnInGripper = c.PawnInGripper()
+	if (c.MotionInProgress()) then
+		p.MotionStop(500)
+	end
+	if (pawnInGripper) then
 		p.GripperMove(GripperGrab)
 		return true
 	end
@@ -134,6 +141,31 @@ function DeployFullTower(x, y)
 	end)
 	
 	p.TurnSafe(-math.pi / 2, 4, 8)
+	p.GoSafe(130, goSpeed, goAcc)
+	p.GripperMove(90)
+end
+
+function DeployHalfTower(left, x, y)
+	p.TurnToSafe(x, y, turnSpeed, turnAcc)
+	p.GoToSafe(x, y, goSpeed, goAcc)
+	
+	c.runparallel(
+	function()
+		p.ArmMove(left, 130)
+		p.Magnet(left, -1)
+		p.ArmMove(left, 0)
+		p.Magnet(left, 0)
+	end,
+	function()
+		p.GripperMove(GripperHold)
+		p.ConsoleMove(70)
+	end)
+	
+	if (left) then
+		p.TurnSafe(math.pi / 2, 4, 8)
+	else
+		p.TurnSafe(-math.pi / 2, 4, 8)
+	end
 	p.GoSafe(130, goSpeed, goAcc)
 	p.GripperMove(90)
 end
