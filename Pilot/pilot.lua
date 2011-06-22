@@ -19,16 +19,8 @@ end
 local function Motion(motion, ...)
 	if (not motion(...)) then
 		control.music("error")
-		pilot.sleep(100)
-		if (not motion(...)) then
-			control.music("error")
-			pilot.sleep(1000)
-			if (not motion(...)) then
-				control.music("error")
-				control.print("(pilot) Motion hiba")
-				return false
-			end
-		end
+		control.print("(pilot) Motion hiba")
+		return false
 	end
 	MotionInProgress()
 	return not control.GetMotionError()
