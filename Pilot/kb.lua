@@ -6,7 +6,7 @@ turnAcc = 10
 
 c.music("start")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.print("Startgomb lenyomva, kalibrálunk");
 
 p.sleep(1000)
@@ -28,7 +28,7 @@ c.CalibrateConsole();
 
 c.music("calibrate")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.print("Startgomb lenyomva, indulunk");
 
 repeat
@@ -37,14 +37,14 @@ repeat
 	
 	pawnInGripper = false
 	moveFinished = false
-	c.runparallel(
+	p.runparallel(
 		function()
 			p.Go(800)
 			moveFinished = true
 		end,
 		function()
 			repeat
-				c.process()
+				p.process()
 			until (c.PawnInGripper() or moveFinished)
 			pawnInGripper = c.PawnInGripper()
 			if (pawnInGripper) then
@@ -92,14 +92,14 @@ repeat
 		
 		pawnInGripper = false
 		moveFinished = false
-		c.runparallel(
+		p.runparallel(
 			function()
 				p.Go(800)
 				moveFinished = true
 			end,
 			function()
 				repeat
-					c.process()
+					p.process()
 				until (c.PawnInGripper() or moveFinished)
 				pawnInGripper = c.PawnInGripper()
 				if (pawnInGripper) then

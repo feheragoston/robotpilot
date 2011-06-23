@@ -8,7 +8,7 @@ goAcc = 800
 turnSpeed = 2
 turnAcc = 8
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 --c.StartMatch();
 --c.print("Meccs elkezdodott");
 

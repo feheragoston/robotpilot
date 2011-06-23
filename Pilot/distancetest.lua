@@ -3,7 +3,7 @@ Ori = 1;
 
 dofile("Pilot/calibration.lua")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 --c.StartMatch();
 --c.print("Meccs elkezdodott");
 
@@ -16,7 +16,7 @@ end
 p.GoTo(225, Offset + Ori * (410 + ROBOT_WIDTH))
 p.TurnTo(1700, Offset + Ori * (410 + ROBOT_WIDTH))
 
-c.runparallel(
+p.runparallel(
 function()
 	p.GoTo(1700, Offset + Ori * (410 + ROBOT_WIDTH), 200, 400)
 end,
@@ -25,6 +25,6 @@ function()
 		a, b = c.GetDistance("left")
 		x, y, phi = c.GetRobotPos()
 		c.print(x, y, a, b)
-		c.process()
+		p.process()
 	until (not c.MotionInProgress())
 end)

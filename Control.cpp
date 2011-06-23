@@ -89,7 +89,6 @@ Control::Control(Config* config) {
 		{"getelapsedtime", c_getelapsedtime},
 		{"exit", c_exit},
 		{"wait", c_wait},
-		{"process", c_process},
 		{"runparallel", c_runparallel},
 		{"simulate", c_simulate},
 		{"in_simulate", c_in_simulate},
@@ -174,6 +173,8 @@ Control::Control(Config* config) {
 	luaC_export(L, STORAGE_GRIPPER);
 	luaC_export(L, STORAGE_LEFT);
 	luaC_export(L, STORAGE_RIGHT);
+
+	luaC_export(L, PRIMITIVES_WAIT);
 
 	luaL_dostring(L, "package.path = package.path .. \";./Pilot/?.lua\"; c = control; p = require(\"pilot\");");
 
@@ -870,23 +871,6 @@ int Control::c_wait(lua_State *L) {
 	}
 
 	return 0;
-}
-
-int Control::c_process(lua_State *L) {
-	long int useconds = luaL_optinteger(L, 1, PRIMITIVES_WAIT);
-
-	int i = lua_pushthread(L);
-	lua_pop(L, 1);
-	if (i == 1) {
-		lua_getfield(L, LUA_GLOBALSINDEX, "control");
-		lua_getfield(L, -1, "wait");
-		lua_remove(L, -2);
-		lua_pushinteger(L, useconds);
-		lua_call(L, 1, 0);
-		return 0;
-	} else {
-		return lua_yield(L, 0);
-	}
 }
 
 int Control::c_runparallel(lua_State *L) {

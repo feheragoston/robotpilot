@@ -5,7 +5,7 @@ p = require("pilot")
 
 c.print("Indul");
 
-c.runparallel(
+p.runparallel(
 function()
 	local i = 0;
 	repeat

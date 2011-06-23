@@ -15,14 +15,18 @@ function sleep(milliseconds)
 	end
 end
 
-function process()
+function process(wait)
+	if (wait == nil) then
+		wait = PRIMITIVES_WAIT
+	end
+	
 	if (control.in_simulate()) then
-		control.wait();
+		control.wait(0);
 	else
 		if (coroutine.running()) then
 			coroutine.yield();
 		else
-			control.wait();
+			control.wait(wait);
 		end
 	end
 end

@@ -6,7 +6,7 @@ GripperGrab = 53;
 
 dofile("Pilot/calibration.lua")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.StartMatch();
 c.print("Meccs elkezdodott");
 

@@ -19,7 +19,7 @@ Ori = 1;
 
 dofile("Pilot/calibration.lua")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 --c.StartMatch();
 --c.print("Meccs elkezdodott");
 
@@ -45,7 +45,7 @@ armtest(true, 1000, 100)
 
 
 --[[
-c.runparallel(
+p.runparallel(
 function ()
 	armtest(true)
 end,

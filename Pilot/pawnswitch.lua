@@ -31,7 +31,7 @@ function DeployPawn(x1, y1, x2, y2)
 	p.GoSafe(-250, goSpeed, goAcc)
 end
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 --c.print("Meccs elkezdodott");
 
@@ -48,7 +48,7 @@ p.TurnToSafe(350, Offset + Ori * 800, turnSpeed, 4)
 
 pawnInGripper = false
 moveFinished = false
-c.runparallel(
+p.runparallel(
 	1000,
 	function()
 		p.GoToSafe(350, Offset + Ori * 800)
@@ -62,7 +62,7 @@ c.runparallel(
 	end,
 	function()
 		repeat
-			c.process()
+			p.process()
 		until (c.PawnInGripper() or moveFinished)
 		pawnInGripper = c.PawnInGripper()
 		if (pawnInGripper) then
@@ -104,7 +104,7 @@ p.GripperMove(90)
 pawnInGripper = false;
 c.GoToSafe(1700, Offset + Ori * 800, 300, 500)
 repeat
-	c.process(1000)
+	p.process(1000)
 until (c.PawnInGripper() or not c.MotionInProgress())
 pawnInGripper = c.PawnInGripper()
 if (c.MotionInProgress()) then
@@ -149,7 +149,7 @@ while (pawnInGripper) do
 				if (priority + priorityChange >= 0) then
 					-- ha a prioritas elerne a 0-t, akkor korbeertunk, nem tudunk lerakni
 					c.print("Nem tudunk egyik lerako poziciohoz sem odamenni");
-					c.process();
+					p.process();
 					break;
 				end
 				priorityChanged = 0;
@@ -159,7 +159,7 @@ while (pawnInGripper) do
 		end
 	else
 		c.print("Nincs tobb lerako pozicio")
-		c.process();
+		p.process();
 		break;
 	end
 end;
@@ -174,7 +174,7 @@ c.print(x1, y1, x2, y2, dist)
 p.TurnTo(x2, y2, turnSpeed, turnAcc)
 p.GoTo(x2, y2, goSpeed, goAcc)
 
-c.runparallel(
+p.runparallel(
 function()
 	p.ArmMove(true, 130)
 	p.Magnet(true, -1)
@@ -203,7 +203,7 @@ p.GoSafe(-200, goSpeed, goAcc)
 p.TurnTo(1200, 975)
 p.GoTo(1200, 975)
 p.TurnTo(0, 975)
-c.runparallel(
+p.runparallel(
 function()
 	p.ArmMove(false, 130)
 	p.Magnet(false, -1)

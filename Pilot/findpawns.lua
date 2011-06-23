@@ -69,7 +69,7 @@ end
 
 dofile("Pilot/calibration.lua")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 --c.print("Meccs elkezdodott");
 
@@ -127,7 +127,7 @@ repeat
 				end
 			else
 				c.print("Nincs tobb lerako pozicio bal karhoz")
-				c.process()
+				p.process()
 				break;
 			end
 		end;
@@ -170,7 +170,7 @@ repeat
 						if (priority + priorityChange >= 0) then
 							-- ha a prioritas elerne a 0-t, akkor korbeertunk, nem tudunk lerakni
 							c.print("Nem tudunk egyik lerako poziciohoz sem odamenni");
-							c.process();
+							p.process();
 							break;
 						end
 						priorityChanged = 0;
@@ -180,7 +180,7 @@ repeat
 				end
 			else
 				c.print("Nincs tobb lerako pozicio")
-				c.process();
+				p.process();
 				break;
 			end
 		end;
@@ -212,5 +212,5 @@ repeat
 		c.print("Hiba", err);
 		p.MotionStop(MAX_DEC)
 	end
-	c.process()
+	p.process()
 until (c.GetStopButton());
