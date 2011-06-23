@@ -4,6 +4,10 @@ local control = control
 module(...)
 
 function sleep(milliseconds)
+	if (control.in_simulate()) then
+		return
+	end
+
 	local callTime = control.gettimeofday();
 	while (control.getelapsedtime(callTime) < milliseconds * 1000) do
 		control.process()

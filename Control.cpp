@@ -55,14 +55,18 @@ bool Control::logDeployFields = true;
 bool Control::logDynObstacles = true;
 bool Control::logPawns = true;
 
-#define ROBOT_POINT_NUM 6
+#define ROBOT_POINT_NUM 10
 double Control::robotBody[][2] = {
 		{ 140,  140 + 15},
 		{-105,  140 + 15},
 		{-160,   65},
 		{-160,  -65},
 		{-105, -140 - 15},
-		{ 140, -140 - 15}
+		{ 140, -140 - 15},
+		{ 140,  110},
+		{  70,   35},
+		{  70,  -35},
+		{ 140, -110}
 };
 
 Control::Control(Config* config) {
@@ -652,10 +656,11 @@ void Control::addDynamicObstacle(Obstacle* obstacle) {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 
 	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
+		int j2 = (j+1)%ROBOT_POINT_NUM;
 		double x1 = cos(phi) * robotBody[j][0] - sin(phi) * robotBody[j][1] + x;
 		double y1 = sin(phi) * robotBody[j][0] + cos(phi) * robotBody[j][1] + y;
-		double x2 = cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] - sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + x;
-		double y2 = sin(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][0] + cos(phi) * robotBody[(j+1)%ROBOT_POINT_NUM][1] + y;
+		double x2 = cos(phi) * robotBody[j2][0] - sin(phi) * robotBody[j2][1] + x;
+		double y2 = sin(phi) * robotBody[j2][0] + cos(phi) * robotBody[j2][1] + y;
 		if (obstacle->Intersect(x1, y1, x2, y2)) {
 			delete obstacle;
 			return;
@@ -1770,8 +1775,8 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 				}
 			}
 		} else if (type == STORAGE_GRIPPER) {
-			px = x + cos(phi) * ROBOT_FRONT_PAWN;
-			py = y + sin(phi) * ROBOT_FRONT_PAWN;
+			px = x + cos(phi) * (ROBOT_FRONT_PAWN + 10);
+			py = y + sin(phi) * (ROBOT_FRONT_PAWN + 10);
 		} else if (type == STORAGE_LEFT) {
 			px = x + cos(phi) * MAGNET_POS_X - sin(phi) * MAGNET_POS_Y;
 			py = y + sin(phi) * MAGNET_POS_X + cos(phi) * MAGNET_POS_Y;

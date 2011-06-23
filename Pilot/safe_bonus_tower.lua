@@ -1,12 +1,25 @@
 
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
---[[
+
 	goSpeed = 400
 	goAcc = 500
 	turnSpeed = 2
 	turnAcc = 2
-]]
+
+for i = 1, 10 do
+	c.runparallel(
+	function()
+		c.process()
+	end,
+	function()
+		c.process()
+	end,
+	function()
+		c.process()
+	end)
+end
+
 c.runparallel(
 function()
 	repeat
@@ -77,15 +90,17 @@ repeat
 				if (math.abs(ignoreRadius - leftIR) < 10) then
 					c.print("Felszedes bal karral")
 					c.SetPawnType(leftPX, leftPY, FIG_WENT_OVER)
-					PickupWithArmFromBoard(true, leftX, leftY)
-					pawnInLeft = true
-					c.SetPawnType(leftPX, leftPY, FIG_PICKED_UP)
+					if (PickupWithArmFromBoard(true, leftX, leftY)) then
+						pawnInLeft = true
+						c.SetPawnType(leftPX, leftPY, FIG_PICKED_UP)
+					end
 				elseif (math.abs(ignoreRadius - rightIR) < 10) then
 					c.print("Felszedes jobb karral")
 					c.SetPawnType(rightPX, rightPY, FIG_WENT_OVER)
-					PickupWithArmFromBoard(false, rightX, rightY)
-					pawnInRight = true
-					c.SetPawnType(rightPX, rightPY, FIG_PICKED_UP)
+					if (PickupWithArmFromBoard(false, rightX, rightY)) then
+						pawnInRight = true
+						c.SetPawnType(rightPX, rightPY, FIG_PICKED_UP)
+					end
 				elseif (math.abs(ignoreRadius - gripperBIR) < 10) then
 					c.print("Felszedes gripperrel tablarol")
 					c.SetPawnType(gripperBPX, gripperBPY, FIG_WENT_OVER)
@@ -184,6 +199,18 @@ repeat
 						p.GoSafe(-200, goSpeed, goAcc)
 					elseif (c.simulate(function() p.GoSafe(-100, goSpeed, goAcc); end)) then
 						p.GoSafe(-100, goSpeed, goAcc)
+					else
+--[[
+						if (c.simulate(function() p.Go(-50); p.GoSafe(-200, goSpeed, goAcc); end)) then
+							p.GoSafe(-250, goSpeed, goAcc)
+						elseif (c.simulate(function() p.Go(-50); p.GoSafe(-150, goSpeed, goAcc); end)) then
+							p.GoSafe(-200, goSpeed, goAcc)
+						elseif (c.simulate(function() p.Go(-50); p.GoSafe(-50, goSpeed, goAcc); end)) then
+							p.GoSafe(-100, goSpeed, goAcc)
+						else
+							p.GoSafe(-50)
+						end
+]]
 					end
 					p.GripperMove(0)
 				end,
@@ -203,4 +230,7 @@ repeat
 		end
 		c.process()
 	end
+	
+	c.print("Lerako fazis kesz")
+	
 until (c.GetStopButton())

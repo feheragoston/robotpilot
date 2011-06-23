@@ -74,10 +74,37 @@ end
 function PickupWithArmFromBoard(left, x, y)
 	p.TurnToSafe(x, y, turnSpeed, turnAcc)
 	p.GoToSafe(x, y, goSpeed, goAcc)
-	p.Magnet(left, 1)
-	p.ArmMove(left, 130)
-	p.sleep(10)
-	p.ArmMove(left, 0)
+	local side = "right"
+	if (left) then
+		side = "left"
+	end
+	local low, high = c.GetDistance(side)
+	c.print("PickupWithArmFromBoard 1", low, high)
+	if (low < 100) then
+		p.Magnet(left, 1)
+		p.ArmMove(left, 130)
+		p.sleep(10)
+		p.ArmMove(left, 0)
+		
+		low, high = c.GetDistance(side)
+		c.print("PickupWithArmFromBoard 2", low, high)
+		if (low < 100) then
+			p.Magnet(left, 1)
+			p.ArmMove(left, 130)
+			p.Turn(0.1)
+			p.Turn(-0.2)
+			p.Turn(0.1)
+			p.ArmMove(left, 0)
+			low, high = c.GetDistance(side)
+			c.print("PickupWithArmFromBoard 3", low, high)
+			if (low < 100) then
+				return false
+			end
+			return true
+		end
+		return true
+	end
+	return false
 end
 
 function SearchWithArmFromBoard(left, ignoreRadius)
