@@ -63,10 +63,10 @@ double Control::robotBody[][2] = {
 		{-160,  -65},
 		{-105, -140 - 15},
 		{ 140, -140 - 15},
-		{ 140,  110},
-		{  70,   35},
+		{ 140, -110},
 		{  70,  -35},
-		{ 140, -110}
+		{  70,   35},
+		{ 140,  110}
 };
 
 Control::Control(Config* config) {
@@ -993,7 +993,7 @@ int Control::c_simulate(lua_State *L) {
 	mPrimitives = realPrimitives;
 	// frissitjuk az allapotat
 	lua_getfield(L, LUA_GLOBALSINDEX, "control");
-	lua_getfield(L, -1, "process");
+	lua_getfield(L, -1, "wait");
 	lua_remove(L, -2);
 	lua_call(L, 0, 0);
 	return 1;

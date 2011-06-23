@@ -1,5 +1,6 @@
 
 local control = control
+local coroutine = coroutine
 
 module(...)
 
@@ -10,13 +11,41 @@ function sleep(milliseconds)
 
 	local callTime = control.gettimeofday();
 	while (control.getelapsedtime(callTime) < milliseconds * 1000) do
-		control.process()
+		process()
 	end
 end
 
+function process()
+	if (control.in_simulate()) then
+		control.wait();
+	else
+		if (coroutine.running()) then
+			coroutine.yield();
+		else
+			control.wait();
+		end
+	end
+end
+
+-- coroutine-ok parhuzamos futtatasa
+function runparallel(t1, t2)
+	local c1 = coroutine.create(t1)
+	local c2 = coroutine.create(t2)
+	while (coroutine.status(c1) == "suspended" or coroutine.status(c2) == "suspended") do
+		if (coroutine.status(c1) == "suspended") then
+			coroutine.resume(c1);
+		end
+		if (coroutine.status(c2) == "suspended") then
+			coroutine.resume(c2);
+		end
+		process()
+	end
+end
+
+
 local function MotionInProgress()
 	while (control.MotionInProgress()) do
-		control.process()
+		process()
 	end
 end
 
@@ -75,7 +104,7 @@ end
 function MotionStop(...)
 	if (control.MotionStop(...)) then
 		while (control.MotionStopInProgress()) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) MotionStop hiba")
@@ -87,7 +116,7 @@ end
 function GripperMove(...)
 	if (control.GripperMove(...)) then
 		while (control.GripperMoveInProgress()) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) GripperMove hiba")
@@ -99,7 +128,7 @@ end
 function ConsoleMove(...)
 	if (control.ConsoleMove(...)) then
 		while (control.ConsoleMoveInProgress()) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) ConsoleMove hiba")
@@ -111,7 +140,7 @@ end
 function ConsoleStop(...)
 	if (control.ConsoleStop(...)) then
 		while (control.ConsoleStopInProgress()) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) ConsoleStop hiba")
@@ -123,7 +152,7 @@ end
 function ArmMove(left, ...)
 	if (control.ArmMove(left, ...)) then
 		while (control.ArmMoveInProgress(left)) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) ArmMove hiba")
@@ -135,7 +164,7 @@ end
 function Magnet(left, ...)
 	if (control.Magnet(left, ...)) then
 		while (control.MagnetInProgress(left)) do
-			control.process()
+			process()
 		end
 	else
 		control.print("(pilot) Magnet hiba")
@@ -147,7 +176,7 @@ end
 function RefreshPawnPositions(...)
 	if (control.RefreshPawnPositions(...)) then
 		while (control.RefreshPawnPositionsInProgress()) do
-			control.process()
+			process()
 		end
 		return control.RefreshPawnPositionsFinished()
 	end

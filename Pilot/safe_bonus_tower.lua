@@ -2,37 +2,26 @@
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
 
+--[[
 	goSpeed = 400
 	goAcc = 500
 	turnSpeed = 2
 	turnAcc = 2
+]]
 
-for i = 1, 10 do
-	c.runparallel(
-	function()
-		c.process()
-	end,
-	function()
-		c.process()
-	end,
-	function()
-		c.process()
-	end)
-end
-
-c.runparallel(
+p.runparallel(
 function()
 	repeat
 		if (not p.RefreshPawnPositions()) then
 			p.sleep(500)
 		end
-		c.process()
+		p.process()
 	until (c.GetStartButton())
 end,
 function()
 	p.sleep(3000)
 	repeat
-		c.process()
+		p.process()
 	until(c.GetStartButton())
 	
 	c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
@@ -131,7 +120,7 @@ repeat
 			p.MotionStop(MAX_DEC)
 			ignoreRadius = ROBOT_RADIUS;
 		end
-		c.process()
+		p.process()
 	until (ignoreRadius == MAX_DISTANCE)
 	
 	c.print("Felszedo fazis kesz: ", pawnInLeft, pawnInRight, pawnInGripper)
@@ -190,36 +179,9 @@ repeat
 						end
 					end
 				end
-				
-				c.runparallel(
-				function()
-					if (c.simulate(function() p.GoSafe(-250, goSpeed, goAcc); end)) then
-						p.GoSafe(-250, goSpeed, goAcc)
-					elseif (c.simulate(function() p.GoSafe(-200, goSpeed, goAcc); end)) then
-						p.GoSafe(-200, goSpeed, goAcc)
-					elseif (c.simulate(function() p.GoSafe(-100, goSpeed, goAcc); end)) then
-						p.GoSafe(-100, goSpeed, goAcc)
-					else
---[[
-						if (c.simulate(function() p.Go(-50); p.GoSafe(-200, goSpeed, goAcc); end)) then
-							p.GoSafe(-250, goSpeed, goAcc)
-						elseif (c.simulate(function() p.Go(-50); p.GoSafe(-150, goSpeed, goAcc); end)) then
-							p.GoSafe(-200, goSpeed, goAcc)
-						elseif (c.simulate(function() p.Go(-50); p.GoSafe(-50, goSpeed, goAcc); end)) then
-							p.GoSafe(-100, goSpeed, goAcc)
-						else
-							p.GoSafe(-50)
-						end
-]]
-					end
-					p.GripperMove(0)
-				end,
-				function()
-					p.ConsoleMove(0)
-				end)
 			else
 				c.print("Nincs tobb lerako pozicio")
-				c.process()
+				p.process()
 				--TODO
 			end
 		end);
@@ -227,8 +189,23 @@ repeat
 			c.print("Hiba", err);
 			p.MotionStop(MAX_DEC)
 			ignorePriority = -1000;
+		else
+			c.print("hatra megyunk")
+			for i = -250, -100, 50 do
+				if (c.simulate(p.GoSafe, i, goSpeed, goAcc)) then
+					p.runparallel(
+					function()
+						p.GoSafe(i, goSpeed, goAcc)
+						p.GripperMove(0)
+					end,
+					function()
+						p.ConsoleMove(0)
+					end)
+					break
+				end
+			end
 		end
-		c.process()
+		p.process()
 	end
 	
 	c.print("Lerako fazis kesz")

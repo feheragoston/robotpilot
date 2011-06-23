@@ -10,7 +10,7 @@
 Primitives::Primitives(Config* config) {
 	mConfig = config;
 
-	mStartButton = false;
+	mStartButton = true;
 	mStopButton = false;
 	mRobotColor = false;
 	mPawnInGripper = false;
