@@ -89,7 +89,6 @@ Control::Control(Config* config) {
 		{"getelapsedtime", c_getelapsedtime},
 		{"exit", c_exit},
 		{"wait", c_wait},
-		{"runparallel", c_runparallel},
 		{"simulate", c_simulate},
 		{"in_simulate", c_in_simulate},
 		{"print", c_print},
@@ -870,79 +869,6 @@ int Control::c_wait(lua_State *L) {
 		}
 	}
 
-	return 0;
-}
-
-int Control::c_runparallel(lua_State *L) {
-	long int useconds = PRIMITIVES_WAIT;
-	std::list<lua_State*> threads;
-	int argc = lua_gettop(L);
-	// parameterek sorrendjet megforditjuk
-	for (int n = 1; n < argc; ++n) {
-		lua_insert(L, n);
-	}
-	// vegigmegyunk a parametereken hatulrol (eredetiben elorol)
-	for (int n = 1; n <= argc; ++n) {
-		if (n == 1 &&  lua_isnumber(L, -1)) {
-			// ha az elso parameter szam, azt vesszuk varakozasnak
-			useconds = lua_tointeger(L, -1);
-			lua_pop(L, 1);
-		} else if (lua_isfunction(L, -1)) {
-			lua_State* N = lua_newthread(L); // ha funkcio, letrehozunk neki egy uj szalat
-			lua_pop(L, 1); // kiszedjuk a stackbol a letrehozott szalat
-			lua_xmove(L, N, 1); // atmozgatjuk a parameterul kapott funkciot a szalhoz
-			threads.push_back(N); // hozzaadjuk a threadpoolhoz
-		} else {
-			if (threads.front() != NULL) {
-				lua_xmove(L, threads.back(), 1); // ha mar van szalunk, hozzaadjuk a parametert
-			} else {
-				lua_pop(L, 1); // ha nincs szalunk kiszedjuk a stackbol
-			}
-		}
-	}
-	while (threads.size() > 0) {
-		for (int i = threads.size(); i > 0; i--) {
-			lua_State* N = threads.front();
-			/* hibakereses
-			 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
-			 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
-			 std::cout << i << " elrontott lua thread: " << lua_status(*j) << std::endl;
-			 }
-			 }
-			 if (lua_status(N) != LUA_YIELD && lua_status(N) != 0) {
-			 std::cout << "elotte: " << lua_status(N) << std::endl;
-			 }
-			 */
-			int exit = lua_resume(N, lua_gettop(N) - 1);
-			if (exit == LUA_YIELD) {
-				threads.push_back(N);
-			} else if (exit != 0) {
-				if (strcmp(luaL_optstring(N, -1, "-"), "cannot resume non-suspended coroutine") == 0) {
-					std::cout << "(Control) Parallel thread error: " << luaL_optstring(N, -1, "-") << std::endl;
-					/* hibakereses
-					 std::cout << "utana: " << lua_status(N) << std::endl;
-					 for (std::list<lua_State*>::iterator j = threads.begin(); j != threads.end(); j++) {
-					 if (lua_status(*j) != LUA_YIELD && lua_status(*j) != 0) {
-					 std::cout << i << " futas utan elrontott lua thread: " << lua_status(*j) << std::endl;
-					 }
-					 }
-					 */
-				} else {
-					luaL_error(L, luaL_optstring(N, -1, "-"));
-				}
-			} else {
-				//lua_close(N);
-			}
-			threads.pop_front();
-		}
-		if (threads.size() > 0) {
-			lua_getfield(L, LUA_GLOBALSINDEX, "control");
-			lua_getfield(L, -1, "process");
-			lua_remove(L, -2);
-			lua_pushinteger(L, useconds);
-			lua_call(L, 1, 0);
-		}
-	}
 	return 0;
 }
 

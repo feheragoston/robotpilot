@@ -1,6 +1,7 @@
 
 local control = control
 local coroutine = coroutine
+local type = type
 
 module(...)
 
@@ -21,7 +22,7 @@ function process(wait)
 	end
 	
 	if (control.in_simulate()) then
-		control.wait(0);
+		control.wait(wait);
 	else
 		if (coroutine.running()) then
 			coroutine.yield();
@@ -31,18 +32,30 @@ function process(wait)
 	end
 end
 
--- coroutine-ok parhuzamos futtatasa
-function runparallel(t1, t2)
-	local c1 = coroutine.create(t1)
-	local c2 = coroutine.create(t2)
-	while (coroutine.status(c1) == "suspended" or coroutine.status(c2) == "suspended") do
-		if (coroutine.status(c1) == "suspended") then
-			coroutine.resume(c1);
+-- functionok parhuzamos futtatasa
+function runparallel(...)
+	local params = {...}
+	local threads = {}
+	local wait = PRIMITIVES_WAIT
+	
+	for i = 1, #params do
+		if (type(params[i]) == "function") then
+			threads[#threads + 1] = coroutine.create(params[i])
+		elseif (type(params[i]) == "number") then
+			wait = params[i]
 		end
-		if (coroutine.status(c2) == "suspended") then
-			coroutine.resume(c2);
+	end
+
+	local running = true
+	while (running) do
+		running = false
+		for i = 1, #threads do
+			if (coroutine.status(threads[i]) == "suspended") then
+				running = true
+				coroutine.resume(threads[i])
+			end
 		end
-		process()
+		process(wait)
 	end
 end
 

@@ -125,7 +125,6 @@ protected:
 
 	static int c_exit(lua_State *L);
 	static int c_wait(lua_State *L);
-	static int c_runparallel(lua_State *L);
 	static int c_simulate(lua_State *L);
 	static int c_in_simulate(lua_State *L);
 	static int c_print(lua_State *L);
