@@ -10,7 +10,7 @@ if (CALIBRATED == nil) then
 	turnSpeed = 6
 	turnAcc = 10
 	
-	GripperGrab = 67
+	GripperGrab = 60
 	GripperHold = 55
 
 	p.sleep(1000)
@@ -43,15 +43,17 @@ if (CALIBRATED == nil) then
 	p.sleep(1000)
 	
 	p.Go(30)
-	x, y, phi = c.GetRobotPos();
-	p.TurnTo(x, 1500)
+	--x, y, phi = c.GetRobotPos();
+	p.TurnTo(795, 1500)
 
 	--p.Go(60)
+	--[[
 	if (c.GetMyColor()) then
 		p.Turn(0.4)
 	else
 		p.Turn(-0.4)
 	end
+	]]
 
 	p.sleep(1000)
 

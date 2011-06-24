@@ -2,6 +2,7 @@
 local control = control
 local coroutine = coroutine
 local type = type
+local error = error
 
 module(...)
 
@@ -52,7 +53,10 @@ function runparallel(...)
 		for i = 1, #threads do
 			if (coroutine.status(threads[i]) == "suspended") then
 				running = true
-				coroutine.resume(threads[i])
+				local status, message = coroutine.resume(threads[i])
+				if (not status) then
+					error(message)
+				end
 			end
 		end
 		process(wait)
