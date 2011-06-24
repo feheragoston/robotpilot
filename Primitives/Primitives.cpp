@@ -24,17 +24,12 @@ Primitives::Primitives(Config* config) {
 Primitives::Primitives(Primitives* source) {
 	mConfig = source->mConfig;
 
-	mStartButton = source->mStartButton;
-	mStopButton = source->mStopButton;
-	mRobotColor = !source->mRobotColor;
+	mStartButton = source->GetStartButton();
+	mStopButton = source->GetStopButton();
+	mRobotColor = !source->GetMyColor();
 
-	//robot = source->robot;
-	//opponent = source->opponent;
-	robot.x = source->robot.x;
-	robot.y = source->robot.y;
-	robot.phi = source->robot.phi;
-	opponent.x = source->opponent.x;
-	opponent.y = source->opponent.y;
+	source->GetRobotPos(&robot.x, &robot.y, &robot.phi);
+	source->GetOpponentPos(&opponent.x, &opponent.y);
 }
 
 Primitives::~Primitives() {

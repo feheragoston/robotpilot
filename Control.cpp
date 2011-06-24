@@ -141,6 +141,7 @@ Control::Control(Config* config) {
 		{"RefreshPawnPositionsInProgress", l_RefreshPawnPositionsInProgress},
 		{"RefreshPawnPositionsFinished", l_RefreshPawnPositionsFinished},
 		{"FindPawn", l_FindPawn},
+		{"GetStoragePos", l_GetStoragePos},
 		{"SetPawnType", l_SetPawnType},
 		{"PawnsNearby", l_PawnsNearby},
 		{"GetDeployPoint", l_GetDeployPoint},
@@ -894,9 +895,7 @@ int Control::c_simulate(lua_State *L) {
 	mPrimitives = new Primitives(realPrimitives);
 	mPrimitives->Init();
 
-	double x, y, phi;
-	realPrimitives->GetRobotPos(&x, &y, &phi);
-	mPrimitives->SetRobotPos(x, y, phi);
+	double x, y;
 	Control::GetOpponentPos(&x, &y);
 	mPrimitives->SetOpponentPos(x, y);
 
@@ -1609,6 +1608,76 @@ int Control::l_FindPawn(lua_State *L) {
 	} else {
 		lua_pushnumber(L, minDist);
 		return 3;
+	}
+}
+
+/**
+ * @param target:
+ * STORAGE_NONE: paraszt koordinatainak visszaadasa
+ * STORAGE_GRIPPER: koordinatak gripperes felszedeshez
+ * STORAGE_LEFT: koordinatak bal karhoz
+ * STORAGE_RIGHT: koordinatak jobb karhoz
+ * 4: koordinatak oldalso parasztok gripperes felszedesehez
+ * @param px
+ * @param py
+ */
+int Control::l_GetStoragePos(lua_State *L) {
+	int target = lua_tointeger(L, 1);
+	double px = lua_tonumber(L, 2);
+	double py = lua_tonumber(L, 3);
+
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+
+	if (target == STORAGE_GRIPPER) {
+		double angle = atan2f(y - py, x - px);
+		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
+		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
+		return 2;
+	} else if (target == STORAGE_LEFT) {
+		double c2 = sqr(px - x) + sqr(py - y);
+		double b2 = c2 - sqr(MAGNET_POS_Y);
+		if (b2 <= 0) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
+		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + x;
+		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + y;
+		double alpha = atan2(dy - y, dx - x);
+		dx += 20 * cos(alpha);
+		dy += 20 * sin(alpha);
+		lua_pushnumber(L, dx);
+		lua_pushnumber(L, dy);
+		return 2;
+	} else if (target == STORAGE_RIGHT) {
+		double c2 = sqr(x - px) + sqr(y - py);
+		double b2 = c2 - sqr(MAGNET_POS_Y);
+		if (b2 <= 0) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
+		double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + x;
+		double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + y;
+		double alpha = atan2(dy - y, dx - x);
+		dx += -MAGNET_POS_X * cos(alpha);
+		dy += -MAGNET_POS_X * sin(alpha);
+		lua_pushnumber(L, dx);
+		lua_pushnumber(L, dy);
+		return 2;
+	} else if (target == 4) {
+		lua_pushnumber(L, px);
+		if (py > 1500) {
+			lua_pushnumber(L, py - 400);
+		} else {
+			lua_pushnumber(L, py + 400);
+		}
+		lua_pushnumber(L, px);
+		lua_pushnumber(L, py);
+		return 4;
+	} else {
+		lua_pushnumber(L, px);
+		lua_pushnumber(L, py);
+		return 2;
 	}
 }
 

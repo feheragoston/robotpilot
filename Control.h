@@ -175,6 +175,7 @@ protected:
 	static int l_RefreshPawnPositionsInProgress(lua_State *L);
 	static int l_RefreshPawnPositionsFinished(lua_State *L);
 	static int l_FindPawn(lua_State *L);
+	static int l_GetStoragePos(lua_State *L);
 	static int l_SetPawnType(lua_State *L);
 	static int l_PawnsNearby(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
