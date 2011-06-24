@@ -1470,27 +1470,16 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 }
 
 /**
- * FindPawn(target, type)
- * FindPawn(target, type, ignoreRadius)
- * FindPawn(target, type, px, py)
- *
- * target:
- * STORAGE_NONE: paraszt koordinatainak visszaadasa
- * STORAGE_GRIPPER: koordinatak gripperes felszedeshez
- * STORAGE_LEFT: koordinatak bal karhoz
- * STORAGE_RIGHT: koordinatak jobb karhoz
- * 4: koordinatak oldalso parasztok gripperes felszedesehez
- *
- * ignoreRadius: minimum tavolsag, ami folott keressuk
- * a legkozelebbi babut
- *
- * px, py: babu koordinatai
- * @param L
- * @return
+ * FindPawn(type, ignoreRadius = ROBOT_FRONT_MAX, maxRadius = MAX_DISTANCE)
+ * @param type keresett figura tipusa (0 = tetszoleges)
+ * @param ignoreRadius minimum tavolsag, ami folott keressuk a legkozelebbi babut
+ * @param maxRadius maximum tavolsag, ami folott keressuk a legkozelebbi babut
+ * @return px, py: babu koordinatai
  */
 int Control::l_FindPawn(lua_State *L) {
-	int type = luaL_optinteger(L, 2, 0);
-	double ignoreRadius = luaL_optnumber(L, 3, ROBOT_FRONT_MAX);
+	int type = luaL_optinteger(L, 1, 0);
+	double ignoreRadius = luaL_optnumber(L, 2, ROBOT_FRONT_MAX);
+	double maxRadius = luaL_optnumber(L, 3, MAX_DISTANCE);
 
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1551,10 +1540,15 @@ int Control::l_FindPawn(lua_State *L) {
 		}
 	}
 
-	lua_pushnumber(L, px);
-	lua_pushnumber(L, py);
-	lua_pushnumber(L, minDist);
-	return 3;
+	if (minDist < maxRadius) {
+		lua_pushnumber(L, px);
+		lua_pushnumber(L, py);
+		lua_pushnumber(L, minDist);
+		return 3;
+	} else {
+		lua_pushboolean(L, false);
+		return 1;
+	}
 }
 
 /**

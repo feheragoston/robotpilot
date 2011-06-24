@@ -16,20 +16,22 @@ function PickupWithGripperFromBoard(x, y)
 	return false
 end
 
-function SearchWithGripperFromBoard(ignoreRadius, type)
+function SearchWithGripperFromBoard(type, ignoreRadius, maxRadius)
 	local px, py, x, y
 	while (true) do
-		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius);
-		x, y = c.GetStoragePos(STORAGE_GRIPPER, px, py)
-		if (x) then
-			-- a zold mezokrol nem keresunk
-			if (py > 400 and py < 2600 and c.simulate(PickupWithGripperFromBoard, x, y)) then
-				return ignoreRadius, px, py, x, y
-			else
-				ignoreRadius = ignoreRadius + 1
-			end
-		else
+		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius, maxRadius);
+		if (not px) then
 			return MAX_DISTANCE
+		end
+		x, y = c.GetStoragePos(STORAGE_GRIPPER, px, py)
+		if (not x) then
+			return MAX_DISTANCE
+		end
+		-- a zold mezokrol nem keresunk
+		if (py > 400 and py < 2600 and c.simulate(PickupWithGripperFromBoard, x, y)) then
+			return ignoreRadius, px, py, x, y
+		else
+			ignoreRadius = ignoreRadius + 1
 		end
 	end
 end
@@ -55,20 +57,22 @@ function PickupWithGripperFromSides(px, py, x, y)
 	return false
 end
 
-function SearchWithGripperFromSides(ignoreRadius, type)
+function SearchWithGripperFromSides(type, ignoreRadius, maxRadius)
 	local px, py, x, y
 	while (true) do
-		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius);
-		x, y, px, py = c.GetStoragePos(4, px, py)
-		if (x) then
-			-- csak a zold mezokrol keresunk
-			if ((py < 400 or py > 2600) and c.simulate(PickupWithGripperFromSides, px, py, x, y)) then
-				return ignoreRadius, px, py, x, y
-			else
-				ignoreRadius = ignoreRadius + 1
-			end
-		else
+		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius, maxRadius);
+		if (not px) then
 			return MAX_DISTANCE
+		end
+		x, y, px, py = c.GetStoragePos(4, px, py)
+		if (not x) then
+			return MAX_DISTANCE
+		end
+		-- csak a zold mezokrol keresunk
+		if ((py < 400 or py > 2600) and c.simulate(PickupWithGripperFromSides, px, py, x, y)) then
+			return ignoreRadius, px, py, x, y
+		else
+			ignoreRadius = ignoreRadius + 1
 		end
 	end
 end
@@ -76,6 +80,11 @@ end
 function PickupWithArmFromBoard(left, x, y)
 	p.TurnToSafe(x, y, turnSpeed, turnAcc)
 	p.GoToSafe(x, y, goSpeed, goAcc)
+
+	if (c.in_simulate()) then
+		return true
+	end
+
 	local side = "right"
 	if (left) then
 		side = "left"
@@ -92,7 +101,7 @@ function PickupWithArmFromBoard(left, x, y)
 		c.print("PickupWithArmFromBoard 2", low, high)
 		if (low < 90) then
 			p.Magnet(left, 1)
-			p.ArmMove(left, 130)
+			p.ArmMove(left, 125)
 			p.Turn(0.2)
 			p.Turn(-0.4)
 			p.Turn(0.2)
@@ -109,24 +118,26 @@ function PickupWithArmFromBoard(left, x, y)
 	return false
 end
 
-function SearchWithArmFromBoard(left, ignoreRadius)
+function SearchWithArmFromBoard(left, ignoreRadius, maxRadius)
 	local arm = STORAGE_RIGHT
 	local px, py, x, y
 	if (left) then
 		arm = STORAGE_LEFT
 	end
 	while (true) do
-		px, py, ignoreRadius = c.FindPawn(FIG_PAWN, ignoreRadius)
-		x, y = c.GetStoragePos(arm, px, py)
-		if (x) then
-			-- a zold mezokrol nem keresunk
-			if (py > 400 and py < 2600 and c.simulate(PickupWithArmFromBoard, left, x, y)) then
-				return ignoreRadius, px, py, x, y
-			else
-				ignoreRadius = ignoreRadius + 1
-			end
-		else
+		px, py, ignoreRadius = c.FindPawn(FIG_PAWN, ignoreRadius, maxRadius)
+		if (not px) then
 			return MAX_DISTANCE
+		end
+		x, y = c.GetStoragePos(arm, px, py)
+		if (not x) then
+			return MAX_DISTANCE
+		end
+		-- a zold mezokrol nem keresunk
+		if (py > 400 and py < 2600 and c.simulate(PickupWithArmFromBoard, left, x, y)) then
+			return ignoreRadius, px, py, x, y
+		else
+			ignoreRadius = ignoreRadius + 1
 		end
 	end
 end

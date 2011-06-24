@@ -44,34 +44,32 @@ repeat
 	repeat
 		ignoreRadius = ROBOT_RADIUS;
 		local status, err = pcall(function()
-			leftIR = MAX_DISTANCE
-			rightIR = MAX_DISTANCE
-			gripperGIR = MAX_DISTANCE -- green area
-			gripperBIR = MAX_DISTANCE -- board
-			
-			-- meghatarozzuk a legkozelebbi parasztot
-			local px, py, minDist = c.FindPawn(FIG_PAWN, ignoreRadius)
+			local leftIR = MAX_DISTANCE
+			local rightIR = MAX_DISTANCE
+			local gripperGIR = MAX_DISTANCE -- green area
+			local gripperBIR = MAX_DISTANCE -- board
 			
 			if (not pawnInLeft) then
-				leftIR, leftPX, leftPY, leftX, leftY = SearchWithArmFromBoard(true, ignoreRadius)
+				leftIR, leftPX, leftPY, leftX, leftY = SearchWithArmFromBoard(true, ignoreRadius, MAX_DISTANCE)
 				c.print("Left:", leftIR, leftPX, leftPY, leftX, leftY)
 			end
-			-- ha a balkar megtalalta a legkozelebbi parasztot, nem szimulalunk foloslegesen
-			if (not pawnInRight and leftIR > minDist + 10) then
-				rightIR, rightPX, rightPY, rightX, rightY = SearchWithArmFromBoard(false, ignoreRadius)
+			if (not pawnInRight) then
+				rightIR, rightPX, rightPY, rightX, rightY = SearchWithArmFromBoard(false, ignoreRadius, leftIR - 10)
 				c.print("Right:", rightIR, rightPX, rightPY, rightX, rightY)
 			end
-			-- ha a bal vagy jobb kar megtalalta a legkozelebbi parasztot, nem szimulalunk foloslegesen
-			if (not pawnInGripper and math.min(leftIR, rightIR) > minDist + 10) then
+			if (not pawnInGripper) then
 				ir = math.max(ignoreRadius, ROBOT_FRONT_MAX + PAWN_RADIUS)
+				
+				c.print("Gripper kereses:", ir, math.min(leftIR, rightIR) - 10)
+				
 				if (safe1Deployed and bonus1Deployed) then
 					gripperPawnType = FIG_KING
-					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, gripperPawnType)
+					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(gripperPawnType, ir, math.min(leftIR, rightIR) - 10)
 				else
 					gripperPawnType = FIG_PAWN
-					gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY = SearchWithGripperFromBoard(ir, gripperPawnType)
+					gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY = SearchWithGripperFromBoard(gripperPawnType, ir, math.min(leftIR, rightIR) - 10)
 					c.print("GripperB:", gripperBIR, gripperBPX, gripperBPY, gripperBX, gripperBY)
-					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(ir, gripperPawnType)
+					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(gripperPawnType, ir, math.min(leftIR, rightIR) - 10)
 					gripperGIR = gripperGIR + 100 -- a zold teruletrol csak akkor szedjunk ha nagyon muszaj
 				end
 				c.print("GripperG:", gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY)
