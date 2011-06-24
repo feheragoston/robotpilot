@@ -347,6 +347,11 @@ bool PrimitivesNet::RefineDeadreckoning(double x, double y, double phi) {
 	message.d3 = phi;
 	netConnection->Send(&message, sizeof(msgd3));
 	posRefine.inprogress = true;
+
+	refineDelta.x = 0;
+	refineDelta.y = 0;
+	refineDelta.phi = 0;
+
 	return true;
 }
 
