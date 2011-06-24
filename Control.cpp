@@ -1692,8 +1692,8 @@ int Control::l_GetDeployPoint(lua_State *L) {
 		if ((color && d == 0) || (!color && d == 1)) {
 			if (deployFields[i] < min && deployFields[i] > ignorePriority) {
 				// ellenorizzuk, hogy van-e a mezon akadaly
-				double x = field / 6 * 350 + 175;
-				double y = field % 6 * 350 + 175 + 450;
+				double x = i / 6 * 350 + 175;
+				double y = i % 6 * 350 + 175 + 450;
 				bool free = true;
 				for (std::list<Obstacle*>::iterator o = dynObstacles.begin(); o != dynObstacles.end(); o++) {
 					if ((*o)->Intersect(x, y, 175)) {

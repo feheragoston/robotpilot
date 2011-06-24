@@ -2,10 +2,10 @@
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
 
-	goSpeed = 600
-	goAcc = 500
+	goSpeed = 400
+	goAcc = 800
 	turnSpeed = 4
-	turnAcc = 4
+	turnAcc = 8
 
 p.runparallel(
 function()
