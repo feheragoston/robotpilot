@@ -45,7 +45,7 @@ public:
 	bool RefineDeadreckoning(double x, double y, double phi);
 	bool RefineDeadreckoningInProgress();
 	void GetRefineData(double* dx, double* dy, double* dphi);
-	bool RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi);
+	bool RefreshPawnPositions(msgpawns* pawns, function_t f, double x, double y, double phi);
 	bool RefreshPawnPositionsInProgress();
 	bool RefreshPawnPositionsFinished();
 

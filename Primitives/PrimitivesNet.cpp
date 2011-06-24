@@ -360,14 +360,13 @@ void PrimitivesNet::GetRefineData(double* dx, double* dy, double* dphi) {
 	*dphi = refineDelta.phi;
 }
 
-bool PrimitivesNet::RefreshPawnPositions(msgpawns* pawns, double x, double y, double phi) {
+bool PrimitivesNet::RefreshPawnPositions(msgpawns* pawns, function_t f, double x, double y, double phi) {
 	this->pawns = pawns;
 	if (pawnRefresh.inprogress) {
 		return false;
 	}
 	msgd3 message;
-	//message.function = MSG_PAWNS;
-	message.function = MSG_PAWNS_AT_START;
+	message.function = f;
 	message.d1 = x;
 	message.d2 = y;
 	message.d3 = phi;
