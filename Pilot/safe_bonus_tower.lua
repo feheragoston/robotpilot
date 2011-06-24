@@ -50,7 +50,7 @@ repeat
 			gripperBIR = MAX_DISTANCE -- board
 			
 			-- meghatarozzuk a legkozelebbi parasztot
-			local px, py, minDist = c.FindPawn(STORAGE_NONE, FIG_PAWN, ignoreRadius)
+			local px, py, minDist = c.FindPawn(FIG_PAWN, ignoreRadius)
 			
 			if (not pawnInLeft) then
 				leftIR, leftPX, leftPY, leftX, leftY = SearchWithArmFromBoard(true, ignoreRadius)
@@ -152,19 +152,19 @@ repeat
 					end
 				else
 					if (pawnInLeft) then
-						x1, y1, x2, y2, dist = c.FindPawn(STORAGE_LEFT, 1, x2, y2)
-						if (x1) then
+						local tx, ty = c.GetStoragePos(STORAGE_LEFT, x2, y2)
+						if (tx) then
 							if (pawnInRight) then
-								if (c.simulate(DeployFullTower, x2, y2)) then
-									DeployFullTower(x2, y2)
+								if (c.simulate(DeployFullTower, tx, ty)) then
+									DeployFullTower(tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
 								end
 							else
-								if (c.simulate(DeployHalfTower, true, x2, y2)) then
-									DeployHalfTower(true, x2, y2)
+								if (c.simulate(DeployHalfTower, true, tx, ty)) then
+									DeployHalfTower(true, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
 									pawnInGripper = false;
@@ -172,10 +172,10 @@ repeat
 							end
 						end
 					elseif (pawnInRight) then
-						x1, y1, x2, y2, dist = c.FindPawn(STORAGE_RIGHT, 1, x2, y2)
-						if (x1) then
-							if (c.simulate(DeployHalfTower, false, x2, y2)) then
-								DeployHalfTower(false, x2, y2)
+						local tx, ty = c.GetStoragePos(STORAGE_RIGHT, x2, y2)
+						if (tx) then
+							if (c.simulate(DeployHalfTower, false, tx, ty)) then
+								DeployHalfTower(false, tx, ty)
 								c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 								pawnInRight = false;
 								pawnInGripper = false;

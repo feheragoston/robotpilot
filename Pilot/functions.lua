@@ -19,7 +19,8 @@ end
 function SearchWithGripperFromBoard(ignoreRadius, type)
 	local px, py, x, y
 	while (true) do
-		px, py, x, y, ignoreRadius = c.FindPawn(STORAGE_GRIPPER, type, ignoreRadius);
+		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius);
+		x, y = c.GetStoragePos(STORAGE_GRIPPER, px, py)
 		if (x) then
 			-- a zold mezokrol nem keresunk
 			if (py > 400 and py < 2600 and c.simulate(PickupWithGripperFromBoard, x, y)) then
@@ -57,7 +58,8 @@ end
 function SearchWithGripperFromSides(ignoreRadius, type)
 	local px, py, x, y
 	while (true) do
-		px, py, x, y, ignoreRadius = c.FindPawn(4, type, ignoreRadius);
+		px, py, ignoreRadius = c.FindPawn(type, ignoreRadius);
+		x, y, px, py = c.GetStoragePos(4, px, py)
 		if (x) then
 			-- csak a zold mezokrol keresunk
 			if ((py < 400 or py > 2600) and c.simulate(PickupWithGripperFromSides, px, py, x, y)) then
@@ -114,7 +116,8 @@ function SearchWithArmFromBoard(left, ignoreRadius)
 		arm = STORAGE_LEFT
 	end
 	while (true) do
-		px, py, x, y, ignoreRadius = c.FindPawn(arm, FIG_PAWN, ignoreRadius)
+		px, py, ignoreRadius = c.FindPawn(FIG_PAWN, ignoreRadius)
+		x, y = c.GetStoragePos(arm, px, py)
 		if (x) then
 			-- a zold mezokrol nem keresunk
 			if (py > 400 and py < 2600 and c.simulate(PickupWithArmFromBoard, left, x, y)) then

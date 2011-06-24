@@ -1489,25 +1489,47 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
  * @return
  */
 int Control::l_FindPawn(lua_State *L) {
-	int target = luaL_optinteger(L, 1, 0);
 	int type = luaL_optinteger(L, 2, 0);
+	double ignoreRadius = luaL_optnumber(L, 3, ROBOT_FRONT_MAX);
+
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	int argc = lua_gettop(L);
 
 	double px;
 	double py;
 	double minDist;
 
-	if (argc < 4) {
-		double ignoreRadius = luaL_optnumber(L, 3, ROBOT_FRONT_MAX);
-		int closest = vipawns->num;
-		for (int i = 0; i < vipawns->num; i++) {
-			msgpawn* pawn = &(vipawns->pawns[i]);
+	int closest = vipawns->num;
+	for (int i = 0; i < vipawns->num; i++) {
+		msgpawn* pawn = &(vipawns->pawns[i]);
+		if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
+			double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+			if (dist > ignoreRadius) {
+				if (closest == vipawns->num || dist < minDist) {
+					// megnezzuk, hogy a mi mezonkon van-e
+					if (pawnOnOurColor(pawn->x, pawn->y)) {
+						continue;
+					}
+
+					minDist = dist;
+					closest = i;
+				}
+			}
+		}
+	}
+
+	if (closest < vipawns->num) {
+		px = vipawns->pawns[closest].x;
+		py = vipawns->pawns[closest].y;
+	} else {
+		closest = pawns->num;
+		for (int i = 0; i < pawns->num; i++) {
+			msgpawn* pawn = &(pawns->pawns[i]);
 			if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
 				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
 				if (dist > ignoreRadius) {
-					if (closest == vipawns->num || dist < minDist) {
+					if (closest == pawns->num || dist < minDist) {
 						// megnezzuk, hogy a mi mezonkon van-e
 						if (pawnOnOurColor(pawn->x, pawn->y)) {
 							continue;
@@ -1520,43 +1542,10 @@ int Control::l_FindPawn(lua_State *L) {
 			}
 		}
 
-		if (closest < vipawns->num) {
-			px = vipawns->pawns[closest].x;
-			py = vipawns->pawns[closest].y;
+		if (closest < pawns->num) {
+			px = pawns->pawns[closest].x;
+			py = pawns->pawns[closest].y;
 		} else {
-			closest = pawns->num;
-			for (int i = 0; i < pawns->num; i++) {
-				msgpawn* pawn = &(pawns->pawns[i]);
-				if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
-					double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
-					// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
-					if (dist > ignoreRadius) {
-						if (closest == pawns->num || dist < minDist) {
-							// megnezzuk, hogy a mi mezonkon van-e
-							if (pawnOnOurColor(pawn->x, pawn->y)) {
-								continue;
-							}
-
-							minDist = dist;
-							closest = i;
-						}
-					}
-				}
-			}
-
-			if (closest < pawns->num) {
-				px = pawns->pawns[closest].x;
-				py = pawns->pawns[closest].y;
-			} else {
-				lua_pushboolean(L, false);
-				return 1;
-			}
-		}
-	} else {
-		px = lua_tonumber(L, 3);
-		py = lua_tonumber(L, 4);
-		minDist = sqrt(sqr(px - x) + sqr(py - y));
-		if (minDist < MAGNET_POS_Y) {
 			lua_pushboolean(L, false);
 			return 1;
 		}
@@ -1564,51 +1553,8 @@ int Control::l_FindPawn(lua_State *L) {
 
 	lua_pushnumber(L, px);
 	lua_pushnumber(L, py);
-	if (target == STORAGE_GRIPPER) {
-		double angle = atan2f(y - py, x - px);
-		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
-		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
-		lua_pushnumber(L, minDist);
-		return 5;
-	} else if (target == STORAGE_LEFT) {
-		double c2 = sqr(px - x) + sqr(py - y);
-		if (c2 < EPSILON) {
-			cout << "(Control) Tul kicsi tavolsag: " << c2 << endl;
-			c2 = EPSILON;
-		}
-		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + x;
-		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + y;
-		double alpha = atan2(dy - y, dx - x);
-		dx += 20 * cos(alpha);
-		dy += 20 * sin(alpha);
-		lua_pushnumber(L, dx);
-		lua_pushnumber(L, dy);
-		lua_pushnumber(L, minDist);
-		return 5;
-	} else if (target == STORAGE_RIGHT) {
-		double c2 = sqr(x - px) + sqr(y - py);
-		double dx = cos(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + x;
-		double dy = sin(atan2(py - y, px - x) + asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(c2 - sqr(MAGNET_POS_Y)) + y;
-		double alpha = atan2(dy - y, dx - x);
-		dx += -MAGNET_POS_X * cos(alpha);
-		dy += -MAGNET_POS_X * sin(alpha);
-		lua_pushnumber(L, dx);
-		lua_pushnumber(L, dy);
-		lua_pushnumber(L, minDist);
-		return 5;
-	} else if (target == 4) {
-		lua_pushnumber(L, px);
-		if (py > 1500) {
-			lua_pushnumber(L, py - 400);
-		} else {
-			lua_pushnumber(L, py + 400);
-		}
-		lua_pushnumber(L, minDist);
-		return 5;
-	} else {
-		lua_pushnumber(L, minDist);
-		return 3;
-	}
+	lua_pushnumber(L, minDist);
+	return 3;
 }
 
 /**

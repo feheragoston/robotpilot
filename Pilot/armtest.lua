@@ -31,9 +31,10 @@ end
 
 p.GoTo(250, Offset + Ori * 800)
 
-x1, y1, x2, y2 = c.FindPawn(STORAGE_RIGHT, 1)
-p.TurnTo(x2, y2)
-p.GoTo(x2, y2)
+px, py, dist = c.FindPawn(FIG_PAWN)
+tx, ty = c.GetStoragePos(STORAGE_RIGHT, px, py)
+p.TurnTo(tx, ty)
+p.GoTo(tx, ty)
 
 c.music("starwars")
 armtest(false, 1000, 100)

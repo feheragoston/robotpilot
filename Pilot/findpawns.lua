@@ -97,11 +97,12 @@ repeat
 		while (not pawnInLeftArm) do
 			c.print("Paraszt keresese bal karba");
 			p.RefreshPawnPositions()
-			px, py, x, y, ignoreRadius = c.FindPawn(STORAGE_LEFT, 1, ignoreRadius);
-			if (x) then
-				if (c.Simulate(PickNextPawnWithArm, x, y, true)) then
+			px, py, ignoreRadius = c.FindPawn(FIG_PAWN, ignoreRadius);
+			tx, ty = c.GetStoragePos(STORAGE_LEFT, px, py)
+			if (tx) then
+				if (c.Simulate(PickNextPawnWithArm, tx, ty, true)) then
 					deadpos = false;
-					PickNextPawnWithArm(x, y, true);
+					PickNextPawnWithArm(tx, ty, true);
 					stuck = 0;
 				else
 					ignoreRadius = ignoreRadius + 1;
@@ -136,7 +137,8 @@ repeat
 		while (not pawnInGripper) do
 			c.print("Paraszt keresese");
 			p.RefreshPawnPositions()
-			px, py, x, y, ignoreRadius = c.FindPawn(4, 0, ignoreRadius);
+			px, py, ignoreRadius = c.FindPawn(FIG_NOTHING, ignoreRadius);
+			x, y, px, py = c.GetStoragePos(4, px, py)
 			if (x) then
 				if (c.simulate(GoToNextPawn, x, y, px, py)) then
 					deadpos = false;
