@@ -88,16 +88,16 @@ function PickupWithArmFromBoard(left, x, y)
 		
 		low, high = c.GetDistance(side)
 		c.print("PickupWithArmFromBoard 2", low, high)
-		if (low < 100) then
+		if (low < 90) then
 			p.Magnet(left, 1)
 			p.ArmMove(left, 130)
-			p.Turn(0.1)
-			p.Turn(-0.2)
-			p.Turn(0.1)
+			p.Turn(0.2)
+			p.Turn(-0.4)
+			p.Turn(0.2)
 			p.ArmMove(left, 0)
 			low, high = c.GetDistance(side)
 			c.print("PickupWithArmFromBoard 3", low, high)
-			if (low < 100) then
+			if (low < 75) then
 				return false
 			end
 			return true
@@ -145,10 +145,11 @@ end
 
 function DeployFullTower(x, y)
 	p.TurnToSafe(x, y, turnSpeed, turnAcc)
-	p.GoToSafe(x, y, goSpeed, goAcc)
 	
 	p.runparallel(
 	function()
+		p.GoToSafe(x, y, goSpeed, goAcc)
+		
 		p.ArmMove(true, 130)
 		p.Magnet(true, -1)
 		p.ArmMove(true, 0)
@@ -174,10 +175,11 @@ end
 
 function DeployHalfTower(left, x, y)
 	p.TurnToSafe(x, y, turnSpeed, turnAcc)
-	p.GoToSafe(x, y, goSpeed, goAcc)
 	
 	p.runparallel(
 	function()
+		p.GoToSafe(x, y, goSpeed, goAcc)
+		
 		p.ArmMove(left, 130)
 		p.Magnet(left, -1)
 		p.ArmMove(left, 0)
