@@ -35,6 +35,8 @@ bool PrimitivesNet::CameraInit() {
 			return false;
 		}
 	}
+	posRefine.inprogress = false;
+	pawnRefresh.inprogress = false;
 	return true;
 }
 
