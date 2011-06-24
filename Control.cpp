@@ -17,6 +17,8 @@ int Control::logfile = NULL;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
+msgpawns* Control::vipawns = NULL;
+msgpawns* Control::startpawns = NULL;
 std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
 std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
 bool Control::sendDynObstacles = true;
@@ -140,6 +142,7 @@ Control::Control(Config* config) {
 		{"RefreshPawnPositionsFinished", l_RefreshPawnPositionsFinished},
 		{"FindPawn", l_FindPawn},
 		{"SetPawnType", l_SetPawnType},
+		{"PawnsNearby", l_PawnsNearby},
 		{"GetDeployPoint", l_GetDeployPoint},
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
 
@@ -193,6 +196,13 @@ Control::Control(Config* config) {
 		}
 		pawns->pawns[i].type = 1;
 	}
+	startpawns = new msgpawns();
+	startpawns->function = MSG_PAWNS;
+	startpawns->num = 0;
+	vipawns = new msgpawns();
+	vipawns->function = MSG_PAWNS;
+	vipawns->num = 0;
+
 	logPawns = true;
 
 	if (obstacles.empty()) {
@@ -245,6 +255,10 @@ Control::~Control() {
 	}
 
 	delete opponent;
+
+	delete pawns;
+	delete vipawns;
+	delete startpawns;
 }
 
 bool Control::Init() {
@@ -408,7 +422,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			if (connectCamera()) {
 				double x, y, phi;
 				mPrimitives->GetRobotPos(&x, &y, &phi);
-				mCamera->RefreshPawnPositions(pawns, x, y, phi);
+				mCamera->RefreshPawnPositions(pawns, MSG_PAWNS, x, y, phi);
 			}
 		} else {
 			mServer->Send(n, pawns, sizeof(msgpawns));
@@ -1383,6 +1397,29 @@ int Control::l_StartMatch(lua_State *L) {
 	obstacles.push_back(new Circle(1885, offset + dir * 2375, PAWN_RADIUS));
 	sendDynObstacles = true;
 
+	for (int i = 0; i < pawns->num; i++) {
+		startpawns->pawns[i].x = pawns->pawns[i].x;
+		startpawns->pawns[i].y = pawns->pawns[i].y;
+		startpawns->pawns[i].type = pawns->pawns[i].type;
+	}
+	startpawns->num = pawns->num;
+
+	for (int i = 0; i < pawns->num; i++) {
+		float viline = 975.;
+		if (color) {
+			viline = 2025.;
+		}
+		if (fabs(pawns->pawns[i].y - viline) < 200) {
+			int n = vipawns->num;
+			vipawns->pawns[n].x = pawns->pawns[i].x;
+			vipawns->pawns[n].y = pawns->pawns[i].y;
+			vipawns->pawns[n].type = pawns->pawns[i].type;
+			vipawns->num++;
+		}
+	}
+
+	logPawns = true;
+
 	return 0;
 }
 
@@ -1391,9 +1428,13 @@ int Control::l_RefreshPawnPositions(lua_State *L) {
 		lua_pushboolean(L, false);
 		return 1;
 	}
+	function_t f = MSG_PAWNS;
+	if (startpawns->num == 0) {
+		f = MSG_PAWNS_AT_START;
+	}
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	lua_pushboolean(L, mCamera->RefreshPawnPositions(pawns, x, y, phi));
+	lua_pushboolean(L, mCamera->RefreshPawnPositions(pawns, f, x, y, phi));
 	return 1;
 }
 
@@ -1461,14 +1502,13 @@ int Control::l_FindPawn(lua_State *L) {
 
 	if (argc < 4) {
 		double ignoreRadius = luaL_optnumber(L, 3, ROBOT_FRONT_MAX);
-		int closest = pawns->num;
-		for (int i = 0; i < pawns->num; i++) {
-			msgpawn* pawn = &(pawns->pawns[i]);
+		int closest = vipawns->num;
+		for (int i = 0; i < vipawns->num; i++) {
+			msgpawn* pawn = &(vipawns->pawns[i]);
 			if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
 				double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
-				// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
 				if (dist > ignoreRadius) {
-					if (closest == pawns->num || dist < minDist) {
+					if (closest == vipawns->num || dist < minDist) {
 						// megnezzuk, hogy a mi mezonkon van-e
 						if (pawnOnOurColor(pawn->x, pawn->y)) {
 							continue;
@@ -1481,12 +1521,37 @@ int Control::l_FindPawn(lua_State *L) {
 			}
 		}
 
-		if (closest >= pawns->num) {
-			lua_pushboolean(L, false);
-			return 1;
+		if (closest < vipawns->num) {
+			px = vipawns->pawns[closest].x;
+			py = vipawns->pawns[closest].y;
 		} else {
-			px = pawns->pawns[closest].x;
-			py = pawns->pawns[closest].y;
+			closest = pawns->num;
+			for (int i = 0; i < pawns->num; i++) {
+				msgpawn* pawn = &(pawns->pawns[i]);
+				if ((type == 0 && pawn->type < FIG_PPKING) || pawn->type == type) {
+					double dist = sqrt(sqr(pawn->x - x) + sqr(pawn->y - y));
+					// tul kozeli parasztot nem probaljuk meg felszedni mert eltoljuk
+					if (dist > ignoreRadius) {
+						if (closest == pawns->num || dist < minDist) {
+							// megnezzuk, hogy a mi mezonkon van-e
+							if (pawnOnOurColor(pawn->x, pawn->y)) {
+								continue;
+							}
+
+							minDist = dist;
+							closest = i;
+						}
+					}
+				}
+			}
+
+			if (closest < pawns->num) {
+				px = pawns->pawns[closest].x;
+				py = pawns->pawns[closest].y;
+			} else {
+				lua_pushboolean(L, false);
+				return 1;
+			}
 		}
 	} else {
 		px = lua_tonumber(L, 3);
@@ -1557,8 +1622,36 @@ int Control::l_SetPawnType(lua_State *L) {
 			pawns->pawns[i].type = pawns->pawns[i].type | type;
 		}
 	}
+	for (int i = 0; i < vipawns->num; i++) {
+		if (fabsf(vipawns->pawns[i].x - x) < PAWN_RADIUS
+				&& fabsf(vipawns->pawns[i].y - y) < PAWN_RADIUS) {
+			vipawns->pawns[i].type = vipawns->pawns[i].type | type;
+		}
+	}
+	for (int i = 0; i < startpawns->num; i++) {
+		if (fabsf(startpawns->pawns[i].x - x) < PAWN_RADIUS
+				&& fabsf(startpawns->pawns[i].y - y) < PAWN_RADIUS) {
+			startpawns->pawns[i].type = startpawns->pawns[i].type | type;
+		}
+	}
 	logPawns = true;
 	return 0;
+}
+
+int Control::l_PawnsNearby(lua_State *L) {
+	double x, y, phi;
+	mPrimitives->GetRobotPos(&x, &y, &phi);
+	for (int i = 0; i < pawns->num; i++) {
+		msgpawn* pawn = &(pawns->pawns[i]);
+		if (pawn->type < FIG_PPKING) {
+			if (sqr(pawn->x - x) + sqr(pawn->y - y) < (ROBOT_FRONT_MAX + PAWN_RADIUS) * (ROBOT_FRONT_MAX + PAWN_RADIUS)) {
+				lua_pushboolean(L, true);
+				return 1;
+			}
+		}
+	}
+	lua_pushboolean(L, false);
+	return 1;
 }
 
 /**
@@ -1599,12 +1692,12 @@ int Control::l_GetDeployPoint(lua_State *L) {
 		double x = field / 6 * 350 + 175;
 		double y = field % 6 * 350 + 175 + 450;
 
-		// vedett helyek keskenyebbek, nem a kozepukre rakunk
-		if (field == 30 || field == 31 || field == 34 || field == 35) {
+		// vedett helyek keskenyebbek, nem a kozepukre rakunk, also sornal sem rakjuk a fal melle
+		if (field >= 30) {
 			x -= 60;
 			if (field == 30 || field == 34) {
 				y += 60;
-			} else {
+			} else if (field == 31 || field == 35) {
 				y -= 60;
 			}
 		}

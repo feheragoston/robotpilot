@@ -53,6 +53,8 @@ protected:
 	static int logfile;
 
 	static msgpawns* pawns;
+	static msgpawns* vipawns;
+	static msgpawns* startpawns;
 
 	static std::list<Obstacle*> obstacles;
 	static std::list<Obstacle*> dynObstacles;
@@ -174,6 +176,7 @@ protected:
 	static int l_RefreshPawnPositionsFinished(lua_State *L);
 	static int l_FindPawn(lua_State *L);
 	static int l_SetPawnType(lua_State *L);
+	static int l_PawnsNearby(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
 	static int l_SetDeployPointPriority(lua_State *L);
 };
