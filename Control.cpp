@@ -1682,8 +1682,20 @@ int Control::l_GetDeployPoint(lua_State *L) {
 		int d = (i / 6 + i % 6) % 2;
 		if ((color && d == 0) || (!color && d == 1)) {
 			if (deployFields[i] < min && deployFields[i] > ignorePriority) {
-				min = deployFields[i];
-				field = i;
+				// ellenorizzuk, hogy van-e a mezon akadaly
+				double x = field / 6 * 350 + 175;
+				double y = field % 6 * 350 + 175 + 450;
+				bool free = true;
+				for (std::list<Obstacle*>::iterator o = dynObstacles.begin(); o != dynObstacles.end(); o++) {
+					if ((*o)->Intersect(x, y, 175)) {
+						free = false;
+						break;
+					}
+				}
+				if (free) {
+					min = deployFields[i];
+					field = i;
+				}
 			}
 		}
 	}
@@ -1789,12 +1801,10 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 		}
 
 		if (target == 30 || target == 31 || target == 34 || target == 35) {
+			// a biztos helyre statikus akadalyokat is beteszunk
 			obstacles.push_back(new Circle(px, py, 100));
-			logDynObstacles = true;
-			sendDynObstacles = true;
-		} else {
-			addDynamicObstacle(new Circle(px, py, 100));
 		}
+		addDynamicObstacle(new Circle(px, py, 100));
 	}
 
 	return 0;
