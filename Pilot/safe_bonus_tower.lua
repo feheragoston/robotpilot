@@ -2,10 +2,12 @@
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
 
+--[[
 	goSpeed = 400
 	goAcc = 800
 	turnSpeed = 4
 	turnAcc = 8
+]]
 
 p.runparallel(
 function()
@@ -38,6 +40,8 @@ safe2Deployed = false;
 bonus1Deployed = false;
 
 repeat
+	local deadpos = true;
+	
 	c.print("Felszedo fazis indul")
 	
 	
@@ -78,6 +82,7 @@ repeat
 			ignoreRadius = math.min(leftIR, rightIR, gripperGIR, gripperBIR)
 			c.print("ignoreRadius:", ignoreRadius)
 			if (ignoreRadius < MAX_DISTANCE) then
+				deadpos = false
 				if (leftIR < ignoreRadius + 10) then
 					c.print("Felszedes bal karral")
 					c.SetPawnType(leftPX, leftPY, FIG_WENT_OVER)
@@ -99,7 +104,7 @@ repeat
 						pawnInGripper = gripperPawnType;
 						c.SetPawnType(gripperBPX, gripperBPY, FIG_PICKED_UP)
 					end
-				elseif (gripperGIR < ignoreRadius + 10) then
+				else
 					c.print("Felszedes gripperrel zold mezorol")
 					c.SetPawnType(gripperGPX, gripperGPY, FIG_WENT_OVER)
 					if (PickupWithGripperFromSides(gripperGPX, gripperGPY, gripperGX, gripperGY)) then
@@ -135,6 +140,7 @@ repeat
 			if (x1) then
 				if (gripperPawnType == FIG_PAWN or (not pawnInLeft and not pawnInRight)) then
 					if (c.simulate(DeployFromGripper, x1, y1, x2, y2)) then
+						deadpos = false
 						DeployFromGripper(x1, y1, x2, y2);
 						c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- jeloljuk, hogy a mezo foglalt
 						pawnInGripper = false
@@ -153,8 +159,16 @@ repeat
 						local tx, ty = c.GetStoragePos(STORAGE_LEFT, x2, y2)
 						if (tx) then
 							if (pawnInRight) then
-								if (c.simulate(DeployFullTower, tx, ty)) then
-									DeployFullTower(tx, ty)
+								if (c.simulate(DeployFullTower, true, tx, ty)) then
+									deadpos = false
+									DeployFullTower(true, tx, ty)
+									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									pawnInLeft = false;
+									pawnInRight = false;
+									pawnInGripper = false;
+								elseif (c.simulate(DeployFullTower, false, tx, ty)) then
+									deadpos = false
+									DeployGullTower(false, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
 									pawnInRight = false;
@@ -162,6 +176,7 @@ repeat
 								end
 							else
 								if (c.simulate(DeployHalfTower, true, tx, ty)) then
+									deadpos = false
 									DeployHalfTower(true, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
@@ -173,6 +188,7 @@ repeat
 						local tx, ty = c.GetStoragePos(STORAGE_RIGHT, x2, y2)
 						if (tx) then
 							if (c.simulate(DeployHalfTower, false, tx, ty)) then
+								deadpos = false
 								DeployHalfTower(false, tx, ty)
 								c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 								pawnInRight = false;
@@ -213,4 +229,18 @@ repeat
 	
 	c.print("Lerako fazis kesz")
 	
+	while (deadpos) do
+		c.print("Beszorultunk, feloldas indul")
+		local turn = 0
+		if (math.random() > 0.3) then
+			turn = (math.random() - 0.5) * math.pi * 2
+		end
+		local go = math.random(-1000, 1000)
+		if (c.simulate(ResolveDeadpos, turn, go)) then
+			c.print("Beszorulas feloldva")
+			deadpos = false
+			ResolveDeadpos(turn, go)
+		end
+	end
+
 until (c.GetStopButton())

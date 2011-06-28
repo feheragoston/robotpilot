@@ -1090,7 +1090,7 @@ int Control::l_RefineDeadreckoning(lua_State *L) {
 		time = InitTime() - time;
 		mCamera->GetRefineData(&dx, &dy, &dphi);
 		mPrimitives->GetRobotPos(&x, &y, &phi);
-		mPrimitives->SetRobotPos(x + dx, y + dy, phi + dphi);
+		mPrimitives->SetRobotPos(x - dx, y - dy, phi - dphi);
 		cout << "(Control) RefineDeadreckoning : " << dx << ", " << dy << ", " << dphi << ", " << time << "ms" << endl;
 		lua_pushboolean(L, true);
 		return 1;

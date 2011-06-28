@@ -5,7 +5,7 @@ if (CALIBRATED == nil) then
 	Offset = 0
 	Ori = 1
 
-	goSpeed = 800
+	goSpeed = 600
 	goAcc = 800
 	turnSpeed = 6
 	turnAcc = 10

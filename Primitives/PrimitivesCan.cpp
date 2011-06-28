@@ -1203,13 +1203,14 @@ long int PrimitivesCan::GetOpponentPos_Unsafe(double* x, double* y){
 
 void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
-	double tmpX, tmpY, tmpPhi;
+	double xr, yr, phir;
 
-	GetRobotPos_Unsafe(&tmpX, &tmpY, &tmpPhi);
+	deadreck->GET_POS(&xr, &yr, &phir);
 
-	deadreckCheckX		+= 	x	- tmpX;
-	deadreckCheckY		+= 	y	- tmpY;
-	deadreckCheckPhi	+= 	phi	- tmpPhi;
+	//ConvRobotToWorld() fuggvenyszamitasabol
+	deadreckCheckPhi = phi - phir;
+	deadreckCheckX = x - (xr * cos(deadreckCheckPhi) - yr * sin(deadreckCheckPhi));
+	deadreckCheckY = y - (xr * sin(deadreckCheckPhi) + yr * cos(deadreckCheckPhi));
 
 }
 
