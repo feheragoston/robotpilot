@@ -15,6 +15,8 @@ if (CALIBRATED == nil) then
 
 	p.sleep(1000)
 	
+	c.music("start")
+
 	c.print("Startra varunk");
 	repeat p.process() until (c.GetStartButton());
 	c.print("Startgomb lenyomva, elkezdjuk a kalibraciot");

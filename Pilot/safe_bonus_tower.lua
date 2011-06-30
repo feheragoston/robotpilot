@@ -20,6 +20,7 @@ function()
 end,
 function()
 	p.sleep(3000)
+	c.music("start")
 	repeat
 		p.process()
 	until(c.GetStartButton())
@@ -137,8 +138,10 @@ repeat
 	
 	c.print("Felszedo fazis kesz: ", pawnInLeft, pawnInRight, pawnInGripper)
 	
-	ignorePriority = -1000;
-	while (pawnInGripper) do
+	local ignorePriority = -1000
+	local hasDeployPoint = true
+	
+	while (pawnInGripper and hasDeployPoint) do
 		local status, err = pcall(function()
 			c.print("Paraszt uritese");
 			x1, y1, x2, y2, target, ignorePriority = c.GetDeployPoint(STORAGE_GRIPPER, ignorePriority);
@@ -165,6 +168,7 @@ repeat
 						if (tx) then
 							if (pawnInRight) then
 								if (c.simulate(DeployFullTower, true, tx, ty)) then
+									c.music("starwars")
 									deadpos = false
 									DeployFullTower(true, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
@@ -172,6 +176,7 @@ repeat
 									pawnInRight = false;
 									pawnInGripper = false;
 								elseif (c.simulate(DeployFullTower, false, tx, ty)) then
+									c.music("starwars")
 									deadpos = false
 									DeployGullTower(false, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
@@ -181,6 +186,7 @@ repeat
 								end
 							else
 								if (c.simulate(DeployHalfTower, true, tx, ty)) then
+									c.music("axelfoley")
 									deadpos = false
 									DeployHalfTower(true, tx, ty)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
@@ -193,6 +199,7 @@ repeat
 						local tx, ty = c.GetStoragePos(STORAGE_RIGHT, x2, y2)
 						if (tx) then
 							if (c.simulate(DeployHalfTower, false, tx, ty)) then
+								c.music("axelfoley")
 								deadpos = false
 								DeployHalfTower(false, tx, ty)
 								c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
@@ -221,31 +228,38 @@ repeat
 			else
 				c.print("Nincs tobb lerako pozicio")
 				p.process()
+				hasDeployPoint = false
 				--TODO
 			end
 		end);
 		if (not status) then
-			c.print("Hiba", err);
+			c.print("Hiba", err)
 			p.MotionStop(MAX_DEC)
-			ignorePriority = -1000;
+			ignorePriority = -1000
 		end
 		p.process()
 	end
 	
 	c.print("Lerako fazis kesz")
 	
-	while (deadpos) do
-		c.print("Beszorultunk, feloldas indul")
-		local turn = 0
-		if (math.random() > 0.3) then
-			turn = (math.random() - 0.5) * math.pi * 2
+	local status, err = pcall(function()
+		while (deadpos) do
+			c.print("Beszorultunk, feloldas indul")
+			local turn = 0
+			if (math.random() > 0.3) then
+				turn = (math.random() - 0.5) * math.pi * 2
+			end
+			local go = math.random(-1000, 1000)
+			if (c.simulate(ResolveDeadpos, turn, go)) then
+				c.print("Beszorulas feloldva")
+				deadpos = false
+				ResolveDeadpos(turn, go)
+			end
 		end
-		local go = math.random(-1000, 1000)
-		if (c.simulate(ResolveDeadpos, turn, go)) then
-			c.print("Beszorulas feloldva")
-			deadpos = false
-			ResolveDeadpos(turn, go)
-		end
+	end);
+	if (not status) then
+		c.print("Hiba", err);
+		p.MotionStop(MAX_DEC)
 	end
 
 until (c.GetStopButton())
