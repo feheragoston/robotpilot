@@ -17,6 +17,7 @@ function()
 		end
 		p.process()
 	until (c.GetStartButton())
+	c.ValidateStartSetup()
 end,
 function()
 	p.sleep(3000)
@@ -32,14 +33,12 @@ function()
 	safe2Deployed = false;
 	bonus1Deployed = false;
 
-	if (c.PawnNearPoint(1750, 800) or c.PawnNearPoint(1750, 1150)) then
-		c.SetDeployPointPriority(30, 1, STORAGE_NONE)
-		c.SetDeployPointPriority(31, 1, STORAGE_NONE)
-		c.SetDeployPointPriority(34, 1, STORAGE_NONE)
-		c.SetDeployPointPriority(35, 1, STORAGE_NONE)
-		safe1Deployed = true;
-		safe2Deployed = true;
-	end
+	c.SetDeployPointPriority(30, 1, STORAGE_NONE)
+	c.SetDeployPointPriority(31, 1, STORAGE_NONE)
+	c.SetDeployPointPriority(34, 1, STORAGE_NONE)
+	c.SetDeployPointPriority(35, 1, STORAGE_NONE)
+	safe1Deployed = true;
+	safe2Deployed = true;
 	
 	if (c.PawnNearPoint(350, 800)) then
 		p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)

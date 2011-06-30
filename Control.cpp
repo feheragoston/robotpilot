@@ -30,12 +30,12 @@ bool Control::simulate = false;
 bool Control::safeMotion = false;
 
 int Control::deployFields[36] = {
-		-11, -15, -14, -14, -15, -11,
+		-11, -18, -14, -14, -18, -11,
 		-13, -12, -10, -10, -12, -13,
 		 -8,  -2,  -1,  -1,  -2,  -8,
 		 -4,  -7,  -3,  -3,  -7,  -4,
 		 -9,  -5,  -6,  -6,  -5,  -9,
-		-18, -16, -17, -17, -16, -18
+		-16, -15, -17, -17, -15, -16
 };
 
 /*
@@ -148,6 +148,7 @@ Control::Control(Config* config) {
 		{"PawnNearPoint", l_PawnNearPoint},
 		{"GetDeployPoint", l_GetDeployPoint},
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
+		{"ValidateStartSetup", l_ValidateStartSetup},
 
 		{NULL, NULL}
 	};
@@ -1833,5 +1834,28 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 		addDynamicObstacle(new Circle(px, py, 100));
 	}
 
+	return 0;
+}
+
+int Control::l_ValidateStartSetup(lua_State *L) {
+	int kingnum = 0;
+	for (int i = 0; i < pawns->num; i++) {
+		if (fabsf(pawns->pawns[i].y - 290) < PAWN_RADIUS) {
+			if (pawns->pawns[i].type == 4) {
+				kingnum++;
+			}
+		}
+	}
+
+	if (kingnum == 0) {
+		for (int i = 0; i < pawns->num; i++) {
+			if (fabsf(pawns->pawns[i].y - 290) < PAWN_RADIUS) {
+				pawns->pawns[i].type = 4;
+			}
+			if (fabsf(pawns->pawns[i].y - 2710) < PAWN_RADIUS) {
+				pawns->pawns[i].type = 4;
+			}
+		}
+	}
 	return 0;
 }

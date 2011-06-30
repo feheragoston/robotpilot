@@ -181,6 +181,7 @@ protected:
 	static int l_PawnNearPoint(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
 	static int l_SetDeployPointPriority(lua_State *L);
+	static int l_ValidateStartSetup(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */
