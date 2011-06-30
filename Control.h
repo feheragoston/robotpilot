@@ -178,6 +178,7 @@ protected:
 	static int l_GetStoragePos(lua_State *L);
 	static int l_SetPawnType(lua_State *L);
 	static int l_PawnsNearby(lua_State *L);
+	static int l_PawnNearPoint(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
 	static int l_SetDeployPointPriority(lua_State *L);
 };

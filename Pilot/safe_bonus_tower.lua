@@ -4,7 +4,7 @@ dofile("Pilot/functions.lua")
 
 --[[
 	goSpeed = 400
-	goAcc = 800
+	goAcc = 500
 	turnSpeed = 4
 	turnAcc = 8
 ]]
@@ -24,11 +24,16 @@ function()
 		p.process()
 	until(c.GetStartButton())
 	
-	c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
+	c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 	c.print("Meccs elkezdodott");
 	
-	p.TurnTo(200, Offset + Ori * 800, turnSpeed, 4)
-	p.GoTo(200, Offset + Ori * 800, goSpeed, goAcc)
+	if (c.PawnNearPoint(350, 800)) then
+		p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)
+		p.GoTo(200, Offset + Ori * 400, goSpeed, goAcc)
+	else
+		p.TurnTo(200, Offset + Ori * 800, turnSpeed, 4)
+		p.GoTo(200, Offset + Ori * 800, goSpeed, goAcc)
+	end
 end)
 
 pawnInGripper = false

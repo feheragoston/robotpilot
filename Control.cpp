@@ -28,7 +28,7 @@ double Control::opponent_y = -1100.;
 double Control::angry = 0.;
 bool Control::simulate = false;
 bool Control::safeMotion = false;
-/*
+
 int Control::deployFields[36] = {
 		-15, -12, -14, -14, -12, -15,
 		-11, -13, -10, -10, -13, -11,
@@ -37,8 +37,8 @@ int Control::deployFields[36] = {
 		 -9,  -5,  -6,  -6,  -5,  -9,
 		-18, -16, -17, -17, -16, -18
 };
-	MOST NE MENJUNK AT A MASIK TERFELRE
-*/
+
+/*
 int Control::deployFields[36] = {
 		  0,  -7,   0,   0,  -7,   0,
 		 -6,   0,  -5,  -5,   0,  -6,
@@ -47,6 +47,7 @@ int Control::deployFields[36] = {
 		  0,  -4,   0,   0,  -4,   0,
 		 -9,   0,  -8,  -8,   0,  -9
 };
+*/
 struct timeval Control::runStart = {0, 0};
 struct timeval Control::initStart = {0, 0};
 struct timeval Control::matchStart = {0, 0};
@@ -144,6 +145,7 @@ Control::Control(Config* config) {
 		{"GetStoragePos", l_GetStoragePos},
 		{"SetPawnType", l_SetPawnType},
 		{"PawnsNearby", l_PawnsNearby},
+		{"PawnNearPoint", l_PawnNearPoint},
 		{"GetDeployPoint", l_GetDeployPoint},
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
 
@@ -1657,6 +1659,21 @@ int Control::l_PawnsNearby(lua_State *L) {
 				lua_pushboolean(L, true);
 				return 1;
 			}
+		}
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+int Control::l_PawnNearPoint(lua_State *L) {
+	float x = lua_tonumber(L, 1);
+	float y = lua_tonumber(L, 2);
+
+	for (int i = 0; i < pawns->num; i++) {
+		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
+				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
+			lua_pushboolean(L, true);
+			return 1;
 		}
 	}
 	lua_pushboolean(L, false);
