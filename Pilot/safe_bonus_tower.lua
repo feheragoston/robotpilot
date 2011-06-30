@@ -28,6 +28,19 @@ function()
 	c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 	c.print("Meccs elkezdodott");
 	
+	safe1Deployed = false;
+	safe2Deployed = false;
+	bonus1Deployed = false;
+
+	if (c.PawnNearPoint(1750, 800) or c.PawnNearPoint(1750, 1150)) then
+		c.SetDeployPointPriority(30, 1, STORAGE_NONE)
+		c.SetDeployPointPriority(31, 1, STORAGE_NONE)
+		c.SetDeployPointPriority(34, 1, STORAGE_NONE)
+		c.SetDeployPointPriority(35, 1, STORAGE_NONE)
+		safe1Deployed = true;
+		safe2Deployed = true;
+	end
+	
 	if (c.PawnNearPoint(350, 800)) then
 		p.TurnTo(200, Offset + Ori * 400, turnSpeed, 4)
 		p.GoTo(200, Offset + Ori * 400, goSpeed, goAcc)
@@ -40,10 +53,6 @@ end)
 pawnInGripper = false
 pawnInLeft = false
 pawnInRight = false
-
-safe1Deployed = false;
-safe2Deployed = false;
-bonus1Deployed = false;
 
 repeat
 	local deadpos = true;

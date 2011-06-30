@@ -13,7 +13,7 @@ function PickupWithGripperFromBoard(x, y)
 		p.GripperMove(GripperGrab)
 		return true
 	end
-	p.GripperMove(0)
+	p.GripperMove(GripperGrab)
 	return false
 end
 
@@ -55,7 +55,7 @@ function PickupWithGripperFromSides(px, py, x, y)
 		p.GripperMove(GripperGrab)
 		return true
 	end
-	p.GripperMove(0)
+	p.GripperMove(GripperGrab)
 	return false
 end
 

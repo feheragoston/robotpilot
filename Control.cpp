@@ -1807,7 +1807,7 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 			px = target / 6 * 350 + 175;
 			py = target % 6 * 350 + 175 + 450;
 			if (target == 30 || target == 31 || target == 34 || target == 35) {
-				// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
+				// vedett helyre nem kozepre rakjuk az akadalyt
 				px -= 60;
 				if (target == 30 || target == 34) {
 					py += 60;
