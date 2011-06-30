@@ -72,7 +72,7 @@ repeat
 				
 				c.print("Gripper kereses:", ir, math.min(leftIR, rightIR) - 10)
 				
-				if (safe1Deployed and bonus1Deployed) then
+				if (safe1Deployed) then
 					gripperPawnType = FIG_KING
 					gripperGIR, gripperGPX, gripperGPY, gripperGX, gripperGY = SearchWithGripperFromSides(gripperPawnType, ir, math.min(leftIR, rightIR) - 10)
 				else
