@@ -1856,6 +1856,7 @@ int Control::l_ValidateStartSetup(lua_State *L) {
 				pawns->pawns[i].type = 4;
 			}
 		}
+		logPawns = true;
 	}
 	return 0;
 }

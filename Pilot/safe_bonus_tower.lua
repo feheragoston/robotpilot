@@ -173,6 +173,7 @@ repeat
 				else
 					if (pawnInLeft) then
 						local tx, ty = c.GetStoragePos(STORAGE_LEFT, x2, y2)
+						local trx, try = c.GetStoragePos(STORAGE_RIGHT, x2, y2)
 						if (tx) then
 							if (pawnInRight) then
 								if (c.simulate(DeployFullTower, true, tx, ty)) then
@@ -183,10 +184,10 @@ repeat
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
-								elseif (c.simulate(DeployFullTower, false, tx, ty)) then
+								elseif (trx and c.simulate(DeployFullTower, false, trx, try)) then
 									c.music("starwars")
 									deadpos = false
-									DeployGullTower(false, tx, ty)
+									DeployFullTower(false, trx, try)
 									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
 									pawnInLeft = false;
 									pawnInRight = false;
