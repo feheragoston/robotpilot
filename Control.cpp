@@ -883,6 +883,7 @@ int Control::c_wait(lua_State *L) {
 		if (mPrimitives->GetOpponentPos(&ox, &oy) < SONAR_TIMEOUT) {
 			Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
 			removeCollidingDynamicObstacles(opp);
+			SetPawnType(ox, oy, FIG_WENT_OVER);
 			delete opp;
 		}
 	}
@@ -1624,10 +1625,7 @@ int Control::l_GetStoragePos(lua_State *L) {
 	}
 }
 
-int Control::l_SetPawnType(lua_State *L) {
-	float x = lua_tonumber(L, 1);
-	float y = lua_tonumber(L, 2);
-	int type = luaL_optinteger(L, 3, -1);
+void Control::SetPawnType(float x, float y, int type) {
 	for (int i = 0; i < pawns->num; i++) {
 		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
 				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
@@ -1647,6 +1645,13 @@ int Control::l_SetPawnType(lua_State *L) {
 		}
 	}
 	logPawns = true;
+}
+
+int Control::l_SetPawnType(lua_State *L) {
+	float x = lua_tonumber(L, 1);
+	float y = lua_tonumber(L, 2);
+	int type = luaL_optinteger(L, 3, -1);
+	SetPawnType(x, y, type);
 	return 0;
 }
 
