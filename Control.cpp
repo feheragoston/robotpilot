@@ -179,6 +179,7 @@ Control::Control(Config* config) {
 	luaC_export(L, STORAGE_GRIPPER);
 	luaC_export(L, STORAGE_LEFT);
 	luaC_export(L, STORAGE_RIGHT);
+	luaC_export(L, STORAGE_VISION);
 
 	luaC_export(L, PRIMITIVES_WAIT);
 
@@ -612,12 +613,14 @@ bool Control::obstacleCollision() {
 		double rx2 = robotBody[j2][0];
 		double ry2 = robotBody[j2][1];
 
+		/*
 		if (j == 0 || j == ROBOT_POINT_NUM) {
 			rx1 += sin(gripperPos) * 105;
 		}
 		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
 			rx2 += sin(gripperPos) * 105;
 		}
+		*/
 
 		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
 		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
@@ -644,6 +647,23 @@ bool Control::obstacleCollision() {
 		}
 		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				(*i)->Print();
+				return true;
+			}
+		}
+	}
+	if (gripperPos > 15 && gripperPos < 75) {
+		double px = x + cos(phi) * ROBOT_FRONT_PAWN;
+		double py = y + sin(phi) * ROBOT_FRONT_PAWN;
+
+		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+			if ((*i)->Intersect(px, py, PAWN_RADIUS)) {
+				(*i)->Print();
+				return true;
+			}
+		}
+		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+			if ((*i)->Intersect(px, py, PAWN_RADIUS)) {
 				(*i)->Print();
 				return true;
 			}
@@ -1459,6 +1479,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 		ret = mCamera->RefreshPawnPositionsFinished();
 	}
 	if (ret) {
+		/*
 		for (int i = 0; i < pawns->num; i++) {
 			if (pawnOnOurColor(pawns->pawns[i].x, pawns->pawns[i].y)) {
 				addDynamicObstacle(new Circle(pawns->pawns[i].x, pawns->pawns[i].y, PAWN_RADIUS));
@@ -1468,6 +1489,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 				delete pawn;
 			}
 		}
+		*/
 	}
 	lua_pushboolean(L, ret);
 	return 1;
@@ -1577,6 +1599,11 @@ int Control::l_GetStoragePos(lua_State *L) {
 		double angle = atan2f(y - py, x - px);
 		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
+		return 2;
+	} else if (target == STORAGE_VISION) {
+		double angle = atan2f(y - py, x - px);
+		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 200));
+		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 200));
 		return 2;
 	} else if (target == STORAGE_LEFT) {
 		double c2 = sqr(px - x) + sqr(py - y);

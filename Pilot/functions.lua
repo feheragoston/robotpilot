@@ -160,13 +160,10 @@ function DeployFromGripper(x1, y1, x2, y2)
 end
 
 function DeployFullTower(left, x, y)
+	p.TurnToSafe(x, y, turnSpeed, turnAcc)
 	
 	p.runparallel(
 	function()
-		p.TurnToSafe(x, y, turnSpeed, turnAcc)
-		while (c.GetConsolePos() < 70) do
-			p.process()
-		end
 		p.GoToSafe(x, y, goSpeed, goAcc)
 		
 		p.ArmMove(left, 130)
@@ -204,13 +201,10 @@ function DeployFullTower(left, x, y)
 end
 
 function DeployHalfTower(left, x, y)
+	p.TurnToSafe(x, y, turnSpeed, turnAcc)
 	
 	p.runparallel(
 	function()
-		p.TurnToSafe(x, y, turnSpeed, turnAcc)
-		while (c.GetConsolePos() < 70) do
-			p.process()
-		end
 		p.GoToSafe(x, y, goSpeed, goAcc)
 		
 		p.ArmMove(left, 130)
@@ -220,7 +214,7 @@ function DeployHalfTower(left, x, y)
 	end,
 	function()
 		p.GripperMove(GripperHold)
-		p.ConsoleMove(90)
+		p.ConsoleMove(70)
 	end)
 	
 	if (left) then
@@ -228,12 +222,7 @@ function DeployHalfTower(left, x, y)
 	else
 		p.TurnSafe(-math.pi / 2, 4, 8)
 	end
-	p.runparallel(function()
-		p.ConsoleMove(70)
-	end,
-	function()
-		p.GoSafe(130, goSpeed, goAcc)
-	end)
+	p.GoSafe(130, goSpeed, goAcc)
 	p.GripperMove(90)
 end
 
