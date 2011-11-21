@@ -30,12 +30,12 @@ bool Control::simulate = false;
 bool Control::safeMotion = false;
 
 int Control::deployFields[36] = {
-		-11, -18, -14, -14, -18, -11,
-		-13, -12, -10, -10, -12, -13,
-		 -8,  -2,  -1,  -1,  -2,  -8,
+		-11,  -2, -14, -14,  -2, -11,
+		-16, -17, -10, -10, -17, -16,
+		 -8, -18,  -1,  -1, -18,  -8,
 		 -4,  -7,  -3,  -3,  -7,  -4,
 		 -9,  -5,  -6,  -6,  -5,  -9,
-		-16, -15, -17, -17, -15, -16
+		-13, -15, -12, -12, -15, -13
 };
 
 /*
@@ -179,6 +179,7 @@ Control::Control(Config* config) {
 	luaC_export(L, STORAGE_GRIPPER);
 	luaC_export(L, STORAGE_LEFT);
 	luaC_export(L, STORAGE_RIGHT);
+	luaC_export(L, STORAGE_GREEN);
 	luaC_export(L, STORAGE_VISION);
 
 	luaC_export(L, PRIMITIVES_WAIT);
@@ -1635,7 +1636,7 @@ int Control::l_GetStoragePos(lua_State *L) {
 		lua_pushnumber(L, dx);
 		lua_pushnumber(L, dy);
 		return 2;
-	} else if (target == 4) {
+	} else if (target == STORAGE_GREEN) {
 		lua_pushnumber(L, px);
 		if (py > 1500) {
 			lua_pushnumber(L, py - 400);

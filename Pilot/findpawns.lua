@@ -138,7 +138,7 @@ repeat
 			c.print("Paraszt keresese");
 			p.RefreshPawnPositions()
 			px, py, ignoreRadius = c.FindPawn(FIG_NOTHING, ignoreRadius);
-			x, y, px, py = c.GetStoragePos(4, px, py)
+			x, y, px, py = c.GetStoragePos(STORAGE_GREEN, px, py)
 			if (x) then
 				if (c.simulate(GoToNextPawn, x, y, px, py)) then
 					deadpos = false;

@@ -66,7 +66,7 @@ function SearchWithGripperFromSides(type, ignoreRadius, maxRadius)
 		if (not px) then
 			return MAX_DISTANCE
 		end
-		x, y, px, py = c.GetStoragePos(4, px, py)
+		x, y, px, py = c.GetStoragePos(STORAGE_GREEN, px, py)
 		if (not x) then
 			return MAX_DISTANCE
 		end
@@ -179,11 +179,11 @@ function DeployFullTower(left, x, y)
 	end)
 
 	if (left) then
-		p.TurnSafe(math.pi, 4, 8)
+		p.Turn(math.pi, 4, 8)
 	else
-		p.TurnSafe(-math.pi, 4, 8)
+		p.Turn(-math.pi, 4, 8)
 	end
-	p.GoSafe(30, goSpeed, goAcc)
+	p.Go(30, goSpeed, goAcc)
 
 	p.ArmMove(not left, 90)
 	p.Magnet(not left, -1)
@@ -192,11 +192,15 @@ function DeployFullTower(left, x, y)
 	p.Magnet(not left, 0)
 	
 	if (left) then
-		p.TurnSafe(-math.pi / 2, 4, 8)
+		p.Turn(-math.pi / 2, 4, 8)
 	else
-		p.TurnSafe(math.pi / 2, 4, 8)
+		p.Turn(math.pi / 2, 4, 8)
 	end
-	p.GoSafe(130, goSpeed, goAcc)
+	if (c.in_simulate()) then
+		p.GoSafe(130, goSpeed, goAcc)
+	else
+		p.Go(130, goSpeed, goAcc)
+	end
 	p.GripperMove(90)
 end
 
@@ -218,11 +222,15 @@ function DeployHalfTower(left, x, y)
 	end)
 	
 	if (left) then
-		p.TurnSafe(math.pi / 2, 4, 8)
+		p.Turn(math.pi / 2, 4, 8)
 	else
-		p.TurnSafe(-math.pi / 2, 4, 8)
+		p.Turn(-math.pi / 2, 4, 8)
 	end
-	p.GoSafe(130, goSpeed, goAcc)
+	if (c.in_simulate()) then
+		p.GoSafe(130, goSpeed, goAcc)
+	else
+		p.Go(130, goSpeed, goAcc)
+	end
 	p.GripperMove(90)
 end
 

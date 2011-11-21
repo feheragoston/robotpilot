@@ -38,7 +38,8 @@
 #define		STORAGE_GRIPPER		1
 #define		STORAGE_LEFT		2
 #define		STORAGE_RIGHT		3
-#define		STORAGE_VISION		4
+#define		STORAGE_GREEN		4
+#define		STORAGE_VISION		5
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 
