@@ -294,7 +294,7 @@ bool Control::Init() {
 		*/
 
 		mServer = new Server();
-		mServer->setMessageCallback(serverMessageCallback);
+		mServer->SetMessageCallback(serverMessageCallback);
 		mServer->Listen(13001);
 		return true;
 	}

@@ -22,7 +22,7 @@ Server::Server() {
 	tv.tv_usec = 0;
 }
 
-void Server::setMessageCallback(messageCallback cb) {
+void Server::SetMessageCallback(messageCallback cb) {
 	m_messageCallback = cb;
 }
 
@@ -101,7 +101,7 @@ bool Server::Process() {
 		break;
 	default:
 		/*
-		 * csatlakozott kliensek olvasasa, irasa
+		 * csatlakozott kliensek olvasasa
 		 */
 		for (int i = 0; i < MAX_CONNECTIONS; i++) {
 			if (client_active[i]) {
