@@ -1215,7 +1215,7 @@ int Control::l_TurnTo(lua_State *L) {
 	double mx, my, mphi;
 	mPrimitives->GetRobotPos(&mx, &my, &mphi);
 
-	double angle = atan2f(y - my, x - mx) - mphi;
+	double angle = atan2(y - my, x - mx) - mphi;
 
 	while (angle > M_PI) {
 		angle -= M_PI * 2;
@@ -1500,7 +1500,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
  * FindPawn(type, ignoreRadius = ROBOT_FRONT_MAX, maxRadius = MAX_DISTANCE)
  * @param type keresett figura tipusa (0 = tetszoleges)
  * @param ignoreRadius minimum tavolsag, ami folott keressuk a legkozelebbi babut
- * @param maxRadius maximum tavolsag, ami folott keressuk a legkozelebbi babut
+ * @param maxRadius maximum tavolsag, ami alatt keressuk a legkozelebbi babut
  * @return px, py: babu koordinatai
  */
 int Control::l_FindPawn(lua_State *L) {
@@ -1584,7 +1584,7 @@ int Control::l_FindPawn(lua_State *L) {
  * STORAGE_GRIPPER: koordinatak gripperes felszedeshez
  * STORAGE_LEFT: koordinatak bal karhoz
  * STORAGE_RIGHT: koordinatak jobb karhoz
- * 4: koordinatak oldalso parasztok gripperes felszedesehez
+ * STORAGE_GREEN: koordinatak oldalso parasztok gripperes felszedesehez
  * @param px
  * @param py
  */
@@ -1597,12 +1597,12 @@ int Control::l_GetStoragePos(lua_State *L) {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 
 	if (target == STORAGE_GRIPPER) {
-		double angle = atan2f(y - py, x - px);
+		double angle = atan2(y - py, x - px);
 		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
 		return 2;
 	} else if (target == STORAGE_VISION) {
-		double angle = atan2f(y - py, x - px);
+		double angle = atan2(y - py, x - px);
 		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 200));
 		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 200));
 		return 2;
@@ -1616,8 +1616,8 @@ int Control::l_GetStoragePos(lua_State *L) {
 		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + x;
 		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + y;
 		double alpha = atan2(dy - y, dx - x);
-		dx += 20 * cos(alpha);
-		dy += 20 * sin(alpha);
+		dx += -MAGNET_POS_X * cos(alpha);
+		dy += -MAGNET_POS_X * sin(alpha);
 		lua_pushnumber(L, dx);
 		lua_pushnumber(L, dy);
 		return 2;
