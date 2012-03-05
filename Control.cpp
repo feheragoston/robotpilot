@@ -13,7 +13,7 @@ Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
-int Control::logfile = NULL;
+int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
@@ -80,7 +80,7 @@ Control::Control(Config* config) {
 
 		if (logfile < 0) {
 			cerr << "Error opening logfile: " << mConfig->LogFile << " " << logfile << endl;
-			logfile = NULL;
+			logfile = 0;
 		}
 	}
 
@@ -238,7 +238,7 @@ Control::Control(Config* config) {
 Control::~Control() {
 	if (logfile) {
 		close(logfile);
-		logfile = NULL;
+		logfile = 0;
 	}
 	if (mPrimitives) {
 		delete mPrimitives;
@@ -518,7 +518,7 @@ void Control::log() {
 		if (write(logfile, &stop, sizeof(function_t)) < 0) {
 			cerr << "Error writing log, closing log" << endl;
 			close(logfile);
-			logfile = NULL;
+			logfile = 0;
 		}
 	}
 }
@@ -1727,13 +1727,6 @@ int Control::l_GetDeployPoint(lua_State *L) {
 	int ignorePriority = luaL_optinteger(L, 2, -1000);
 
 	bool color = mPrimitives->GetMyColor();
-
-	int dir = 1;
-	int offset = 0;
-	if (color) {
-		dir = -1;
-		offset = 3000;
-	}
 
 	int min = 1;
 	int field = -1;
