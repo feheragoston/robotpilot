@@ -40,11 +40,13 @@ public:
 	void BDC_GOTO(double x, double y, double max_speed, double max_acc);
 	void BDC_TURN(double angle, double max_speed, double max_acc);
 	void BDC_SET_SPEED(double v, double w);
+	void BDC_SET_WHEELSPEED(double vLeft, double vRight);
 
 
 	progress_t AnyStop;
 	progress_t AnyMotion;
 	progress_t SetSpeed;
+	progress_t SetWheelSpeed;
 
 
 };

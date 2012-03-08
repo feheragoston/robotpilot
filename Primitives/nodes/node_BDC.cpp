@@ -220,6 +220,28 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 }
 
 
+void node_BDC::BDC_SET_WHEELSPEED(double vLeft, double vRight){
+
+	UDPmsg msg;
+
+	msg.node_id		= id;
+	msg.function	= CMD_BDC_SET_SPEED;
+	msg.length		= 4;
+
+	//bal motornak meg kell forditani a sebesseget
+	SET_S16(&(msg.data[0]), (s16)((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight));
+	SET_S16(&(msg.data[2]), (s16)((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft));
+
+	UDPdriver::send(&msg);
+
+	SetWheelSpeed.inProgress = true;
+	SetWheelSpeed.finished = false;
+
+	cout << name << "\t___send SETWHEELSPEED___:\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
+
+}
+
+
 void node_BDC::INIT_PARAM(void){
 
 	UDPmsg msg;

@@ -252,6 +252,17 @@ bool Primitives::SetSpeedInProgress() {
 	return false;
 }
 
+bool Primitives::SetWheelSpeed(double vLeft, double vRight){
+	//most nullázunk, nem számít
+	robot.v = 0;
+	robot.w = 0;
+	return true;
+}
+
+bool Primitives::SetWheelSpeedInProgress(){
+	return false;
+}
+
 bool Primitives::Go(double distance, double max_speed, double max_acc) {
 	if (MotionInProgress() || MotionStopInProgress()) {
 		return false;

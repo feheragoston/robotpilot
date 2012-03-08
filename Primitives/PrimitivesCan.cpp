@@ -522,6 +522,48 @@ bool PrimitivesCan::SetSpeedInProgress(void){
 }
 
 
+bool PrimitivesCan::SetWheelSpeed(double vLeft, double vRight){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	bdc->AnyStop.inProgress ||
+		bdc->AnyMotion.inProgress ||
+		bdc->SetSpeed.inProgress ||
+		bdc->SetWheelSpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		bdc->BDC_SET_WHEELSPEED(vLeft, vRight);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetWheelSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = bdc->SetWheelSpeed.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 	EnterCritical();

@@ -124,6 +124,20 @@ public:
 	virtual bool SetSpeedInProgress();
 
 	/**
+	 * sebessegertekek beallitasa
+	 * @param vLeft [mm/s]
+	 * @param vRight [mm/s]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool SetWheelSpeed(double vLeft, double vRight);
+
+	/**
+	 * SetWheelSpeed allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool SetWheelSpeedInProgress();
+
+	/**
 	 * egyenes haladas
 	 * @param distance [mm]
 	 * @param max_speed [mm/s]

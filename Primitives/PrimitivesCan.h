@@ -63,6 +63,8 @@ public:
 
 	bool SetSpeed(double v, double w);
 	bool SetSpeedInProgress(void);
+	bool SetWheelSpeed(double vLeft, double vRight);
+	bool SetWheelSpeedInProgress();
 
 	bool Go(double distance, double max_speed, double max_acc);
 	bool GoTo(double x, double y, double max_speed, double max_acc);
