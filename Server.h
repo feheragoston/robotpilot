@@ -27,7 +27,7 @@ typedef void (*messageCallback)(int n, const void* message, msglen_t size);
 class Server {
 	public:
 		Server();
-		virtual void setMessageCallback(messageCallback cb);
+		void SetMessageCallback(messageCallback cb);
 		bool Listen(int portno);
 		bool Process();
 		bool Send(int n, const void* message, msglen_t size);

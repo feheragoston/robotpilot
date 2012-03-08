@@ -176,10 +176,13 @@ protected:
 	static int l_RefreshPawnPositionsFinished(lua_State *L);
 	static int l_FindPawn(lua_State *L);
 	static int l_GetStoragePos(lua_State *L);
+	static void SetPawnType(float x, float y, int type);
 	static int l_SetPawnType(lua_State *L);
 	static int l_PawnsNearby(lua_State *L);
+	static int l_PawnNearPoint(lua_State *L);
 	static int l_GetDeployPoint(lua_State *L);
 	static int l_SetDeployPointPriority(lua_State *L);
+	static int l_ValidateStartSetup(lua_State *L);
 };
 
 #endif /* CONTROL_H_ */

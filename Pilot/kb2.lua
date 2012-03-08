@@ -6,7 +6,7 @@ turnAcc = 6
 
 c.music("start")
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.print("Startgomb lenyomva, kalibrálunk");
 
 p.sleep(1000)
@@ -31,7 +31,7 @@ c.music("calibrate")
 
 repeat
 
-repeat c.process() until (c.GetStartButton());
+repeat p.process() until (c.GetStartButton());
 c.print("Startgomb lenyomva, indulunk");
 
 		p.Magnet(true, 1)

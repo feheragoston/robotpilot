@@ -53,6 +53,8 @@ pawnInGripper = false
 pawnInLeft = false
 pawnInRight = false
 
+towerFinished = false
+
 repeat
 	local deadpos = true;
 	
@@ -158,7 +160,7 @@ repeat
 					if (c.simulate(DeployFromGripper, x1, y1, x2, y2)) then
 						deadpos = false
 						DeployFromGripper(x1, y1, x2, y2);
-						c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- jeloljuk, hogy a mezo foglalt
+						--c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- jeloljuk, hogy a mezo foglalt
 						pawnInGripper = false
 						if (target == 30 or target == 35) then
 							safe1Deployed = true
@@ -180,7 +182,8 @@ repeat
 									c.music("starwars")
 									deadpos = false
 									DeployFullTower(true, tx, ty)
-									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									--c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									towerFinished = true;
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
@@ -188,7 +191,8 @@ repeat
 									c.music("starwars")
 									deadpos = false
 									DeployFullTower(false, trx, try)
-									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									--c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									towerFinished = true;
 									pawnInLeft = false;
 									pawnInRight = false;
 									pawnInGripper = false;
@@ -198,7 +202,8 @@ repeat
 									c.music("axelfoley")
 									deadpos = false
 									DeployHalfTower(true, tx, ty)
-									c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									--c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+									towerFinished = true;
 									pawnInLeft = false;
 									pawnInGripper = false;
 								end
@@ -211,26 +216,11 @@ repeat
 								c.music("axelfoley")
 								deadpos = false
 								DeployHalfTower(false, tx, ty)
-								c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+								--c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- a tetejere gripperrel rakunk
+								towerFinished = true;
 								pawnInRight = false;
 								pawnInGripper = false;
 							end
-						end
-					end
-				end
-				if (not pawnInGripper) then
-					c.print("hatra megyunk")
-					for i = -250, -100, 50 do
-						if (c.simulate(p.GoSafe, i, goSpeed, goAcc)) then
-							p.runparallel(
-							function()
-								p.GoSafe(i, goSpeed, goAcc)
-								p.GripperMove(0)
-							end,
-							function()
-								p.ConsoleMove(0)
-							end)
-							break
 						end
 					end
 				end
@@ -271,4 +261,155 @@ repeat
 		p.MotionStop(MAX_DEC)
 	end
 
-until (c.GetStopButton())
+until (towerFinished)
+
+p.Go(-50)
+p.ConsoleMove(0)
+p.Go(80)
+p.GripperMove(GripperGrab)
+
+goSpeed = 600
+goAcc = 500
+turnSpeed = 8
+turnAcc = 8
+
+function backOff()
+	p.MotionStop(MAX_DEC)
+	if (c.simulate(p.GoSafe, -100)) then
+		p.Go(-100)
+	end 
+end
+
+status, err = pcall(function()
+	tx = 525
+	ty = 1675
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+status, err = pcall(function()
+	tx = tx + 700
+	ty = ty + 700
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+status, err = pcall(function()
+	tx = tx + 350
+	ty = ty - 350
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+status, err = pcall(function()
+	ty = ty - 700
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+status, err = pcall(function()
+	tx = tx - 700
+	ty = ty - 700
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+status, err = pcall(function()
+	tx = tx - 350
+	ty = ty + 350
+	p.TurnToSafe(tx, Offset + Ori * ty, turnSpeed, turnAcc)
+	p.GoToSafe(tx, Offset + Ori * ty, goSpeed, goAcc)
+end)
+if (not status) then
+	c.print("Hiba", err);
+	backOff()
+end
+
+deployed = false
+
+function deploy1()
+	p.TurnToSafe(525, Offset + Ori * 1850, turnSpeed, turnAcc)
+	p.GoToSafe(525, Offset + Ori * 1850, goSpeed, goAcc)
+	p.TurnToSafe(525, Offset + Ori * 3000, turnSpeed, turnAcc)
+	p.GripperMove(70)
+end
+function deploy2()
+	p.TurnToSafe(1225, Offset + Ori * 1850, turnSpeed, turnAcc)
+	p.GoToSafe(1225, Offset + Ori * 1850, goSpeed, goAcc)
+	p.TurnToSafe(1225, Offset + Ori * 3000, turnSpeed, turnAcc)
+	p.GripperMove(70)
+end
+function deploy3()
+	p.TurnToSafe(1750, Offset + Ori * 1325, turnSpeed, turnAcc)
+	p.GoToSafe(1750, Offset + Ori * 1325, goSpeed, goAcc)
+	p.TurnToSafe(2100, Offset + Ori * 1325, turnSpeed, turnAcc)
+	p.GripperMove(70)
+end
+function deploy4()
+	p.TurnToSafe(525, Offset + Ori * 800, turnSpeed, turnAcc)
+	p.GoToSafe(525, Offset + Ori * 800, goSpeed, goAcc)
+	p.TurnToSafe(525, Offset + Ori * 0, turnSpeed, turnAcc)
+	p.GripperMove(70)
+end
+
+while (not deployed) do
+	deadpos = true
+	status, err = pcall(function()
+		if (c.simulate(deploy1)) then
+			deadpos = false
+			deploy1()
+			deployed = true
+		elseif (c.simulate(deploy2)) then
+			deadpos = false
+			deploy2()
+			deployed = true
+		elseif (c.simulate(deploy3)) then
+			deadpos = false
+			deploy3()
+			deployed = true
+		elseif (c.simulate(deploy4)) then
+			deadpos = false
+			deploy4()
+			deployed = true
+		end
+		
+		while (deadpos) do
+			c.print("Beszorultunk, feloldas indul")
+			local turn = 0
+			if (math.random() > 0.3) then
+				turn = (math.random() - 0.5) * math.pi * 2
+			end
+			local go = math.random(-1000, 1000)
+			if (c.simulate(ResolveDeadpos, turn, go)) then
+				c.print("Beszorulas feloldva")
+				deadpos = false
+				ResolveDeadpos(turn, go)
+			end
+		end
+
+	end)
+	if (not status) then
+		c.print("Hiba", err);
+		p.MotionStop(MAX_DEC)
+	end
+end

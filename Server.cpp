@@ -22,7 +22,7 @@ Server::Server() {
 	tv.tv_usec = 0;
 }
 
-void Server::setMessageCallback(messageCallback cb) {
+void Server::SetMessageCallback(messageCallback cb) {
 	m_messageCallback = cb;
 }
 
@@ -101,7 +101,7 @@ bool Server::Process() {
 		break;
 	default:
 		/*
-		 * csatlakozott kliensek olvasasa, irasa
+		 * csatlakozott kliensek olvasasa
 		 */
 		for (int i = 0; i < MAX_CONNECTIONS; i++) {
 			if (client_active[i]) {
@@ -110,10 +110,8 @@ bool Server::Process() {
 					// kiolvassuk milyen hosszu uzenet jott
 					int size_read = recv(client_sock[i], buffer, sizeof(msglen_t), 0);
 					msglen_t msg_len = *((msglen_t*) buffer);
-					//std::cout << "msg_len: " << msg_len << " size_read: " << size_read << std::endl;
 					size_read = recv(client_sock[i], buffer, msg_len, 0);
 					while (size_read > 0 && size_read < msg_len) {
-						//std::cout << "msg_len: " << (int)msg_len << " size_read: " << size_read << std::endl;
 						size_read += recv(client_sock[i], buffer+size_read, msg_len - size_read, 0);
 					}
 					if (size_read < 1 || strncmp("quit", buffer, 4) == 0) {

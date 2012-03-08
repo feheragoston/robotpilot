@@ -30,6 +30,8 @@ Primitives::Primitives(Primitives* source) {
 
 	source->GetRobotPos(&robot.x, &robot.y, &robot.phi);
 	source->GetOpponentPos(&opponent.x, &opponent.y);
+	gripperPos = source->GetGripperPos();
+	consolePos = source->GetConsolePos();
 }
 
 Primitives::~Primitives() {

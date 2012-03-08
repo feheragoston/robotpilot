@@ -2,12 +2,10 @@
 dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
 
---[[
 	goSpeed = 400
 	goAcc = 500
 	turnSpeed = 4
 	turnAcc = 8
-]]
 
 p.runparallel(
 function()
@@ -26,7 +24,7 @@ function()
 		p.process()
 	until(c.GetStartButton())
 	
-	c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
+	c.StartMatch(false); -- !!!!!!!!!!!!!!!!!!
 	c.print("Meccs elkezdodott");
 	
 	safe1Deployed = false;
@@ -53,6 +51,7 @@ pawnInGripper = false
 pawnInLeft = false
 pawnInRight = false
 
+--[[
 repeat
 	local deadpos = true;
 	
@@ -141,7 +140,6 @@ repeat
 			c.print("Hiba", err);
 			p.MotionStop(MAX_DEC)
 		end
-		p.process()
 	until (ignoreRadius == MAX_DISTANCE)
 	
 	c.print("Felszedo fazis kesz: ", pawnInLeft, pawnInRight, pawnInGripper)
@@ -236,9 +234,7 @@ repeat
 				end
 			else
 				c.print("Nincs tobb lerako pozicio")
-				p.process()
 				hasDeployPoint = false
-				--TODO
 			end
 		end);
 		if (not status) then
@@ -246,14 +242,107 @@ repeat
 			p.MotionStop(MAX_DEC)
 			ignorePriority = -1000
 		end
-		p.process()
 	end
 	
 	c.print("Lerako fazis kesz")
 	
+	if (not pawnInGripper and deadpos) then
+		-- ha nincs gripperben semmi es beszorulas van, atlepunk a kereso modba
+		break
+	end
+
 	local status, err = pcall(function()
 		while (deadpos) do
 			c.print("Beszorultunk, feloldas indul")
+			local turn = 0
+			if (math.random() > 0.3) then
+				turn = (math.random() - 0.5) * math.pi * 2
+			end
+			local go = math.random(-1000, 1000)
+			if (c.simulate(ResolveDeadpos, turn, go)) then
+				c.print("Beszorulas feloldva")
+				deadpos = false
+				ResolveDeadpos(turn, go)
+			end
+		end
+	end);
+	if (not status) then
+		c.print("Hiba", err);
+		p.MotionStop(MAX_DEC)
+	end
+	
+until (c.GetStopButton())
+]]
+
+c.print("Lopos fazis indul")
+
+repeat
+	local deadpos = true;
+	
+	ignoreRadius = ROBOT_RADIUS;
+	type = 6
+	
+	while (not pawnInGripper and ignoreRadius < MAX_DISTANCE) do
+		local status, err = pcall(function()
+			c.print("Kereso fazis indul")
+			p.RefreshPawnPositions()
+			px, py, iR = c.FindPawn(type, ignoreRadius);
+			if (px) then
+				local x, y = c.GetStoragePos(STORAGE_VISION, px, py)
+				if (c.simulate(PickupWithGripperFromBoard, x, y)) then
+					deadpos = false
+					if (PickupWithGripperFromBoard(x, y)) then
+						pawnInGripper = true
+						-- TODO lerako prioritasok frissitese
+					end
+				else
+					ignoreRadius = iR + 1
+				end
+			else
+				if (type > 4) then
+					type = type - 1
+					ignoreRadius = ROBOT_RADIUS
+				else
+					ignoreRadius = MAX_DISTANCE
+				end
+			end
+		end)
+		if (not status) then
+			c.print("Hiba", err);
+			p.MotionStop(MAX_DEC)
+		end
+	end
+	
+	local ignorePriority = -1000
+	local hasDeployPoint = true
+	
+	while (pawnInGripper and hasDeployPoint) do
+		c.print("Lerako fazis indul")
+		local status, err = pcall(function()
+			c.print("Paraszt uritese");
+			x1, y1, x2, y2, target, ignorePriority = c.GetDeployPoint(STORAGE_GRIPPER, ignorePriority);
+			if (x1) then
+				if (c.simulate(DeployFromGripper, x1, y1, x2, y2)) then
+					deadpos = false
+					DeployFromGripper(x1, y1, x2, y2);
+					c.SetDeployPointPriority(target, 1, STORAGE_GRIPPER); -- jeloljuk, hogy a mezo foglalt
+					pawnInGripper = false
+				end
+			else
+				c.print("Nincs tobb lerako pozicio")
+				hasDeployPoint = false
+			end
+		end)
+		if (not status) then
+			c.print("Hiba", err);
+			p.MotionStop(MAX_DEC)
+		end
+	end
+
+	local status, err = pcall(function()
+		while (deadpos) do
+			c.print("Beszorultunk, feloldas indul")
+			-- TODO ha van a karban paraszt, rakjuk le
 			local turn = 0
 			if (math.random() > 0.3) then
 				turn = (math.random() - 0.5) * math.pi * 2

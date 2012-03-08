@@ -149,9 +149,9 @@ private:
 
 	bool bdcMotionError;
 
-	double deadreckCheckX;
-	double deadreckCheckY;
-	double deadreckCheckPhi;
+	double deadreckCheckXw;
+	double deadreckCheckYw;
+	double deadreckCheckPhiw;
 
 	double sonarXOffset;
 	double sonarYOffset;

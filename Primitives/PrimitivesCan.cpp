@@ -71,9 +71,9 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 
 	bdcMotionError		= false;
 
-	deadreckCheckX		= 0;
-	deadreckCheckY		= 0;
-	deadreckCheckPhi	= 0;
+	deadreckCheckXw		= 0;
+	deadreckCheckYw		= 0;
+	deadreckCheckPhiw	= 0;
 
 	sonarXOffset		= 0;
 	sonarYOffset		= 0;
@@ -1158,9 +1158,9 @@ void PrimitivesCan::KEEP_ALIVE_SLEEP(void){
 void PrimitivesCan::ConvRobotToWorld(double xr, double yr, double phir, double* xw, double* yw, double* phiw){
 
 	//elforgatom, majd eltolom
-	*xw = deadreckCheckX + xr * cos(deadreckCheckPhi) - yr * sin(deadreckCheckPhi);
-	*yw = deadreckCheckY + xr * sin(deadreckCheckPhi) + yr * cos(deadreckCheckPhi);
-	*phiw = deadreckCheckPhi + phir;
+	*xw = deadreckCheckXw + xr * cos(deadreckCheckPhiw) - yr * sin(deadreckCheckPhiw);
+	*yw = deadreckCheckYw + xr * sin(deadreckCheckPhiw) + yr * cos(deadreckCheckPhiw);
+	*phiw = deadreckCheckPhiw + phir;
 
 	while(*phiw > M_PI)
 		*phiw -= 2*M_PI;
@@ -1174,9 +1174,9 @@ void PrimitivesCan::ConvRobotToWorld(double xr, double yr, double phir, double* 
 void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir){
 
 	//eltolom, majd elforgatom
-	*xr = (xw - deadreckCheckX) * cos(-deadreckCheckPhi) - (yw - deadreckCheckY) * sin(-deadreckCheckPhi);
-	*yr = (xw - deadreckCheckX) * sin(-deadreckCheckPhi) + (yw - deadreckCheckY) * cos(-deadreckCheckPhi);
-	*phir = phiw - deadreckCheckPhi;
+	*xr = (xw - deadreckCheckXw) * cos(-deadreckCheckPhiw) - (yw - deadreckCheckYw) * sin(-deadreckCheckPhiw);
+	*yr = (xw - deadreckCheckXw) * sin(-deadreckCheckPhiw) + (yw - deadreckCheckYw) * cos(-deadreckCheckPhiw);
+	*phir = phiw - deadreckCheckPhiw;
 
 	while(*phir > M_PI)
 		*phir -= 2*M_PI;
@@ -1191,17 +1191,13 @@ void PrimitivesCan::Calibrate_Unsafe(void){
 
 	//red
 	if(GetMyColor_Unsafe() == COLOR_RED){
-		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
-		deadreckCheckY		= DEADRECK_CALIB_DISTANCE_Y;
-		deadreckCheckPhi	= M_PI/2 - DEADRECK_CALIB_PHI;
+		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, M_PI/2 - DEADRECK_CALIB_PHI);
 		TM33Build(SONAR_TX_RED, SONAR_TY_RED, SONAR_ALPHA_RED, T33WS);
 	}
 
 	//blue
 	else{
-		deadreckCheckX		= DEADRECK_CALIB_DISTANCE_X;
-		deadreckCheckY		= AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y;
-		deadreckCheckPhi	= -M_PI/2 + DEADRECK_CALIB_PHI;
+		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y, -M_PI/2 + DEADRECK_CALIB_PHI);
 		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
 	}
 
@@ -1245,13 +1241,14 @@ long int PrimitivesCan::GetOpponentPos_Unsafe(double* x, double* y){
 
 void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
-	double tmpX, tmpY, tmpPhi;
+	double xr, yr, phir;
 
-	GetRobotPos_Unsafe(&tmpX, &tmpY, &tmpPhi);
+	deadreck->GET_POS(&xr, &yr, &phir);
 
-	deadreckCheckX		+= 	x	- tmpX;
-	deadreckCheckY		+= 	y	- tmpY;
-	deadreckCheckPhi	+= 	phi	- tmpPhi;
+	//ConvRobotToWorld() fuggvenyszamitasabol
+	deadreckCheckPhiw = phi - phir;
+	deadreckCheckXw = x - (xr * cos(deadreckCheckPhiw) - yr * sin(deadreckCheckPhiw));
+	deadreckCheckYw = y - (xr * sin(deadreckCheckPhiw) + yr * cos(deadreckCheckPhiw));
 
 }
 

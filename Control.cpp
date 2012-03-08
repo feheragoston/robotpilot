@@ -13,7 +13,7 @@ Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
-int Control::logfile = NULL;
+int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 msgpawns* Control::pawns = NULL;
@@ -28,17 +28,17 @@ double Control::opponent_y = -1100.;
 double Control::angry = 0.;
 bool Control::simulate = false;
 bool Control::safeMotion = false;
-/*
+
 int Control::deployFields[36] = {
-		-15, -12, -14, -14, -12, -15,
-		-11, -13, -10, -10, -13, -11,
-		 -8,  -2,  -1,  -1,  -2,  -8,
+		-11,  -2, -14, -14,  -2, -11,
+		-16, -17, -10, -10, -17, -16,
+		 -8, -18,  -1,  -1, -18,  -8,
 		 -4,  -7,  -3,  -3,  -7,  -4,
 		 -9,  -5,  -6,  -6,  -5,  -9,
-		-18, -16, -17, -17, -16, -18
+		-13, -15, -12, -12, -15, -13
 };
-	MOST NE MENJUNK AT A MASIK TERFELRE
-*/
+
+/*
 int Control::deployFields[36] = {
 		  0,  -7,   0,   0,  -7,   0,
 		 -6,   0,  -5,  -5,   0,  -6,
@@ -47,6 +47,7 @@ int Control::deployFields[36] = {
 		  0,  -4,   0,   0,  -4,   0,
 		 -9,   0,  -8,  -8,   0,  -9
 };
+*/
 struct timeval Control::runStart = {0, 0};
 struct timeval Control::initStart = {0, 0};
 struct timeval Control::matchStart = {0, 0};
@@ -79,7 +80,7 @@ Control::Control(Config* config) {
 
 		if (logfile < 0) {
 			cerr << "Error opening logfile: " << mConfig->LogFile << " " << logfile << endl;
-			logfile = NULL;
+			logfile = 0;
 		}
 	}
 
@@ -144,8 +145,10 @@ Control::Control(Config* config) {
 		{"GetStoragePos", l_GetStoragePos},
 		{"SetPawnType", l_SetPawnType},
 		{"PawnsNearby", l_PawnsNearby},
+		{"PawnNearPoint", l_PawnNearPoint},
 		{"GetDeployPoint", l_GetDeployPoint},
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
+		{"ValidateStartSetup", l_ValidateStartSetup},
 
 		{NULL, NULL}
 	};
@@ -176,6 +179,8 @@ Control::Control(Config* config) {
 	luaC_export(L, STORAGE_GRIPPER);
 	luaC_export(L, STORAGE_LEFT);
 	luaC_export(L, STORAGE_RIGHT);
+	luaC_export(L, STORAGE_GREEN);
+	luaC_export(L, STORAGE_VISION);
 
 	luaC_export(L, PRIMITIVES_WAIT);
 
@@ -233,7 +238,7 @@ Control::Control(Config* config) {
 Control::~Control() {
 	if (logfile) {
 		close(logfile);
-		logfile = NULL;
+		logfile = 0;
 	}
 	if (mPrimitives) {
 		delete mPrimitives;
@@ -289,7 +294,7 @@ bool Control::Init() {
 		*/
 
 		mServer = new Server();
-		mServer->setMessageCallback(serverMessageCallback);
+		mServer->SetMessageCallback(serverMessageCallback);
 		mServer->Listen(13001);
 		return true;
 	}
@@ -513,7 +518,7 @@ void Control::log() {
 		if (write(logfile, &stop, sizeof(function_t)) < 0) {
 			cerr << "Error writing log, closing log" << endl;
 			close(logfile);
-			logfile = NULL;
+			logfile = 0;
 		}
 	}
 }
@@ -609,12 +614,14 @@ bool Control::obstacleCollision() {
 		double rx2 = robotBody[j2][0];
 		double ry2 = robotBody[j2][1];
 
+		/*
 		if (j == 0 || j == ROBOT_POINT_NUM) {
 			rx1 += sin(gripperPos) * 105;
 		}
 		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
 			rx2 += sin(gripperPos) * 105;
 		}
+		*/
 
 		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
 		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
@@ -641,6 +648,23 @@ bool Control::obstacleCollision() {
 		}
 		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				(*i)->Print();
+				return true;
+			}
+		}
+	}
+	if (gripperPos > 15 && gripperPos < 75) {
+		double px = x + cos(phi) * ROBOT_FRONT_PAWN;
+		double py = y + sin(phi) * ROBOT_FRONT_PAWN;
+
+		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+			if ((*i)->Intersect(px, py, PAWN_RADIUS)) {
+				(*i)->Print();
+				return true;
+			}
+		}
+		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+			if ((*i)->Intersect(px, py, PAWN_RADIUS)) {
 				(*i)->Print();
 				return true;
 			}
@@ -880,6 +904,7 @@ int Control::c_wait(lua_State *L) {
 		if (mPrimitives->GetOpponentPos(&ox, &oy) < SONAR_TIMEOUT) {
 			Circle* opp = new Circle(ox, oy, ROBOT_WIDTH);
 			removeCollidingDynamicObstacles(opp);
+			SetPawnType(ox, oy, FIG_WENT_OVER);
 			delete opp;
 		}
 	}
@@ -1080,7 +1105,7 @@ int Control::l_RefineDeadreckoning(lua_State *L) {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	if (mCamera->RefineDeadreckoning(x, y, phi)) {
 		unsigned int time = InitTime();
-		while (mCamera->RefineDeadreckoningInProgress()) {
+		while (mCamera->RefineDeadreckoningInProgress() && (InitTime() - time) < 10000) {
 			c_wait(L);
 			if (!mCamera) {
 				lua_pushboolean(L, false);
@@ -1090,7 +1115,7 @@ int Control::l_RefineDeadreckoning(lua_State *L) {
 		time = InitTime() - time;
 		mCamera->GetRefineData(&dx, &dy, &dphi);
 		mPrimitives->GetRobotPos(&x, &y, &phi);
-		mPrimitives->SetRobotPos(x - dx, y - dy, phi + dphi);
+		mPrimitives->SetRobotPos(x - dx, y - dy, phi - dphi);
 		cout << "(Control) RefineDeadreckoning : " << dx << ", " << dy << ", " << dphi << ", " << time << "ms" << endl;
 		lua_pushboolean(L, true);
 		return 1;
@@ -1190,7 +1215,7 @@ int Control::l_TurnTo(lua_State *L) {
 	double mx, my, mphi;
 	mPrimitives->GetRobotPos(&mx, &my, &mphi);
 
-	double angle = atan2f(y - my, x - mx) - mphi;
+	double angle = atan2(y - my, x - mx) - mphi;
 
 	while (angle > M_PI) {
 		angle -= M_PI * 2;
@@ -1455,6 +1480,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 		ret = mCamera->RefreshPawnPositionsFinished();
 	}
 	if (ret) {
+		/*
 		for (int i = 0; i < pawns->num; i++) {
 			if (pawnOnOurColor(pawns->pawns[i].x, pawns->pawns[i].y)) {
 				addDynamicObstacle(new Circle(pawns->pawns[i].x, pawns->pawns[i].y, PAWN_RADIUS));
@@ -1464,6 +1490,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
 				delete pawn;
 			}
 		}
+		*/
 	}
 	lua_pushboolean(L, ret);
 	return 1;
@@ -1473,7 +1500,7 @@ int Control::l_RefreshPawnPositionsFinished(lua_State *L) {
  * FindPawn(type, ignoreRadius = ROBOT_FRONT_MAX, maxRadius = MAX_DISTANCE)
  * @param type keresett figura tipusa (0 = tetszoleges)
  * @param ignoreRadius minimum tavolsag, ami folott keressuk a legkozelebbi babut
- * @param maxRadius maximum tavolsag, ami folott keressuk a legkozelebbi babut
+ * @param maxRadius maximum tavolsag, ami alatt keressuk a legkozelebbi babut
  * @return px, py: babu koordinatai
  */
 int Control::l_FindPawn(lua_State *L) {
@@ -1557,7 +1584,7 @@ int Control::l_FindPawn(lua_State *L) {
  * STORAGE_GRIPPER: koordinatak gripperes felszedeshez
  * STORAGE_LEFT: koordinatak bal karhoz
  * STORAGE_RIGHT: koordinatak jobb karhoz
- * 4: koordinatak oldalso parasztok gripperes felszedesehez
+ * STORAGE_GREEN: koordinatak oldalso parasztok gripperes felszedesehez
  * @param px
  * @param py
  */
@@ -1570,9 +1597,14 @@ int Control::l_GetStoragePos(lua_State *L) {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 
 	if (target == STORAGE_GRIPPER) {
-		double angle = atan2f(y - py, x - px);
+		double angle = atan2(y - py, x - px);
 		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 100));
 		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 100));
+		return 2;
+	} else if (target == STORAGE_VISION) {
+		double angle = atan2(y - py, x - px);
+		lua_pushnumber(L, px + cos(angle) * (ROBOT_FRONT_PAWN - 200));
+		lua_pushnumber(L, py + sin(angle) * (ROBOT_FRONT_PAWN - 200));
 		return 2;
 	} else if (target == STORAGE_LEFT) {
 		double c2 = sqr(px - x) + sqr(py - y);
@@ -1584,8 +1616,8 @@ int Control::l_GetStoragePos(lua_State *L) {
 		double dx = cos(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + x;
 		double dy = sin(atan2(py - y, px - x) - asin(MAGNET_POS_Y / sqrt(c2))) * sqrt(b2) + y;
 		double alpha = atan2(dy - y, dx - x);
-		dx += 20 * cos(alpha);
-		dy += 20 * sin(alpha);
+		dx += -MAGNET_POS_X * cos(alpha);
+		dy += -MAGNET_POS_X * sin(alpha);
 		lua_pushnumber(L, dx);
 		lua_pushnumber(L, dy);
 		return 2;
@@ -1604,7 +1636,7 @@ int Control::l_GetStoragePos(lua_State *L) {
 		lua_pushnumber(L, dx);
 		lua_pushnumber(L, dy);
 		return 2;
-	} else if (target == 4) {
+	} else if (target == STORAGE_GREEN) {
 		lua_pushnumber(L, px);
 		if (py > 1500) {
 			lua_pushnumber(L, py - 400);
@@ -1621,10 +1653,7 @@ int Control::l_GetStoragePos(lua_State *L) {
 	}
 }
 
-int Control::l_SetPawnType(lua_State *L) {
-	float x = lua_tonumber(L, 1);
-	float y = lua_tonumber(L, 2);
-	int type = luaL_optinteger(L, 3, -1);
+void Control::SetPawnType(float x, float y, int type) {
 	for (int i = 0; i < pawns->num; i++) {
 		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
 				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
@@ -1644,6 +1673,13 @@ int Control::l_SetPawnType(lua_State *L) {
 		}
 	}
 	logPawns = true;
+}
+
+int Control::l_SetPawnType(lua_State *L) {
+	float x = lua_tonumber(L, 1);
+	float y = lua_tonumber(L, 2);
+	int type = luaL_optinteger(L, 3, -1);
+	SetPawnType(x, y, type);
 	return 0;
 }
 
@@ -1663,6 +1699,21 @@ int Control::l_PawnsNearby(lua_State *L) {
 	return 1;
 }
 
+int Control::l_PawnNearPoint(lua_State *L) {
+	float x = lua_tonumber(L, 1);
+	float y = lua_tonumber(L, 2);
+
+	for (int i = 0; i < pawns->num; i++) {
+		if (fabsf(pawns->pawns[i].x - x) < PAWN_RADIUS
+				&& fabsf(pawns->pawns[i].y - y) < PAWN_RADIUS) {
+			lua_pushboolean(L, true);
+			return 1;
+		}
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+
 /**
  * STORAGE_NONE: lerakohely koordinatainak visszaadasa
  * STORAGE_GRIPPER: koordinatak gripperes lerakashoz
@@ -1676,13 +1727,6 @@ int Control::l_GetDeployPoint(lua_State *L) {
 	int ignorePriority = luaL_optinteger(L, 2, -1000);
 
 	bool color = mPrimitives->GetMyColor();
-
-	int dir = 1;
-	int offset = 0;
-	if (color) {
-		dir = -1;
-		offset = 3000;
-	}
 
 	int min = 1;
 	int field = -1;
@@ -1790,7 +1834,7 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 			px = target / 6 * 350 + 175;
 			py = target % 6 * 350 + 175 + 450;
 			if (target == 30 || target == 31 || target == 34 || target == 35) {
-				// vedett helyre statikus akadalyt teszunk, hogy veletlenul se szedjuk ki
+				// vedett helyre nem kozepre rakjuk az akadalyt
 				px -= 60;
 				if (target == 30 || target == 34) {
 					py += 60;
@@ -1816,5 +1860,29 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 		addDynamicObstacle(new Circle(px, py, 100));
 	}
 
+	return 0;
+}
+
+int Control::l_ValidateStartSetup(lua_State *L) {
+	int kingnum = 0;
+	for (int i = 0; i < pawns->num; i++) {
+		if (fabsf(pawns->pawns[i].y - 290) < PAWN_RADIUS) {
+			if (pawns->pawns[i].type == 4) {
+				kingnum++;
+			}
+		}
+	}
+
+	if (kingnum == 0) {
+		for (int i = 0; i < pawns->num; i++) {
+			if (fabsf(pawns->pawns[i].y - 290) < PAWN_RADIUS) {
+				pawns->pawns[i].type = 4;
+			}
+			if (fabsf(pawns->pawns[i].y - 2710) < PAWN_RADIUS) {
+				pawns->pawns[i].type = 4;
+			}
+		}
+		logPawns = true;
+	}
 	return 0;
 }

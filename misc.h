@@ -38,10 +38,12 @@
 #define		STORAGE_GRIPPER		1
 #define		STORAGE_LEFT		2
 #define		STORAGE_RIGHT		3
+#define		STORAGE_GREEN		4
+#define		STORAGE_VISION		5
 
 #define		PAWN_RADIUS			100		// paraszt sugara [mm]
 
-#define		SONAR_TIMEOUT		2000	// sonartol kapott ertek ervenyessegi limitje [ms]
+#define		SONAR_TIMEOUT		1000	// sonartol kapott ertek ervenyessegi limitje [ms]
 
 #define		PRIMITIVES_WAIT		50000	// alapertelmezett Primitives->Wait ido [us]
 /////////////////

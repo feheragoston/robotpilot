@@ -13,6 +13,7 @@ function PickupWithGripperFromBoard(x, y)
 		p.GripperMove(GripperGrab)
 		return true
 	end
+	p.GripperMove(GripperGrab)
 	return false
 end
 
@@ -54,6 +55,7 @@ function PickupWithGripperFromSides(px, py, x, y)
 		p.GripperMove(GripperGrab)
 		return true
 	end
+	p.GripperMove(GripperGrab)
 	return false
 end
 
@@ -64,7 +66,7 @@ function SearchWithGripperFromSides(type, ignoreRadius, maxRadius)
 		if (not px) then
 			return MAX_DISTANCE
 		end
-		x, y, px, py = c.GetStoragePos(4, px, py)
+		x, y, px, py = c.GetStoragePos(STORAGE_GREEN, px, py)
 		if (not x) then
 			return MAX_DISTANCE
 		end
@@ -108,7 +110,7 @@ function PickupWithArmFromBoard(left, x, y)
 			p.ArmMove(left, 0)
 			low, high = c.GetDistance(side)
 			c.print("PickupWithArmFromBoard 3", low, high)
-			if (low < 75) then
+			if (low < 60) then
 				return false
 			end
 			return true
@@ -157,33 +159,48 @@ function DeployFromGripper(x1, y1, x2, y2)
 	p.GripperMove(90)
 end
 
-function DeployFullTower(x, y)
+function DeployFullTower(left, x, y)
 	p.TurnToSafe(x, y, turnSpeed, turnAcc)
 	
 	p.runparallel(
 	function()
 		p.GoToSafe(x, y, goSpeed, goAcc)
 		
-		p.ArmMove(true, 130)
-		p.Magnet(true, -1)
-		p.ArmMove(true, 0)
-		p.Magnet(true, 0)
+		p.ArmMove(left, 130)
+		p.Magnet(left, -1)
+		p.sleep(10)
+		p.ArmMove(left, 0)
+		p.Magnet(left, 0)
 		
-		p.TurnSafe(-math.pi, 4, 8)
-		p.GoSafe(30, goSpeed, goAcc)
-	
-		p.ArmMove(false, 90)
-		p.Magnet(false, -1)
-		p.ArmMove(false, 0)
-		p.Magnet(false, 0)
 	end,
 	function()
 		p.GripperMove(GripperHold)
 		p.ConsoleMove(120)
 	end)
+
+	if (left) then
+		p.Turn(math.pi, 4, 8)
+	else
+		p.Turn(-math.pi, 4, 8)
+	end
+	p.Go(30, goSpeed, goAcc)
+
+	p.ArmMove(not left, 90)
+	p.Magnet(not left, -1)
+	p.sleep(10)
+	p.ArmMove(not left, 0)
+	p.Magnet(not left, 0)
 	
-	p.TurnSafe(-math.pi / 2, 4, 8)
-	p.GoSafe(130, goSpeed, goAcc)
+	if (left) then
+		p.Turn(-math.pi / 2, 4, 8)
+	else
+		p.Turn(math.pi / 2, 4, 8)
+	end
+	if (c.in_simulate()) then
+		p.GoSafe(130, goSpeed, goAcc)
+	else
+		p.Go(130, goSpeed, goAcc)
+	end
 	p.GripperMove(90)
 end
 
@@ -205,10 +222,23 @@ function DeployHalfTower(left, x, y)
 	end)
 	
 	if (left) then
-		p.TurnSafe(math.pi / 2, 4, 8)
+		p.Turn(math.pi / 2, 4, 8)
 	else
-		p.TurnSafe(-math.pi / 2, 4, 8)
+		p.Turn(-math.pi / 2, 4, 8)
 	end
-	p.GoSafe(130, goSpeed, goAcc)
+	if (c.in_simulate()) then
+		p.GoSafe(130, goSpeed, goAcc)
+	else
+		p.Go(130, goSpeed, goAcc)
+	end
 	p.GripperMove(90)
 end
+
+-- Beszorulas feloldasa
+function ResolveDeadpos(turn, go)
+	if (turn ~= 0) then
+		p.TurnSafe(turn)
+	end;
+	p.GoSafe(go)
+end
+-- Beszorulas feloldasa
