@@ -118,12 +118,6 @@ public:
 	virtual bool SetSpeed(double v, double w);
 
 	/**
-	 * SetSpeed allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool SetSpeedInProgress();
-
-	/**
 	 * sebessegertekek beallitasa
 	 * @param vLeft [mm/s]
 	 * @param vRight [mm/s]
@@ -132,10 +126,10 @@ public:
 	virtual bool SetWheelSpeed(double vLeft, double vRight);
 
 	/**
-	 * SetWheelSpeed allapota
+	 * sebessegbeallitasok (SetSpeed, SetWheelSpeed) allapotanak lekerdezese
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool SetWheelSpeedInProgress();
+	virtual bool SetSpeedInProgress();
 
 	/**
 	 * egyenes haladas

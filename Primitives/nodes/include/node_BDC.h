@@ -45,8 +45,7 @@ public:
 
 	progress_t AnyStop;
 	progress_t AnyMotion;
-	progress_t SetSpeed;
-	progress_t SetWheelSpeed;
+	progress_t AnySpeed;
 
 
 };

@@ -250,10 +250,6 @@ bool Primitives::SetSpeed(double v, double w) {
 	return true;
 }
 
-bool Primitives::SetSpeedInProgress() {
-	return false;
-}
-
 bool Primitives::SetWheelSpeed(double vLeft, double vRight){
 	//most nullázunk, nem számít
 	robot.v = 0;
@@ -261,7 +257,7 @@ bool Primitives::SetWheelSpeed(double vLeft, double vRight){
 	return true;
 }
 
-bool Primitives::SetWheelSpeedInProgress(){
+bool Primitives::SetSpeedInProgress(){
 	return false;
 }
 

@@ -75,10 +75,10 @@ void node_BDC::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_BDC_SET_SPEED_REPLY:
-				SetSpeed.done = GET_BOOL(&(msg->data[0]), 0);
-				SetSpeed.inProgress = false;
-				SetSpeed.finished = true;
-				cout << name << "\t___recv SETSPEED:\t" << (SetSpeed.done?"1":"0") << endl;
+				AnySpeed.done = GET_BOOL(&(msg->data[0]), 0);
+				AnySpeed.inProgress = false;
+				AnySpeed.finished = true;
+				cout << name << "\t___recv SETSPEED:\t" << (AnySpeed.done?"1":"0") << endl;
 				break;
 
 			default:
@@ -212,8 +212,8 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 
 	UDPdriver::send(&msg);
 
-	SetSpeed.inProgress = true;
-	SetSpeed.finished = false;
+	AnySpeed.inProgress = true;
+	AnySpeed.finished = false;
 
 	cout << name << "\t___send SETSPEED___:\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
 
@@ -234,8 +234,8 @@ void node_BDC::BDC_SET_WHEELSPEED(double vLeft, double vRight){
 
 	UDPdriver::send(&msg);
 
-	SetWheelSpeed.inProgress = true;
-	SetWheelSpeed.finished = false;
+	AnySpeed.inProgress = true;
+	AnySpeed.finished = false;
 
 	cout << name << "\t___send SETWHEELSPEED___:\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
 

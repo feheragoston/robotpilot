@@ -491,7 +491,7 @@ bool PrimitivesCan::SetSpeed(double v, double w){
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	bdc->AnyStop.inProgress ||
 		bdc->AnyMotion.inProgress ||
-		bdc->SetSpeed.inProgress){
+		bdc->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -501,19 +501,6 @@ bool PrimitivesCan::SetSpeed(double v, double w){
 		ret = ACT_STARTED;
 	}
 
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::SetSpeedInProgress(void){
-
-	EnterCritical();
-
-	bool ret = bdc->SetSpeed.inProgress;
 
 	ExitCritical();
 
@@ -532,8 +519,7 @@ bool PrimitivesCan::SetWheelSpeed(double vLeft, double vRight){
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	bdc->AnyStop.inProgress ||
 		bdc->AnyMotion.inProgress ||
-		bdc->SetSpeed.inProgress ||
-		bdc->SetWheelSpeed.inProgress){
+		bdc->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -551,11 +537,11 @@ bool PrimitivesCan::SetWheelSpeed(double vLeft, double vRight){
 }
 
 
-bool PrimitivesCan::SetWheelSpeedInProgress(void){
+bool PrimitivesCan::SetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = bdc->SetWheelSpeed.inProgress;
+	bool ret = bdc->AnySpeed.inProgress;
 
 	ExitCritical();
 
@@ -574,7 +560,7 @@ bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	bdc->AnyStop.inProgress ||
 		bdc->AnyMotion.inProgress ||
-		bdc->SetSpeed.inProgress){
+		bdc->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -605,7 +591,7 @@ bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	bdc->AnyStop.inProgress ||
 		bdc->AnyMotion.inProgress ||
-		bdc->SetSpeed.inProgress){
+		bdc->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -636,7 +622,7 @@ bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	bdc->AnyStop.inProgress ||
 		bdc->AnyMotion.inProgress ||
-		bdc->SetSpeed.inProgress){
+		bdc->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
