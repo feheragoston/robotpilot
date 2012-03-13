@@ -33,8 +33,6 @@ bool Config::Parse(int argc, char *argv[]) {
 				std::cout << "Sim Mode" << std::endl;
 				PrimitivesCan = false;
 				PrimitivesNet = false;
-
-				DebugSimulation = true;
 				break;
 			case 'c':
 				std::cout << "CAN Mode";
