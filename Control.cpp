@@ -150,6 +150,9 @@ Control::Control(Config* config) {
 		{"SetDeployPointPriority", l_SetDeployPointPriority},
 		{"ValidateStartSetup", l_ValidateStartSetup},
 
+		{"AddTestObstacles", l_AddTestObstacles},
+		{"ClearDynObstacles", l_ClearDynObstacles},
+
 		{NULL, NULL}
 	};
 
@@ -1916,6 +1919,21 @@ int Control::l_ValidateStartSetup(lua_State *L) {
 			}
 		}
 		logPawns = true;
+	}
+	return 0;
+}
+
+int Control::l_AddTestObstacles(lua_State *L) {
+	for (int i = 0; i < pawns->num; i++) {
+		dynObstacles.push_back(new Circle(pawns->pawns[i].x, pawns->pawns[i].y, PAWN_RADIUS));
+	}
+	return 0;
+}
+
+int Control::l_ClearDynObstacles(lua_State *L) {
+	while (!dynObstacles.empty()) {
+		delete dynObstacles.front();
+		dynObstacles.pop_front();
 	}
 	return 0;
 }
