@@ -1855,9 +1855,9 @@ int Control::l_SetDeployPointPriority(lua_State *L) {
 
 		if (target == 30 || target == 31 || target == 34 || target == 35) {
 			// a biztos helyre statikus akadalyokat is beteszunk
-			obstacles.push_back(new Circle(px, py, 100));
+			obstacles.push_back(new Circle(px, py, PAWN_RADIUS));
 		}
-		addDynamicObstacle(new Circle(px, py, 100));
+		addDynamicObstacle(new Circle(px, py, PAWN_RADIUS));
 	}
 
 	return 0;
