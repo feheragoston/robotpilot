@@ -191,7 +191,7 @@ Control::Control(Config* config) {
 
 	pawns = new msgpawns();
 	pawns->function = MSG_PAWNS;
-	pawns->num = 10;
+	pawns->num = 19;
 	for (int i = 0; i < 10; i++) {
 		if (i < 5) {
 			pawns->pawns[i].x = 690 + i * 280;
@@ -200,8 +200,41 @@ Control::Control(Config* config) {
 			pawns->pawns[i].x = 690 + (i - 5) * 280;
 			pawns->pawns[i].y = AREA_LENGTH - GREEN_PAWN_Y;
 		}
-		pawns->pawns[i].type = 1;
+		pawns->pawns[i].type = FIG_PAWN;
 	}
+	pawns->pawns[3].type = FIG_KING;
+	pawns->pawns[4].type = FIG_QUEEN;
+	pawns->pawns[8].type = FIG_KING;
+	pawns->pawns[9].type = FIG_QUEEN;
+
+	pawns->pawns[10].x = 1050;
+	pawns->pawns[10].y = 1500;
+	pawns->pawns[10].type = FIG_PAWN;
+	pawns->pawns[11].x = 100;
+	pawns->pawns[11].y = 1150;
+	pawns->pawns[11].type = FIG_PAWN;
+	pawns->pawns[12].x = 1750;
+	pawns->pawns[12].y = 1150;
+	pawns->pawns[12].type = FIG_PAWN;
+	pawns->pawns[13].x = 1050;
+	pawns->pawns[13].y = 800;
+	pawns->pawns[13].type = FIG_PAWN;
+	pawns->pawns[14].x = 1750;
+	pawns->pawns[14].y = 800;
+	pawns->pawns[14].type = FIG_PAWN;
+	pawns->pawns[15].x = 100;
+	pawns->pawns[15].y = 1850;
+	pawns->pawns[15].type = FIG_PAWN;
+	pawns->pawns[16].x = 1750;
+	pawns->pawns[16].y = 1850;
+	pawns->pawns[16].type = FIG_PAWN;
+	pawns->pawns[17].x = 1050;
+	pawns->pawns[17].y = 2200;
+	pawns->pawns[17].type = FIG_PAWN;
+	pawns->pawns[18].x = 1750;
+	pawns->pawns[18].y = 2200;
+	pawns->pawns[18].type = FIG_PAWN;
+
 	startpawns = new msgpawns();
 	startpawns->function = MSG_PAWNS;
 	startpawns->num = 0;
