@@ -21,6 +21,15 @@ function GoToTest(points)
 	end
 end
 
+function GoFromTest(from, points)
+	c.SetRobotPos(from.x, from.y)
+	p.TurnTo(points[1].x, points[1].y)
+	for i, point in ipairs(points) do
+		p.TurnToSafe(point.x, point.y)
+		p.GoToSafe(point.x, point.y)
+	end
+end
+
 startTime = c.gettimeofday()
 c.simulate(p.GoToSafe, 350, 2200)
 c.print("GoTo:", c.getelapsedtime(startTime) / 1000000)
@@ -33,7 +42,7 @@ c.print("test1:", c.getelapsedtime(startTime) / 1000000)
 
 points = {}
 for i=0,120 do
-	points[i+1] = { x = math.floor(i / 5) * 175 + 175, y = i % 5 * 175 + 450 }
+	points[i+1] = { x = math.floor(i / 5) * 175 + 175, y = i % 5 * 175 + 625 }
 end
 
 c.AddTestObstacles()
@@ -68,6 +77,17 @@ for i,c1 in ipairs(points) do
 end
 c.print("step3:", c.getelapsedtime(startTime) / 1000000)
 ]]
+
+for i,c1 in ipairs(points) do
+	for j,c2 in ipairs(points) do
+		if (i < j) then
+			if (c.simulate(GoFromTest, c1, {c2})) then
+				print(i, "=>", j)
+			end
+		end
+	end
+end
+c.print("step4:", c.getelapsedtime(startTime) / 1000000)
 
 c.ClearDynObstacles()
 
