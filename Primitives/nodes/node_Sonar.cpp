@@ -73,14 +73,14 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				(*val) = 0;
 				for(u8 i=0 ; i<4 ; i++){
 					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i])) - '0';
+					(*val) += GET_U8(&(msg->data[i+8])) - '0';
 				}
 
 				val = &(SonarPosY[1]);
 				(*val) = 0;
 				for(u8 i=0 ; i<4 ; i++){
 					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i+4])) - '0';
+					(*val) += GET_U8(&(msg->data[i+12])) - '0';
 				}
 
 				gettimeofday(&prevMsgTime, NULL);

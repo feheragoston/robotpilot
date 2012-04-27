@@ -51,6 +51,7 @@ private:
 	double Servo_Deg_Incr_grad[SERVO_COUNT];
 	u16 Servo_Limit_Low_Pos_Incr[SERVO_COUNT];
 	u16 Servo_Limit_High_Pos_Incr[SERVO_COUNT];
+	u16 Servo_Limit_Current_Ma[SERVO_COUNT];
 
 	u16 Servo_Pos_Incr[SERVO_COUNT];
 	u16 Servo_CmdPos_Incr[SERVO_COUNT];
