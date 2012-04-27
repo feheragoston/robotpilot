@@ -19,6 +19,8 @@
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 
+#define SONAR_TRANSMITTER_COUNT				2
+
 #define ACT_STARTED							true
 #define ACT_START_ERROR						false
 
@@ -390,13 +392,13 @@
 
 
 //----- sonar -----
-#define SONAR_TX_BLUE		2202.0
-#define SONAR_TY_BLUE		3102.0
-#define SONAR_ALPHA_BLUE	M_PI
+#define SONAR_TX_BLUE				2202.0
+#define SONAR_TY_BLUE				3102.0
+#define SONAR_ALPHA_BLUE			M_PI
 
-#define SONAR_TX_RED		-102.0
-#define SONAR_TY_RED		-102.0
-#define SONAR_ALPHA_RED		0.0
+#define SONAR_TX_RED				-102.0
+#define SONAR_TY_RED				-102.0
+#define SONAR_ALPHA_RED				0.0
 
 
 

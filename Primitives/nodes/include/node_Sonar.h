@@ -33,13 +33,13 @@ public:
 
 	void INIT_PARAM(void);
 
-	long int GET_POS(double* x, double* y);
+	long int GET_POS(u8 num, double* x, double* y);
 
 
 private:
 
-	double SonarPosX;
-	double SonarPosY;
+	double SonarPosX[SONAR_TRANSMITTER_COUNT];
+	double SonarPosY[SONAR_TRANSMITTER_COUNT];
 	struct timeval prevMsgTime;
 
 

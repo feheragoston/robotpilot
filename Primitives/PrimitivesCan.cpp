@@ -732,7 +732,7 @@ long int PrimitivesCan::GetOpponentPos(double * x, double* y){
 
 	EnterCritical();
 
-	long int ret = GetOpponentPos_Unsafe(x, y);
+	long int ret = GetOpponentPos_Unsafe(0, x, y);
 
 	ExitCritical();
 
@@ -769,7 +769,7 @@ void PrimitivesCan::SetOpponentPos(double x, double y){
 
 	double tmpX, tmpY;
 
-	GetOpponentPos_Unsafe(&tmpX, &tmpY);
+	GetOpponentPos_Unsafe(0, &tmpX, &tmpY);
 
 	sonarXOffset = x - tmpX;
 	sonarYOffset = y - tmpY;
@@ -1201,14 +1201,14 @@ void PrimitivesCan::GetRobotPos_Unsafe(double* x, double* y, double* phi){
 }
 
 
-long int PrimitivesCan::GetOpponentPos_Unsafe(double* x, double* y){
+long int PrimitivesCan::GetOpponentPos_Unsafe(u8 num, double* x, double* y){
 
 	long int ret;
 
 	double sonarpos_S[3];	// Szonar pozicioadat
 	double sonarpos_W[3];	// Szonar pozicioadat vilagkoordinatakban
 
-	ret = sonar->GET_POS((&sonarpos_S[0]), (&sonarpos_S[1]));
+	ret = sonar->GET_POS(num, (&sonarpos_S[0]), (&sonarpos_S[1]));
 	sonarpos_S[2] = 1.0;
 
 	M33V3Mult(T33WS, sonarpos_S, sonarpos_W);

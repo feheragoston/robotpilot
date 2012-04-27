@@ -18,8 +18,10 @@ node_Sonar::node_Sonar(void) : node(SONAR_ID, "node_Sonar", SONAR_KEEP_ALIVE_MS,
 
 
 	//----- valtozo init ELEJE -----
-	SonarPosX = -1000;
-	SonarPosY = -1000;
+	for(u8 i=0 ; i<SONAR_TRANSMITTER_COUNT ; i++){
+		SonarPosX[i] = -1000;
+		SonarPosY[i] = -1000;
+	}
 	gettimeofday(&prevMsgTime, NULL);
 	//----- valtozo init VEGE -----
 
@@ -49,18 +51,40 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				break;
 
 			case MSG_PERIODIC_TO_PC:
+
 				//ASCII-ban kuldi
-				SonarPosX = 0;
+				double* val;
+
+				val = &(SonarPosX[0]);
+				(*val) = 0;
 				for(u8 i=0 ; i<4 ; i++){
-					SonarPosX *= 10;
-					SonarPosX += GET_U8(&(msg->data[i])) - '0';
+					(*val) *= 10;
+					(*val) += GET_U8(&(msg->data[i])) - '0';
 				}
-				SonarPosY = 0;
+
+				val = &(SonarPosY[0]);
+				(*val) = 0;
 				for(u8 i=0 ; i<4 ; i++){
-					SonarPosY *= 10;
-					SonarPosY += GET_U8(&(msg->data[i+4])) - '0';
+					(*val) *= 10;
+					(*val) += GET_U8(&(msg->data[i+4])) - '0';
 				}
+
+				val = &(SonarPosX[1]);
+				(*val) = 0;
+				for(u8 i=0 ; i<4 ; i++){
+					(*val) *= 10;
+					(*val) += GET_U8(&(msg->data[i])) - '0';
+				}
+
+				val = &(SonarPosY[1]);
+				(*val) = 0;
+				for(u8 i=0 ; i<4 ; i++){
+					(*val) *= 10;
+					(*val) += GET_U8(&(msg->data[i+4])) - '0';
+				}
+
 				gettimeofday(&prevMsgTime, NULL);
+
 				break;
 
 			default:
@@ -88,12 +112,12 @@ void node_Sonar::INIT_PARAM(void){
 }
 
 
-long int node_Sonar::GET_POS(double* x, double* y){
+long int node_Sonar::GET_POS(u8 num, double* x, double* y){
 
 	struct timeval timeElapsed;
 
-	*x = SonarPosX;
-	*y = SonarPosY;
+	*x = SonarPosX[num];
+	*y = SonarPosY[num];
 
 	TimeMeasure(&prevMsgTime, &timeElapsed);
 
