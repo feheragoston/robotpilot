@@ -4,6 +4,7 @@ Config::Config() {
 	strcpy(CanIp, "");
 	strcpy(NetIp, "");
 	strcpy(BindIp, "");
+	strcpy(NokiaIp, "");
 	strcpy(LuaFile, "");
 	strcpy(LogFile, "");
 
@@ -11,6 +12,7 @@ Config::Config() {
 	PrimitivesNet = false;
 
 	DebugSimulation = false;
+	NokiaServer = false;
 }
 
 bool Config::Parse(int argc, char *argv[]) {
@@ -19,14 +21,15 @@ bool Config::Parse(int argc, char *argv[]) {
 			switch (argv[i][1]) {
 			case 'h': // help
 				std::cout << "Command line parameters:" << std::endl;
-				std::cout << "	-h	This message" << std::endl;
-				std::cout << "	-s	Sim Mode" << std::endl;
-				std::cout << "	-c [ip_address]	CAN Mode" << std::endl;
-				std::cout << "	-n [ip_address]	Net Mode" << std::endl;
+				std::cout << "	-h			This message" << std::endl;
+				std::cout << "	-s			Sim Mode" << std::endl;
+				std::cout << "	-c [ip_address]		CAN Mode" << std::endl;
+				std::cout << "	-n [ip_address]		Net Mode" << std::endl;
 				std::cout << "	-l <Pilot/file.lua>	lua file to run" << std::endl;
-				std::cout << "	-b <ip_address>	Bind server on ip" << std::endl;
-				std::cout << "	-ds	Debug simulation" << std::endl;
-				std::cout << "	-dl <logfile>	Log to file" << std::endl;
+				std::cout << "	-b <ip_address>		Bind server on ip" << std::endl;
+				std::cout << "	-ds			Debug simulation" << std::endl;
+				std::cout << "	-dl <logfile>		Log to file" << std::endl;
+				std::cout << "	-dn [ip_address]	Send status to nokia server" << std::endl;
 				return false;
 				break;
 			case 's':
@@ -105,6 +108,18 @@ bool Config::Parse(int argc, char *argv[]) {
 							std::cout << "Error: no log file specified" << std::endl;
 							return false;
 						}
+					}
+					if (argv[i][2] == 'n') {
+						NokiaServer = true;
+						std::cout << "Using Nokia Server";
+						if (i + 1 < argc) {
+							if (isIp(argv[i + 1])) {
+								strcpy(NokiaIp, argv[i + 1]);
+								i++;
+								std::cout << ": " << NokiaIp;
+							}
+						}
+						std::cout << std::endl;
 					}
 				}
 				break;
