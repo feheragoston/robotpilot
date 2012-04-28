@@ -26,6 +26,7 @@ extern "C" {
 #include "Primitives/Net/Protocol/Protocol.h"
 #include "Obstacles/Circle.h"
 #include "Obstacles/Line.h"
+#include "nokia_server.h"
 
 #define luaC_export(L,s)	lua_pushnumber(L, s); lua_setfield(L, LUA_GLOBALSINDEX, #s)
 
@@ -49,6 +50,7 @@ protected:
 	static Primitives* mPrimitives;
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
+	static nokia_server* ns;
 
 	static int logfile;
 
