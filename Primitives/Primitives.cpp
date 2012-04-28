@@ -327,6 +327,14 @@ void Primitives::GetRobotPos(double* x, double* y, double* phi) {
 	*phi = robot.phi;
 }
 
+void Primitives::GetRobotPos(int* x, int* y, int* phi) {
+	double dx, dy, dphi;
+	GetRobotPos(&dx, &dy, &dphi);
+	*x = (int) dx;
+	*y = (int) dy;
+	*phi = (int) (dphi * 180. / M_PI);
+}
+
 long int Primitives::GetOpponentPos(double * x, double* y) {
 	*x = opponent.x;
 	*y = opponent.y;
