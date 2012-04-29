@@ -212,6 +212,14 @@ public:
 	virtual void GetRobotPos(double* x, double* y, double* phi);
 
 	/**
+	 * GetRobotPos egesz szamokra
+	 * @param x [mm]
+	 * @param y [mm]
+	 * @param phi [deg]
+	 */
+	void GetRobotPos(int* x, int* y, int* phi);
+
+	/**
 	 * ellenfel poziciojanak lekerdezese
 	 * @param x [mm]
 	 * @param y [mm]

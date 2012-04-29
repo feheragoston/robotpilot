@@ -13,6 +13,7 @@ Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
+nokia_server* Control::ns = NULL;
 int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
@@ -285,6 +286,9 @@ Control::~Control() {
 	if (mServer) {
 		delete mServer;
 	}
+	if (ns) {
+		delete ns;
+	}
 	lua_close(L);
 
 	while (!obstacles.empty()) {
@@ -332,6 +336,10 @@ bool Control::Init() {
 		mServer = new Server();
 		mServer->SetMessageCallback(serverMessageCallback);
 		mServer->Listen(13001);
+
+		if (mConfig->NokiaServer) {
+			ns = new nokia_server();
+		}
 		return true;
 	}
 
@@ -907,6 +915,11 @@ int Control::c_wait(lua_State *L) {
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */
 	log();
 	mServer->Process();
+	if (mConfig->NokiaServer) {
+		int x, y, phi;
+		mPrimitives->GetRobotPos(&x, &y, &phi);
+		ns->set_location(x, y, phi);
+	}
 
 	/* statusz ellenorzesek */
 	if (mPrimitives->GetStopButton()) {
