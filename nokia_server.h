@@ -19,13 +19,13 @@ typedef enum ROBOT_STATE {CLOSED = 0, OPENED = 1} robot_state;
 class nokia_server
 {
     public:
-        nokia_server();
+        nokia_server(std::string ipaddr = "192.168.2.15");
         ~nokia_server();
 
-        void set_location(int x, int y, int phi); //Aktualis pozicio beallitasa
-        void set_speed(int left_wheel, int right_wheel); //Aktualis sebesseg megadasa
+        void set_location(double x, double y, double phi); //Aktualis pozicio beallitasa
+        void set_speed(double left_wheel, double right_wheel); //Aktualis sebesseg megadasa
         void set_state(robot_state state); //Allapot megadasa (nyitott/csukott)
-        void set_opponent(std::string name, int x, int y, int phi, int r); //egy bizonyos nevu ellenfel poziciojanak es meretenek megadasa
+        void set_opponent(std::string name, double x, double y, double phi, double r); //egy bizonyos nevu ellenfel poziciojanak es meretenek megadasa
         void send_message(std::string msg, msg_type type, int alert_interval); //uzenet kijelzese. amennyiben az alert_interval > 0, az uzenet villogva megjelenik a terkep felett
         void send_variable(std::string name, std::string value); //egy bizonyos nevu valtozo ertekenek elkuldese
         void clear_opponents(); //letorli a palyarol az ellenfeleket.
