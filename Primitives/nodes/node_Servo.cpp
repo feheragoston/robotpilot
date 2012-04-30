@@ -162,7 +162,7 @@ void node_Servo::INIT_PARAM(void){
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
 
-	msg.length		= 24;
+	msg.length		= 36;
 
 	SET_U16(&(msg.data[0]), Servo_Limit_Low_Pos_Incr[0]);
 	SET_U16(&(msg.data[2]), Servo_Limit_High_Pos_Incr[0]);
