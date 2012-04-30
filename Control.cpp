@@ -14,6 +14,7 @@ Primitives* Control::mPrimitives = NULL;
 PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 nokia_server* Control::ns = NULL;
+unsigned int Control::nokia_sent = 0;
 int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
@@ -915,10 +916,11 @@ int Control::c_wait(lua_State *L) {
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */
 	log();
 	mServer->Process();
-	if (mConfig->NokiaServer) {
-		int x, y, phi;
+	if (mConfig->NokiaServer && (InitTime() > nokia_sent)) {
+		double x, y, phi;
 		mPrimitives->GetRobotPos(&x, &y, &phi);
 		ns->set_location(x, y, phi);
+		nokia_sent = InitTime() + 100;
 	}
 
 	/* statusz ellenorzesek */

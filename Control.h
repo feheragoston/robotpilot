@@ -51,6 +51,7 @@ protected:
 	static PrimitivesNet* mCamera;
 	static Server* mServer;
 	static nokia_server* ns;
+	static unsigned int nokia_sent;
 
 	static int logfile;
 
