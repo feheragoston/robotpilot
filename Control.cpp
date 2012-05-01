@@ -309,6 +309,11 @@ Control::~Control() {
 }
 
 bool Control::Init() {
+	if (sizeof(msgstatus) > 255) {
+		cout << "(Control) Fatal error: msgstatus is too big" << endl;
+		return false;
+	}
+
 	gettimeofday(&runStart, NULL);
 	gettimeofday(&initStart, NULL);
 	gettimeofday(&matchStart, NULL);
