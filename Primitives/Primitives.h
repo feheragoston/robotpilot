@@ -63,15 +63,9 @@ public:
 
 	/**
 	 * A szinkapcsolo allapotanak lekerdezese
-	 * @return false: piros, true: kek
+	 * @return false: lila, true: piros
 	 */
 	virtual bool GetMyColor();
-
-	/**
-	 * Annak lekerdezese, hogy van-e paraszt a gripper-ek kozott
-	 * @return igaz, ha van benn paraszt
-	 */
-	virtual bool PawnInGripper();
 
 	/**
 	 * motortap be/ki kapcsolasa
@@ -221,11 +215,12 @@ public:
 
 	/**
 	 * ellenfel poziciojanak lekerdezese
+	 * @param n az ellenfel robot szama (0 vagy 1)
 	 * @param x [mm]
 	 * @param y [mm]
 	 * @return utolso frissites ota eltelt ido [ms]
 	 */
-	virtual long int GetOpponentPos(double * x, double* y);
+	virtual long int GetOpponentPos(unsigned char n, double * x, double* y);
 
 	/**
 	 * sebessegertekek lekerdezese
@@ -244,39 +239,87 @@ public:
 
 	/**
 	 * ellenfel poziciojanak beallitasa
+	 * @param n az ellenfel robot szama (0 vagy 1)
 	 * @param x [mm]
 	 * @param y [mm]
 	 */
-	virtual void SetOpponentPos(double x, double y);
+	virtual void SetOpponentPos(unsigned char n, double x, double y);
 
 	/**
 	 * Visszaadja a tavolsagerzekelok erteket
-	 * @param distance a hat tavolsagerzekelo erteke [mm]
+	 * @param distance a ketto tavolsagerzekelo erteke [mm]
 	 */
-	virtual void GetDistances(double distance[6]);
+	virtual void GetDistances(double distance[2]);
 
 	///////////////////////////////////////////////////////////////////////
-	// GRIPPER
+	// GRIPPER (elorol hatrafele nezve bal oldali, jobb oldali)
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * elso megfogo mozgatasa
-	 * @param pos [deg], 0 zart helyzet, 90 nyitott helyzet
+	 * Also megfogo kar mozgatasa
+	 * @param left bal/jobb kar mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 zart
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool GripperMove(double pos);
+	virtual bool GripperMove(bool left, double pos, double max_speed, double max_acc);
 
 	/**
-	 * elso megfogo mozgatas allapota
+	 * Also megfogo kar mozgatas allapota
+	 * @param left bal/jobb kar allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool GripperMoveInProgress();
+	virtual bool GripperMoveInProgress(bool left);
 
 	/**
-	 * elso megfogo szogenek lekerdezese
-	 * @return [mm], zart helyzet 0
+	 * Legutobbi also megfogo mozgatas hibajanak lekerdezese
+	 * @param left bal/jobb kar
+	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual double GetGripperPos();
+	virtual bool GetGripperError(bool left);
+
+	/**
+	 * Also megfogo kar szogenek lekerdezese
+	 * @param left bal/jobb kar allapota
+	 * @return [deg], zart helyzet 0
+	 */
+	virtual double GetGripperPos(bool left);
+
+	///////////////////////////////////////////////////////////////////////
+	// CLAW (elorol hatrafele nezve bal oldali, jobb oldali)
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Felso terelo karok mozgatasa
+	 * @param left bal/jobb karok mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 zart
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool ClawMove(bool left, double pos, double max_speed, double max_acc);
+
+	/**
+	 * Felso terelo karok mozgatasanak allapota
+	 * @param left bal/jobb karok allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ClawMoveInProgress(bool left);
+
+	/**
+	 * Legutobbi felso terelo mozgatas hibajanak lekerdezese
+	 * @param left bal/jobb kar
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetClawError(bool left);
+
+	/**
+	 * Felso terelo karok szogenek lekerdezese
+	 * @param left bal/jobb kar allapota
+	 * @return [deg], zart helyzet 0
+	 */
+	virtual double GetClawPos(bool left);
 
 	///////////////////////////////////////////////////////////////////////
 	// CONSOLE
@@ -328,47 +371,63 @@ public:
 	virtual double GetConsolePos();
 
 	///////////////////////////////////////////////////////////////////////
-	// ARM (elorol hatrafele nezve bal oldali, jobb oldali)
+	// ARM
 	///////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Kar mozgatasa
-	 * @param left bal/jobb kar mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool ArmMove(bool left, double pos, double max_speed, double max_acc);
+	virtual bool ArmMove(double pos, double max_speed, double max_acc);
 
 	/**
 	 * Kar mozgatas allapota
-	 * @param left bal/jobb kar allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool ArmMoveInProgress(bool left);
+	virtual bool ArmMoveInProgress();
 
 	/**
 	 * Kar poziciojanak lekerdezese
-	 * @param left bal/jobb kar
 	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 */
-	virtual double GetArmPos(bool left);
+	virtual double GetArmPos();
+
+	///////////////////////////////////////////////////////////////////////
+	// COMPRESSOR
+	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Magnes polaritasanak valtoztatasa
-	 * @param left bal/jobb magnes
-	 * @param polarity 1: vonzas, 0: kikapcsolt, -1: taszitas
+	 * Kompresszor kapcsolasa
+	 * @param on allapot
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool Magnet(bool left, int polarity);
+	virtual bool Compressor(bool on);
 
 	/**
-	 * Magnes polaritas valtas allapota
-	 * @param left bal/jobb magnes
+	 * Kompresszor kapcsolas allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool MagnetInProgress(bool left);
+	virtual bool CompressorInProgress();
+
+	///////////////////////////////////////////////////////////////////////
+	// VALVE
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Szelep kapcsolasa
+	 * @param open allapot
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool Valve(bool open);
+
+	/**
+	 * Szelep kapcsolas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ValveInProgress();
 
 protected:
 	/**
@@ -390,11 +449,6 @@ protected:
 	bool mStopButton;
 
 	/**
-	 * a parasztkapcsolo allapotat tarolja
-	 */
-	bool mPawnInGripper;
-
-	/**
 	 * a robot es az ellenfel pozicioja
 	 */
 	position robot, opponent;
@@ -410,12 +464,14 @@ protected:
 	progress turn;
 	progress motionStop;
 
-	progress gripperMove;
-	double gripperPos;
+	progress leftGripperMove, rightGripperMove;
+	double leftGripperPos, rightGripperPos;
+	progress leftClawMove, rightClawMove;
+	double leftClawPos, rightClawPos;
 	progress consoleMove;
 	double consolePos;
-	progress leftArmMove, rightArmMove;
-	double leftArmPos, rightArmPos;
+	progress armMove;
+	double armPos;
 
 };
 
