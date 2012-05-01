@@ -46,6 +46,9 @@
 #define		SONAR_TIMEOUT		1000	// sonartol kapott ertek ervenyessegi limitje [ms]
 
 #define		PRIMITIVES_WAIT		50000	// alapertelmezett Primitives->Wait ido [us]
+
+#define		OPPONENT_NUM		2		// nyilvantartott ellenfelek szama
+#define		PROXIMITY_NUM		2		// tavolsagerzekelok szama
 /////////////////
 // Robot szine
 

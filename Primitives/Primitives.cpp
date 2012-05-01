@@ -13,12 +13,16 @@ Primitives::Primitives(Config* config) {
 	mStartButton = true;
 	mStopButton = false;
 	mRobotColor = false;
-	mPawnInGripper = false;
 
-	gripperPos = 0;
+	leftGripperPos = 0;
+	rightGripperPos = 0;
+	leftClawPos = 0;
+	rightClawPos = 0;
 	consolePos = 0;
-	leftArmPos = 0;
-	rightArmPos = 0;
+	armPos = 0;
+
+	compressor = false;
+	valve = false;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -29,9 +33,17 @@ Primitives::Primitives(Primitives* source) {
 	mRobotColor = !source->GetMyColor();
 
 	source->GetRobotPos(&robot.x, &robot.y, &robot.phi);
-	source->GetOpponentPos(&opponent.x, &opponent.y);
-	gripperPos = source->GetGripperPos();
+	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
+		source->GetOpponentPos(i, &opponent[i].x, &opponent[i].y);
+	}
+	leftGripperPos = source->GetGripperPos(true);
+	rightGripperPos = source->GetGripperPos(false);
+	leftClawPos = source->GetClawPos(true);
+	rightClawPos = source->GetClawPos(false);
 	consolePos = source->GetConsolePos();
+	armPos = source->GetArmPos();
+	compressor = source->GetCompressor();
+	valve = source->GetValve();
 }
 
 Primitives::~Primitives() {
@@ -202,10 +214,6 @@ bool Primitives::Wait(long int useconds) {
 	return true;
 }
 
-bool Primitives::PawnInGripper(void) {
-	return mPawnInGripper;
-}
-
 bool Primitives::GetStartButton() {
 	return mStartButton;
 }
@@ -235,8 +243,10 @@ bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.y = 200;
 	robot.phi = M_PI / 2;
 
-	opponent.x = 200;
-	opponent.y = 2800;
+	for (int i = 0; i < OPPONENT_NUM; i++) {
+		opponent[i].x = 200;
+		opponent[i].y = 2800;
+	}
 	return true;
 }
 
@@ -335,9 +345,11 @@ void Primitives::GetRobotPos(int* x, int* y, int* phi) {
 	*phi = (int) (dphi * 180. / M_PI);
 }
 
-long int Primitives::GetOpponentPos(double * x, double* y) {
-	*x = opponent.x;
-	*y = opponent.y;
+long int Primitives::GetOpponentPos(unsigned char n, double * x, double* y) {
+	if (n < OPPONENT_NUM) {
+		*x = opponent[n].x;
+		*y = opponent[n].y;
+	}
 	return 0;
 }
 
@@ -352,28 +364,65 @@ void Primitives::SetRobotPos(double x, double y, double phi) {
 	robot.phi = phi;
 }
 
-void Primitives::SetOpponentPos(double x, double y) {
-	opponent.x = x;
-	opponent.y = y;
+void Primitives::SetOpponentPos(unsigned char n, double x, double y) {
+	if (n < OPPONENT_NUM) {
+		opponent[n].x = x;
+		opponent[n].y = y;
+	}
 }
 
-void Primitives::GetDistances(double distance[6]) {
-	for (int i = 0; i < 6; i++) {
+void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
+	for (int i = 0; i < PROXIMITY_NUM; i++) {
 		distance[i] = 400;
 	}
 }
 
-bool Primitives::GripperMove(double pos) {
-	gripperPos = pos;
+bool Primitives::GripperMove(bool left, double pos, double max_speed, double max_acc) {
+	if (left) {
+		leftGripperPos = pos;
+	} else {
+		rightGripperPos = pos;
+	}
 	return true;
 }
 
-bool Primitives::GripperMoveInProgress() {
+bool Primitives::GripperMoveInProgress(bool left) {
 	return false;
 }
 
-double Primitives::GetGripperPos() {
-	return gripperPos;
+bool Primitives::GetGripperError(bool left) {
+	return false;
+}
+
+double Primitives::GetGripperPos(bool left) {
+	if (left) {
+		return leftGripperPos;
+	}
+	return rightGripperPos;
+}
+
+bool Primitives::ClawMove(bool left, double pos, double max_speed, double max_acc) {
+	if (left) {
+		leftClawPos = pos;
+	} else {
+		rightClawPos = pos;
+	}
+	return true;
+}
+
+bool Primitives::ClawMoveInProgress(bool left) {
+	return false;
+}
+
+bool Primitives::GetClawError(bool left) {
+	return false;
+}
+
+double Primitives::GetClawPos(bool left) {
+	if (left) {
+		return leftClawPos;
+	}
+	return rightClawPos;
 }
 
 bool Primitives::CalibrateConsole() {
@@ -406,30 +455,45 @@ double Primitives::GetConsolePos() {
 	return consolePos;
 }
 
-bool Primitives::ArmMove(bool left, double pos, double max_speed, double max_acc) {
-	if (left) {
-		leftArmPos = pos;
-	} else {
-		rightArmPos = pos;
-	}
+bool Primitives::ArmMove(double pos, double max_speed, double max_acc) {
+	armPos = pos;
 	return true;
 }
 
-bool Primitives::ArmMoveInProgress(bool left) {
+bool Primitives::ArmMoveInProgress() {
 	return false;
 }
 
-double Primitives::GetArmPos(bool left) {
-	if (left) {
-		return leftArmPos;
-	}
-	return rightArmPos;
+bool Primitives::GetArmError() {
+	return false;
 }
 
-bool Primitives::Magnet(bool left, int polarity) {
+double Primitives::GetArmPos() {
+	return armPos;
+}
+
+bool Primitives::Compressor(bool on) {
+	compressor = on;
 	return true;
 }
 
-bool Primitives::MagnetInProgress(bool left) {
+bool Primitives::CompressorInProgress() {
 	return false;
+}
+
+bool Primitives::GetCompressor() {
+	return compressor;
+}
+
+bool Primitives::Valve(bool open) {
+	valve = open;
+	return true;
+}
+
+bool Primitives::ValveInProgress() {
+	return false;
+}
+
+bool Primitives::GetValve() {
+	return valve;
 }

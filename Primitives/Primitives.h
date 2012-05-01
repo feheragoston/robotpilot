@@ -215,7 +215,7 @@ public:
 
 	/**
 	 * ellenfel poziciojanak lekerdezese
-	 * @param n az ellenfel robot szama (0 vagy 1)
+	 * @param n az ellenfel robot szama (0..OPPONENT_NUM-1)
 	 * @param x [mm]
 	 * @param y [mm]
 	 * @return utolso frissites ota eltelt ido [ms]
@@ -239,7 +239,7 @@ public:
 
 	/**
 	 * ellenfel poziciojanak beallitasa
-	 * @param n az ellenfel robot szama (0 vagy 1)
+	 * @param n az ellenfel robot szama (0..OPPONENT_NUM-1)
 	 * @param x [mm]
 	 * @param y [mm]
 	 */
@@ -247,9 +247,9 @@ public:
 
 	/**
 	 * Visszaadja a tavolsagerzekelok erteket
-	 * @param distance a ketto tavolsagerzekelo erteke [mm]
+	 * @param distance a PROXIMITY_NUM db tavolsagerzekelo erteke [mm]
 	 */
-	virtual void GetDistances(double distance[2]);
+	virtual void GetDistances(double distance[PROXIMITY_NUM]);
 
 	///////////////////////////////////////////////////////////////////////
 	// GRIPPER (elorol hatrafele nezve bal oldali, jobb oldali)
@@ -390,6 +390,12 @@ public:
 	virtual bool ArmMoveInProgress();
 
 	/**
+	 * Legutobbi kar mozgatas hibajanak lekerdezese
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetArmError();
+
+	/**
 	 * Kar poziciojanak lekerdezese
 	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 */
@@ -412,6 +418,12 @@ public:
 	 */
 	virtual bool CompressorInProgress();
 
+	/**
+	 * Kompresszor allapota
+	 * @return true: bekapcsolva, false: nincs bekapcsolva
+	 */
+	virtual bool GetCompressor();
+
 	///////////////////////////////////////////////////////////////////////
 	// VALVE
 	///////////////////////////////////////////////////////////////////////
@@ -428,6 +440,12 @@ public:
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
 	virtual bool ValveInProgress();
+
+	/**
+	 * Szelep allapota
+	 * @return true: nyitva, false: zarva
+	 */
+	virtual bool GetValve();
 
 protected:
 	/**
@@ -451,7 +469,7 @@ protected:
 	/**
 	 * a robot es az ellenfel pozicioja
 	 */
-	position robot, opponent;
+	position robot, opponent[OPPONENT_NUM];
 
 	/**
 	 * mozgasoknal a celpozicio
@@ -472,6 +490,8 @@ protected:
 	double consolePos;
 	progress armMove;
 	double armPos;
+
+	bool compressor, valve;
 
 };
 
