@@ -148,16 +148,26 @@ Control::Control(Config* config) {
 		obstacles.push_back(new Line(AREA_WIDTH, 0, AREA_WIDTH, AREA_LENGTH));
 
 		// start vedo falak
-		obstacles.push_back(new Line(400, 0, 400, 400));
-		obstacles.push_back(new Line(400, 3000, 400, 2600));
+		obstacles.push_back(new Line(500, 0, 500, 400));
+		obstacles.push_back(new Line(500, AREA_LENGTH, 500, AREA_LENGTH - 400));
 
-		// biztos terulet falai
-		obstacles.push_back(new Line(1850, 450, 2100, 450));
-		obstacles.push_back(new Line(1850, 1150, 2100, 1150));
-		obstacles.push_back(new Line(1850, 1850, 2100, 1850));
-		obstacles.push_back(new Line(1850, 2550, 2100, 2550));
-		obstacles.push_back(new Line(1980, 450, 1980, 1150));
-		obstacles.push_back(new Line(1980, 1850, 1980, 2550));
+		// hold falak
+		obstacles.push_back(new Line(AREA_WIDTH - 750, 370, AREA_WIDTH, 325));
+		obstacles.push_back(new Line(AREA_WIDTH - 750, AREA_LENGTH - 370, AREA_WIDTH, AREA_LENGTH - 325));
+
+		// palmafa
+		obstacles.push_back(new Circle(1000, 1500, 20));
+
+		// totemek kozepe
+		obstacles.push_back(new Line( 965, 1065, 1035, 1065));
+		obstacles.push_back(new Line( 965, 1065,  965, 1135));
+		obstacles.push_back(new Line( 965, 1135, 1035, 1135));
+		obstacles.push_back(new Line(1035, 1065, 1035, 1135));
+
+		obstacles.push_back(new Line( 965, 1865, 1035, 1865));
+		obstacles.push_back(new Line( 965, 1865,  965, 1935));
+		obstacles.push_back(new Line( 965, 1935, 1035, 1935));
+		obstacles.push_back(new Line(1035, 1865, 1035, 1935));
 	}
 	// ellenfelet alapbol kirakjuk a palyarol
 	for (int i = 0; i < OPPONENT_NUM; i++) {
