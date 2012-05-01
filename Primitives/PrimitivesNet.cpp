@@ -35,8 +35,6 @@ bool PrimitivesNet::CameraInit() {
 			return false;
 		}
 	}
-	posRefine.inprogress = false;
-	pawnRefresh.inprogress = false;
 	return true;
 }
 
@@ -71,17 +69,22 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		robot.phi = data->phi;
 		robot.v = data->v;
 		robot.w = data->w;
-		opponent.x = data->ox;
-		opponent.y = data->oy;
+		for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
+			opponent[i].x = data->ox[i];
+			opponent[i].y = data->oy[i];
+		}
 		mStartButton = data->startButton;
 		mStopButton = data->stopButton;
 		mRobotColor = data->color;
-		mPawnInGripper = data->pawnInGripper;
-		gripperPos = data->gripperPos;
+		leftGripperPos = data->leftGripperPos;
+		rightGripperPos = data->rightGripperPos;
+		leftClawPos = data->leftClawPos;
+		rightClawPos = data->rightClawPos;
+		armPos = data->armPos;
 		consolePos = data->consolePos;
-		leftArmPos = data->leftArmPos;
-		rightArmPos = data->rightArmPos;
-		for (int i = 0; i < 6; i++) {
+		compressor = data->compressor;
+		valve = data->valve;
+		for (int i = 0; i < PROXIMITY_NUM; i++) {
 			distances[i] = data->distances[i];
 		}
 	} else if (*function == MSG_CALIBRATEPOS && size == sizeof(msgb1)) {
@@ -109,42 +112,11 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		if (data->b1) {
 			motionStop.inprogress = false;
 		}
-	} else if (*function == MSG_GRIPPERMOVE && size == sizeof(msgb1)) {
-		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
-			gripperMove.inprogress = false;
-		}
 	} else if (*function == MSG_CONSOLEMOVE && size == sizeof(msgb1)) {
 		msgb1* data = (msgb1*) buffer;
 		if (data->b1) {
 			consoleMove.inprogress = true;
 		}
-	} else if (*function == MSG_ARMMOVE && size == sizeof(msgb1)) {
-		msgb1* data = (msgb1*) buffer;
-		if (data->b1) {
-			leftArmMove.inprogress = false;
-		} else {
-			rightArmMove.inprogress = false;
-		}
-	} else if (*function == MSG_POSREFINE && size == sizeof(msgd3)) {
-		msgd3* data = (msgd3*) buffer;
-		refineDelta.x = data->d1;
-		refineDelta.y = data->d2;
-		refineDelta.phi = data->d3;
-		printf("POSREFINE: %f %f %f\n", refineDelta.x, refineDelta.y, refineDelta.phi);
-		posRefine.inprogress = false;
-	} else if (*function == MSG_PAWNS && size == sizeof(msgpawns)) {
-		msgpawns* data = (msgpawns*) buffer;
-		if (pawns->num <= 19) {
-			pawns->num = data->num;
-			for (int i = 0; i < data->num; i++) {
-				pawns->pawns[i].type = data->pawns[i].type;
-				pawns->pawns[i].x = data->pawns[i].x;
-				pawns->pawns[i].y = data->pawns[i].y;
-			}
-			pawnRefresh.finished = true;
-		}
-		pawnRefresh.inprogress = false;
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
 		return false;
@@ -243,20 +215,91 @@ void PrimitivesNet::GetDistances(double distance[6]) {
 	}
 }
 
-bool PrimitivesNet::GripperMove(double pos) {
-	if (gripperMove.inprogress) {
+bool PrimitivesNet::GripperMove(bool left, double pos, double max_speed, double max_acc) {
+	progress* p;
+	uint8_t id;
+	if (left) {
+		p = &leftGripperMove;
+		id = 0; // TODO
+	} else {
+		p = &rightGripperMove;
+		id = 1; // TODO
+	}
+	if (p->inprogress) {
 		return false;
 	}
-	msgd1 message;
-	message.function = MSG_GRIPPERMOVE;
-	message.d1 = pos;
-	netConnection->Send(&message, sizeof(msgd1));
-	gripperMove.inprogress = true;
+	msgservo message;
+	message.function = MSG_SERVOMOVE;
+	message.id = id;
+	message.pos = pos;
+	message.speed = max_speed;
+	message.acc = max_acc;
+	netConnection->Send(&message, sizeof(msgservo));
+	p->inprogress = true;
 	return true;
 }
 
-bool PrimitivesNet::GripperMoveInProgress() {
-	return gripperMove.inprogress;
+bool PrimitivesNet::GripperMoveInProgress(bool left) {
+	progress* p;
+	if (left) {
+		p = &leftGripperMove;
+	} else {
+		p = &rightGripperMove;
+	}
+	return p->inprogress;
+}
+
+bool PrimitivesNet::ClawMove(bool left, double pos, double max_speed, double max_acc) {
+	progress* p;
+	uint8_t id;
+	if (left) {
+		p = &leftClawMove;
+		id = 2; // TODO
+	} else {
+		p = &rightClawMove;
+		id = 3; // TODO
+	}
+	if (p->inprogress) {
+		return false;
+	}
+	msgservo message;
+	message.function = MSG_SERVOMOVE;
+	message.id = id;
+	message.pos = pos;
+	message.speed = max_speed;
+	message.acc = max_acc;
+	netConnection->Send(&message, sizeof(msgservo));
+	p->inprogress = true;
+	return true;
+}
+
+bool PrimitivesNet::ClawMoveInProgress(bool left) {
+	progress* p;
+	if (left) {
+		p = &leftClawMove;
+	} else {
+		p = &rightClawMove;
+	}
+	return p->inprogress;
+}
+
+bool PrimitivesNet::ArmMove(double pos, double max_speed, double max_acc) {
+	if (armMove.inprogress) {
+		return false;
+	}
+	msgservo message;
+	message.function = MSG_SERVOMOVE;
+	message.id = 4; // TODO
+	message.pos = pos;
+	message.speed = max_speed;
+	message.acc = max_acc;
+	netConnection->Send(&message, sizeof(msgservo));
+	armMove.inprogress = true;
+	return true;
+}
+
+bool PrimitivesNet::ArmMoveInProgress() {
+	return armMove.inprogress;
 }
 
 bool PrimitivesNet::CalibrateConsole() {
@@ -298,95 +341,20 @@ double PrimitivesNet::GetConsolePos() {
 	return 0.;
 }
 
-bool PrimitivesNet::ArmMove(bool left, double pos, double max_speed, double max_acc) {
-	progress* p;
-	if (left) {
-		p = &leftArmMove;
-	} else {
-		p = &rightArmMove;
-	}
-	if (p->inprogress) {
-		return false;
-	}
-	msgarm message;
-	message.function = MSG_ARMMOVE;
-	message.left = left;
-	message.pos = pos;
-	message.speed = max_speed;
-	message.acc = max_acc;
-	netConnection->Send(&message, sizeof(msgarm));
-	p->inprogress = true;
+bool PrimitivesNet::Compressor(bool on) {
+	msgb1 message;
+	message.function = MSG_COMPRESSOR;
+	message.b1 = on;
+	netConnection->Send(&message, sizeof(msgb1));
+	compressor = on;
 	return true;
 }
 
-bool PrimitivesNet::ArmMoveInProgress(bool left) {
-	progress* p;
-	if (left) {
-		p = &leftArmMove;
-	} else {
-		p = &rightArmMove;
-	}
-	return p->inprogress;
-}
-
-bool PrimitivesNet::Magnet(bool left, int polarity) {
-	msgmagnet message;
-	message.function = MSG_MAGNET;
-	message.left = left;
-	message.polarity = polarity;
-	netConnection->Send(&message, sizeof(msgmagnet));
+bool PrimitivesNet::Valve(bool open) {
+	msgb1 message;
+	message.function = MSG_VALVE;
+	message.b1 = open;
+	netConnection->Send(&message, sizeof(msgb1));
+	compressor = open;
 	return true;
-}
-
-bool PrimitivesNet::RefineDeadreckoning(double x, double y, double phi) {
-	if (posRefine.inprogress) {
-		return false;
-	}
-	msgd3 message;
-	message.function = MSG_POSREFINE;
-	message.d1 = x;
-	message.d2 = y;
-	message.d3 = phi;
-	netConnection->Send(&message, sizeof(msgd3));
-	posRefine.inprogress = true;
-
-	refineDelta.x = 0;
-	refineDelta.y = 0;
-	refineDelta.phi = 0;
-
-	return true;
-}
-
-bool PrimitivesNet::RefineDeadreckoningInProgress() {
-	return posRefine.inprogress;
-}
-
-void PrimitivesNet::GetRefineData(double* dx, double* dy, double* dphi) {
-	*dx = refineDelta.x;
-	*dy = refineDelta.y;
-	*dphi = refineDelta.phi;
-}
-
-bool PrimitivesNet::RefreshPawnPositions(msgpawns* pawns, function_t f, double x, double y, double phi) {
-	this->pawns = pawns;
-	if (pawnRefresh.inprogress) {
-		return false;
-	}
-	msgd3 message;
-	message.function = f;
-	message.d1 = x;
-	message.d2 = y;
-	message.d3 = phi;
-	netConnection->Send(&message, sizeof(msgd3));
-	pawnRefresh.inprogress = true;
-	pawnRefresh.finished = false;
-	return true;
-}
-
-bool PrimitivesNet::RefreshPawnPositionsInProgress() {
-	return pawnRefresh.inprogress;
-}
-
-bool PrimitivesNet::RefreshPawnPositionsFinished() {
-	return pawnRefresh.finished;
 }

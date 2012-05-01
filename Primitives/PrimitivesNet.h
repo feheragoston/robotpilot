@@ -29,25 +29,21 @@ public:
 	bool GoTo(double x, double y, double max_speed, double max_acc);
 	bool Turn(double angle, double max_speed, double max_acc);
 	bool MotionStop(double dec);
-	void GetDistances(double distance[6]);
+	void GetDistances(double distance[PROXIMITY_NUM]);
 
-	bool GripperMove(double pos);
-	bool GripperMoveInProgress();
+	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
+	bool GripperMoveInProgress(bool left);
+	bool ClawMove(bool left, double pos, double max_speed, double max_acc);
+	bool ClawMoveInProgress(bool left);
+	bool ArmMove(double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress();
 	bool CalibrateConsole();
 	bool ConsoleMove(double pos, double max_speed, double max_acc);
 	bool ConsoleMoveInProgress();
 	bool ConsoleStop();
 	double GetConsolePos();
-	bool ArmMove(bool left, double pos, double max_speed, double max_acc);
-	bool ArmMoveInProgress(bool left);
-	bool Magnet(bool left, int polarity);
-
-	bool RefineDeadreckoning(double x, double y, double phi);
-	bool RefineDeadreckoningInProgress();
-	void GetRefineData(double* dx, double* dy, double* dphi);
-	bool RefreshPawnPositions(msgpawns* pawns, function_t f, double x, double y, double phi);
-	bool RefreshPawnPositionsInProgress();
-	bool RefreshPawnPositionsFinished();
+	bool Compressor(bool on);
+	bool Valve(bool open);
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa
@@ -55,11 +51,6 @@ protected:
 
 	Net* netConnection;
 
-	progress posRefine;
-	position refineDelta;
-	double dx, dy, dphi;
-	progress pawnRefresh;
-	msgpawns* pawns;
 	double distances[6];
 };
 
