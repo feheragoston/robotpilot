@@ -728,11 +728,11 @@ void PrimitivesCan::GetRobotPos(double* x, double* y, double* phi){
 }
 
 
-long int PrimitivesCan::GetOpponentPos(double * x, double* y){
+long int PrimitivesCan::GetOpponentPos(unsigned char n, double * x, double* y){
 
 	EnterCritical();
 
-	long int ret = GetOpponentPos_Unsafe(0, x, y);
+	long int ret = GetOpponentPos_Unsafe(n, x, y);
 
 	ExitCritical();
 
@@ -763,13 +763,13 @@ void PrimitivesCan::SetRobotPos(double x, double y, double phi){
 }
 
 
-void PrimitivesCan::SetOpponentPos(double x, double y){
+void PrimitivesCan::SetOpponentPos(unsigned char n, double x, double y){
 
 	EnterCritical();
 
 	double tmpX, tmpY;
 
-	GetOpponentPos_Unsafe(0, &tmpX, &tmpY);
+	GetOpponentPos_Unsafe(n, &tmpX, &tmpY);
 
 	sonarXOffset = x - tmpX;
 	sonarYOffset = y - tmpY;
@@ -779,11 +779,11 @@ void PrimitivesCan::SetOpponentPos(double x, double y){
 }
 
 
-void PrimitivesCan::GetDistances(double distance[6]){
+void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
 
-	for(u8 i=0 ; i<6 ; i++)
+	for(u8 i=0 ; i<PROXIMITY_NUM ; i++)
 		distance[i] = input->GET_DISTANCE(i);
 
 	ExitCritical();

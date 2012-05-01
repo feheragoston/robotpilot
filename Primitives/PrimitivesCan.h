@@ -75,12 +75,12 @@ public:
 	bool MotionStopInProgress(void);
 
 	void GetRobotPos(double* x, double* y, double* phi);
-	long int GetOpponentPos(double * x, double* y);
+	long int GetOpponentPos(unsigned char n, double * x, double* y);
 	void GetSpeed(double* v, double* w);
 	void SetRobotPos(double x, double y, double phi);
-	void SetOpponentPos(double x, double y);
+	void SetOpponentPos(unsigned char n, double x, double y);
 
-	void GetDistances(double distance[6]);
+	void GetDistances(double distance[PROXIMITY_NUM]);
 
 	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
 	bool GripperMoveInProgress(bool left);
