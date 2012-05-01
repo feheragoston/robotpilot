@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "../../../misc.h"
+
 #define MSG_UNKNOWN 0
 #define MSG_REFRESHSTATUS 1
 #define MSG_CALIBRATEPOS 2
@@ -31,18 +33,6 @@
 #define MSG_PRINT 18
 #define MSG_OBSTACLES 19
 #define MSG_PAWNS_AT_START 20
-
-#define FIG_NOTHING 	0
-#define FIG_PAWN 		1
-#define FIG_PPAWN 		2
-#define FIG_KING 		4
-#define FIG_PKING 		5
-#define FIG_PPKING 		6
-#define FIG_QUEEN 		8
-#define FIG_PQUEEN 		9
-#define FIG_PPQUEEN		10
-#define FIG_WENT_OVER 	16
-#define FIG_PICKED_UP 	32
 
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;
@@ -66,8 +56,8 @@ typedef struct msgstatus {
 	double rightGripperPos;
 	double leftClawPos;
 	double rightClawPos;
-	double consolePos;
 	double armPos;
+	double consolePos;
 	bool compressor;
 	bool valve;
 	double distances[PROXIMITY_NUM];

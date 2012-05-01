@@ -55,18 +55,13 @@ protected:
 
 	static int logfile;
 
-	static msgpawns* pawns;
-	static msgpawns* vipawns;
-	static msgpawns* startpawns;
-
 	static std::list<Obstacle*> obstacles;
 	static std::list<Obstacle*> dynObstacles;
 	static bool sendDynObstacles;
 	static double robotBody[][2];
-	static Circle* opponent;
-	static double opponent_x, opponent_y;
-	static double angry;
-	static int deployFields[36];
+	static Circle* opponent[OPPONENT_NUM];
+	static double opponent_x[OPPONENT_NUM], opponent_y[OPPONENT_NUM];
+	static double angry[OPPONENT_NUM];
 
 	static bool simulate;
 	static bool safeMotion;
@@ -76,23 +71,17 @@ protected:
 	static struct timeval runStart; // Run indulasanak ideje
 	static struct timeval initStart; // Init indulasanak ideje
 	static struct timeval matchStart; // Start gomb megnyomasanak ideje
-	static struct timeval sleepCalled; // utolso Sleep hivas ideje
-	static long int timeToSleep;
 	static bool matchStarted; // Meccs elkezdodott
 	static bool exitControl;
 
-	static bool logDeployFields;
 	static bool logDynObstacles;
-	static bool logPawns;
 	static void log();
 
 	static void setSafeMotion(lua_State *L);
-	static long int refreshOpponent();
+	static long int refreshOpponent(unsigned char n);
 	static bool opponentTooClose();
 	static bool obstacleCollision();
-	static void removeCollidingDynamicObstacles(Obstacle* obstacle);
 	static void addDynamicObstacle(Obstacle* obstacle);
-	static bool pawnOnOurColor(double x, double y);
 
 	/**
 	 * futasido ezredmasodpercben
@@ -138,13 +127,10 @@ protected:
 	static int l_GetStartButton(lua_State *L);
 	static int l_GetStopButton(lua_State *L);
 	static int l_GetMyColor(lua_State *L);
-	static int l_PawnInGripper(lua_State *L);
 	static int l_GetDistances(lua_State *L);
-	static int l_GetDistance(lua_State *L);
 	static int l_SetMotorSupply(lua_State *L);
 
 	static int l_CalibrateDeadreckoning(lua_State *L);
-	static int l_RefineDeadreckoning(lua_State *L);
 	static int l_SetSpeed(lua_State *L);
 	static int l_Go(lua_State *L);
 	static int l_GoTo(lua_State *L);
@@ -156,36 +142,28 @@ protected:
 	static int l_MotionStopInProgress(lua_State *L);
 	static int l_GetRobotPos(lua_State *L);
 	static int l_SetRobotPos(lua_State *L);
-	static long int GetOpponentPos(double* ox, double* oy);
-	static void SetOpponentPos(double ox, double oy);
+	static long int GetOpponentPos(unsigned char n, double* ox, double* oy);
+	static void SetOpponentPos(unsigned char n, double ox, double oy);
 	static int l_GetOpponentPos(lua_State *L);
 
 	static int l_GripperMove(lua_State *L);
 	static int l_GripperMoveInProgress(lua_State *L);
+	static int l_ClawMove(lua_State *L);
+	static int l_ClawMoveInProgress(lua_State *L);
+	static int l_ArmMove(lua_State *L);
+	static int l_ArmMoveInProgress(lua_State *L);
 	static int l_CalibrateConsole(lua_State *L);
 	static int l_ConsoleMove(lua_State *L);
 	static int l_ConsoleMoveInProgress(lua_State *L);
 	static int l_ConsoleStop(lua_State *L);
 	static int l_ConsoleStopInProgress(lua_State *L);
 	static int l_GetConsolePos(lua_State *L);
-	static int l_ArmMove(lua_State *L);
-	static int l_ArmMoveInProgress(lua_State *L);
-	static int l_Magnet(lua_State *L);
-	static int l_MagnetInProgress(lua_State *L);
+	static int l_Compressor(lua_State *L);
+	static int l_CompressorInProgress(lua_State *L);
+	static int l_Valve(lua_State *L);
+	static int l_ValveInProgress(lua_State *L);
 
 	static int l_StartMatch(lua_State *L);
-	static int l_RefreshPawnPositions(lua_State *L);
-	static int l_RefreshPawnPositionsInProgress(lua_State *L);
-	static int l_RefreshPawnPositionsFinished(lua_State *L);
-	static int l_FindPawn(lua_State *L);
-	static int l_GetStoragePos(lua_State *L);
-	static void SetPawnType(float x, float y, int type);
-	static int l_SetPawnType(lua_State *L);
-	static int l_PawnsNearby(lua_State *L);
-	static int l_PawnNearPoint(lua_State *L);
-	static int l_GetDeployPoint(lua_State *L);
-	static int l_SetDeployPointPriority(lua_State *L);
-	static int l_ValidateStartSetup(lua_State *L);
 
 	static int l_AddTestObstacles(lua_State *L);
 	static int l_ClearDynObstacles(lua_State *L);
