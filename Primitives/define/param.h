@@ -30,7 +30,7 @@
 #define COLOR_RED							false
 #define COLOR_BLUE							true
 
-#define AREA_LENGTH_X						2100
+#define AREA_LENGTH_X						2000
 #define AREA_LENGTH_Y						3000
 
 
