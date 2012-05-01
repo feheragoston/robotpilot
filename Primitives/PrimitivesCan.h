@@ -82,9 +82,17 @@ public:
 
 	void GetDistances(double distance[6]);
 
-	bool GripperMove(double pos);
-	bool GripperMoveInProgress(void);
-	double GetGripperPos(void);
+	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
+	bool GripperMoveInProgress(bool left);
+	double GetGripperPos(bool left);
+
+	bool ClawMove(bool left, double pos, double max_speed, double max_acc);
+	bool ClawMoveInProgress(bool left);
+	double GetClawPos(bool left);
+
+	bool ArmMove(double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress();
+	double GetArmPos();
 
 	bool CalibrateConsole(void);
 	bool CalibrateConsoleInProgress(void);
@@ -95,10 +103,6 @@ public:
 	bool ConsoleStop(void);
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
-
-	bool ArmMove(bool left, double pos, double max_speed, double max_acc);
-	bool ArmMoveInProgress(bool left);
-	double GetArmPos(bool left);
 
 	bool Magnet(bool left, int polarity);
 	bool MagnetInProgress(bool left);

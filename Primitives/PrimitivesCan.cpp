@@ -791,23 +791,20 @@ void PrimitivesCan::GetDistances(double distance[6]){
 }
 
 
-bool PrimitivesCan::GripperMove(double pos){
+bool PrimitivesCan::GripperMove(bool left, double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
+	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
 
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].inProgress ||
-		servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].inProgress){
+	if(servo->Setpos[num].inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		servo->SERVO_SET_POS(SERVO_GRIPPER_LEFT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
-		servo->SERVO_SET_POS(SERVO_GRIPPER_RIGHT_INDEX, pos, SERVO_GRIPPER_MAX_SPEED, SERVO_GRIPPER_MAX_ACC);
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
 		ret = ACT_STARTED;
 	}
 
@@ -819,12 +816,12 @@ bool PrimitivesCan::GripperMove(double pos){
 }
 
 
-bool PrimitivesCan::GripperMoveInProgress(void){
+bool PrimitivesCan::GripperMoveInProgress(bool left){
 
 	EnterCritical();
 
-	bool ret =	servo->Setpos[SERVO_GRIPPER_LEFT_INDEX].inProgress ||
-				servo->Setpos[SERVO_GRIPPER_RIGHT_INDEX].inProgress;
+	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
 
@@ -833,11 +830,120 @@ bool PrimitivesCan::GripperMoveInProgress(void){
 }
 
 
-double PrimitivesCan::GetGripperPos(void){
+double PrimitivesCan::GetGripperPos(bool left){
 
 	EnterCritical();
 
-	double ret = (servo->GET_POS(SERVO_GRIPPER_LEFT_INDEX) + servo->GET_POS(SERVO_GRIPPER_RIGHT_INDEX)) / 2;
+	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ClawMove(bool left, double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ClawMoveInProgress(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetClawPos(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ArmMove(double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = SERVO_ARM_INDEX;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ArmMoveInProgress(){
+
+	EnterCritical();
+
+	u8 num = SERVO_ARM_INDEX;
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetArmPos(){
+
+	EnterCritical();
+
+	u8 num = SERVO_ARM_INDEX;
+	double ret = servo->GET_POS(num);
 
 	ExitCritical();
 
@@ -972,61 +1078,6 @@ double PrimitivesCan::GetConsolePos(void){
 	EnterCritical();
 
 	double ret = console->GET_POS();
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::ArmMove(bool left, double pos, double max_speed, double max_acc){
-
-	EnterCritical();
-
-	bool ret;
-	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(servo->Setpos[num].inProgress){
-		ret = ACT_START_ERROR;
-	}
-
-	//ha elindithatjuk
-	else{
-		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
-		ret = ACT_STARTED;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::ArmMoveInProgress(bool left){
-
-	EnterCritical();
-
-	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
-	bool ret = servo->Setpos[num].inProgress;
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-double PrimitivesCan::GetArmPos(bool left){
-
-	EnterCritical();
-
-	u8 num = (left ? SERVO_LEFT_ARM_INDEX : SERVO_RIGHT_ARM_INDEX);
-	double ret = servo->GET_POS(num);
 
 	ExitCritical();
 
