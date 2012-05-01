@@ -322,6 +322,37 @@ public:
 	virtual double GetClawPos(bool left);
 
 	///////////////////////////////////////////////////////////////////////
+	// ARM
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Kar mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool ArmMove(double pos, double max_speed, double max_acc);
+
+	/**
+	 * Kar mozgatas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ArmMoveInProgress();
+
+	/**
+	 * Legutobbi kar mozgatas hibajanak lekerdezese
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetArmError();
+
+	/**
+	 * Kar poziciojanak lekerdezese
+	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
+	 */
+	virtual double GetArmPos();
+
+	///////////////////////////////////////////////////////////////////////
 	// CONSOLE
 	///////////////////////////////////////////////////////////////////////
 
@@ -369,37 +400,6 @@ public:
 	 * @return [mm], also pozicio 0
 	 */
 	virtual double GetConsolePos();
-
-	///////////////////////////////////////////////////////////////////////
-	// ARM
-	///////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Kar mozgatasa
-	 * @param pos abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
-	 * @param max_speed [deg/s]
-	 * @param max_acc [deg/s^2]
-	 * @return true: folyamat elindult, false: hiba tortent
-	 */
-	virtual bool ArmMove(double pos, double max_speed, double max_acc);
-
-	/**
-	 * Kar mozgatas allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool ArmMoveInProgress();
-
-	/**
-	 * Legutobbi kar mozgatas hibajanak lekerdezese
-	 * @return true: hiba volt, false: nem volt hiba
-	 */
-	virtual bool GetArmError();
-
-	/**
-	 * Kar poziciojanak lekerdezese
-	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
-	 */
-	virtual double GetArmPos();
 
 	///////////////////////////////////////////////////////////////////////
 	// COMPRESSOR

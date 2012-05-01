@@ -425,6 +425,23 @@ double Primitives::GetClawPos(bool left) {
 	return rightClawPos;
 }
 
+bool Primitives::ArmMove(double pos, double max_speed, double max_acc) {
+	armPos = pos;
+	return true;
+}
+
+bool Primitives::ArmMoveInProgress() {
+	return false;
+}
+
+bool Primitives::GetArmError() {
+	return false;
+}
+
+double Primitives::GetArmPos() {
+	return armPos;
+}
+
 bool Primitives::CalibrateConsole() {
 	consolePos = 0.;
 	return true;
@@ -453,23 +470,6 @@ bool Primitives::ConsoleStopInProgress() {
 
 double Primitives::GetConsolePos() {
 	return consolePos;
-}
-
-bool Primitives::ArmMove(double pos, double max_speed, double max_acc) {
-	armPos = pos;
-	return true;
-}
-
-bool Primitives::ArmMoveInProgress() {
-	return false;
-}
-
-bool Primitives::GetArmError() {
-	return false;
-}
-
-double Primitives::GetArmPos() {
-	return armPos;
 }
 
 bool Primitives::Compressor(bool on) {
