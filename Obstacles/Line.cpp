@@ -6,6 +6,11 @@ Line::Line(double x1, double y1, double x2, double y2) {
 }
 
 void Line::Set(double x1, double y1, double x2, double y2) {
+	mx1 = x1;
+	my1 = y1;
+	mx2 = x2;
+	my2 = y2;
+
 	if (fabs(y2 - y1) > fabs(x2 - x1)) {
 		m = (x2 - x1) / (y2 - y1);
 		b = x1 - m * y1;
@@ -208,10 +213,10 @@ bool Line::Intersect(double x, double y, double r) {
 	double r2 = sqr(r);
 
 	// benne van
-	if (sqr(maxx - x) + sqr(maxy - y) < r2) {
+	if (sqr(mx1 - x) + sqr(my1 - y) < r2) {
 		return true;
 	}
-	if (sqr(minx - x) + sqr(miny - y) < r2) {
+	if (sqr(mx2 - x) + sqr(my2 - y) < r2) {
 		return true;
 	}
 
@@ -280,20 +285,20 @@ bool Line::Intersect(double x, double y, double r) {
 }
 
 bool Line::Intersect(Obstacle* obstacle) {
-	return obstacle->Intersect(minx, miny, maxx, maxy);
+	return obstacle->Intersect(mx1, my1, mx2, my2);
 }
 
 Line::~Line() {
 }
 
 void Line::Print() {
-	printf("Line %f %f %f %f\n", minx, miny, maxx, maxy);
+	printf("Line %f %f %f %f\n", mx1, my1, mx2, my2);
 }
 
 void Line::getObstacle(msgobstacle* obstacle) {
 	Obstacle::getObstacle(obstacle);
-	obstacle->d[0] = minx;
-	obstacle->d[1] = miny;
-	obstacle->d[2] = maxx;
-	obstacle->d[3] = maxy;
+	obstacle->d[0] = mx1;
+	obstacle->d[1] = my1;
+	obstacle->d[2] = mx2;
+	obstacle->d[3] = my2;
 }

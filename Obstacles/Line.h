@@ -31,6 +31,7 @@ public:
 	void getObstacle(msgobstacle* obstacle);
 
 	double minx, miny, maxx, maxy;
+	double mx1, my1, mx2, my2;
 protected:
 	double m, b;
 	bool ylonger;
