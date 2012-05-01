@@ -55,34 +55,23 @@ typedef struct msgstatus {
 	double phi;
 	double v;
 	double w;
-	double ox;
-	double oy;
-	double oradius;
+	double ox[OPPONENT_NUM];
+	double oy[OPPONENT_NUM];
+	double oradius[OPPONENT_NUM];
 	bool startButton;
 	bool stopButton;
 	bool color;
-	bool pawnInGripper;
 	bool motorSupply;
-	double gripperPos;
+	double leftGripperPos;
+	double rightGripperPos;
+	double leftClawPos;
+	double rightClawPos;
 	double consolePos;
-	double leftArmPos;
-	double rightArmPos;
-	double distances[6];
+	double armPos;
+	bool compressor;
+	bool valve;
+	double distances[PROXIMITY_NUM];
 } msgstatus;
-
-typedef struct msgpawn {
-	float x;
-	float y;
-	uint8_t type;
-} msgpawn;
-
-typedef struct msgpawns {
-	function_t function;
-	float x[4];
-	float y[4];
-	uint8_t num;
-	msgpawn pawns[19];
-} msgpawns;
 
 typedef struct msgb1 {
 	function_t function;
@@ -115,24 +104,13 @@ typedef struct msgd4 {
 	double d4;
 } msgd4;
 
-typedef struct msgarm {
+typedef struct msgservo {
 	function_t function;
-	bool left;
+	uint8_t id;
 	double pos;
 	double speed;
 	double acc;
 } msgarm;
-
-typedef struct msgmagnet {
-	function_t function;
-	bool left;
-	int8_t polarity;
-} msgmagnet;
-
-typedef struct msgdeploypriority {
-	function_t function;
-	int8_t priority[36];
-} msgdeploypriority;
 
 typedef struct msgprint {
 	function_t function;
