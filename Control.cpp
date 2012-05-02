@@ -19,8 +19,10 @@ int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
 obstacleList Control::obstacles = obstacleList();
+obstacleList Control::highObstacles = obstacleList();
 obstacleList Control::dynObstacles = obstacleList();
 obstacleList Control::robotObstacles = obstacleList();
+bool Control::sendObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 bool Control::sendDynObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 Circle* Control::opponent[OPPONENT_NUM] = {NULL, NULL};
 double Control::opponent_x[OPPONENT_NUM] = {-1100., -1100.};
@@ -33,6 +35,7 @@ struct timeval Control::runStart = {0, 0};
 struct timeval Control::initStart = {0, 0};
 struct timeval Control::matchStart = {0, 0};
 
+bool Control::logObstacles = true;
 bool Control::logDynObstacles = true;
 
 #define ROBOT_POINT_NUM 10
@@ -142,12 +145,6 @@ Control::Control(Config* config) {
 
 	if (obstacles.empty()) {
 		// Akadalyok definialasa
-		// Falak
-		obstacles.push_back(new Line(0, 0, AREA_WIDTH, 0));
-		obstacles.push_back(new Line(0, 0, 0, AREA_LENGTH));
-		obstacles.push_back(new Line(0, AREA_LENGTH, AREA_WIDTH, AREA_LENGTH));
-		obstacles.push_back(new Line(AREA_WIDTH, 0, AREA_WIDTH, AREA_LENGTH));
-
 		// start vedo falak
 		obstacles.push_back(new Line(500, 0, 500, 400));
 		obstacles.push_back(new Line(500, AREA_LENGTH, 500, AREA_LENGTH - 400));
@@ -157,18 +154,35 @@ Control::Control(Config* config) {
 		obstacles.push_back(new Line(AREA_WIDTH - 750, AREA_LENGTH - 370, AREA_WIDTH, AREA_LENGTH - 325));
 
 		// palmafa
-		obstacles.push_back(new Circle(1000, 1500, 20));
+		highObstacles.push_back(new Circle(1000, 1500, 20));
+
+		// totemek
+		obstacles.push_back(new Line( 875,  975, 1125,  975));
+		obstacles.push_back(new Line( 875,  975,  875, 1225));
+		obstacles.push_back(new Line( 875, 1225, 1125, 1225));
+		obstacles.push_back(new Line(1125,  975, 1125, 1225));
+
+		obstacles.push_back(new Line( 875, 1775, 1125, 1775));
+		obstacles.push_back(new Line( 875, 1775,  875, 2025));
+		obstacles.push_back(new Line( 875, 2025, 1125, 2025));
+		obstacles.push_back(new Line(1125, 1775, 1125, 2025));
 
 		// totemek kozepe
-		obstacles.push_back(new Line( 965, 1065, 1035, 1065));
-		obstacles.push_back(new Line( 965, 1065,  965, 1135));
-		obstacles.push_back(new Line( 965, 1135, 1035, 1135));
-		obstacles.push_back(new Line(1035, 1065, 1035, 1135));
+		highObstacles.push_back(new Line( 965, 1065, 1035, 1065));
+		highObstacles.push_back(new Line( 965, 1065,  965, 1135));
+		highObstacles.push_back(new Line( 965, 1135, 1035, 1135));
+		highObstacles.push_back(new Line(1035, 1065, 1035, 1135));
 
-		obstacles.push_back(new Line( 965, 1865, 1035, 1865));
-		obstacles.push_back(new Line( 965, 1865,  965, 1935));
-		obstacles.push_back(new Line( 965, 1935, 1035, 1935));
-		obstacles.push_back(new Line(1035, 1865, 1035, 1935));
+		highObstacles.push_back(new Line( 965, 1865, 1035, 1865));
+		highObstacles.push_back(new Line( 965, 1865,  965, 1935));
+		highObstacles.push_back(new Line( 965, 1935, 1035, 1935));
+		highObstacles.push_back(new Line(1035, 1865, 1035, 1935));
+
+		// Falak
+		obstacles.push_back(new Line(0, 0, AREA_WIDTH, 0));
+		obstacles.push_back(new Line(0, 0, 0, AREA_LENGTH));
+		obstacles.push_back(new Line(0, AREA_LENGTH, AREA_WIDTH, AREA_LENGTH));
+		obstacles.push_back(new Line(AREA_WIDTH, 0, AREA_WIDTH, AREA_LENGTH));
 	}
 	// ellenfelet alapbol kirakjuk a palyarol
 	for (int i = 0; i < OPPONENT_NUM; i++) {
@@ -318,6 +332,7 @@ void Control::Run() {
 
 void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 	if (size == 0) {
+		sendObstacles[n] = true;
 		sendDynObstacles[n] = true;
 		return;
 	}
@@ -347,35 +362,69 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
 
-		msgobstacles rob;
-		rob.function = MSG_ROBOTBODY;
+		msgshapes rob;
+		rob.function = MSG_SHAPES;
 		rob.num = robotObstacles.size();
+		rob.id = 0;
+		rob.color[0] = 0;
+		rob.color[1] = 255;
+		rob.color[2] = 128;
+		rob.color[3] = 255;
 		obstacleIterator o = robotObstacles.begin();
 		for (unsigned int i = 0; i < rob.num; i++) {
 			(*o)->getObstacle(&rob.obstacles[i]);
 			o++;
 		}
-		mServer->Send(n, &rob, sizeof(msgobstacles));
+		mServer->Send(n, &rob, sizeof(msgshapes));
+
+		if (sendObstacles[n]) {
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+
+			obs.id = 1;
+			obs.num = min(obstacles.size(), 14);
+			obs.color[0] = 255;
+			obs.color[1] = 255;
+			obs.color[2] = 0;
+			obs.color[3] = 255;
+			obstacleIterator o = obstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			mServer->Send(n, &obs, sizeof(msgshapes));
+
+			obs.id = 2;
+			obs.num = highObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 255;
+			obs.color[3] = 255;
+			o = highObstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			mServer->Send(n, &obs, sizeof(msgshapes));
+
+			sendObstacles[n] = false;
+		}
 
 		if (sendDynObstacles[n]) {
-			msgobstacles obs;
-			obs.function = MSG_OBSTACLES;
-			obs.num = 14;
-			if (dynObstacles.size() + obstacles.size() < 14) {
-				obs.num = dynObstacles.size() + obstacles.size();
-			}
-			obstacleIterator o = dynObstacles.end();
-			o--;
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+			obs.id = 3;
+			obs.num = dynObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 0;
+			obs.color[3] = 128;
+			obstacleIterator o = dynObstacles.begin();
 			for (unsigned int i = 0; i < obs.num; i++) {
-				if (i == dynObstacles.size()) {
-					o = obstacles.end();
-					o--;
-				}
 				(*o)->getObstacle(&obs.obstacles[i]);
-				o--;
+				o++;
 			}
-
-			mServer->Send(n, &obs, sizeof(msgobstacles));
+			mServer->Send(n, &obs, sizeof(msgshapes));
 			sendDynObstacles[n] = false;
 		}
 
@@ -423,25 +472,57 @@ void Control::log() {
 		write(logfile, &size, sizeof(msglen_t));
 		write(logfile, &status, size);
 
+		if (logObstacles) {
+			logObstacles = false;
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+
+			obs.id = 1;
+			obs.num = min(obstacles.size(), 14);
+			obs.color[0] = 255;
+			obs.color[1] = 255;
+			obs.color[2] = 0;
+			obs.color[3] = 255;
+			obstacleIterator o = obstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			size = sizeof(msgshapes);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &obs, size);
+
+			obs.id = 2;
+			obs.num = highObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 255;
+			obs.color[3] = 255;
+			o = highObstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			size = sizeof(msgshapes);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &obs, size);
+		}
 		if (logDynObstacles) {
 			logDynObstacles = false;
-			msgobstacles obs;
-			obs.function = MSG_OBSTACLES;
-			obs.num = 14;
-			if (dynObstacles.size() + obstacles.size() < 14) {
-				obs.num = dynObstacles.size() + obstacles.size();
-			}
-			obstacleIterator o = dynObstacles.end();
-			o--;
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+			obs.id = 3;
+			obs.num = dynObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 0;
+			obs.color[3] = 128;
+			obstacleIterator o = dynObstacles.begin();
 			for (unsigned int i = 0; i < obs.num; i++) {
-				if (i == dynObstacles.size()) {
-					o = obstacles.end();
-					o--;
-				}
 				(*o)->getObstacle(&obs.obstacles[i]);
-				o--;
+				o++;
 			}
-			size = sizeof(msgobstacles);
+			size = sizeof(msgshapes);
 			write(logfile, &size, sizeof(msglen_t));
 			write(logfile, &obs, size);
 		}
