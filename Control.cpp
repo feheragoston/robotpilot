@@ -35,6 +35,7 @@ struct timeval Control::runStart = {0, 0};
 struct timeval Control::initStart = {0, 0};
 struct timeval Control::matchStart = {0, 0};
 
+bool Control::logObstacles = true;
 bool Control::logDynObstacles = true;
 
 #define ROBOT_POINT_NUM 10
@@ -471,25 +472,57 @@ void Control::log() {
 		write(logfile, &size, sizeof(msglen_t));
 		write(logfile, &status, size);
 
+		if (logObstacles) {
+			logObstacles = false;
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+
+			obs.id = 1;
+			obs.num = min(obstacles.size(), 14);
+			obs.color[0] = 255;
+			obs.color[1] = 255;
+			obs.color[2] = 0;
+			obs.color[3] = 255;
+			obstacleIterator o = obstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			size = sizeof(msgshapes);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &obs, size);
+
+			obs.id = 2;
+			obs.num = highObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 255;
+			obs.color[3] = 255;
+			o = highObstacles.begin();
+			for (unsigned int i = 0; i < obs.num; i++) {
+				(*o)->getObstacle(&obs.obstacles[i]);
+				o++;
+			}
+			size = sizeof(msgshapes);
+			write(logfile, &size, sizeof(msglen_t));
+			write(logfile, &obs, size);
+		}
 		if (logDynObstacles) {
 			logDynObstacles = false;
-			msgobstacles obs;
-			obs.function = MSG_OBSTACLES;
-			obs.num = 14;
-			if (dynObstacles.size() + obstacles.size() < 14) {
-				obs.num = dynObstacles.size() + obstacles.size();
-			}
-			obstacleIterator o = dynObstacles.end();
-			o--;
+			msgshapes obs;
+			obs.function = MSG_SHAPES;
+			obs.id = 3;
+			obs.num = dynObstacles.size();
+			obs.color[0] = 255;
+			obs.color[1] = 0;
+			obs.color[2] = 0;
+			obs.color[3] = 128;
+			obstacleIterator o = dynObstacles.begin();
 			for (unsigned int i = 0; i < obs.num; i++) {
-				if (i == dynObstacles.size()) {
-					o = obstacles.end();
-					o--;
-				}
 				(*o)->getObstacle(&obs.obstacles[i]);
-				o--;
+				o++;
 			}
-			size = sizeof(msgobstacles);
+			size = sizeof(msgshapes);
 			write(logfile, &size, sizeof(msglen_t));
 			write(logfile, &obs, size);
 		}

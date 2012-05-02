@@ -80,6 +80,7 @@ protected:
 	static bool matchStarted; // Meccs elkezdodott
 	static bool exitControl;
 
+	static bool logObstacles;
 	static bool logDynObstacles;
 	static void log();
 
