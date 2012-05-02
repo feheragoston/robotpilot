@@ -37,6 +37,7 @@ public:
 	void SERVO_SET_POS(u8 num, double pos, double speed, double acc);
 
 	double GET_POS(u8 num);
+	bool GET_ERROR(u8 num);
 
 
 	progress_t Setpos[SERVO_COUNT];

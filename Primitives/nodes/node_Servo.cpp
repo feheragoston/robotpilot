@@ -248,3 +248,10 @@ double node_Servo::GET_POS(u8 num){
 	return SERVO_INCR_TO_DEG(num, Servo_Pos_Incr[num]);
 
 }
+
+
+bool node_Servo::GET_ERROR(u8 num){
+
+	return (!Setpos[num].done);
+
+}

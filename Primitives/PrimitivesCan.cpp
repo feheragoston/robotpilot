@@ -844,6 +844,20 @@ double PrimitivesCan::GetGripperPos(bool left){
 }
 
 
+bool PrimitivesCan::GetGripperError(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	bool ret = servo->GET_ERROR(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::ClawMove(bool left, double pos, double max_speed, double max_acc){
 
 	EnterCritical();
@@ -889,6 +903,20 @@ double PrimitivesCan::GetClawPos(bool left){
 
 	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
 	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetClawError(bool left){
+
+	EnterCritical();
+
+	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
 
@@ -944,6 +972,20 @@ double PrimitivesCan::GetArmPos(){
 
 	u8 num = SERVO_ARM_INDEX;
 	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetArmError(void){
+
+	EnterCritical();
+
+	u8 num = SERVO_ARM_INDEX;
+	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
 
@@ -1292,7 +1334,7 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 bool PrimitivesCan::GetMyColor_Unsafe(void){
 
-	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_BLUE : COLOR_RED);
+	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_RED : COLOR_PURPLE);
 
 	return ret;
 

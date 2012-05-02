@@ -85,14 +85,17 @@ public:
 	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
 	bool GripperMoveInProgress(bool left);
 	double GetGripperPos(bool left);
+	bool GetGripperError(bool left);
 
 	bool ClawMove(bool left, double pos, double max_speed, double max_acc);
 	bool ClawMoveInProgress(bool left);
 	double GetClawPos(bool left);
+	bool GetClawError(bool left);
 
 	bool ArmMove(double pos, double max_speed, double max_acc);
 	bool ArmMoveInProgress();
 	double GetArmPos();
+	bool GetArmError();
 
 	bool CalibrateConsole(void);
 	bool CalibrateConsoleInProgress(void);
