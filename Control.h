@@ -61,6 +61,7 @@ protected:
 	static obstacleList obstacles;
 	static obstacleList highObstacles;
 	static obstacleList dynObstacles;
+	static obstacleList collisionObstacles;
 	static bool sendObstacles[MAX_CONNECTIONS];
 	static bool sendDynObstacles[MAX_CONNECTIONS];
 	static double robotBody[][2];
@@ -89,6 +90,7 @@ protected:
 	static bool opponentTooClose();
 	static bool obstacleCollision();
 	static void addDynamicObstacle(Obstacle* obstacle);
+	static void clearCollisionObstacles();
 
 	/**
 	 * futasido ezredmasodpercben

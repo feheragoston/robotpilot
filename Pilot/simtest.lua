@@ -52,16 +52,18 @@ for i,line in ipairs(points) do
 end
 c.print("step1:", c.getelapsedtime(startTime) / 1000000)
 
+--[[
 for i,c1 in ipairs(points) do
 	for j,c2 in ipairs(points) do
 		if (j ~= i) then
 			if (c.simulate(GoToTest, {c1, c2})) then
-				print(i, j)
+				print("2", i, j)
 			end
 		end
 	end
 end
 c.print("step2:", c.getelapsedtime(startTime) / 1000000)
+]]
 
 --[[
 for i,c1 in ipairs(points) do
@@ -78,16 +80,18 @@ end
 c.print("step3:", c.getelapsedtime(startTime) / 1000000)
 ]]
 
+--[[
 for i,c1 in ipairs(points) do
 	for j,c2 in ipairs(points) do
 		if (i < j) then
 			if (c.simulate(GoFromTest, c1, {c2})) then
-				print(i, "=>", j)
+				print("4", i, "=>", j)
 			end
 		end
 	end
 end
 c.print("step4:", c.getelapsedtime(startTime) / 1000000)
+]]
 
 c.ClearDynObstacles()
 
