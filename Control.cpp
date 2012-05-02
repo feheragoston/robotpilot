@@ -22,6 +22,7 @@ obstacleList Control::obstacles = obstacleList();
 obstacleList Control::highObstacles = obstacleList();
 obstacleList Control::dynObstacles = obstacleList();
 obstacleList Control::robotObstacles = obstacleList();
+obstacleList Control::collisionObstacles = obstacleList();
 bool Control::sendObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 bool Control::sendDynObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 Circle* Control::opponent[OPPONENT_NUM] = {NULL, NULL};
@@ -378,6 +379,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		mServer->Send(n, &rob, sizeof(msgshapes));
 
 		if (sendObstacles[n]) {
+			sendObstacles[n] = false;
+
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
 
@@ -406,17 +409,17 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 				o++;
 			}
 			mServer->Send(n, &obs, sizeof(msgshapes));
-
-			sendObstacles[n] = false;
 		}
 
 		if (sendDynObstacles[n]) {
+			sendDynObstacles[n] = false;
+
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
 			obs.id = 3;
 			obs.num = dynObstacles.size();
 			obs.color[0] = 255;
-			obs.color[1] = 0;
+			obs.color[1] = 128;
 			obs.color[2] = 0;
 			obs.color[3] = 128;
 			obstacleIterator o = dynObstacles.begin();
@@ -425,7 +428,21 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 				o++;
 			}
 			mServer->Send(n, &obs, sizeof(msgshapes));
-			sendDynObstacles[n] = false;
+
+			if (collisionObstacles.size() > 0) {
+				obs.id = 4;
+				obs.num = collisionObstacles.size();
+				obs.color[0] = 255;
+				obs.color[1] = 0;
+				obs.color[2] = 0;
+				obs.color[3] = 255;
+				o = collisionObstacles.begin();
+				for (unsigned int i = 0; i < obs.num; i++) {
+					(*o)->getObstacle(&obs.obstacles[i]);
+					o++;
+				}
+				mServer->Send(n, &obs, sizeof(msgshapes));
+			}
 		}
 
 	} else if (*function == MSG_VISIONTEST && size == 1) {
@@ -514,7 +531,7 @@ void Control::log() {
 			obs.id = 3;
 			obs.num = dynObstacles.size();
 			obs.color[0] = 255;
-			obs.color[1] = 0;
+			obs.color[1] = 128;
 			obs.color[2] = 0;
 			obs.color[3] = 128;
 			obstacleIterator o = dynObstacles.begin();
@@ -525,6 +542,23 @@ void Control::log() {
 			size = sizeof(msgshapes);
 			write(logfile, &size, sizeof(msglen_t));
 			write(logfile, &obs, size);
+
+			if (collisionObstacles.size() > 0) {
+				obs.id = 4;
+				obs.num = collisionObstacles.size();
+				obs.color[0] = 255;
+				obs.color[1] = 0;
+				obs.color[2] = 0;
+				obs.color[3] = 255;
+				o = collisionObstacles.begin();
+				for (unsigned int i = 0; i < obs.num; i++) {
+					(*o)->getObstacle(&obs.obstacles[i]);
+					o++;
+				}
+				size = sizeof(msgshapes);
+				write(logfile, &size, sizeof(msglen_t));
+				write(logfile, &obs, size);
+			}
 		}
 
 		function_t stop = 0xFF;
@@ -649,13 +683,22 @@ bool Control::obstacleCollision() {
 
 		for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
-				(*i)->Print();
+				clearCollisionObstacles();
+				collisionObstacles.push_back(*i);
+				return true;
+			}
+		}
+		for (obstacleIterator i = highObstacles.begin(); i != highObstacles.end(); i++) {
+			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				clearCollisionObstacles();
+				collisionObstacles.push_back(*i);
 				return true;
 			}
 		}
 		for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
-				(*i)->Print();
+				clearCollisionObstacles();
+				collisionObstacles.push_back(*i);
 				return true;
 			}
 		}
@@ -684,6 +727,14 @@ void Control::addDynamicObstacle(Obstacle* obstacle) {
 		sendDynObstacles[i] = true;
 	}
 	//cout << "(Control) Number of dynamic obstacles: " << dynObstacles.size() << endl;
+}
+
+void Control::clearCollisionObstacles() {
+	collisionObstacles.clear();
+	logDynObstacles = true;
+	for (int i = 0; i < MAX_CONNECTIONS; i++) {
+		sendDynObstacles[i] = true;
+	}
 }
 
 unsigned int Control::RunTime() {
@@ -1339,6 +1390,10 @@ int Control::l_StartMatch(lua_State *L) {
 
 int Control::l_AddTestObstacles(lua_State *L) {
 	dynObstacles.push_back(new Circle(1000, 1500, 100));
+	logDynObstacles = true;
+	for (int i = 0; i < MAX_CONNECTIONS; i++) {
+		sendDynObstacles[i] = true;
+	}
 	return 0;
 }
 
@@ -1346,6 +1401,10 @@ int Control::l_ClearDynObstacles(lua_State *L) {
 	while (!dynObstacles.empty()) {
 		delete dynObstacles.front();
 		dynObstacles.pop_front();
+	}
+	logDynObstacles = true;
+	for (int i = 0; i < MAX_CONNECTIONS; i++) {
+		sendDynObstacles[i] = true;
 	}
 	return 0;
 }
