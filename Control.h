@@ -30,6 +30,9 @@ extern "C" {
 
 #define luaC_export(L,s)	lua_pushnumber(L, s); lua_setfield(L, LUA_GLOBALSINDEX, #s)
 
+typedef std::list<Obstacle*> obstacleList;
+typedef std::list<Obstacle*>::iterator obstacleIterator;
+
 class Control {
 public:
 	Control(Config* config);
@@ -55,10 +58,11 @@ protected:
 
 	static int logfile;
 
-	static std::list<Obstacle*> obstacles;
-	static std::list<Obstacle*> dynObstacles;
-	static bool sendDynObstacles;
+	static obstacleList obstacles;
+	static obstacleList dynObstacles;
+	static bool sendDynObstacles[MAX_CONNECTIONS];
 	static double robotBody[][2];
+	static obstacleList robotObstacles;
 	static Circle* opponent[OPPONENT_NUM];
 	static double opponent_x[OPPONENT_NUM], opponent_y[OPPONENT_NUM];
 	static double angry[OPPONENT_NUM];
