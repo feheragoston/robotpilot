@@ -112,7 +112,7 @@
 
 #define DEADRECK_KEEP_ALIVE_MS					1000
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
-#define DEADRECK_SEND_PERIOD_TO_NODE_MS			5//3	//!!!ne legyen tul kicsi
+#define DEADRECK_SEND_PERIOD_TO_NODE_MS			1
 
 #define BDC_KEEP_ALIVE_MS						1000
 #define BDC_SEND_PERIOD_TO_PC_MS				100
