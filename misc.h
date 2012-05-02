@@ -25,10 +25,10 @@
 #define		RED_ORIENTATION		-1				// koordinatak iranya
 
 #define		ROBOT_RADIUS		175		// a robot fordulasahoz szugseges sugar [mm]
-#define		ROBOT_WIDTH			150		// a robot szelessege / 2 [mm]
-#define		ROBOT_FRONT			140		// a robot elejenek tavolsaga a kozeppontbol [mm]
-#define		ROBOT_FRONT_MAX		240		// a robot elejenek tavolsaga nyitott megfogoval [mm]
-#define		ROBOT_BACK			160		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
+#define		ROBOT_WIDTH			165		// a robot szelessege / 2 [mm]
+#define		ROBOT_FRONT			155		// a robot elejenek tavolsaga a kozeppontbol [mm]
+#define		ROBOT_FRONT_MAX		335		// a robot elejenek tavolsaga nyitott megfogoval [mm]
+#define		ROBOT_BACK			135		// a robot hatuljanak tavolsaga a kozeppontbol [mm]
 
 #define		SONAR_TIMEOUT		1000	// sonartol kapott ertek ervenyessegi limitje [ms]
 
