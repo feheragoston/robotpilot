@@ -36,7 +36,7 @@
 #define MSG_SERVOMOVE 21
 #define MSG_COMPRESSOR 22
 #define MSG_VALVE 23
-#define MSG_ROBOTBODY 24
+#define MSG_SHAPES 24
 
 typedef uint8_t msglen_t;
 typedef uint8_t function_t;
@@ -121,6 +121,14 @@ typedef struct msgobstacles {
 	uint8_t num;
 	msgobstacle obstacles[14];
 } msgobstacles;
+
+typedef struct msgshapes {
+	function_t function;
+	uint8_t num;
+	uint8_t id;
+	uint8_t color[4];
+	msgobstacle obstacles[14];
+} msgshapes;
 
 #pragma pack()
 

@@ -59,7 +59,9 @@ protected:
 	static int logfile;
 
 	static obstacleList obstacles;
+	static obstacleList highObstacles;
 	static obstacleList dynObstacles;
+	static bool sendObstacles[MAX_CONNECTIONS];
 	static bool sendDynObstacles[MAX_CONNECTIONS];
 	static double robotBody[][2];
 	static obstacleList robotObstacles;
