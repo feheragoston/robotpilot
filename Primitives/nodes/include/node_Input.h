@@ -35,6 +35,7 @@ public:
 
 	double GET_DISTANCE(u8 analog_num);
 	bool GET_DIGITAL(u8 digital_num);
+	void SET_DIGITAL(u8 digital_num, bool high);
 
 
 private:
@@ -45,7 +46,12 @@ private:
 	bool analog_has_long_sharp[INPUT_ANALOG_COUNT];
 	bool digital_active_level[INPUT_DIGITAL_COUNT];
 
+	bool digital_is_output[INPUT_DIGITAL_COUNT];
+	bool digital_output_init_state[INPUT_DIGITAL_COUNT];
+
 	double GET_SHARP_MM(u16 analog_value, double table[][2], u8 size);
+
+	progress_t SetOutput[INPUT_DIGITAL_COUNT];
 
 
 };

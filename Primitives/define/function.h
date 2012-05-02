@@ -84,6 +84,8 @@
 
 
 //---------- INPUT_ID ----------
+#define CMD_INPUT_SET_OUTPUT				0x00	//spec.h "spec fuggvenyei" reszben
+#define MSG_INPUT_SET_OUTPUT_REPLY			0x00	//driver.c "REPLY" reszben
 
 
 //---------- VACUUM_ID ----------
