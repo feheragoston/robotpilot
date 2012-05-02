@@ -184,6 +184,7 @@ private:
 
 
 	bool GetMyColor_Unsafe(void);
+	bool HasColor_Unsafe(void);
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
 	long int GetOpponentPos_Unsafe(u8 num, double* x, double* y);
 	void SetRobotPos_Unsafe(double x, double y, double phi);

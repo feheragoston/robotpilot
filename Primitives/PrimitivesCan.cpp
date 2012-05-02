@@ -418,10 +418,16 @@ bool PrimitivesCan::CalibrateDeadreckoningInProgress(void){
 		//varunk az egyik kapcsolora
 		case 1:
 
+#if 0	//ütközéskapcsoló
 			//ha megvan valamelyik utkozeskapcsolo
 			if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
 				deadreckCalibPhase = 2;
+#else	//színkapcsoló
+			//ha megvan a színkapcsoló
+			if(HasColor_Unsafe())
+				deadreckCalibPhase = 2;
+#endif
 
 			ret = true;
 
@@ -1392,8 +1398,21 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 bool PrimitivesCan::GetMyColor_Unsafe(void){
 
-	bool ret = (input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BUTTON_INDEX) ? COLOR_RED : COLOR_PURPLE);
+	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
+	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
 
-	return ret;
+	if(red)			return COLOR_RED;
+	if(purple)		return COLOR_PURPLE;
+	return COLOR_RED;	//ha nincs színünk, akkor azt mondjuk, hogy piros
+
+}
+
+
+bool PrimitivesCan::HasColor_Unsafe(void){
+
+	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
+	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
+
+	return (red || purple);
 
 }

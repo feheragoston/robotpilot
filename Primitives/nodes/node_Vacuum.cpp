@@ -100,7 +100,11 @@ void node_Vacuum::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 0;
+	msg.length		= 1;
+
+	SET_BOOL(&(msg.data[0]), 0, (VACUUM_IS_COMPRESSOR_ON_M2 != 0) ? true : false);
+	SET_BOOL(&(msg.data[0]), 1, (VACUUM_IS_COMPRESSOR_POLARITY_PLUS != 0) ? true : false);
+	SET_BOOL(&(msg.data[0]), 2, (VACUUM_IS_VALVE_POLARITY_PLUS != 0) ? true : false);
 
 	UDPdriver::send(&msg);
 
