@@ -418,7 +418,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			obs.color[1] = 0;
 			obs.color[2] = 0;
 			obs.color[3] = 128;
-			o = dynObstacles.begin();
+			obstacleIterator o = dynObstacles.begin();
 			for (unsigned int i = 0; i < obs.num; i++) {
 				(*o)->getObstacle(&obs.obstacles[i]);
 				o++;
