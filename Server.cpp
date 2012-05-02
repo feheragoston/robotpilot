@@ -109,18 +109,20 @@ bool Server::Process() {
 				if (FD_ISSET(client_sock[i], &rfd)) {
 					// kiolvassuk milyen hosszu uzenet jott
 					int size_read = recv(client_sock[i], buffer, sizeof(msglen_t), 0);
-					msglen_t msg_len = *((msglen_t*) buffer);
-					size_read = recv(client_sock[i], buffer, msg_len, 0);
-					while (size_read > 0 && size_read < msg_len) {
-						size_read += recv(client_sock[i], buffer+size_read, msg_len - size_read, 0);
+					if (size_read > 0) {
+						msglen_t msg_len = *((msglen_t*) buffer);
+						size_read = recv(client_sock[i], buffer, msg_len, 0);
+						while (size_read > 0 && size_read < msg_len) {
+							size_read += recv(client_sock[i], buffer+size_read, msg_len - size_read, 0);
+						}
 					}
-					if (size_read < 1 || strncmp("quit", buffer, 4) == 0) {
+					if (size_read < 1) {
 						// disconnect
 						//std::cout << i << " disconnected" << std::endl;
-						if (m_messageCallback != 0) {
-							(*m_messageCallback)(i, buffer, 0);
-						}
 						client_active[i] = false;
+						if (m_messageCallback != 0) {
+							(*m_messageCallback)(i, "", 0);
+						}
 						client_num--;
 						close(client_sock[i]);
 					} else {
