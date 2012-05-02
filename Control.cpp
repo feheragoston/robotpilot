@@ -18,9 +18,10 @@ unsigned int Control::nokia_sent = 0;
 int Control::logfile = 0;
 bool Control::matchStarted = false;
 bool Control::exitControl = false;
-std::list<Obstacle*> Control::obstacles = std::list<Obstacle*>();
-std::list<Obstacle*> Control::dynObstacles = std::list<Obstacle*>();
-bool Control::sendDynObstacles = true;
+obstacleList Control::obstacles = obstacleList();
+obstacleList Control::dynObstacles = obstacleList();
+obstacleList Control::robotObstacles = obstacleList();
+bool Control::sendDynObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 Circle* Control::opponent[OPPONENT_NUM] = {NULL, NULL};
 double Control::opponent_x[OPPONENT_NUM] = {-1100., -1100.};
 double Control::opponent_y[OPPONENT_NUM] = {-1100., -1100.};
@@ -36,16 +37,16 @@ bool Control::logDynObstacles = true;
 
 #define ROBOT_POINT_NUM 10
 double Control::robotBody[][2] = {
-		{ 140,  140 + 15},
-		{-105,  140 + 15},
-		{-160,   65},
-		{-160,  -65},
-		{-105, -140 - 15},
-		{ 140, -140 - 15},
-		{ 140, -110},
-		{  70,  -35},
-		{  70,   35},
-		{ 140,  110}
+		{ 155,  145},
+		{  55,  145},
+		{  25,  165},
+		{ -25,  165},
+		{-135,  100},
+		{-135, -100},
+		{ -25, -165},
+		{  25, -165},
+		{  55, -145},
+		{ 155, -145}
 };
 
 Control::Control(Config* config) {
@@ -203,6 +204,11 @@ Control::~Control() {
 		dynObstacles.pop_front();
 	}
 
+	while (!robotObstacles.empty()) {
+		delete robotObstacles.front();
+		robotObstacles.pop_front();
+	}
+
 	for (int i = 0; i < OPPONENT_NUM; i++) {
 		delete opponent[i];
 	}
@@ -311,6 +317,11 @@ void Control::Run() {
 }
 
 void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
+	if (size == 0) {
+		sendDynObstacles[n] = true;
+		return;
+	}
+
 	function_t* function = (function_t*) message;
 	if (*function == MSG_REFRESHSTATUS && size == sizeof(msgb1)) {
 		msgstatus response;
@@ -336,14 +347,24 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
 
-		if (sendDynObstacles) {
+		msgobstacles rob;
+		rob.function = MSG_ROBOTBODY;
+		rob.num = robotObstacles.size();
+		obstacleIterator o = robotObstacles.begin();
+		for (unsigned int i = 0; i < rob.num; i++) {
+			(*o)->getObstacle(&rob.obstacles[i]);
+			o++;
+		}
+		mServer->Send(n, &rob, sizeof(msgobstacles));
+
+		if (sendDynObstacles[n]) {
 			msgobstacles obs;
 			obs.function = MSG_OBSTACLES;
 			obs.num = 14;
 			if (dynObstacles.size() + obstacles.size() < 14) {
 				obs.num = dynObstacles.size() + obstacles.size();
 			}
-			std::list<Obstacle*>::iterator o = dynObstacles.end();
+			obstacleIterator o = dynObstacles.end();
 			o--;
 			for (unsigned int i = 0; i < obs.num; i++) {
 				if (i == dynObstacles.size()) {
@@ -355,7 +376,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			}
 
 			mServer->Send(n, &obs, sizeof(msgobstacles));
-			sendDynObstacles = false;
+			sendDynObstacles[n] = false;
 		}
 
 	} else if (*function == MSG_VISIONTEST && size == 1) {
@@ -410,7 +431,7 @@ void Control::log() {
 			if (dynObstacles.size() + obstacles.size() < 14) {
 				obs.num = dynObstacles.size() + obstacles.size();
 			}
-			std::list<Obstacle*>::iterator o = dynObstacles.end();
+			obstacleIterator o = dynObstacles.end();
 			o--;
 			for (unsigned int i = 0; i < obs.num; i++) {
 				if (i == dynObstacles.size()) {
@@ -517,6 +538,11 @@ bool Control::obstacleCollision() {
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 
+	while (!robotObstacles.empty()) {
+		delete robotObstacles.front();
+		robotObstacles.pop_front();
+	}
+
 	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
 		int j2 = (j+1)%ROBOT_POINT_NUM;
 		double rx1 = robotBody[j][0];
@@ -538,13 +564,15 @@ bool Control::obstacleCollision() {
 		double x2 = cos(phi) * rx2 - sin(phi) * ry2 + x;
 		double y2 = sin(phi) * rx2 + cos(phi) * ry2 + y;
 
-		for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+		robotObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
 				(*i)->Print();
 				return true;
 			}
 		}
-		for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+		for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
 				(*i)->Print();
 				return true;
@@ -571,7 +599,9 @@ void Control::addDynamicObstacle(Obstacle* obstacle) {
 	}
 	dynObstacles.push_back(obstacle);
 	logDynObstacles = true;
-	sendDynObstacles = true;
+	for (int i = 0; i < MAX_CONNECTIONS; i++) {
+		sendDynObstacles[i] = true;
+	}
 	//cout << "(Control) Number of dynamic obstacles: " << dynObstacles.size() << endl;
 }
 
@@ -619,12 +649,12 @@ bool Control::checkLine(double x1, double y1, double x2, double y2) {
 			return false;
 		}
 	}
-	for (std::list<Obstacle*>::iterator i = obstacles.begin(); i != obstacles.end(); i++) {
+	for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
 		if ((*i)->Intersect(x1, y1, x2, y2)) {
 			return false;
 		}
 	}
-	for (std::list<Obstacle*>::iterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+	for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 		if ((*i)->Intersect(x1, y1, x2, y2)) {
 			return false;
 		}
