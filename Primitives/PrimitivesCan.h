@@ -163,8 +163,8 @@ private:
 	double deadreckCheckYw;
 	double deadreckCheckPhiw;
 
-	double sonarXOffset;
-	double sonarYOffset;
+	double sonarXOffset[SONAR_TRANSMITTER_COUNT];
+	double sonarYOffset[SONAR_TRANSMITTER_COUNT];
 
 	double T33WS[3][3];	//World-Sonar transzformacios matrix
 	//----- valtozo VEGE -----

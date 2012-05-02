@@ -75,8 +75,10 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	deadreckCheckYw		= 0;
 	deadreckCheckPhiw	= 0;
 
-	sonarXOffset		= 0;
-	sonarYOffset		= 0;
+	for(int i=0 ; i < SONAR_TRANSMITTER_COUNT ; i++){
+		sonarXOffset[i] = 0;
+		sonarYOffset[i] = 0;
+	}
 
 	deadreckCalibPhase		= 0;
 	//---------- valtozo VEGE ----------
@@ -758,8 +760,8 @@ void PrimitivesCan::SetOpponentPos(unsigned char n, double x, double y){
 
 	GetOpponentPos_Unsafe(n, &tmpX, &tmpY);
 
-	sonarXOffset = x - tmpX;
-	sonarYOffset = y - tmpY;
+	sonarXOffset[n] = x - tmpX;
+	sonarYOffset[n] = y - tmpY;
 
 	ExitCritical();
 
@@ -1366,8 +1368,8 @@ long int PrimitivesCan::GetOpponentPos_Unsafe(u8 num, double* x, double* y){
 	*y = sonarpos_W[1];
 
 	//offset hizzaadasa
-	*x += sonarXOffset;
-	*y += sonarYOffset;
+	*x += sonarXOffset[num];
+	*y += sonarYOffset[num];
 
 	return ret;
 
