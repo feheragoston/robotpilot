@@ -20,7 +20,7 @@
 #include "nodes/include/node_Deadreck.h"
 #include "nodes/include/node_BDC.h"
 #include "nodes/include/node_Input.h"
-#include "nodes/include/node_Magnet.h"
+#include "nodes/include/node_Vacuum.h"
 #include "nodes/include/node_Servo.h"
 #include "nodes/include/node_Sonar.h"
 #include "nodes/include/node_Power.h"
@@ -52,7 +52,6 @@ public:
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	bool GetMyColor(void);
-	bool PawnInGripper(void);
 
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);
@@ -107,8 +106,13 @@ public:
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
 
-	bool Magnet(bool left, int polarity);
-	bool MagnetInProgress(bool left);
+	bool Compressor(bool on);
+	bool CompressorInProgress(void);
+	bool GetCompressor(void);
+
+	bool Valve(bool open);
+	bool ValveInProgress(void);
+	bool GetValve(void);
 	//----- Primitives VEGE -----
 
 
@@ -143,7 +147,7 @@ private:
 	node_Deadreck*		deadreck;
 	node_BDC*			bdc;
 	node_Input*			input;
-	node_Magnet*		magnet;
+	node_Vacuum*		vacuum;
 	node_Servo*			servo;
 	node_Sonar*			sonar;
 	node_Power*			power;

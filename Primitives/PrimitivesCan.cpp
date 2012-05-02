@@ -90,7 +90,7 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	deadreck	= new node_Deadreck();
 	bdc			= new node_BDC();
 	input		= new node_Input();
-	magnet		= new node_Magnet();
+	vacuum		= new node_Vacuum();
 	servo		= new node_Servo();
 	sonar		= new node_Sonar();
 	power		= new node_Power();
@@ -115,8 +115,8 @@ void PrimitivesCan::addNodesToCan(void){
 	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
-	if(!MAGNET_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(MAGNET_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(MAGNET_ID);
+	if(!VACUUM_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(VACUUM_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(VACUUM_ID);
 
 	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
@@ -184,7 +184,7 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(bdc)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(magnet)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(vacuum)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(power)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	//SONAR-nak nem kuldunk semmit
@@ -300,19 +300,6 @@ bool PrimitivesCan::GetMyColor(void){
 	EnterCritical();
 
 	bool ret = GetMyColor_Unsafe();
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::PawnInGripper(void){
-
-	EnterCritical();
-
-	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX);
 
 	ExitCritical();
 
@@ -1128,22 +1115,22 @@ double PrimitivesCan::GetConsolePos(void){
 }
 
 
-bool PrimitivesCan::Magnet(bool left, int polarity){
+bool PrimitivesCan::Compressor(bool on){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
+	u8 num = VACUUM_COMPRESSOR_INDEX;
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(magnet->SetPolarity[num].inProgress){
+	if(vacuum->Set[num].inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		magnet->MAGNET_SET_POLARITY(num, polarity);
+		vacuum->VACUUM_SET(num, on);
 		ret = ACT_STARTED;
 	}
 
@@ -1155,12 +1142,81 @@ bool PrimitivesCan::Magnet(bool left, int polarity){
 }
 
 
-bool PrimitivesCan::MagnetInProgress(bool left){
+bool PrimitivesCan::CompressorInProgress(void){
 
 	EnterCritical();
 
-	u8 num = (left ? MAGNET_LEFT_INDEX : MAGNET_RIGHT_INDEX);
-	bool ret = magnet->SetPolarity[num].inProgress;
+	u8 num = VACUUM_COMPRESSOR_INDEX;
+	bool ret = vacuum->Set[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetCompressor(void){
+
+	EnterCritical();
+
+	u8 num = VACUUM_COMPRESSOR_INDEX;
+	bool ret = vacuum->GET_ON(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::Valve(bool open){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = VACUUM_VALVE_INDEX;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(vacuum->Set[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		vacuum->VACUUM_SET(num, open);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ValveInProgress(void){
+
+	EnterCritical();
+
+	u8 num = VACUUM_VALVE_INDEX;
+	bool ret = vacuum->Set[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetValve(void){
+
+	EnterCritical();
+
+	u8 num = VACUUM_VALVE_INDEX;
+	bool ret = vacuum->GET_ON(num);
 
 	ExitCritical();
 
@@ -1201,7 +1257,7 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	deadreck->evalMsg(msg);
 	bdc->evalMsg(msg);
 	input->evalMsg(msg);
-	magnet->evalMsg(msg);
+	vacuum->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
 	power->evalMsg(msg);

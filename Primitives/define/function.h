@@ -86,9 +86,9 @@
 //---------- INPUT_ID ----------
 
 
-//---------- MAGNET_ID ----------
-#define CMD_MAGNET_SET_POLARITY				0x00	//spec.h "spec fuggvenyei" reszben
-#define MSG_MAGNET_SET_POLARITY_REPLY		0x00	//driver.c "REPLY" reszben
+//---------- VACUUM_ID ----------
+#define CMD_VACUUM_SET						0x00	//spec.h "spec fuggvenyei" reszben
+#define MSG_VACUUM_SET_REPLY				0x00	//driver.c "REPLY" reszben
 
 
 //---------- SERVO_ID ----------

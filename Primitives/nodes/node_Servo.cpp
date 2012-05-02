@@ -109,7 +109,6 @@ void node_Servo::evalMsg(UDPmsg* msg){
 
 			case MSG_SERVO_SET_POS_REPLY:
 				num = GET_U8(&(msg->data[0]));
-				Servo_Pos_Incr[num] = Servo_CmdPos_Incr[num];
 				Setpos[num].done = GET_BOOL(&(msg->data[1]), 0);
 				Servo_Pos_Incr[num] = GET_U16(&(msg->data[2]));
 				Setpos[num].inProgress = false;

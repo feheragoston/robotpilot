@@ -38,13 +38,13 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_active_level[INPUT_DIGITAL_COLOR_BUTTON_INDEX]				= ((INPUT_DIGITAL_COLOR_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
-	digital_active_level[INPUT_DIGITAL_PAWN_IN_GRIPPER_INDEX]			= ((INPUT_DIGITAL_PAWN_IN_GRIPPER_ACTIVE_LEVEL != 0)			? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_0_INDEX]					= ((INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_1_INDEX]					= ((INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_2_INDEX]					= ((INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_3_INDEX]					= ((INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_4_INDEX]					= ((INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL != 0)						? true : false);
-	//----- valtozo init VEGE -----
+	digital_active_level[INPUT_DIGITAL_PLUS_5_INDEX]					= ((INPUT_DIGITAL_PLUS_5_ACTIVE_LEVEL != 0)						? true : false);
+		//----- valtozo init VEGE -----
 
 
 }
