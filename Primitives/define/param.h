@@ -299,8 +299,8 @@
 //----- deadreck -----
 //az Y falra kell rasimitani
 #define DEADRECK_CALIB_DISTANCE_X				((double)153)	//[mm]
-#define DEADRECK_CALIB_DISTANCE_Y				((double)158)	//[mm]
-#define DEADRECK_CALIB_PHI						((double)48.515 * M_PI / 180)	//[rad]
+#define DEADRECK_CALIB_DISTANCE_Y				((double)159)	//[mm]
+#define DEADRECK_CALIB_PHI						((double)49.87 * M_PI / 180)	//[rad]
 
 // originalt megoldasok
 //#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 261.274198830535)
