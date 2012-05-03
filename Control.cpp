@@ -191,6 +191,12 @@ Control::Control(Config* config) {
 		obstacles.push_back(new Line(0, 0, 0, AREA_LENGTH));
 		obstacles.push_back(new Line(0, AREA_LENGTH, AREA_WIDTH, AREA_LENGTH));
 		obstacles.push_back(new Line(AREA_WIDTH, 0, AREA_WIDTH, AREA_LENGTH));
+
+		// Gombok
+		highObstacles.push_back(new Line(AREA_WIDTH - BUTTON_LENGTH, 640, AREA_WIDTH, 640));
+		highObstacles.push_back(new Line(AREA_WIDTH - BUTTON_LENGTH, 1117, AREA_WIDTH, 1117));
+		highObstacles.push_back(new Line(AREA_WIDTH - BUTTON_LENGTH, 1883, AREA_WIDTH, 1883));
+		highObstacles.push_back(new Line(AREA_WIDTH - BUTTON_LENGTH, 2360, AREA_WIDTH, 2360));
 	}
 	// ellenfelet alapbol kirakjuk a palyarol
 	for (int i = 0; i < OPPONENT_NUM; i++) {
