@@ -35,7 +35,11 @@ public:
 
 	double GET_DISTANCE(u8 analog_num);
 	bool GET_DIGITAL(u8 digital_num);
-	void SET_DIGITAL(u8 digital_num, bool high);
+	void SET_DIGITAL(u8 digital_num, bool on);
+
+	double GET_PRESSURE(u8 analog_num);
+
+	progress_t SetOutput[INPUT_DIGITAL_COUNT];
 
 
 private:
@@ -50,8 +54,6 @@ private:
 	bool digital_output_init_state[INPUT_DIGITAL_COUNT];
 
 	double GET_SHARP_MM(u16 analog_value, double table[][2], u8 size);
-
-	progress_t SetOutput[INPUT_DIGITAL_COUNT];
 
 
 };

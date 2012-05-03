@@ -57,6 +57,9 @@ public:
 	bool SetMotorSupplyInProgress(void);
 	bool GetMotorSupply(void);
 
+	bool SetEyeColor(int color);
+	bool SetEyeColorInProgress(void);
+
 	bool CalibrateDeadreckoning(bool simulate = false);
 	bool CalibrateDeadreckoningInProgress(void);
 
@@ -113,6 +116,10 @@ public:
 	bool Valve(bool open);
 	bool ValveInProgress(void);
 	bool GetValve(void);
+
+	double GetPressure(void);
+	bool ResetPressure(bool reset);
+	bool ResetPressureInProgress(void);
 	//----- Primitives VEGE -----
 
 

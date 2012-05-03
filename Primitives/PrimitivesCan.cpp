@@ -368,6 +368,49 @@ bool PrimitivesCan::GetMotorSupply(void){
 }
 
 
+bool PrimitivesCan::SetEyeColor(int color){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(input->SetOutput[INPUT_DIGITAL_EYE_COLOR_INDEX].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+
+		if(color)	input->SET_DIGITAL(INPUT_DIGITAL_EYE_COLOR_INDEX, 1);
+		else		input->SET_DIGITAL(INPUT_DIGITAL_EYE_COLOR_INDEX, 0);
+
+		ret = ACT_STARTED;
+
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetEyeColorInProgress(void){
+
+	EnterCritical();
+
+	bool ret = input->SetOutput[INPUT_DIGITAL_EYE_COLOR_INDEX].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::CalibrateDeadreckoning(bool simulate){
 
 	EnterCritical();
@@ -1225,6 +1268,50 @@ bool PrimitivesCan::GetValve(void){
 
 	u8 num = VACUUM_VALVE_INDEX;
 	bool ret = vacuum->GET_ON(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetPressure(void){
+	return input->GET_PRESSURE(INPUT_ANALOG_PRESSURE_INDEX);
+}
+
+
+bool PrimitivesCan::ResetPressure(bool reset){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(input->SetOutput[INPUT_DIGITAL_RESET_PRESSURE_INDEX].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		input->SET_DIGITAL(INPUT_DIGITAL_RESET_PRESSURE_INDEX, reset);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::ResetPressureInProgress(void){
+
+	EnterCritical();
+
+	bool ret = input->SetOutput[INPUT_DIGITAL_RESET_PRESSURE_INDEX].inProgress;
 
 	ExitCritical();
 

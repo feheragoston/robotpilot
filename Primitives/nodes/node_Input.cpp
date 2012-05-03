@@ -39,34 +39,33 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_active_level[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]		= ((INPUT_DIGITAL_COLOR_PURPLE_BUTTON_ACTIVE_LEVEL != 0)		? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
+	digital_active_level[INPUT_DIGITAL_EYE_COLOR_INDEX]					= ((INPUT_DIGITAL_EYE_COLOR_ACTIVE_LEVEL != 0)					? true : false);
+	digital_active_level[INPUT_DIGITAL_RESET_PRESSURE_INDEX]			= ((INPUT_DIGITAL_RESET_PRESSURE_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_0_INDEX]					= ((INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_1_INDEX]					= ((INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_2_INDEX]					= ((INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL != 0)						? true : false);
-	digital_active_level[INPUT_DIGITAL_PLUS_3_INDEX]					= ((INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL != 0)						? true : false);
-	digital_active_level[INPUT_DIGITAL_PLUS_4_INDEX]					= ((INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL != 0)						? true : false);
 
 	digital_is_output[INPUT_DIGITAL_START_BUTTON_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_START_BUTTON != 0)				? true : false);
 	digital_is_output[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]				= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_RED_BUTTON != 0)			? true : false);
 	digital_is_output[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]			= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_PURPLE_BUTTON != 0)		? true : false);
 	digital_is_output[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_FRONT_LEFT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_FRONT_RIGHT_LIMIT_SWITCH != 0)	? true : false);
+	digital_is_output[INPUT_DIGITAL_EYE_COLOR_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_EYE_COLOR != 0)					? true : false);
+	digital_is_output[INPUT_DIGITAL_RESET_PRESSURE_INDEX]				= ((INPUT_DIGITAL_IS_OUTPUT_RESET_PRESSURE != 0)			? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_0_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_0 != 0)					? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_1_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_1 != 0)					? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_2_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_2 != 0)					? true : false);
-	digital_is_output[INPUT_DIGITAL_PLUS_3_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_3 != 0)					? true : false);
-	digital_is_output[INPUT_DIGITAL_PLUS_4_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_4 != 0)					? true : false);
 
 	digital_output_init_state[INPUT_DIGITAL_START_BUTTON_INDEX]				= INPUT_DIGITAL_OUTPUT_START_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]			= INPUT_DIGITAL_OUTPUT_COLOR_RED_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]		= INPUT_DIGITAL_OUTPUT_COLOR_PURPLE_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_FRONT_LEFT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_FRONT_RIGHT_LIMIT_SWITCH_INIT_STATE;
+	digital_output_init_state[INPUT_DIGITAL_EYE_COLOR_INDEX]				= INPUT_DIGITAL_OUTPUT_EYE_COLOR_INIT_STATE;
+	digital_output_init_state[INPUT_DIGITAL_RESET_PRESSURE_INDEX]			= INPUT_DIGITAL_OUTPUT_RESET_PRESSURE_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_0_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_0_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_1_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_1_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_2_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_2_INIT_STATE;
-	digital_output_init_state[INPUT_DIGITAL_PLUS_3_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_3_INIT_STATE;
-	digital_output_init_state[INPUT_DIGITAL_PLUS_4_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_4_INIT_STATE;
-
 	//----- valtozo init VEGE -----
 
 
@@ -132,13 +131,21 @@ void node_Input::INIT_PARAM(void){
 
 	UDPmsg msg;
 
+	bool st;
+
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
 	msg.length		= 1;
 
 	for(int i=0 ; i<INPUT_DIGITAL_OUTPUT_COUNT ; i++){
+
 		SET_BOOL(&(msg.data[0]), 0+2*i, digital_is_output[INPUT_DIGITAL_OUTPUT_MIN_INDEX + i]);
-		SET_BOOL(&(msg.data[0]), 1+2*i, digital_output_init_state[INPUT_DIGITAL_OUTPUT_MIN_INDEX + i]);
+
+		st = digital_output_init_state[INPUT_DIGITAL_OUTPUT_MIN_INDEX + i];
+		//ha aktív alacsony, akkor negálunk
+		if(digital_active_level[INPUT_DIGITAL_OUTPUT_MIN_INDEX + i] == 0)	st = !st;
+
+		SET_BOOL(&(msg.data[0]), 1+2*i, st);
 	}
 
 	UDPdriver::send(&msg);
@@ -207,22 +214,30 @@ bool node_Input::GET_DIGITAL(u8 num){
 }
 
 
-void node_Input::SET_DIGITAL(u8 num, bool high){
+void node_Input::SET_DIGITAL(u8 num, bool on){
 
 	UDPmsg msg;
+
+	//ha aktív alacsony, akkor negálunk
+	if(digital_active_level[num] == 0)	on = !on;
 
 	msg.node_id		= id;
 	msg.function	= CMD_INPUT_SET_OUTPUT;
 	msg.length		= 2;
 
 	SET_U8(&(msg.data[0]), num);
-	SET_BOOL(&(msg.data[1]), 0, high);
+	SET_BOOL(&(msg.data[1]), 0, on);
 
 	UDPdriver::send(&msg);
 
 	SetOutput[num].inProgress = true;
 	SetOutput[num].finished = false;
 
-	cout << name << "\t___send SETOUTPUT [" << (u32)num << "]___:\t" << (high ? "1" : "0") << endl;
+	cout << name << "\t___send SETOUTPUT [" << (u32)num << "]___:\t" << (on ? "1" : "0") << endl;
 
+}
+
+
+double node_Input::GET_PRESSURE(u8 analog_num){
+	return INPUT_ANALOG_TO_V(analog[analog_num]);
 }
