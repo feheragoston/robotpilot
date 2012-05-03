@@ -307,10 +307,15 @@
 //#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
 //#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
 
-// elso kalibracio utan mar igy:
-#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 262.0157386)
-#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.59514464)
-#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.43936839)
+// elso kalibracio utan, még lehet, hogy pontosítani kell
+//saját menést beleszámítva:
+//#define DEADRECK_WHEEL_DISTANCE_REC				((double)1 / 267.294)
+//#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 66.78756)
+//#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.41111)
+//saját menésnélkül
+#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 266.4655)
+#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.3033)
+#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.310)
 #define DEADRECK_LEFT_IS_ROTATE_DIR_A				0
 #define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1
 #define DEADRECK_IS_LEFT_EQEP1						1
@@ -375,7 +380,7 @@
 #define BDC_CONV_OMEGA(omega)						((u16)BDC_CONV_RADS_TO_RPM(omega))
 
 
-#define BDC_IS_LEFT_MOTOR1							1
+#define BDC_IS_LEFT_MOTOR1							0
 //#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
