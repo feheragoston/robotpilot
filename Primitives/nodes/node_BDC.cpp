@@ -202,8 +202,8 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 	msg.length		= 4;
 
 	//v = (vLeft + vRight) / 2
-	//w = (vRight - vLeft) / BDC_WHEEL_DISTANCEyy
-	s16 vLeft	= (s16)(v - w * BDC_WHEEL_DISTANCE / 2);
+	//w = (vLeft - vRight) / BDC_WHEEL_DISTANCEyy
+	s16 vLeft	= (s16)(v + w * BDC_WHEEL_DISTANCE / 2);
 	s16 vRight	= (s16)(v - w * BDC_WHEEL_DISTANCE / 2);
 
 	//bal motornak meg kell forditani a sebesseget
