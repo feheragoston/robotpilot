@@ -511,7 +511,7 @@ double Primitives::GetPressure() {
 	return 3.5;
 }
 
-bool Primitives::ResetPressure() {
+bool Primitives::ResetPressure(bool reset) {
 	return true;
 }
 

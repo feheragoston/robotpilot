@@ -472,9 +472,10 @@ public:
 
 	/**
 	 * Nyomaserzekelo alaphelyzetbe allitasa
+	 * @param reset true: re, false: set
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool ResetPressure();
+	virtual bool ResetPressure(bool reset);
 
 	/**
 	 * Nyomaserzekelo reseteles allapota
