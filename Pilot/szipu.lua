@@ -1,0 +1,11 @@
+c.SetMotorSupply(true)
+
+p.sleep(1000)
+p.Compressor(true)
+p.ArmMove(100)
+p.sleep(200)
+p.ArmMove(10)
+p.Valve(true)
+p.sleep(300)
+p.Valve(false)
+p.ArmMove(45)
