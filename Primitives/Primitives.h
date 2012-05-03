@@ -8,6 +8,7 @@
 #ifndef PRIMITIVES_H_
 #define PRIMITIVES_H_
 
+#include <stdint.h>
 #include <sys/time.h>
 #include <math.h>
 #include "../Config.h"
@@ -63,9 +64,9 @@ public:
 
 	/**
 	 * A szinkapcsolo allapotanak lekerdezese
-	 * @return false: lila, true: piros
+	 * @return -1: lila, 1: piros, 0: undefined
 	 */
-	virtual bool GetMyColor();
+	virtual int8_t GetMyColor();
 
 	/**
 	 * motortap be/ki kapcsolasa
@@ -492,7 +493,7 @@ protected:
 	/**
 	 * a szinkapcsolo allasat tarolja
 	 */
-	bool mRobotColor;
+	int8_t mRobotColor;
 	/**
 	 * a startgomb allapotat tarolja
 	 */

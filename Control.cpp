@@ -1040,8 +1040,7 @@ int Control::l_GetStopButton(lua_State *L) {
 }
 
 int Control::l_GetMyColor(lua_State *L) {
-	bool b = mPrimitives->GetMyColor();
-	lua_pushboolean(L, b);
+	lua_pushinteger(L, mPrimitives->GetMyColor());
 	return 1;
 }
 

@@ -29,8 +29,9 @@
 #define MOTION_NO_ERROR						0
 #define MOTION_ERROR						1
 
-#define COLOR_PURPLE						false
-#define COLOR_RED							true
+#define COLOR_PURPLE						-1
+#define COLOR_UNKNOWN						0
+#define COLOR_RED							1
 
 #define AREA_LENGTH_X						2000
 #define AREA_LENGTH_Y						3000

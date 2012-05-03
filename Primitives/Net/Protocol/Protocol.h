@@ -54,7 +54,7 @@ typedef struct msgstatus {
 	double oradius[OPPONENT_NUM];
 	bool startButton;
 	bool stopButton;
-	bool color;
+	int8_t color;
 	bool motorSupply;
 	double leftGripperPos;
 	double rightGripperPos;

@@ -51,7 +51,7 @@ public:
 
 	bool GetStartButton(void);
 	bool GetStopButton(void);
-	bool GetMyColor(void);
+	int8_t GetMyColor(void);
 
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);
@@ -190,7 +190,7 @@ private:
 	void ConvWorldToRobot(double xw, double yw, double phiw, double* xr, double* yr, double* phir);
 
 
-	bool GetMyColor_Unsafe(void);
+	int8_t GetMyColor_Unsafe(void);
 	bool HasColor_Unsafe(void);
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
 	long int GetOpponentPos_Unsafe(u8 num, double* x, double* y);

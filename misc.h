@@ -39,8 +39,8 @@
 /////////////////
 // Robot szine
 
-#define	RED		0
-#define	BLUE	1
+#define	PURPLE	-1
+#define	RED		1
 
 /////////////////////////
 // Robot kezdopozicioja

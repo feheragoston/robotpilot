@@ -297,11 +297,11 @@ bool PrimitivesCan::GetStopButton(void){
 }
 
 
-bool PrimitivesCan::GetMyColor(void){
+int8_t PrimitivesCan::GetMyColor(void){
 
 	EnterCritical();
 
-	bool ret = GetMyColor_Unsafe();
+	int8_t ret = GetMyColor_Unsafe();
 
 	ExitCritical();
 
@@ -1483,14 +1483,14 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 }
 
 
-bool PrimitivesCan::GetMyColor_Unsafe(void){
+int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
 	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
 
 	if(red)			return COLOR_RED;
 	if(purple)		return COLOR_PURPLE;
-	return COLOR_RED;	//ha nincs színünk, akkor azt mondjuk, hogy piros
+	return COLOR_UNKNOWN;	//ha nincs színünk
 
 }
 

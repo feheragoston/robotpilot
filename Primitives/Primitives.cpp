@@ -30,7 +30,7 @@ Primitives::Primitives(Primitives* source) {
 
 	mStartButton = source->GetStartButton();
 	mStopButton = source->GetStopButton();
-	mRobotColor = !source->GetMyColor();
+	mRobotColor = source->GetMyColor() * -1;
 
 	source->GetRobotPos(&robot.x, &robot.y, &robot.phi);
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
@@ -222,7 +222,7 @@ bool Primitives::GetStopButton() {
 	return mStopButton;
 }
 
-bool Primitives::GetMyColor() {
+int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
