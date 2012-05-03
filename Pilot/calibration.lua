@@ -10,9 +10,6 @@ if (CALIBRATED == nil) then
 	turnSpeed = 6
 	turnAcc = 10
 	
-	GripperGrab = 60
-	GripperHold = 55
-
 	p.sleep(1000)
 	
 	c.music("start")
@@ -26,43 +23,33 @@ if (CALIBRATED == nil) then
 	
 	p.sleep(2000)
 	
-	p.Magnet(true, 0)
-	p.Magnet(false, 0)
-	p.ArmMove(true, 0)
-	c.print("Balkar behajtva");
-	p.ArmMove(false, 0)
-	c.print("Jobbkar behajtva");
+	p.ArmMove(0)
+	p.GripperMove(true, 0)
+	p.GripperMove(false, 1)
+	p.ClawMove(true, 0)
+	p.ClawMove(false, 2)
 	
-	p.GripperMove(0)
-	c.print("Gripper behajtva");
+	--c.CalibrateConsole();
 	
-	c.CalibrateConsole();
-	
+	while (c.GetMyColor() ~= 0) do
+		p.process()
+		c.music("caliberror")
+	end
+
 	c.music("calibrate")
 	
 	c.CalibrateDeadreckoning()
 	c.print("Deadreckoning beallitva");
 	p.sleep(1000)
 	
-	p.Go(30)
-	--x, y, phi = c.GetRobotPos();
-	p.TurnTo(795, 1500)
-
-	--p.Go(60)
-	--[[
-	if (c.GetMyColor()) then
-		p.Turn(0.4)
-	else
-		p.Turn(-0.4)
-	end
-	]]
-
 	p.sleep(1000)
 
-	if (c.GetMyColor()) then
-		c.print("Kekek vagyunk");
+	if (c.GetMyColor() == RED) then
+		c.print("Pirosak vagyunk");
 		Offset = 3000;
 		Ori = -1;
+	elseif (c.GetMyColor() == PURPLE) then
+		c.print("Hajra Lilak!");
 	end
 
 	c.print("Calibrate finished");
