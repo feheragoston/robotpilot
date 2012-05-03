@@ -64,6 +64,19 @@ function runparallel(...)
 end
 
 
+local function SetEyeColor(...)
+	if (control.SetEyeColor(...)) then
+		while (control.SetEyeColorInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) SetEyeColor hiba")
+		return false
+	end
+	return true
+end
+
+
 local function MotionInProgress()
 	while (control.MotionInProgress()) do
 		process()
@@ -134,13 +147,37 @@ function MotionStop(...)
 	return true
 end
 
-function GripperMove(...)
-	if (control.GripperMove(...)) then
-		while (control.GripperMoveInProgress()) do
+function GripperMove(left, ...)
+	if (control.GripperMove(left, ...)) then
+		while (control.GripperMoveInProgress(left)) do
 			process()
 		end
 	else
-		control.print("(pilot) GripperMove hiba")
+		control.print("(pilot) GripperMove hiba", left)
+		return false
+	end
+	return true
+end
+
+function ClawMove(left, ...)
+	if (control.ClawMove(left, ...)) then
+		while (control.ClawMoveInProgress(left)) do
+			process()
+		end
+	else
+		control.print("(pilot) ClawMove hiba", left)
+		return false
+	end
+	return true
+end
+
+function ArmMove(...)
+	if (control.ArmMove(...)) then
+		while (control.ArmMoveInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) ArmMove hiba")
 		return false
 	end
 	return true
@@ -170,36 +207,46 @@ function ConsoleStop(...)
 	return true
 end
 
-function ArmMove(left, ...)
-	if (control.ArmMove(left, ...)) then
-		while (control.ArmMoveInProgress(left)) do
+function Compressor(...)
+	if (control.Compressor(...)) then
+		while (control.CompressorInProgress()) do
 			process()
 		end
 	else
-		control.print("(pilot) ArmMove hiba")
+		control.print("(pilot) Compressor hiba")
 		return false
 	end
 	return true
 end
 
-function Magnet(left, ...)
-	if (control.Magnet(left, ...)) then
-		while (control.MagnetInProgress(left)) do
+function Valve(...)
+	if (control.Valve(...)) then
+		while (control.ValveInProgress()) do
 			process()
 		end
 	else
-		control.print("(pilot) Magnet hiba")
+		control.print("(pilot) Valve hiba")
 		return false
 	end
 	return true
 end
 
-function RefreshPawnPositions(...)
-	if (control.RefreshPawnPositions(...)) then
-		while (control.RefreshPawnPositionsInProgress()) do
+function ResetPressure()
+	if (control.ResetPressure(true)) then
+		while (control.ResetPressureInProgress()) do
 			process()
 		end
-		return control.RefreshPawnPositionsFinished()
+	else
+		control.print("(pilot) ResetPressure hiba: true")
+		return false
 	end
-	return false
+	if (control.ResetPressure(false)) then
+		while (control.ResetPressureInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) ResetPressure hiba: false")
+		return false
+	end
+	return true
 end

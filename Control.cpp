@@ -83,6 +83,8 @@ Control::Control(Config* config) {
 		{"GetMyColor", l_GetMyColor},
 		{"GetDistances", l_GetDistances},
 		{"SetMotorSupply", l_SetMotorSupply},
+		{"SetEyeColor", l_SetEyeColor},
+		{"SetEyeColorInProgress", l_SetEyeColorInProgress},
 
 		{"CalibrateDeadreckoning", l_CalibrateDeadreckoning},
 		{"SetSpeed", l_SetSpeed},
@@ -118,6 +120,9 @@ Control::Control(Config* config) {
 		{"CompressorInProgress", l_CompressorInProgress},
 		{"Valve", l_Valve},
 		{"ValveInProgress", l_ValveInProgress},
+		{"GetPressure", l_GetPressure},
+		{"ResetPressure", l_ResetPressure},
+		{"ResetPressureInProgress", l_ResetPressureInProgress},
 
 		{"StartMatch", l_StartMatch},
 
@@ -1063,6 +1068,17 @@ int Control::l_SetMotorSupply(lua_State *L) {
 	return 1;
 }
 
+int Control::l_SetEyeColor(lua_State *L) {
+	int color = luaL_optinteger(L, 1, 1);
+	lua_pushboolean(L, mPrimitives->SetEyeColor(color));
+	return 1;
+}
+
+int Control::l_SetEyeColorInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->SetEyeColorInProgress());
+	return 1;
+}
+
 int Control::l_CalibrateDeadreckoning(lua_State *L) {
 	bool simulate = optbool(L, 1, false);
 	lua_settop(L, 0);
@@ -1375,6 +1391,22 @@ int Control::l_Valve(lua_State *L) {
 
 int Control::l_ValveInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->ValveInProgress());
+	return 1;
+}
+
+int Control::l_GetPressure(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetPressure());
+	return 1;
+}
+
+int Control::l_ResetPressure(lua_State *L) {
+	bool reset = optbool(L, 1, true);
+	lua_pushboolean(L, mPrimitives->ResetPressure(reset));
+	return 1;
+}
+
+int Control::l_ResetPressureInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->ResetPressureInProgress());
 	return 1;
 }
 

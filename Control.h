@@ -138,6 +138,8 @@ protected:
 	static int l_GetMyColor(lua_State *L);
 	static int l_GetDistances(lua_State *L);
 	static int l_SetMotorSupply(lua_State *L);
+	static int l_SetEyeColor(lua_State *L);
+	static int l_SetEyeColorInProgress(lua_State *L);
 
 	static int l_CalibrateDeadreckoning(lua_State *L);
 	static int l_SetSpeed(lua_State *L);
@@ -171,6 +173,9 @@ protected:
 	static int l_CompressorInProgress(lua_State *L);
 	static int l_Valve(lua_State *L);
 	static int l_ValveInProgress(lua_State *L);
+	static int l_GetPressure(lua_State *L);
+	static int l_ResetPressure(lua_State *L);
+	static int l_ResetPressureInProgress(lua_State *L);
 
 	static int l_StartMatch(lua_State *L);
 
