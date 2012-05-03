@@ -238,6 +238,14 @@ bool Primitives::GetMotorSupply() {
 	return true;
 }
 
+bool Primitives::SetEyeColor(int color) {
+	return true;
+}
+
+bool Primitives::SetEyeColorInProgress() {
+	return false;
+}
+
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 200;
 	robot.y = 200;
@@ -496,4 +504,17 @@ bool Primitives::ValveInProgress() {
 
 bool Primitives::GetValve() {
 	return valve;
+}
+
+
+double Primitives::GetPressure() {
+	return 3.5;
+}
+
+bool Primitives::ResetPressure() {
+	return true;
+}
+
+bool Primitives::ResetPressureInProgress() {
+	return false;
 }

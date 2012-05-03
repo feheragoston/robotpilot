@@ -86,6 +86,19 @@ public:
 	 */
 	virtual bool GetMotorSupply();
 
+	/**
+	 * Szem szinenek beallitasa
+	 * @param color szin
+	 * @return folyamat elindult, false: hiba tortent
+	 */
+	virtual bool SetEyeColor(int color);
+
+	/**
+	 * Szemszinallitas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool SetEyeColorInProgress();
+
 	///////////////////////////////////////////////////////////////////////
 	// MOZGASOK, POZICIOK
 	///////////////////////////////////////////////////////////////////////
@@ -446,6 +459,28 @@ public:
 	 * @return true: nyitva, false: zarva
 	 */
 	virtual bool GetValve();
+
+	///////////////////////////////////////////////////////////////////////
+	// PRESSURE
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Nyomaserzekelo allapotanak lekerdezese
+	 * @return relativ nyomas 0..5
+	 */
+	virtual double GetPressure();
+
+	/**
+	 * Nyomaserzekelo alaphelyzetbe allitasa
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool ResetPressure();
+
+	/**
+	 * Nyomaserzekelo reseteles allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ResetPressureInProgress();
 
 protected:
 	/**
