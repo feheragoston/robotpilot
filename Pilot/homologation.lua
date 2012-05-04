@@ -21,40 +21,53 @@ end
 if (c.simulate(p.GoToSafe, 860, 500 * Ori + Offset)) then
 	p.GoToSafe(860, 500 * Ori + Offset)
 end
-if (c.simulate(p.Go, -220)) then
-	p.Go(-220)
+if (c.simulate(p.GoSafe, -220)) then
+	p.GoSafe(-220)
+end
+
+
+if (c.simulate(p.TurnToSafe, 1775, 640 * Ori + Offset)) then
+	p.TurnToSafe(1775, 640 * Ori + Offset)
+	if (c.simulate(p.GoToSafe, 1775, 640 * Ori + Offset)) then
+		p.GoToSafe(1775, 640 * Ori + Offset)
+		p.ClawMove(false, 30)
+		p.ClawMove(false, 2)
+		if (c.simulate(p.GoSafe, -220)) then
+			p.GoSafe(-220)
+		end
+	end
 end
 
 
 
 
-
-
-if (c.simulate(p.TurnToSafe, 300, Offset + Ori * 790)) then
-	p.TurnToSafe(300, Offset + Ori * 790)
-	if (c.simulate(p.GoToSafe, 300, Offset + Ori * 790)) then
-		p.GoToSafe(300, Offset + Ori * 790)
-		if (c.simulate(p.TurnToSafe, 1400, Offset + Ori * 790)) then
-			p.TurnToSafe(1400, Offset + Ori * 790)
+if (c.simulate(p.TurnToSafe, 1700, Offset + Ori * 790)) then
+	p.TurnToSafe(1700, Offset + Ori * 790)
+	if (c.simulate(p.GoToSafe, 1700, Offset + Ori * 790)) then
+		p.GoToSafe(1700, Offset + Ori * 790)
+		if (c.simulate(p.TurnToSafe, 600, Offset + Ori * 790)) then
+			p.TurnToSafe(600, Offset + Ori * 790)
 			p.GripperMove(false, 95)
 			p.GripperMove(true, 95)
 			p.ClawMove(false, 120)
 			p.ClawMove(true, 120)
-			if (c.simulate(p.GoToSafe, 1400, Offset + Ori * 790)) then
-				p.GoToSafe(1400, Offset + Ori * 790)
+			if (c.simulate(p.GoToSafe, 600, Offset + Ori * 790)) then
+				p.GoToSafe(600, Offset + Ori * 790)
 				p.GripperMove(true, 55)
 				p.GripperMove(false, 55)
-				if (c.simulate(p.TurnToSafe, 700, Offset + Ori * 700)) then
-					p.TurnToSafe(700, Offset + Ori * 700)
+				p.ClawMove(false, 55)
+				p.ClawMove(true, 55)
+				if (c.simulate(p.TurnToSafe, 720, Offset + Ori * 700)) then
+					p.TurnToSafe(720, Offset + Ori * 700)
 				end
-				if (c.simulate(p.GoToSafe, 700, Offset + Ori * 700)) then
-					p.GoToSafe(700, Offset + Ori * 700)
+				if (c.simulate(p.GoToSafe, 720, Offset + Ori * 700)) then
+					p.GoToSafe(720, Offset + Ori * 700)
 				end
-				if (c.simulate(p.TurnToSafe, 700, Offset + Ori * 400)) then
-					p.TurnToSafe(700, Offset + Ori * 400)
+				if (c.simulate(p.TurnToSafe, 720, Offset + Ori * 400)) then
+					p.TurnToSafe(720, Offset + Ori * 400)
 				end
-				if (c.simulate(p.GoToSafe, 700, Offset + Ori * 400)) then
-					p.GoToSafe(700, Offset + Ori * 400)
+				if (c.simulate(p.GoToSafe, 720, Offset + Ori * 400)) then
+					p.GoToSafe(720, Offset + Ori * 400)
 				end
 				p.GripperMove(true, 95)
 				p.GripperMove(false, 95)
