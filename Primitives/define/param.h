@@ -425,13 +425,13 @@
 
 
 //----- sonar -----
-#define SONAR_TX_BLUE				2202.0
-#define SONAR_TY_BLUE				3102.0
-#define SONAR_ALPHA_BLUE			M_PI
+#define SONAR_TX_RED		2098.0
+#define SONAR_TY_RED		3098.0
+#define SONAR_ALPHA_RED		M_PI
 
-#define SONAR_TX_RED				-102.0
-#define SONAR_TY_RED				-102.0
-#define SONAR_ALPHA_RED				0.0
+#define SONAR_TX_PURPLE		-98.0
+#define SONAR_TY_PURPLE		-98.0
+#define SONAR_ALPHA_PURPLE	0.0
 
 
 

@@ -1419,16 +1419,16 @@ void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* 
 
 void PrimitivesCan::Calibrate_Unsafe(void){
 
-	//red
+	//purple
 	if(GetMyColor_Unsafe() == COLOR_PURPLE){
 		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, DEADRECK_CALIB_PHI);
-		TM33Build(SONAR_TX_RED, SONAR_TY_RED, SONAR_ALPHA_RED, T33WS);
+		TM33Build(SONAR_TX_PURPLE, SONAR_TY_PURPLE, SONAR_ALPHA_PURPLE, T33WS);
 	}
 
-	//blue
+	//red
 	else{
 		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, AREA_LENGTH_Y - DEADRECK_CALIB_DISTANCE_Y, -DEADRECK_CALIB_PHI);
-		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
+		TM33Build(SONAR_TX_RED, SONAR_TY_RED, SONAR_ALPHA_RED, T33WS);
 	}
 
 }
