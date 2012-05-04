@@ -690,6 +690,10 @@ bool PrimitivesCan::MotionInProgress(void){
 				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)))
 		bdcMotionError = MOTION_ERROR;
 
+	if (!ret && bdc->AnyMotion.done == 0) {
+		bdcMotionError = MOTION_ERROR;
+	}
+
 	ExitCritical();
 
 	return ret;
