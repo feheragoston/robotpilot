@@ -19,7 +19,7 @@
 #define		AREA_WIDTH	2000	// palya szelessege [mm]
 #define		AREA_LENGTH	3000	// palya hosszusaga [mm]
 
-#define		BUTTON_LENGTH	44	// palackposta gombjanak belogo resze
+#define		BUTTON_LENGTH	48	// palackposta gombjanak belogo resze
 
 #define		PURPLE_OFFSET		0				// poziciok eltolasa
 #define		RED_OFFSET			AREA_LENGTH		// poziciok eltolasa
