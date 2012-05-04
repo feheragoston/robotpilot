@@ -23,7 +23,7 @@ if (CALIBRATED == nil) then
 	
 	p.sleep(2000)
 	
-	p.ArmMove(0)
+	p.ArmMove(15) -- !!!!!!!!
 	p.GripperMove(true, 0)
 	p.GripperMove(false, 1)
 	p.ClawMove(true, 0)
