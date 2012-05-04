@@ -82,3 +82,63 @@ if (c.simulate(p.TurnToSafe, 1700, Offset + Ori * 790)) then
 		end
 	end
 end
+
+
+
+if (c.simulate(p.TurnToSafe, 400, 2000 * Ori + Offset)) then
+	p.TurnToSafe(400, 2000 * Ori + Offset)
+	if (c.simulate(p.GoToSafe, 400, 2000 * Ori + Offset)) then
+		p.GoToSafe(400, 2000 * Ori + Offset)
+		if (c.simulate(p.TurnToSafe, 860, 2280 * Ori + Offset)) then
+			p.TurnToSafe(860, 2280 * Ori + Offset)
+			if (c.simulate(p.GoToSafe, 860, 2280 * Ori + Offset)) then
+				p.GoToSafe(860, 2280 * Ori + Offset)
+				p.runparallel(
+					function()
+						p.GripperMove(false, 95)
+					end,
+					function()
+						p.GripperMove(true, 95)
+					end
+				)
+				if (c.simulate(p.TurnToSafe, 860, 2600 * Ori + Offset)) then
+					p.TurnToSafe(860, 2600 * Ori + Offset)
+					if (c.simulate(p.GoToSafe, 860, 2600 * Ori + Offset)) then
+						p.GoToSafe(860, 2600 * Ori + Offset)
+						p.runparallel(
+							function()
+								p.GripperMove(false, 55)
+							end,
+							function()
+								p.GripperMove(true, 55)
+							end
+						)
+						if (c.simulate(p.GoSafe, -300)) then
+							repeat p.GoSafe(-300) until (c.GetMotionError() == 0)
+							if (c.simulate(p.TurnToSafe, 400, 2000 * Ori + Offset)) then
+								p.TurnToSafe(400, 2000 * Ori + Offset)
+								if (c.simulate(p.GoToSafe, 400, 2000 * Ori + Offset)) then
+									p.GoToSafe(400, 2000 * Ori + Offset)
+									if (c.simulate(p.TurnToSafe, 250, 400 * Ori + Offset)) then
+										p.TurnToSafe(250, 400 * Ori + Offset)
+										if (c.simulate(p.GoToSafe, 250, 400 * Ori + Offset)) then
+											p.GoToSafe(250, 400 * Ori + Offset)
+											p.runparallel(
+												function()
+													p.GripperMove(false, 95)
+												end,
+												function()
+													p.GripperMove(true, 95)
+												end
+											)
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
