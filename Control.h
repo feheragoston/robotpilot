@@ -114,9 +114,10 @@ protected:
 	 * @param y1
 	 * @param x2
 	 * @param y2
-	 * @return true ha nincs utkozes
+	 * @param mode COLLISION_ALL, COLLISION_OBSTACLES, COLLISION_HIGH
+	 * @return true ha van utkozes
 	 */
-	static bool checkLine(double x1, double y1, double x2, double y2);
+	static bool checkLine(double x1, double y1, double x2, double y2, int mode = COLLISION_ALL);
 
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);

@@ -38,6 +38,10 @@
 
 #define		OPPONENT_NUM		2		// nyilvantartott ellenfelek szama
 #define		PROXIMITY_NUM		2		// tavolsagerzekelok szama
+
+#define		COLLISION_ALL		0		// utkozes barmivel
+#define		COLLISION_OBSTACLES	1		// utkozes akadalyokkal
+#define		COLLISION_HIGH		2		// utkozes magas akadalyokkal
 /////////////////
 // Robot szine
 

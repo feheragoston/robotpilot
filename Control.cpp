@@ -663,12 +663,57 @@ bool Control::opponentTooClose() {
 }
 
 bool Control::obstacleCollision() {
-	double x, y, phi;
+	double x, y, phi, lg, rg;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
+	lg = mPrimitives->GetGripperPos(true);
+	rg = mPrimitives->GetGripperPos(false);
 
 	while (!robotObstacles.empty()) {
 		delete robotObstacles.front();
 		robotObstacles.pop_front();
+	}
+
+	if (lg > 0) {
+		// atvaltjuk radianba
+		lg = lg * M_PI / 180.;
+		// a kar kezdopontja
+		double x1 = cos(phi) * 137 - sin(phi) * 133 + x;
+		double y1 = sin(phi) * 137 + cos(phi) * 133 + y;
+		// a kar vegpontja 0 pozicioban
+		double x2 = cos(phi) * 137 - sin(phi) * 5 + x;
+		double y2 = sin(phi) * 137 + cos(phi) * 5 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		double xo = x2 - x1;
+		double yo = y2 - y1;
+		// elforgatjuk es visszatoljuk
+		x2 = cos(lg) * xo - sin(lg) * yo + x1;
+		y2 = sin(lg) * xo + cos(lg) * yo + y1;
+		robotObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+			return true;
+		}
+	}
+	if (rg > 0) {
+		// atvaltjuk radianba es negaljuk, mert a jobb kar ellentetesen forog
+		rg = -rg * M_PI / 180.;
+		// a kar kezdopontja
+		double x1 = cos(phi) * 137 - sin(phi) * -133 + x;
+		double y1 = sin(phi) * 137 + cos(phi) * -133 + y;
+		// a kar vegpontja 0 pozicioban
+		double x2 = cos(phi) * 137 - sin(phi) * -5 + x;
+		double y2 = sin(phi) * 137 + cos(phi) * -5 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		double xo = x2 - x1;
+		double yo = y2 - y1;
+		// elforgatjuk es visszatoljuk
+		x2 = cos(rg) * xo - sin(rg) * yo + x1;
+		y2 = sin(rg) * xo + cos(rg) * yo + y1;
+		robotObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+			return true;
+		}
 	}
 
 	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
@@ -694,26 +739,8 @@ bool Control::obstacleCollision() {
 
 		robotObstacles.push_back(new Line(x1, y1, x2, y2));
 
-		for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
-			if ((*i)->Intersect(x1, y1, x2, y2)) {
-				clearCollisionObstacles();
-				collisionObstacles.push_back(*i);
-				return true;
-			}
-		}
-		for (obstacleIterator i = highObstacles.begin(); i != highObstacles.end(); i++) {
-			if ((*i)->Intersect(x1, y1, x2, y2)) {
-				clearCollisionObstacles();
-				collisionObstacles.push_back(*i);
-				return true;
-			}
-		}
-		for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
-			if ((*i)->Intersect(x1, y1, x2, y2)) {
-				clearCollisionObstacles();
-				collisionObstacles.push_back(*i);
-				return true;
-			}
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+			return true;
 		}
 	}
 	return false;
@@ -788,23 +815,41 @@ unsigned int Control::MatchTime() {
 	return runTime;
 }
 
-bool Control::checkLine(double x1, double y1, double x2, double y2) {
-	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
-		if (opponent[i]->Intersect(x1, y1, x2, y2)) {
-			return false;
+bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
+	if (mode == COLLISION_ALL) {
+		for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
+			if (opponent[i]->Intersect(x1, y1, x2, y2)) {
+				return true;
+			}
 		}
 	}
-	for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
+
+	if (mode == COLLISION_ALL || mode == COLLISION_OBSTACLES) {
+		for (obstacleIterator i = obstacles.begin(); i != obstacles.end(); i++) {
+			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				clearCollisionObstacles();
+				collisionObstacles.push_back(*i);
+				return true;
+			}
+		}
+		for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
+			if ((*i)->Intersect(x1, y1, x2, y2)) {
+				clearCollisionObstacles();
+				collisionObstacles.push_back(*i);
+				return true;
+			}
+		}
+	}
+
+	for (obstacleIterator i = highObstacles.begin(); i != highObstacles.end(); i++) {
 		if ((*i)->Intersect(x1, y1, x2, y2)) {
-			return false;
+			clearCollisionObstacles();
+			collisionObstacles.push_back(*i);
+			return true;
 		}
 	}
-	for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
-		if ((*i)->Intersect(x1, y1, x2, y2)) {
-			return false;
-		}
-	}
-	return true;
+
+	return false;
 }
 
 void Control::report_errors(lua_State *L, int status) {
