@@ -135,6 +135,21 @@ function TurnToSafe(...)
 	return MotionSafe(control.TurnToSafe, ...)
 end
 
+function MoveToSafe(x, y)
+	if (control.simulate(TurnToSafe, x, y)) then
+		if (not TurnToSafe(x, y)) then
+			return false
+		end
+		if (control.simulate(GoToSafe, x, y)) then
+			return GoToSafe(x, y)
+		else
+			return false
+		end
+	else
+		return false
+	end
+end
+
 function MotionStop(...)
 	if (control.MotionStop(...)) then
 		while (control.MotionStopInProgress()) do
