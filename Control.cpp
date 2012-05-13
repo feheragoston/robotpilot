@@ -679,7 +679,7 @@ bool Control::obstacleCollision() {
 		// a kar kezdopontja
 		double x1 = cos(phi) * 137 - sin(phi) * 133 + x;
 		double y1 = sin(phi) * 137 + cos(phi) * 133 + y;
-		// a kar vegpontja 0 pozicioban
+		// a kar kozeppontja 0 pozicioban
 		double x2 = cos(phi) * 137 - sin(phi) * 5 + x;
 		double y2 = sin(phi) * 137 + cos(phi) * 5 + y;
 		// eltoljuk a forgatas kozeppontjaval
@@ -690,7 +690,19 @@ bool Control::obstacleCollision() {
 		y2 = sin(lg) * xo + cos(lg) * yo + y1;
 		robotObstacles.push_back(new Line(x1, y1, x2, y2));
 
-		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+		// a kar vegpontja 0 pozicioban
+		double x3 = cos(phi) * 127 - sin(phi) * -75 + x;
+		double y3 = sin(phi) * 127 + cos(phi) * -75 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		xo = x3 - x1;
+		yo = y3 - y1;
+		// elforgatjuk es visszatoljuk
+		x3 = cos(lg) * xo - sin(lg) * yo + x1;
+		y3 = sin(lg) * xo + cos(lg) * yo + y1;
+		robotObstacles.push_back(new Line(x2, y2, x3, y3));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)
+				|| checkLine(x2, y2, x3, y3, COLLISION_OBSTACLES)) {
 			return true;
 		}
 	}
@@ -711,7 +723,19 @@ bool Control::obstacleCollision() {
 		y2 = sin(rg) * xo + cos(rg) * yo + y1;
 		robotObstacles.push_back(new Line(x1, y1, x2, y2));
 
-		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+		// a kar vegpontja 0 pozicioban
+		double x3 = cos(phi) * 127 - sin(phi) * 75 + x;
+		double y3 = sin(phi) * 127 + cos(phi) * 75 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		xo = x3 - x1;
+		yo = y3 - y1;
+		// elforgatjuk es visszatoljuk
+		x3 = cos(rg) * xo - sin(rg) * yo + x1;
+		y3 = sin(rg) * xo + cos(rg) * yo + y1;
+		robotObstacles.push_back(new Line(x2, y2, x3, y3));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)
+				|| checkLine(x2, y2, x3, y3, COLLISION_OBSTACLES)) {
 			return true;
 		}
 	}
