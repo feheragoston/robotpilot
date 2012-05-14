@@ -55,32 +55,22 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				//ASCII-ban kuldi
 				double* val;
 
-				val = &(SonarPosX[0]);
-				(*val) = 0;
-				for(u8 i=0 ; i<4 ; i++){
-					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i])) - '0';
-				}
+				for(u8 n=0 ; n<SONAR_TRANSMITTER_COUNT ; n++){
 
-				val = &(SonarPosY[0]);
-				(*val) = 0;
-				for(u8 i=0 ; i<4 ; i++){
-					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i+4])) - '0';
-				}
+					val = &(SonarPosX[n]);
+					(*val) = 0;
+					for(u8 i=0 ; i<4 ; i++){
+						(*val) *= 10;
+						(*val) += GET_U8(&(msg->data[8*n + i])) - '0';
+					}
 
-				val = &(SonarPosX[1]);
-				(*val) = 0;
-				for(u8 i=0 ; i<4 ; i++){
-					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i+8])) - '0';
-				}
+					val = &(SonarPosY[n]);
+					(*val) = 0;
+					for(u8 i=0 ; i<4 ; i++){
+						(*val) *= 10;
+						(*val) += GET_U8(&(msg->data[8*n + i + 4])) - '0';
+					}
 
-				val = &(SonarPosY[1]);
-				(*val) = 0;
-				for(u8 i=0 ; i<4 ; i++){
-					(*val) *= 10;
-					(*val) += GET_U8(&(msg->data[i+12])) - '0';
 				}
 
 				gettimeofday(&prevMsgTime, NULL);
