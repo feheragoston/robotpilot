@@ -112,7 +112,7 @@ Control::Control(Config* config) {
 		{"ArmMove", l_ArmMove},
 		{"ArmMoveInProgress", l_ArmMoveInProgress},
 		{"CalibrateConsole", l_CalibrateConsole},
-		{"lCalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
+		{"CalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
 		{"ConsoleMove", l_ConsoleMove},
 		{"ConsoleMoveInProgress", l_ConsoleMoveInProgress},
 		{"ConsoleStop", l_ConsoleStop},
