@@ -27,7 +27,7 @@ if (CALIBRATED == nil) then
 	p.GripperMove(true, 0)
 	p.GripperMove(false, 1)
 	p.ClawMove(true, 0)
-	p.ClawMove(false, 4)
+	p.ClawMove(false, 2)
 	
 	c.CalibrateConsole();
 	
