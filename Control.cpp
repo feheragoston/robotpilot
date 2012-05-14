@@ -22,6 +22,7 @@ obstacleList Control::obstacles = obstacleList();
 obstacleList Control::highObstacles = obstacleList();
 obstacleList Control::dynObstacles = obstacleList();
 obstacleList Control::robotObstacles = obstacleList();
+obstacleList Control::robotHighObstacles = obstacleList();
 obstacleList Control::collisionObstacles = obstacleList();
 bool Control::sendObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
 bool Control::sendDynObstacles[MAX_CONNECTIONS] = {true, true, true, true, true, true, true, true, true, true};
@@ -237,6 +238,11 @@ Control::~Control() {
 		robotObstacles.pop_front();
 	}
 
+	while (!robotHighObstacles.empty()) {
+		delete robotHighObstacles.front();
+		robotHighObstacles.pop_front();
+	}
+
 	for (int i = 0; i < OPPONENT_NUM; i++) {
 		delete opponent[i];
 	}
@@ -378,7 +384,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 
 		msgshapes rob;
 		rob.function = MSG_SHAPES;
-		rob.num = robotObstacles.size();
+		rob.num = min(robotObstacles.size(), 14);
 		rob.id = 0;
 		rob.color[0] = 0;
 		rob.color[1] = 255;
@@ -391,13 +397,26 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		}
 		mServer->Send(n, &rob, sizeof(msgshapes));
 
+		rob.num = min(robotHighObstacles.size(), 14);
+		rob.id = 1;
+		rob.color[0] = 255;
+		rob.color[1] = 200;
+		rob.color[2] = 200;
+		rob.color[3] = 255;
+		o = robotHighObstacles.begin();
+		for (unsigned int i = 0; i < rob.num; i++) {
+			(*o)->getObstacle(&rob.obstacles[i]);
+			o++;
+		}
+		mServer->Send(n, &rob, sizeof(msgshapes));
+
 		if (sendObstacles[n]) {
 			sendObstacles[n] = false;
 
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
 
-			obs.id = 1;
+			obs.id = 2;
 			obs.num = min(obstacles.size(), 14);
 			obs.color[0] = 255;
 			obs.color[1] = 255;
@@ -410,8 +429,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			}
 			mServer->Send(n, &obs, sizeof(msgshapes));
 
-			obs.id = 2;
-			obs.num = highObstacles.size();
+			obs.id = 3;
+			obs.num = min(highObstacles.size(), 14);
 			obs.color[0] = 255;
 			obs.color[1] = 0;
 			obs.color[2] = 255;
@@ -429,8 +448,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
-			obs.id = 3;
-			obs.num = dynObstacles.size();
+			obs.id = 4;
+			obs.num = min(dynObstacles.size(), 14);
 			obs.color[0] = 255;
 			obs.color[1] = 128;
 			obs.color[2] = 0;
@@ -443,8 +462,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 			mServer->Send(n, &obs, sizeof(msgshapes));
 
 			if (collisionObstacles.size() > 0) {
-				obs.id = 4;
-				obs.num = collisionObstacles.size();
+				obs.id = 5;
+				obs.num = min(collisionObstacles.size(), 14);
 				obs.color[0] = 255;
 				obs.color[1] = 0;
 				obs.color[2] = 0;
@@ -507,7 +526,7 @@ void Control::log() {
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
 
-			obs.id = 1;
+			obs.id = 2;
 			obs.num = min(obstacles.size(), 14);
 			obs.color[0] = 255;
 			obs.color[1] = 255;
@@ -522,7 +541,7 @@ void Control::log() {
 			write(logfile, &size, sizeof(msglen_t));
 			write(logfile, &obs, size);
 
-			obs.id = 2;
+			obs.id = 3;
 			obs.num = highObstacles.size();
 			obs.color[0] = 255;
 			obs.color[1] = 0;
@@ -541,7 +560,7 @@ void Control::log() {
 			logDynObstacles = false;
 			msgshapes obs;
 			obs.function = MSG_SHAPES;
-			obs.id = 3;
+			obs.id = 4;
 			obs.num = dynObstacles.size();
 			obs.color[0] = 255;
 			obs.color[1] = 128;
@@ -557,7 +576,7 @@ void Control::log() {
 			write(logfile, &obs, size);
 
 			if (collisionObstacles.size() > 0) {
-				obs.id = 4;
+				obs.id = 5;
 				obs.num = collisionObstacles.size();
 				obs.color[0] = 255;
 				obs.color[1] = 0;
@@ -663,14 +682,116 @@ bool Control::opponentTooClose() {
 }
 
 bool Control::obstacleCollision() {
-	double x, y, phi, lg, rg;
+	double x, y, phi, lg, rg, lc, rc;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	lg = mPrimitives->GetGripperPos(true);
 	rg = mPrimitives->GetGripperPos(false);
+	lc = mPrimitives->GetClawPos(true);
+	rc = mPrimitives->GetClawPos(false);
 
 	while (!robotObstacles.empty()) {
 		delete robotObstacles.front();
 		robotObstacles.pop_front();
+	}
+	while (!robotHighObstacles.empty()) {
+		delete robotHighObstacles.front();
+		robotHighObstacles.pop_front();
+	}
+
+	if (lc > 0) {
+		//129
+		// atvaltjuk radianba
+		lc = lc * M_PI / 180.;
+		// a kar kezdopontja
+		double x1 = cos(phi) * 137 - sin(phi) * 133 + x;
+		double y1 = sin(phi) * 137 + cos(phi) * 133 + y;
+		// a kar kozeppontja 0 pozicioban
+		double x2 = cos(phi) * 137 - sin(phi) * 4 + x;
+		double y2 = sin(phi) * 137 + cos(phi) * 4 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		double xo = x2 - x1;
+		double yo = y2 - y1;
+		// elforgatjuk es visszatoljuk
+		x2 = cos(lc) * xo - sin(lc) * yo + x1;
+		y2 = sin(lc) * xo + cos(lc) * yo + y1;
+		robotHighObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		// a kar vegpontja 0 pozicioban
+		double x3 = cos(phi) * 115 - sin(phi) * -73 + x;
+		double y3 = sin(phi) * 115 + cos(phi) * -73 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		xo = x3 - x1;
+		yo = y3 - y1;
+		// elforgatjuk es visszatoljuk
+		x3 = cos(lc) * xo - sin(lc) * yo + x1;
+		y3 = sin(lc) * xo + cos(lc) * yo + y1;
+		robotHighObstacles.push_back(new Line(x2, y2, x3, y3));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_HIGH)
+				|| checkLine(x2, y2, x3, y3, COLLISION_HIGH)) {
+			return true;
+		}
+	}
+	if (rc > 0) {
+		// atvaltjuk radianba es negaljuk, mert a jobb kar ellentetesen forog
+		rc = -rc * M_PI / 180.;
+		// a kar kezdopontja
+		double x1 = cos(phi) * 137 - sin(phi) * -133 + x;
+		double y1 = sin(phi) * 137 + cos(phi) * -133 + y;
+		// a kar vegpontja 0 pozicioban
+		double x2 = cos(phi) * 137 - sin(phi) * -4 + x;
+		double y2 = sin(phi) * 137 + cos(phi) * -4 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		double xo = x2 - x1;
+		double yo = y2 - y1;
+		// elforgatjuk es visszatoljuk
+		x2 = cos(rc) * xo - sin(rc) * yo + x1;
+		y2 = sin(rc) * xo + cos(rc) * yo + y1;
+		robotHighObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		// a kar vegpontja 0 pozicioban
+		double x3 = cos(phi) * 115 - sin(phi) * 73 + x;
+		double y3 = sin(phi) * 115 + cos(phi) * 73 + y;
+		// eltoljuk a forgatas kozeppontjaval
+		xo = x3 - x1;
+		yo = y3 - y1;
+		// elforgatjuk es visszatoljuk
+		x3 = cos(rc) * xo - sin(rc) * yo + x1;
+		y3 = sin(rc) * xo + cos(rc) * yo + y1;
+		robotHighObstacles.push_back(new Line(x2, y2, x3, y3));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)
+				|| checkLine(x2, y2, x3, y3, COLLISION_OBSTACLES)) {
+			return true;
+		}
+	}
+
+	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
+		int j2 = (j+1)%ROBOT_POINT_NUM;
+		double rx1 = robotBody[j][0];
+		double ry1 = robotBody[j][1];
+		double rx2 = robotBody[j2][0];
+		double ry2 = robotBody[j2][1];
+
+		/*
+		if (j == 0 || j == ROBOT_POINT_NUM) {
+			rx1 += sin(gripperPos) * 105;
+		}
+		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
+			rx2 += sin(gripperPos) * 105;
+		}
+		*/
+
+		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
+		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
+		double x2 = cos(phi) * rx2 - sin(phi) * ry2 + x;
+		double y2 = sin(phi) * rx2 + cos(phi) * ry2 + y;
+
+		robotObstacles.push_back(new Line(x1, y1, x2, y2));
+
+		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
+			return true;
+		}
 	}
 
 	if (lg > 0) {
@@ -740,33 +861,6 @@ bool Control::obstacleCollision() {
 		}
 	}
 
-	for (int j = 0; j < ROBOT_POINT_NUM; j++) {
-		int j2 = (j+1)%ROBOT_POINT_NUM;
-		double rx1 = robotBody[j][0];
-		double ry1 = robotBody[j][1];
-		double rx2 = robotBody[j2][0];
-		double ry2 = robotBody[j2][1];
-
-		/*
-		if (j == 0 || j == ROBOT_POINT_NUM) {
-			rx1 += sin(gripperPos) * 105;
-		}
-		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
-			rx2 += sin(gripperPos) * 105;
-		}
-		*/
-
-		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
-		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
-		double x2 = cos(phi) * rx2 - sin(phi) * ry2 + x;
-		double y2 = sin(phi) * rx2 + cos(phi) * ry2 + y;
-
-		robotObstacles.push_back(new Line(x1, y1, x2, y2));
-
-		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)) {
-			return true;
-		}
-	}
 	return false;
 }
 

@@ -66,6 +66,7 @@ protected:
 	static bool sendDynObstacles[MAX_CONNECTIONS];
 	static double robotBody[][2];
 	static obstacleList robotObstacles;
+	static obstacleList robotHighObstacles;
 	static Circle* opponent[OPPONENT_NUM];
 	static double opponent_x[OPPONENT_NUM], opponent_y[OPPONENT_NUM];
 	static double angry[OPPONENT_NUM];
