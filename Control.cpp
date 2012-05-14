@@ -760,8 +760,8 @@ bool Control::obstacleCollision() {
 		y3 = sin(rc) * xo + cos(rc) * yo + y1;
 		robotHighObstacles.push_back(new Line(x2, y2, x3, y3));
 
-		if (checkLine(x1, y1, x2, y2, COLLISION_OBSTACLES)
-				|| checkLine(x2, y2, x3, y3, COLLISION_OBSTACLES)) {
+		if (checkLine(x1, y1, x2, y2, COLLISION_HIGH)
+				|| checkLine(x2, y2, x3, y3, COLLISION_HIGH)) {
 			return true;
 		}
 	}
