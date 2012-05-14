@@ -23,13 +23,13 @@ if (CALIBRATED == nil) then
 	
 	p.sleep(2000)
 	
-	p.ArmMove(0) -- !!!!!!!!
+	p.ArmMove(0)
 	p.GripperMove(true, 0)
 	p.GripperMove(false, 1)
 	p.ClawMove(true, 0)
-	p.ClawMove(false, 2)
+	p.ClawMove(false, 4)
 	
-	--c.CalibrateConsole();
+	c.CalibrateConsole();
 	
 	while (c.GetMyColor() ~= 0) do
 		p.process()

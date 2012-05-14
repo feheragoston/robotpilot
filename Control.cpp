@@ -1515,7 +1515,7 @@ int Control::l_CalibrateConsole(lua_State *L) {
 
 int Control::l_ConsoleMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
-	double speed = luaL_optnumber(L, 2, 35);
+	double speed = luaL_optnumber(L, 2, 400);
 	double acc = luaL_optnumber(L, 3, 10);
 	lua_pushboolean(L, mPrimitives->ConsoleMove(pos, speed, acc));
 	return 1;
