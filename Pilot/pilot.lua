@@ -198,6 +198,18 @@ function ArmMove(...)
 	return true
 end
 
+function CalibrateConsole(...)
+	if (control.CalibrateConsole(...)) then
+		while (control.CalibrateConsoleInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) CalibrateConsole hiba")
+		return false
+	end
+	return true
+end
+
 function ConsoleMove(...)
 	if (control.ConsoleMove(...)) then
 		while (control.ConsoleMoveInProgress()) do

@@ -112,6 +112,7 @@ Control::Control(Config* config) {
 		{"ArmMove", l_ArmMove},
 		{"ArmMoveInProgress", l_ArmMoveInProgress},
 		{"CalibrateConsole", l_CalibrateConsole},
+		{"lCalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
 		{"ConsoleMove", l_ConsoleMove},
 		{"ConsoleMoveInProgress", l_ConsoleMoveInProgress},
 		{"ConsoleStop", l_ConsoleStop},
@@ -1502,14 +1503,12 @@ int Control::l_ArmMoveInProgress(lua_State *L) {
 }
 
 int Control::l_CalibrateConsole(lua_State *L) {
-	if (mPrimitives->CalibrateConsole()) {
-		while (mPrimitives->CalibrateConsoleInProgress()) {
-			c_wait(L);
-		}
-		lua_pushboolean(L, true);
-		return 1;
-	}
-	lua_pushboolean(L, false);
+	lua_pushboolean(L, mPrimitives->CalibrateConsole());
+	return 1;
+}
+
+int Control::l_CalibrateConsoleInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->CalibrateConsoleInProgress());
 	return 1;
 }
 

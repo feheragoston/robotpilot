@@ -166,6 +166,7 @@ protected:
 	static int l_ArmMove(lua_State *L);
 	static int l_ArmMoveInProgress(lua_State *L);
 	static int l_CalibrateConsole(lua_State *L);
+	static int l_CalibrateConsoleInProgress(lua_State *L);
 	static int l_ConsoleMove(lua_State *L);
 	static int l_ConsoleMoveInProgress(lua_State *L);
 	static int l_ConsoleStop(lua_State *L);
