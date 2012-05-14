@@ -29,7 +29,7 @@ if (CALIBRATED == nil) then
 	p.ClawMove(true, 0)
 	p.ClawMove(false, 2)
 	
-	c.CalibrateConsole();
+	p.CalibrateConsole();
 	
 	while (c.GetMyColor() ~= 0) do
 		p.process()
