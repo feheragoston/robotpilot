@@ -21,7 +21,7 @@
 #define INPUT_DIGITAL_OUTPUT_COUNT			4
 #define INPUT_DIGITAL_OUTPUT_MIN_INDEX		6
 
-#define SONAR_TRANSMITTER_COUNT				2
+#define SONAR_TRANSMITTER_COUNT				3
 
 #define ACT_STARTED							true
 #define ACT_START_ERROR						false
