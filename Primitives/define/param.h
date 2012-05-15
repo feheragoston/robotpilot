@@ -386,7 +386,7 @@
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
 #define BDC_PRE_BRAKE_TIME							0.3	//sec
-#define BDC_OE_CONTROL_P							0.001
+#define BDC_OE_CONTROL_P							0.0007
 #define BDC_OE_CONTROL_I							0.0
 
 
