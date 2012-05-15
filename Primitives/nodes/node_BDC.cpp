@@ -248,8 +248,9 @@ void node_BDC::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 29;
+	msg.length		= 33;
 	SET_BOOL(&(msg.data[0]), 0, BDC_IS_LEFT_MOTOR1);
+	SET_BOOL(&(msg.data[0]), 1, BDC_IS_SERIAL_DRIVE);
 	SET_FLOAT(&(msg.data[1]), BDC_WHEEL_DISTANCE);
 	SET_FLOAT(&(msg.data[5]), BDC_ROBOT_FULL_TURN_INCR);
 	SET_FLOAT(&(msg.data[9]), BDC_RPM_TO_MMPS);
@@ -257,6 +258,7 @@ void node_BDC::INIT_PARAM(void){
 	SET_FLOAT(&(msg.data[17]), BDC_PRE_BRAKE_TIME);
 	SET_FLOAT(&(msg.data[21]), BDC_OE_CONTROL_P);
 	SET_FLOAT(&(msg.data[25]), BDC_OE_CONTROL_I);
+	SET_FLOAT(&(msg.data[29]), BDC_OE_CONTROL_D);
 
 	UDPdriver::send(&msg);
 

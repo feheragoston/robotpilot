@@ -381,6 +381,7 @@
 
 
 #define BDC_IS_LEFT_MOTOR1							1
+#define BDC_IS_SERIAL_DRIVE							1
 //#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
 #define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
@@ -388,6 +389,7 @@
 #define BDC_PRE_BRAKE_TIME							0.3	//sec
 #define BDC_OE_CONTROL_P							0.0007
 #define BDC_OE_CONTROL_I							0.0
+#define BDC_OE_CONTROL_D							0.2
 
 
 
