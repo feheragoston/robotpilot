@@ -16,7 +16,7 @@ until(c.GetStartButton())
 --c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
-p.GoToSafe(685, 2510 * Ori + Offset)
+p.GoToSafe(685, 2510 * Ori + Offset, 1000, 3000)
 p.TurnToSafe(685, 1500)
 
 p.runparallel(
