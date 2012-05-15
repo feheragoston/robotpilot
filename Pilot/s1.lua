@@ -4,9 +4,11 @@ dofile("Pilot/calibration.lua")
 dofile("Pilot/functions.lua")
 
 p.Go(30)
-p.TurnToSafe(265, 305 * Ori + Offset)
-p.GoToSafe(265, 305 * Ori + Offset)
+x, y, phi = c.GetRobotPos()
+p.TurnTo(x, 1500)
+p.Go(140)
 p.TurnToSafe(685, 2510 * Ori + Offset)
+p.Go(-15)
 
 c.music("start")
 repeat
