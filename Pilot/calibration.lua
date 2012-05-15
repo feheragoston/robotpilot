@@ -4,6 +4,8 @@ if (CALIBRATED == nil) then
 	
 	Offset = 0
 	Ori = 1
+	Left = true
+	Right = false
 
 	goSpeed = 600
 	goAcc = 800
@@ -48,6 +50,24 @@ if (CALIBRATED == nil) then
 		c.print("Pirosak vagyunk");
 		Offset = 3000;
 		Ori = -1;
+		Left = false
+		Right = true
+
+		p.runparallel(
+			function()
+				p.GripperMove(false, 55)
+				p.GripperMove(true, 55)
+				p.GripperMove(false, 0)
+				p.GripperMove(true, 1)
+			end,
+			function()
+				p.ClawMove(false, 55)
+				p.ClawMove(true, 55)
+				p.ClawMove(false, 0)
+				p.ClawMove(true, 2)
+			end
+		)
+
 	elseif (c.GetMyColor() == PURPLE) then
 		c.print("Hajra Lilak!");
 	end
