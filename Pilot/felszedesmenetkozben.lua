@@ -18,7 +18,7 @@ p.runparallel(
 		p.ClawMove(Left, 90)
 	end
 )
-p.ArmMove(89)
+p.ArmMove(81) -- felenk nez: 89
 
 p.runparallel(
 	function()
@@ -29,8 +29,8 @@ p.runparallel(
 		repeat
 			x, y, phi = c.GetRobotPos()
 			p.process()
-		until (y > 720)
-		p.ArmMove(100)
+		until (y > 690) -- felenk nez: 720
+		p.ArmMove(100, 1000, 3000)
 		p.sleep(200)
 		p.ArmMove(10, 1000, 200)
 		p.Valve(true)
