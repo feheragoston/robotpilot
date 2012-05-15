@@ -34,20 +34,23 @@ p.runparallel(
 
 
 -- felszedes
-p.GoToSafe(685, 2275 * Ori + Offset) -- Palyahoz igazitani
+p.GoToSafe(685, 2280 * Ori + Offset) -- Palyahoz igazitani
 p.GripperMove(Left, 80, 500, 400)
-PickupWithArm()
+if (c.GetMyColor() == PURPLE) then
+	p.GripperMove(Left, 60, 500, 400)
+end
+p.GripperMove(Left, 100)
+Felszedes()
 
-p.GripperMove(Left, 105)
 
 p.MoveToSafe(685, 2150 * Ori + Offset)
-PickupWithArm()
+Felszedes()
 
 p.MoveToSafe(685, 1700 * Ori + Offset)
 
 p.GripperMove(Left, 130)
-p.GoToSafe(685, 1480 * Ori + Offset) -- Palyahoz igazitani
-p.GripperMove(Left, 105)
+p.GoToSafe(685, 1485 * Ori + Offset) -- Palyahoz igazitani
+p.GripperMove(Left, 100)
 p.GoToSafe(685, 900 * Ori + Offset)
 
 p.runparallel(
