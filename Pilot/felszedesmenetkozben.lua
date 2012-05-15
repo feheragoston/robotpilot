@@ -18,7 +18,7 @@ p.runparallel(
 		p.ClawMove(Left, 90)
 	end
 )
-p.ArmMove(90)
+p.ArmMove(89)
 
 p.runparallel(
 	function()
