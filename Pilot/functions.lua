@@ -152,9 +152,13 @@ function DoubleTotem(bottleside)
 end
 
 -- palackposta benyomasa
-function PushButton()
-	p.TurnToSafe(1775, 670 * Ori + Offset)
-	p.GoToSafe(1775, 670 * Ori + Offset)
+function PushButton(farther)
+	local yposition = 670
+	if (farther) then
+		yposition = 1913
+	end
+	p.TurnToSafe(1775, yposition * Ori + Offset)
+	p.GoToSafe(1775, yposition * Ori + Offset)
 	p.ClawMove(Right, 30)
 	p.ClawMove(Right, 2)
 	p.GoSafe(-220)
