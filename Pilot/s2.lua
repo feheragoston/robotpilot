@@ -41,8 +41,26 @@ if (c.GoTo(685, 2510 * Ori + Offset, 1000, 3000)) then
 	end
 end
 
-if (cd1) then
-end
+while (true) do
 
-if (cd2) then
+	local status, err = pcall(function()
+	
+		if (cd1) then
+			if (c.simulate(PickUpFrom, 500, 1000)) then
+				PickUpFrom(500, 1000)
+			end
+		end
+		
+		if (cd2) then
+			if (c.simulate(PickUpFrom, 500, 2000)) then
+				PickUpFrom(500, 2000)
+			end
+		end
+	
+	end);
+	if (not status) then
+		c.print("Hiba", err);
+		p.MotionStop(MAX_DEC)
+	end
+
 end
