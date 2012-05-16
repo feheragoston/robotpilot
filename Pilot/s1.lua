@@ -18,7 +18,14 @@ until(c.GetStartButton())
 --c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
-p.GoToSafe(685, 2510 * Ori + Offset, 1000, 3000)
+local status, err = pcall(function()
+	p.GoToSafe(685, 2510 * Ori + Offset, 1000, 3000)
+end);
+if (not status) then
+	c.print("Hiba", err);
+	p.MotionStop(MAX_DEC)
+end
+
 p.TurnToSafe(685, 1500)
 
 p.runparallel(
