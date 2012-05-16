@@ -39,7 +39,7 @@ function Eject(waitforit)
 	end
 end
 
--- cel megkozelitese dist -ig
+-- cel megkozelitese dist tavolsagba
 function GoToTarget(x, y, dist)
 	rx, ry, rphi = c.GetRobotPos()
 	dx = cos(rphi) * dist
@@ -48,9 +48,112 @@ function GoToTarget(x, y, dist)
 	p.GoToSafe(x - dx, y - dy)
 end
 
---
+-- coin megkozelitese
 function GoToCoin(x, y)
 	GoToTarget(x, y, 310)
+end
+
+-- coin felszedese
+function PickUpFrom(x, y, waitforit)
+	GoToCoin(x, y)
+	PickUp(waitforit)
+end
+
+--
+function DoubleTotem(bottleside)
+	local xposition = 685
+	local rightArmPos = 90
+	local leftArmPos = 130
+	local totemSide = Left
+
+	if (bottleside) then
+		xposition = 1315
+		rightArmPos = 130
+		leftArmPos = 90
+		totemSide = Right
+	end
+
+	p.GoToSafe(xposition, 2510 * Ori + Offset)
+
+	p.TurnToSafe(xposition, 1500)
+	
+	p.runparallel(
+		function()
+			p.GripperMove(Right, rightArmPos)
+			p.GripperMove(Left, leftArmPos)
+		end,
+		function()
+			p.ClawMove(Right, rightArmPos)
+			p.ClawMove(Left, leftArmPos)
+		end
+	)
+	
+	
+	-- felszedes
+	p.GoToSafe(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+	p.GripperMove(totemSide, 80, 500, 400)
+	if (totemSide == true) then
+		p.GripperMove(totemSide, 60, 500, 400)
+	end
+	p.GripperMove(totemSide, 100)
+	PickUp()
+	
+	
+	p.MoveToSafe(xposition, 2150 * Ori + Offset)
+	PickUp()
+	
+	p.MoveToSafe(xposition, 1700 * Ori + Offset)
+	
+	p.GripperMove(totemSide, 130)
+	p.GoToSafe(xposition, 1485 * Ori + Offset) -- Palyahoz igazitani
+	p.GripperMove(totemSide, 100)
+	p.GoToSafe(xposition, 900 * Ori + Offset)
+	
+	p.runparallel(
+		function()
+			p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
+		end,
+		function()
+			p.GripperMove(Left, 90)
+		end,
+		function()
+			p.GripperMove(Right, 90)
+		end,
+		function()
+			p.ClawMove(Left, 55)
+		end,
+		function()
+			p.ClawMove(Right, 55)
+		end
+	)
+
+	-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
+
+	p.runparallel(
+		function()
+			p.ConsoleMove(140, 1000, 15)
+		end,
+		function()
+			p.GripperMove(Left, 105)
+		end,
+		function()
+			p.GripperMove(Right, 105)
+		end
+	)
+	
+	p.runparallel(
+		function()
+			p.GoSafe(-300)
+		end,
+		function()
+			ResetActuators()
+		end
+	)
+end
+
+-- karok, csapok, megfogok, konzol alaphelyzetbe allitasa
+function ResetActuators()
+	
 end
 
 -- Beszorulas feloldasa
