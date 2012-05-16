@@ -39,6 +39,20 @@ function Urites(waitforit)
 	end
 end
 
+-- cel megkozelitese dist -ig
+function GoToTarget(x, y, dist)
+	rx, ry, rphi = c.GetRobotPos()
+	dx = cos(rphi) * dist
+	dy = sin(rphi) * dist
+	p.TurnToSafe(x - dx, y - dy)
+	p.GoToSafe(x - dx, y - dy)
+end
+
+--
+function GoToCoin(x, y)
+	GoToTarget(x, y, 310)
+end
+
 -- Beszorulas feloldasa
 function ResolveDeadpos(turn, go)
 	if (turn ~= 0) then
