@@ -107,10 +107,13 @@ Control::Control(Config* config) {
 
 		{"GripperMove", l_GripperMove},
 		{"GripperMoveInProgress", l_GripperMoveInProgress},
+		{"GetGripperPos", l_GetGripperPos},
 		{"ClawMove", l_ClawMove},
 		{"ClawMoveInProgress", l_ClawMoveInProgress},
+		{"GetClawPos", l_GetClawPos},
 		{"ArmMove", l_ArmMove},
 		{"ArmMoveInProgress", l_ArmMoveInProgress},
+		{"GetArmPos", l_GetArmPos},
 		{"CalibrateConsole", l_CalibrateConsole},
 		{"CalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
 		{"ConsoleMove", l_ConsoleMove},
@@ -1474,6 +1477,12 @@ int Control::l_GripperMoveInProgress(lua_State *L) {
 	return 1;
 }
 
+int Control::l_GetGripperPos(lua_State *L) {
+	bool left = lua_toboolean(L, 1);
+	lua_pushnumber(L, mPrimitives->GetGripperPos(left));
+	return 1;
+}
+
 int Control::l_ClawMove(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	double pos = luaL_optnumber(L, 2, 0);
@@ -1489,6 +1498,12 @@ int Control::l_ClawMoveInProgress(lua_State *L) {
 	return 1;
 }
 
+int Control::l_GetClawPos(lua_State *L) {
+	bool left = lua_toboolean(L, 1);
+	lua_pushnumber(L, mPrimitives->GetClawPos(left));
+	return 1;
+}
+
 int Control::l_ArmMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
 	double speed = luaL_optnumber(L, 2, 1000);
@@ -1499,6 +1514,11 @@ int Control::l_ArmMove(lua_State *L) {
 
 int Control::l_ArmMoveInProgress(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->ArmMoveInProgress());
+	return 1;
+}
+
+int Control::l_GetArmPos(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetArmPos());
 	return 1;
 }
 
