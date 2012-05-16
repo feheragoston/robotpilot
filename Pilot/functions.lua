@@ -151,6 +151,15 @@ function DoubleTotem(bottleside)
 	)
 end
 
+-- palackposta benyomasa
+function PushButton()
+	p.TurnToSafe(1775, 670 * Ori + Offset)
+	p.GoToSafe(1775, 670 * Ori + Offset)
+	p.ClawMove(Right, 30)
+	p.ClawMove(Right, 2)
+	p.GoSafe(-220)
+end
+
 -- karok, csapok, megfogok, konzol alaphelyzetbe allitasa
 function ResetActuators()
 	if (c.GetArmPos() > 5) then
