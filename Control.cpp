@@ -148,6 +148,7 @@ Control::Control(Config* config) {
 	luaC_export(L, ROBOT_BACK);
 	luaC_export(L, MAX_DEC);
 	luaC_export(L, MAX_DISTANCE);
+	luaC_export(L, OPPONENT_NUM);
 
 	luaC_export(L, PRIMITIVES_WAIT);
 
@@ -1456,10 +1457,11 @@ void Control::SetOpponentPos(unsigned char n, double ox, double oy) {
 int Control::l_GetOpponentPos(lua_State *L) {
 	unsigned char n = luaL_optinteger(L, 1, 0);
 	double x, y;
-	Control::GetOpponentPos(n, &x, &y);
+	long int validity = Control::GetOpponentPos(n, &x, &y);
 	lua_pushnumber(L, x);
 	lua_pushnumber(L, y);
-	return 2;
+	lua_pushinteger(L, validity);
+	return 3;
 }
 
 int Control::l_GripperMove(lua_State *L) {
