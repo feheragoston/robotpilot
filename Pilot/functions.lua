@@ -1,6 +1,6 @@
 
 -- felszedes karral
-function Felszedes(waitforit)
+function PickUp(waitforit)
 	p.Compressor(true)
 	p.sleep(200)
 	p.ArmMove(105)
@@ -25,7 +25,7 @@ function Felszedes(waitforit)
 end
 
 -- urites
-function Urites(waitforit)
+function Eject(waitforit)
 	-- Urites
 	p.ConsoleMove(140, 1000, 15)
 	

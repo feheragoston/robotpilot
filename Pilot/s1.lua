@@ -42,11 +42,11 @@ local status, err = pcall(function()
 		p.GripperMove(Left, 60, 500, 400)
 	end
 	p.GripperMove(Left, 100)
-	Felszedes()
+	PickUp()
 	
 	
 	p.MoveToSafe(685, 2150 * Ori + Offset)
-	Felszedes()
+	PickUp()
 	
 	p.MoveToSafe(685, 1700 * Ori + Offset)
 	
