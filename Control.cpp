@@ -149,6 +149,7 @@ Control::Control(Config* config) {
 	luaC_export(L, MAX_DEC);
 	luaC_export(L, MAX_DISTANCE);
 	luaC_export(L, OPPONENT_NUM);
+	luaC_export(L, SONAR_TIMEOUT);
 
 	luaC_export(L, PRIMITIVES_WAIT);
 

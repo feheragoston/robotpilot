@@ -49,6 +49,7 @@ function GoToTarget(x, y, dist)
 end
 
 -- coin megkozelitese
+-- minimum tavolsag: karhossz + cd sugar: 343 + 60 ~= 400
 function GoToCoin(x, y)
 	GoToTarget(x, y, 310)
 end
