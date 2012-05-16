@@ -153,7 +153,38 @@ end
 
 -- karok, csapok, megfogok, konzol alaphelyzetbe allitasa
 function ResetActuators()
+	if (c.GetArmPos() > 5) then
+		p.ArmMove(0)
+	end
+
+	local lgp = c.GetGripperPos(Left)
+	if (lgp < 55 and lgp > c.GetGripperPos(Right)) then
+		p.GripperMove(Left, 55)
+		p.GripperMove(Right, 55)
+	end
+	if (c.GetGripperPos(Left) > 5) then
+		p.GripperMove(Left, 0)
+	end
+	if (c.GetGripperPos(Right) > 5) then
+		p.GripperMove(Right, 1)
+	end
 	
+	local lcp = c.GetClawPos(Left)
+	if (lcp < 55 and lcp > c.GetClawPos(Right)) then
+		p.ClawMove(Left, 55)
+		p.ClawMove(Right, 55)
+	end
+	if (c.GetClawPos(Left) > 5) then
+		p.ClawMove(Left, 0)
+	end
+	if (c.GetClawPos(Right) > 5) then
+		p.ClawMove(Right, 2)
+	end
+
+	if (c.GetConsolePos() > 20) then
+		p.ConsoleMove(20, 400, 15)
+		p.CalibrateConsole()
+	end
 end
 
 -- Beszorulas feloldasa
