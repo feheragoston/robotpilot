@@ -8,6 +8,7 @@ repeat p.process() until (c.GetStartButton());
 c.StartMatch();
 c.print("Meccs elkezdodott");
 
+-- kimegy
 p.GoToSafe(300, Offset + Ori * 790)
 
 
@@ -25,7 +26,7 @@ if (c.simulate(p.GoSafe, -220)) then
 	repeat p.GoSafe(-220) until (c.GetMotionError() == 0)
 end
 
-
+-- gomb benyomas
 if (c.simulate(p.TurnToSafe, 1775, 670 * Ori + Offset)) then
 	p.TurnToSafe(1775, 670 * Ori + Offset)
 	if (c.simulate(p.GoToSafe, 1775, 670 * Ori + Offset)) then
