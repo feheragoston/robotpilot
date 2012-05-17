@@ -178,11 +178,11 @@ function ResetActuators()
 				p.GripperMove(Left, 55)
 				p.GripperMove(Right, 55)
 			end
-			if (c.GetGripperPos(Left) > 5) then
-				p.GripperMove(Left, 0)
+			if (c.GetGripperPos(Left) > 8) then
+				p.GripperMove(Left, 1)
 			end
-			if (c.GetGripperPos(Right) > 5) then
-				p.GripperMove(Right, 1)
+			if (c.GetGripperPos(Right) > 8) then
+				p.GripperMove(Right, 6)
 			end
 		end,
 		function()
