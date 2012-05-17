@@ -27,7 +27,7 @@ until(c.GetStartButton())
 c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
-if (c.GoTo(685, 2510 * Ori + Offset, 1000, 3000)) then -- finomitani
+if (c.GoTo(510, 2190 * Ori + Offset, 1000, 3000)) then -- finomitani
 	while (c.MotionInProgress() or c.MotionStopInProgress()) do
 		if (c.MotionInProgress()) then
 			for i = 1, OPPONENT_NUM do
@@ -49,23 +49,21 @@ end
 
 while (true) do
 
-	loopstart = c.gettimeofday()
-
 	local status, err = pcall(function()
 	
 		local deadpos = true;
 
 		if (cd1) then
-			if (c.simulate(PickUpFrom, 500, 1000)) then
+			if (c.simulate(PickUpFrom, 500, 1000 * Ori + Offset)) then
 				deadpos = false
-				PickUpFrom(500, 1000)
+				PickUpFrom(500, 1000 * Ori + Offset)
 			end
 		end
 		
 		if (cd2) then
-			if (c.simulate(PickUpFrom, 500, 2000)) then
+			if (c.simulate(PickUpFrom, 500, 2000 * Ori + Offset)) then
 				deadpos = false
-				PickUpFrom(500, 2000)
+				PickUpFrom(500, 2000 * Ori + Offset)
 			end
 		end
 	
@@ -92,14 +90,15 @@ while (true) do
 
 		if (deadpos) then
 			x, y, phi = c.GetRobotPos()
-			if ((x > 1000 or y > 1500) and c.simulate(p.GoToSafe, 355, 665)) then
-				p.GoToSafe(355, 665)
-			elseif ((x < 1000 or y > 1500) and c.simulate(p.GoToSafe, 1645, 715)) then
-				p.GoToSafe(1645, 715)
-			elseif ((x > 1000 or y < 1500) and c.simulate(p.GoToSafe, 580, 2250)) then
-				p.GoToSafe(580, 2250)
-			elseif ((x < 1000 or y < 1500) and c.simulate(p.GoToSafe, 1400, 2250)) then
-				p.GoToSafe(1400, 2250)
+			y = y * Ori + Offset
+			if ((x > 1000 or y > 1500) and c.simulate(p.GoToSafe, 355, 665 * Ori + Offset)) then
+				p.GoToSafe(355, 665 * Ori + Offset)
+			elseif ((x < 1000 or y > 1500) and c.simulate(p.GoToSafe, 1645, 715 * Ori + Offset)) then
+				p.GoToSafe(1645, 715 * Ori + Offset)
+			elseif ((x > 1000 or y < 1500) and c.simulate(p.GoToSafe, 580, 225 * Ori + Offset0)) then
+				p.GoToSafe(580, 2250 * Ori + Offset)
+			elseif ((x < 1000 or y < 1500) and c.simulate(p.GoToSafe, 1400, 2250 * Ori + Offset)) then
+				p.GoToSafe(1400, 2250 * Ori + Offset)
 			else
 
 				while (deadpos) do
