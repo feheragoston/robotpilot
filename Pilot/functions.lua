@@ -173,6 +173,13 @@ function PushButton(farther)
 	p.TurnToSafe(1775, yposition * Ori + Offset)
 	p.GoToSafe(1775, yposition * Ori + Offset)
 	p.GripperMove(Right, 30)
+
+	if (farther) then
+		button2 = false -- GLOBAL
+	else
+		button1 = false -- GLOBAL
+	end
+
 	ResetActuators()
 	p.GoSafe(-220)
 end

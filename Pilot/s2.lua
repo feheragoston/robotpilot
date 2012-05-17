@@ -16,6 +16,8 @@ totem1map = true
 totem2map = true
 totem1bottle = true
 totem2bottle = true
+button1 = true
+button2 = true
 
 c.music("start")
 repeat
@@ -64,6 +66,18 @@ while (true) do
 		if (totem1map and totem2map) then
 			if (c.simulate(DoubleTotem, false)) then
 				DoubleTotem(false)
+			end
+		end
+		
+		if (button1) then
+			if (c.simulate(PushButton, false)) then
+				PushButton(false)
+			end
+		end
+		
+		if (button2) then
+			if (c.simulate(PushButton, true)) then
+				PushButton(true)
 			end
 		end
 
