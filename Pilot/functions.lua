@@ -161,7 +161,7 @@ function PushButton(farther)
 	p.TurnToSafe(1775, yposition * Ori + Offset)
 	p.GoToSafe(1775, yposition * Ori + Offset)
 	p.GripperMove(Right, 30)
-	p.GripperMove(Right, 1)
+	ResetActuators()
 	p.GoSafe(-220)
 end
 
@@ -178,7 +178,7 @@ function ResetActuators()
 				p.GripperMove(Left, 55)
 				p.GripperMove(Right, 55)
 			end
-			if (c.GetGripperPos(Left) > 8) then
+			if (c.GetGripperPos(Left) > 3) then
 				p.GripperMove(Left, 1)
 			end
 			if (c.GetGripperPos(Right) > 8) then
@@ -191,10 +191,10 @@ function ResetActuators()
 				p.ClawMove(Left, 55)
 				p.ClawMove(Right, 55)
 			end
-			if (c.GetClawPos(Left) > 5) then
+			if (c.GetClawPos(Left) > 2) then
 				p.ClawMove(Left, 0)
 			end
-			if (c.GetClawPos(Right) > 5) then
+			if (c.GetClawPos(Right) > 4) then
 				p.ClawMove(Right, 2)
 			end
 		end,
