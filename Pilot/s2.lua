@@ -12,13 +12,17 @@ p.Go(-15)
 
 cd1 = true
 cd2 = true
+totem1map = true
+totem2map = true
+totem1bottle = true
+totem2bottle = true
 
 c.music("start")
 repeat
 	p.process()
 until(c.GetStartButton())
 
---c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
+c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
 if (c.GoTo(685, 2510 * Ori + Offset, 1000, 3000)) then
@@ -57,6 +61,12 @@ while (true) do
 			end
 		end
 	
+		if (totem1map and totem2map) then
+			if (c.simulate(DoubleTotem, false)) then
+				DoubleTotem(false)
+			end
+		end
+
 	end);
 	if (not status) then
 		c.print("Hiba", err);

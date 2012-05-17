@@ -94,7 +94,7 @@ function DoubleTotem(bottleside)
 	p.GoToSafe(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
 	p.GripperMove(totemSide, 80, 500, 400)
 	if (totemSide == true) then
-		p.GripperMove(totemSide, 60, 500, 400)
+		p.GripperMove(totemSide, 60, 500, 400) -- Beallitani
 	end
 	p.GripperMove(totemSide, 100)
 	PickUp()
@@ -105,11 +105,23 @@ function DoubleTotem(bottleside)
 	
 	p.MoveToSafe(xposition, 1700 * Ori + Offset)
 	
+	if (bottleside) then
+		totem2bottle = false -- GLOBAL
+	else
+		totem2map = false -- GLOBAL
+	end
+	
 	p.GripperMove(totemSide, 130)
 	p.GoToSafe(xposition, 1485 * Ori + Offset) -- Palyahoz igazitani
 	p.GripperMove(totemSide, 100)
 	p.GoToSafe(xposition, 900 * Ori + Offset)
 	
+	if (bottleside) then
+		totem1bottle = false -- GLOBAL
+	else
+		totem1map = false -- GLOBAL
+	end
+
 	p.runparallel(
 		function()
 			p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
