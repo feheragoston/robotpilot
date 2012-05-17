@@ -1,5 +1,6 @@
 
 dofile("Pilot/calibration.lua")
+dofile("Pilot/functions.lua")
 
 p.Go(50, 100, 100)
 p.TurnTo(300, Offset + Ori * 790)
@@ -46,16 +47,8 @@ end
 local status, err = pcall(function()
 
 	-- gomb benyomas
-	if (c.simulate(p.TurnToSafe, 1775, 670 * Ori + Offset)) then
-		p.TurnToSafe(1775, 670 * Ori + Offset)
-		if (c.simulate(p.GoToSafe, 1775, 670 * Ori + Offset)) then
-			p.GoToSafe(1775, 670 * Ori + Offset)
-			p.GripperMove(Right, 30)
-			p.GripperMove(Right, 1)
-			if (c.simulate(p.GoSafe, -220)) then
-				repeat p.GoSafe(-220) until (c.GetMotionError() == 0)
-			end
-		end
+	if (c.simulate(PushButton, false)) then
+		PushButton(false)
 	end
 
 end);
@@ -63,3 +56,4 @@ if (not status) then
 	c.print("Hiba", err);
 	p.MotionStop(MAX_DEC)
 end
+
