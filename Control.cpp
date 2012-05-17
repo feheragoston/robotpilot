@@ -527,6 +527,38 @@ void Control::log() {
 		write(logfile, &size, sizeof(msglen_t));
 		write(logfile, &status, size);
 
+		msgshapes rob;
+		rob.function = MSG_SHAPES;
+		rob.num = min(robotObstacles.size(), 14);
+		rob.id = 0;
+		rob.color[0] = 0;
+		rob.color[1] = 255;
+		rob.color[2] = 128;
+		rob.color[3] = 255;
+		obstacleIterator o = robotObstacles.begin();
+		for (unsigned int i = 0; i < rob.num; i++) {
+			(*o)->getObstacle(&rob.obstacles[i]);
+			o++;
+		}
+		size = sizeof(msgshapes);
+		write(logfile, &size, sizeof(msglen_t));
+		write(logfile, &rob, size);
+
+		rob.num = min(robotHighObstacles.size(), 14);
+		rob.id = 1;
+		rob.color[0] = 255;
+		rob.color[1] = 200;
+		rob.color[2] = 200;
+		rob.color[3] = 255;
+		o = robotHighObstacles.begin();
+		for (unsigned int i = 0; i < rob.num; i++) {
+			(*o)->getObstacle(&rob.obstacles[i]);
+			o++;
+		}
+		size = sizeof(msgshapes);
+		write(logfile, &size, sizeof(msglen_t));
+		write(logfile, &rob, size);
+
 		if (logObstacles) {
 			logObstacles = false;
 			msgshapes obs;
