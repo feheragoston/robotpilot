@@ -57,3 +57,15 @@ if (not status) then
 	p.MotionStop(MAX_DEC)
 end
 
+local status, err = pcall(function()
+
+	-- tavolabbi gomb benyomasa
+	if (c.simulate(PushButton, true)) then
+		PushButton(true)
+	end
+
+end);
+if (not status) then
+	c.print("Hiba", err);
+	p.MotionStop(MAX_DEC)
+end
