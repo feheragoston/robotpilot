@@ -42,8 +42,8 @@ end
 -- cel megkozelitese dist tavolsagba
 function GoToTarget(x, y, dist)
 	rx, ry, rphi = c.GetRobotPos()
-	dx = cos(rphi) * dist
-	dy = sin(rphi) * dist
+	dx = math.cos(rphi) * dist
+	dy = math.sin(rphi) * dist
 	p.TurnToSafe(x - dx, y - dy)
 	p.GoToSafe(x - dx, y - dy)
 end
