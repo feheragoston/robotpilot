@@ -160,8 +160,8 @@ function PushButton(farther)
 	end
 	p.TurnToSafe(1775, yposition * Ori + Offset)
 	p.GoToSafe(1775, yposition * Ori + Offset)
-	p.ClawMove(Right, 30)
-	p.ClawMove(Right, 2)
+	p.GripperMove(Right, 30)
+	p.GripperMove(Right, 1)
 	p.GoSafe(-220)
 end
 
