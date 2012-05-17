@@ -348,16 +348,16 @@
 #define BDC_INCR_PER_MOTORROT						3000
 #define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
 
-#define BDC_INCR_PER_MM								((double)494317 / 400)
+#define BDC_INCR_PER_MM								((double)494317 / 400) //Odett, de most ugyanaz
 #define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
 #define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
 
 #define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
 
-#define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10)
+#define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10) // Odett, nincs hasznalva
 #define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
 
-#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
+#define BDC_WHEEL_DISTANCE							161.5 // kezzel mert ertek
 
 #define BDC_SEC_PER_MIN								60
 
@@ -382,8 +382,8 @@
 
 #define BDC_IS_LEFT_MOTOR1							1
 #define BDC_IS_SERIAL_DRIVE							1
-//#define BDC_WHEEL_DISTANCE							((double)BDC_MM_PER_FULL_TURN / M_PI)
-#define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN
+//#define BDC_WHEEL_DISTANCE							lsd feljebb
+#define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN	//// nincs hasznalva
 #define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
 #define BDC_MM_TO_INCR								BDC_INCR_PER_MM
 #define BDC_PRE_BRAKE_TIME							0.3	//sec
