@@ -72,8 +72,24 @@ local status, err = pcall(function()
 			p.GripperMove(Left, 90)
 		end
 	)
+	p.runparallel(
+		function()
+			x, y, phi = c.GetRobotPos()
+			p.GoToSafe(x, 360 * Ori + Offset, 500, 100)
+		end,
+		function()
+			p.GripperMove(Left, 130)
+		end
+	)
 	Eject(false)
-	p.GoSafe(-300)
+	p.runparallel(
+		function()
+			p.GoSafe(-340)
+		end,
+		function()
+			p.GripperMove(Left, 90)
+		end
+	)
 	
 	-- gomb benyomas
 	p.runparallel(
@@ -83,7 +99,7 @@ local status, err = pcall(function()
 		function()
 			p.MoveToSafe(1795, 700 * Ori + Offset)
 			p.Go(-50)
-			p.GoTo(1795, 700 * Ori + Offset, 100, 75)
+			p.GoTo(1820, 700 * Ori + Offset, 100, 75)
 		end
 	)
 	p.sleep(1000)
