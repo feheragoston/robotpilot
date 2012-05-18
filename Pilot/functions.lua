@@ -209,6 +209,26 @@ function PushButton(farther)
 	p.GoSafe(-220)
 end
 
+-- kar, csapok, megfogok csukva vannak-e
+function ActuatorsClosed()
+	if (c.GetArmPos() > 5) then
+		return false
+	end
+	if (c.GetGripperPos(Left) > 3) then
+		return false
+	end
+	if (c.GetGripperPos(Right) > 8) then
+		return false
+	end
+	if (c.GetClawPos(Left) > 2) then
+		return false
+	end
+	if (c.GetClawPos(Right) > 4) then
+		return false
+	end
+	return true
+end
+
 -- karok, csapok, megfogok, konzol alaphelyzetbe allitasa
 function ResetActuators()
 	if (c.GetArmPos() > 5) then
