@@ -106,9 +106,9 @@ function DoubleTotem(bottleside)
 	
 	-- felszedes
 	if (c.in_simulate()) then
-		p.GoTo(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+		p.GoTo(xposition, 2290 * Ori + Offset) -- Palyahoz igazitani
 	else
-		p.GoToSafe(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+		p.GoToSafe(xposition, 2290 * Ori + Offset) -- Palyahoz igazitani
 	end
 	p.GripperMove(totemSide, 80, 500, 400)
 	if (totemSide == true) then
