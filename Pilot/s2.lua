@@ -64,6 +64,7 @@ while (true) do
 			if (c.simulate(PickUpFrom, 500, 2000 * Ori + Offset)) then
 				deadpos = false
 				PickUpFrom(500, 2000 * Ori + Offset)
+				ResetActuators()
 			end
 		end
 	
