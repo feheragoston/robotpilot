@@ -706,8 +706,7 @@ bool Control::opponentTooClose() {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
 			double distances[PROXIMITY_NUM];
 			mPrimitives->GetDistances(distances);
-			if (distances[INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX] < distance ||
-					distances[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX] < distance) {
+			if (distances[0] < distance || distances[1] < distance) {
 				cout << "(Control) Sonar timeout, opponent too close!" << endl;
 				// elhelyezzuk az ellenfelet, hogy legkozelebb ne probaljunk erre menni
 				double ox = x + (distance + ROBOT_RADIUS * 2.5 - angry[0]) * cos(phi);
