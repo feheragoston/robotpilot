@@ -666,6 +666,21 @@ long int Control::refreshOpponent(unsigned char n) {
 }
 
 bool Control::opponentTooClose() {
+
+	bool theyStuck = true;
+
+	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
+		double ox, oy;
+		long int validity = Control::GetOpponentPos(i, &ox, &oy);
+		if (!(validity < SONAR_TIMEOUT && ox < 500 && (oy < 500 || oy > 2500))) {
+			theyStuck = false;
+		}
+	}
+
+	if (theyStuck) {
+		return false;
+	}
+
 	double x, y, phi, v, w;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
