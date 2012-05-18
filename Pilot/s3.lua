@@ -5,9 +5,7 @@ dofile("Pilot/functions.lua")
 
 p.Go(150)
 x, y, phi = c.GetRobotPos()
-p.TurnTo(x, 1500)
-x, y, phi = c.GetRobotPos()
-p.GoTo(x, 340)
+p.TurnTo(500, 1000)
 
 cd1 = true
 cd2 = true
@@ -28,7 +26,58 @@ c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
 local status, err = pcall(function()
-	p.GoToSafe(x, 590)
+	p.runparallel(
+		function()
+			p.GripperMove(Right, 55)
+			p.GripperMove(Left, 90)
+			p.GripperMove(Right, 1)
+		end,
+		function()
+			p.ClawMove(Right, 90)
+			p.ClawMove(Left, 90)
+		end
+	)
+	p.ArmMove(89)
+	
+	p.runparallel(
+		function()
+			p.Go(767.84) -- ???
+			p.TurnSafe(-1.5165 * Ori)
+		end,
+		function()
+			p.Compressor(true)
+			repeat
+				x, y, phi = c.GetRobotPos()
+				p.process()
+			until (y * Ori + Offset > 720) -- ???
+			p.ArmMove(100, 1000, 3000)
+			p.sleep(200)
+			p.ArmMove(10, 1000, 200)
+			p.Valve(true)
+			p.sleep(100)
+			p.Valve(false)
+			p.ArmMove(0)
+			c.Compressor(false)
+			p.ClawMove(Left, 0)
+			p.ClawMove(Right, 2)
+		end
+	)
+	p.GoSafe(500) -- ???
+	x, y, phi = c.GetRobotPos()
+	MoveToSafe(x, 350 * Ori + Offset)
+	Eject(false)
+	p.GoSafe(-350)
+	
+	-- gomb benyomas
+	p.runparallel(
+		function()
+			ResetActuators()
+		end,
+		function()
+			MoveToSafe(1795, 700 * Ori + Offset)
+		end
+	)
+	p.Go(-95)
 end);
 if (not status) then
 	c.print("Hiba", err);
