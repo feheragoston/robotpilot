@@ -180,9 +180,12 @@ function PushButton(farther)
 	if (farther) then
 		yposition = 1913
 	end
-	p.TurnToSafe(1775, yposition * Ori + Offset)
-	p.GoToSafe(1775, yposition * Ori + Offset)
-	p.GripperMove(Right, 30)
+	x, y, phi = c.GetRobotPos()
+	if (math.abs(y - yposition * Ori + Offset) > 50) then
+		p.MoveToSafe(1400, yposition * Ori + Offset)
+	end
+	p.MoveToSafe(1795, yposition * Ori + Offset)
+	--p.GripperMove(Right, 30)
 
 	if (farther) then
 		button2 = false -- GLOBAL
@@ -190,7 +193,7 @@ function PushButton(farther)
 		button1 = false -- GLOBAL
 	end
 
-	ResetActuators()
+	--ResetActuators()
 	p.GoSafe(-220)
 end
 
