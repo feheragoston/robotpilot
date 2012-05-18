@@ -16,6 +16,7 @@ totem1bottle = true
 totem2bottle = true
 button1 = true
 button2 = true
+rose = true
 
 c.music("start")
 repeat
@@ -57,12 +58,18 @@ local status, err = pcall(function()
 			p.Valve(false)
 			p.ArmMove(0)
 			c.Compressor(false)
-			p.ClawMove(Right, 0)
-			p.ClawMove(Left, 2)
 			p.GripperMove(Left, 130)
 		end
 	)
-	p.GoSafe(500) -- ???
+	p.runparallel(
+		function()
+			p.GoSafe(500) -- ???
+		end,
+		function()
+			p.ClawMove(Right, 0)
+			p.ClawMove(Left, 2)
+		end
+	)
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
@@ -75,7 +82,7 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.GoToSafe(x, 360 * Ori + Offset, 500, 100)
+			p.GoToSafe(x, 350 * Ori + Offset, 500, 100)
 		end,
 		function()
 			p.GripperMove(Left, 130)
@@ -84,7 +91,7 @@ local status, err = pcall(function()
 	Eject(false)
 	p.runparallel(
 		function()
-			p.GoSafe(-340)
+			p.GoSafe(-350)
 		end,
 		function()
 			p.GripperMove(Left, 90)
@@ -120,11 +127,117 @@ while (true) do
 
 		local deadpos = true;
 
+		if (rose) then
+			rose = false
+			if (c.simulate(PickUpFrom, 1700, 1400 * Ori + Offset, false)) then
+				p.runparallel(
+					function()
+						p.MoveToSafe(1700, 1300)
+					end,
+					function()
+						p.ClawMove(Left, 90)
+						p.ClawMove(Right, 90)
+						p.ArmMove(80)
+					end
+				)
+				local cddist = 100
+				PickUpFrom(1700, (1500 - cddist) * Ori + Offset, false)
+				PickUpFrom(1700 + cddist, 1500 * Ori + Offset, false)
+				PickUpFrom(1700 - cddist, 1500 * Ori + Offset, false)
+				PickUpFrom(1700, (1500 + cddist) * Ori + Offset, false)
+				p.runparallel(
+					function()
+						p.MoveToSafe(1700, 1913 * Ori + Offset)
+					end,
+					function()
+						ResetActuators()
+					end
+				)
+			end
+		end
+
 		if (button2 and ActuatorsClosed()) then
 			if (c.simulate(PushButton, true)) then
 				deadpos = false
 				PushButton(true)
 				c.print("Meccs ido masodik gombig: ", c.matchtime() / 1000)
+			end
+		end
+		
+		if (totem1bottle) then
+			x, y, phi = c.GetRobotPos()
+			if (math.abs(x - 1600) > 50 or math.abs(y - 1913) > 50) then
+				if (c.simulate(p.MoveToSafe, 1600, 1913)) then
+					p.MoveToSafe(1600, 1913)
+				else
+					error("(s3) Nem tudunk odamenni a totem1 kezdoponthoz")
+				end
+			end
+			totem1bottle = false
+			if (c.simulate(p.MoveToSafe, 1315, 1500)) then
+				p.runparallel(
+					function()
+						p.MoveToSafe(1315, 1500)
+					end,
+					function()
+						p.ClawMove(Left, 90)
+						p.ClawMove(Right, 90)
+					end,
+					function()
+						p.GripperMove(Left, 90)
+						p.GripperMove(Right, 90)
+					end
+				)
+				p.runparallel(
+					function()
+						p.TurnToSafe(1315, 900 * Ori + Offset)
+					end,
+					function()
+						p.GripperMove(Right, 100)
+					end
+				)
+				p.GoToSafe(1315, 900 * Ori + Offset)
+				
+				p.runparallel(
+					function()
+						p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
+					end,
+					function()
+						p.GripperMove(Left, 90)
+					end,
+					function()
+						p.GripperMove(Right, 90)
+					end,
+					function()
+						p.ClawMove(Left, 55)
+					end,
+					function()
+						p.ClawMove(Right, 55)
+					end
+				)
+
+				-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
+				p.runparallel(
+					function()
+						p.ConsoleMove(140, 1000, 15)
+					end,
+					function()
+						p.GripperMove(Left, 105)
+					end,
+					function()
+						p.GripperMove(Right, 105)
+					end
+				)
+
+				p.runparallel(
+					function()
+						p.GoSafe(-300)
+					end,
+					function()
+						ResetActuators()
+					end
+				)
+
 			end
 		end
 
@@ -133,6 +246,7 @@ while (true) do
 			if (not ActuatorsClosed()) then
 				if (c.simulate(p.GoSafe, -200)) then
 					p.GoSafe(-200)
+					ResetActuators()
 				end
 			end
 
