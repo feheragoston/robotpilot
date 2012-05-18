@@ -72,6 +72,7 @@ Control::Control(Config* config) {
 	static const luaL_Reg controllib[] = {
 		{"gettimeofday", c_gettimeofday},
 		{"getelapsedtime", c_getelapsedtime},
+		{"matchtime", c_matchtime},
 		{"exit", c_exit},
 		{"wait", c_wait},
 		{"simulate", c_simulate},
@@ -1080,6 +1081,11 @@ int Control::c_getelapsedtime(lua_State *L) {
 		lua_pushnil(L);
 		return 1;
 	}
+}
+
+int Control::c_matchtime(lua_State *L) {
+	lua_pushinteger(L, MatchTime());
+	return 1;
 }
 
 int Control::c_exit(lua_State *L) {

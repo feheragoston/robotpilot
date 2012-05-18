@@ -96,6 +96,8 @@ if (not status) then
 	p.MotionStop(MAX_DEC)
 end
 
+c.print(c.matchtime())
+
 while (true) do
 
 	local status, err = pcall(function()
@@ -106,6 +108,7 @@ while (true) do
 			if (c.simulate(PushButton, true)) then
 				deadpos = false
 				PushButton(true)
+				c.print(c.matchtime())
 			end
 		end
 

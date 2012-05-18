@@ -127,6 +127,7 @@ protected:
 
 	static int c_gettimeofday(lua_State *L);
 	static int c_getelapsedtime(lua_State *L);
+	static int c_matchtime(lua_State *L);
 
 	static int c_exit(lua_State *L);
 	static int c_wait(lua_State *L);
