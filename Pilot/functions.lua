@@ -198,7 +198,7 @@ function PushButton(farther)
 	end
 	p.MoveToSafe(1795, yposition * Ori + Offset)
 	p.GoSafe(-50)
-	p.GoToSafe(1795, yposition * Ori + Offset, 100, 75)
+	p.GoTo(1820, yposition * Ori + Offset, 100, 75)
 	--p.GripperMove(Right, 30)
 
 	if (farther) then
