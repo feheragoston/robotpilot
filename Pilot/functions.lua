@@ -43,6 +43,7 @@ function GoToTarget(x, y, dist)
 	tphi = math.atan2(y - ry, x - rx)
 	dx = math.cos(tphi) * dist
 	dy = math.sin(tphi) * dist
+	c.print("(functions) GoToTarget celpont", x - dx, y - dy)
 	p.TurnToSafe(x - dx, y - dy)
 	p.GoToSafe(x - dx, y - dy)
 end
@@ -50,7 +51,7 @@ end
 -- coin megkozelitese
 -- minimum tavolsag: karhossz + cd sugar: 343 + 60 ~= 400
 function GoToCoin(x, y)
-	GoToTarget(x, y, 310)
+	GoToTarget(x, y, 280)
 end
 
 -- coin felszedese
