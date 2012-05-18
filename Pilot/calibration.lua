@@ -26,10 +26,10 @@ if (CALIBRATED == nil) then
 	p.sleep(2000)
 	
 	p.ArmMove(0)
-	p.GripperMove(true, 1)
-	p.GripperMove(false, 6)
-	p.ClawMove(true, 0)
-	p.ClawMove(false, 2)
+	p.GripperMove(false, 1)
+	p.GripperMove(true, 6)
+	p.ClawMove(false, 0)
+	p.ClawMove(true, 2)
 	
 	p.CalibrateConsole();
 	
@@ -55,16 +55,16 @@ if (CALIBRATED == nil) then
 
 		p.runparallel(
 			function()
-				p.GripperMove(false, 55)
 				p.GripperMove(true, 55)
-				p.GripperMove(false, 1)
-				p.GripperMove(true, 6)
+				p.GripperMove(false, 55)
+				p.GripperMove(true, 1)
+				p.GripperMove(false, 6)
 			end,
 			function()
-				p.ClawMove(false, 55)
 				p.ClawMove(true, 55)
-				p.ClawMove(false, 0)
-				p.ClawMove(true, 2)
+				p.ClawMove(false, 55)
+				p.ClawMove(true, 0)
+				p.ClawMove(false, 2)
 			end
 		)
 

@@ -28,13 +28,11 @@ c.print("Meccs elkezdodott");
 local status, err = pcall(function()
 	p.runparallel(
 		function()
-			p.GripperMove(Right, 55)
 			p.GripperMove(Left, 90)
-			p.GripperMove(Right, 1)
 		end,
 		function()
-			p.ClawMove(Right, 90)
 			p.ClawMove(Left, 90)
+			p.ClawMove(Right, 90)
 		end
 	)
 	p.ArmMove(87)
@@ -58,8 +56,8 @@ local status, err = pcall(function()
 			p.Valve(false)
 			p.ArmMove(0)
 			c.Compressor(false)
-			p.ClawMove(Left, 0)
-			p.ClawMove(Right, 2)
+			p.ClawMove(Right, 0)
+			p.ClawMove(Left, 2)
 			p.GripperMove(Left, 130)
 		end
 	)

@@ -3,11 +3,11 @@
 function PickUp(waitforit)
 	p.runparallel(
 		function()
-			if (c.GetClawPos(Right) <  80) then
-				c.ClawMove(Right, 90)
+			if (c.GetClawPos(Left) <  80) then
+				c.ClawMove(Left, 90)
 			end
-			if (c.GetClawPos(Left) < 80) then
-				clClawMove(Left, 90)
+			if (c.GetClawPos(Right) < 80) then
+				clClawMove(Right, 90)
 			end
 		end,
 		function()
@@ -94,12 +94,12 @@ function DoubleTotem(bottleside)
 	
 	p.runparallel(
 		function()
-			p.GripperMove(Right, rightArmPos)
-			p.GripperMove(Left, leftArmPos)
+			p.GripperMove(Left, rightArmPos)
+			p.GripperMove(Right, leftArmPos)
 		end,
 		function()
-			p.ClawMove(Right, rightArmPos)
-			p.ClawMove(Left, leftArmPos)
+			p.ClawMove(Left, rightArmPos)
+			p.ClawMove(Right, leftArmPos)
 		end
 	)
 	
@@ -214,16 +214,16 @@ function ActuatorsClosed()
 	if (c.GetArmPos() > 5) then
 		return false
 	end
-	if (c.GetGripperPos(Left) > 3) then
+	if (c.GetGripperPos(Right) > 3) then
 		return false
 	end
-	if (c.GetGripperPos(Right) > 8) then
+	if (c.GetGripperPos(Left) > 8) then
 		return false
 	end
-	if (c.GetClawPos(Left) > 2) then
+	if (c.GetClawPos(Right) > 2) then
 		return false
 	end
-	if (c.GetClawPos(Right) > 4) then
+	if (c.GetClawPos(Left) > 4) then
 		return false
 	end
 	return true
@@ -237,29 +237,29 @@ function ResetActuators()
 
 	p.runparallel(
 		function()
-			local lgp = c.GetGripperPos(Left)
-			if (lgp < 55 and lgp > c.GetGripperPos(Right)) then
-				p.GripperMove(Left, 55)
+			local lgp = c.GetGripperPos(Right)
+			if (lgp < 55 and lgp > c.GetGripperPos(Left)) then
 				p.GripperMove(Right, 55)
+				p.GripperMove(Left, 55)
 			end
-			if (c.GetGripperPos(Left) > 3) then
-				p.GripperMove(Left, 1)
+			if (c.GetGripperPos(Right) > 3) then
+				p.GripperMove(Right, 1)
 			end
-			if (c.GetGripperPos(Right) > 8) then
-				p.GripperMove(Right, 6)
+			if (c.GetGripperPos(Left) > 8) then
+				p.GripperMove(Left, 6)
 			end
 		end,
 		function()
-			local lcp = c.GetClawPos(Left)
-			if (lcp < 55 and lcp > c.GetClawPos(Right)) then
-				p.ClawMove(Left, 55)
+			local lcp = c.GetClawPos(Right)
+			if (lcp < 55 and lcp > c.GetClawPos(Left)) then
 				p.ClawMove(Right, 55)
+				p.ClawMove(Left, 55)
 			end
-			if (c.GetClawPos(Left) > 2) then
-				p.ClawMove(Left, 0)
+			if (c.GetClawPos(Right) > 2) then
+				p.ClawMove(Right, 0)
 			end
-			if (c.GetClawPos(Right) > 4) then
-				p.ClawMove(Right, 2)
+			if (c.GetClawPos(Left) > 4) then
+				p.ClawMove(Left, 2)
 			end
 		end,
 		function()
