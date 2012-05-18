@@ -106,7 +106,7 @@ local status, err = pcall(function()
 		function()
 			p.MoveToSafe(1795, 700 * Ori + Offset)
 			p.Go(-50)
-			p.GoTo(1820, 700 * Ori + Offset, 100, 75)
+			p.GoTo(1815, 700 * Ori + Offset, 100, 75)
 		end
 	)
 	p.sleep(1000)
