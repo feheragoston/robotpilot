@@ -5,7 +5,7 @@ dofile("Pilot/functions.lua")
 
 p.Go(150)
 x, y, phi = c.GetRobotPos()
-p.sleep(200)
+p.sleep(1000)
 p.TurnTo(500, 1000 * Ori + Offset)
 
 cd1 = true
@@ -82,7 +82,8 @@ local status, err = pcall(function()
 		end,
 		function()
 			p.MoveToSafe(1795, 700 * Ori + Offset)
-			p.Go(30, 500, 200)
+			p.Go(-50)
+			p.GoTo(1795, 700 * Ori + Offset, 100, 75)
 		end
 	)
 	p.sleep(1000)
@@ -101,7 +102,12 @@ while (true) do
 
 		local deadpos = true;
 
-		
+		if (button2 and ActuatorsClosed()) then
+			if (c.simulate(PushButton, true)) then
+				deadpos = false
+				PushButton(true)
+			end
+		end
 
 		-- BERAGADAS FELOLDASA
 		if (deadpos) then
