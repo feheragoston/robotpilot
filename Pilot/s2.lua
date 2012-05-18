@@ -96,6 +96,12 @@ while (true) do
 		end
 
 		if (deadpos) then
+			if (not ActuatorsClosed()) then
+				if (c.simulate(p.GoSafe, -200)) then
+					p.GoSafe(-200)
+				end
+			end
+
 			x, y, phi = c.GetRobotPos()
 			y = y * Ori + Offset
 			if ((x > 800 or y > 900) and c.simulate(p.MoveToSafe, 355, 665 * Ori + Offset)) then
