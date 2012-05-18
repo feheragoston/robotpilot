@@ -41,7 +41,7 @@ local status, err = pcall(function()
 	
 	p.runparallel(
 		function()
-			p.Go(767.84) -- ???
+			p.Go(620) -- ???
 			p.TurnSafe(-1.5165 * Ori)
 		end,
 		function()
@@ -60,11 +60,19 @@ local status, err = pcall(function()
 			c.Compressor(false)
 			p.ClawMove(Left, 0)
 			p.ClawMove(Right, 2)
+			p.GripperMove(Left, 130)
 		end
 	)
 	p.GoSafe(500) -- ???
-	x, y, phi = c.GetRobotPos()
-	MoveToSafe(x, 350 * Ori + Offset)
+	p.runparallel(
+		function()
+			x, y, phi = c.GetRobotPos()
+			p.MoveToSafe(x, 350 * Ori + Offset)
+		end,
+		function()
+			p.GripperMove(Left, 90)
+		end
+	)
 	Eject(false)
 	p.GoSafe(-350)
 	
@@ -74,7 +82,7 @@ local status, err = pcall(function()
 			ResetActuators()
 		end,
 		function()
-			MoveToSafe(1795, 700 * Ori + Offset)
+			p.MoveToSafe(1795, 700 * Ori + Offset)
 		end
 	)
 	p.Go(-95)
