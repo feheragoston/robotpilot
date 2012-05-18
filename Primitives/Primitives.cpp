@@ -12,7 +12,7 @@ Primitives::Primitives(Config* config) {
 
 	mStartButton = true;
 	mStopButton = false;
-	mRobotColor = false;
+	mRobotColor = 0;
 
 	leftGripperPos = 0;
 	rightGripperPos = 0;
@@ -247,9 +247,13 @@ bool Primitives::SetEyeColorInProgress() {
 }
 
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
-	robot.x = 200;
-	robot.y = 200;
-	robot.phi = M_PI / 2;
+	robot.x = 153;
+	robot.y = 159;
+	robot.phi = 49.87 * M_PI / 180.;
+
+	if (mRobotColor == 0) {
+		mRobotColor = -1;
+	}
 
 	for (int i = 0; i < OPPONENT_NUM; i++) {
 		opponent[i].x = 200;
