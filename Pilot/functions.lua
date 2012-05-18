@@ -194,9 +194,11 @@ function PushButton(farther)
 	end
 	x, y, phi = c.GetRobotPos()
 	if (math.abs(y - yposition * Ori + Offset) > 50) then
-		p.MoveToSafe(1400, yposition * Ori + Offset)
+		p.MoveToSafe(1700, yposition * Ori + Offset)
 	end
 	p.MoveToSafe(1795, yposition * Ori + Offset)
+	p.GoSafe(-50)
+	p.GoToSafe(1795, yposition * Ori + Offset, 100, 75)
 	--p.GripperMove(Right, 30)
 
 	if (farther) then
