@@ -10,12 +10,12 @@ p.TurnToSafe(250, 1500)
 
 p.runparallel(
 	function()
-		p.GripperMove(Right, 90)
 		p.GripperMove(Left, 90)
+		p.GripperMove(Right, 90)
 	end,
 	function()
-		p.ClawMove(Right, 90)
 		p.ClawMove(Left, 90)
+		p.ClawMove(Right, 90)
 	end
 )
 p.ArmMove(81) -- felenk nez: 89
