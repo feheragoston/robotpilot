@@ -703,7 +703,8 @@ bool Control::opponentTooClose() {
 		validity = max(validity, refreshOpponent(i));
 	}
 	if (validity > SONAR_TIMEOUT && !mPrimitives->ArmMoveInProgress()
-			&& mPrimitives->GetPressure() < 2.7 && !mPrimitives->GetValve()) {
+			&& mPrimitives->GetPressure() < 2.7 && !mPrimitives->GetValve()
+			&& (x < 1600 || abs(phi) > M_PI / 2)) {
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
 			double distances[PROXIMITY_NUM];
