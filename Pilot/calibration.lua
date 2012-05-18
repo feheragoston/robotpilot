@@ -33,6 +33,8 @@ if (CALIBRATED == nil) then
 	
 	p.CalibrateConsole();
 	
+	p.Valve(false)
+	
 	while (c.GetMyColor() ~= 0) do
 		p.process()
 		c.music("caliberror")
