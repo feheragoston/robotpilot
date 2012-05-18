@@ -5,6 +5,7 @@ dofile("Pilot/functions.lua")
 
 p.Go(150)
 x, y, phi = c.GetRobotPos()
+p.sleep(200)
 p.TurnTo(500, 1000 * Ori + Offset)
 
 cd1 = true
@@ -65,14 +66,14 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.MoveToSafe(x, 370 * Ori + Offset)
+			p.MoveToSafe(x, 400 * Ori + Offset)
 		end,
 		function()
 			p.GripperMove(Left, 90)
 		end
 	)
 	Eject(false)
-	p.GoSafe(-330)
+	p.GoSafe(-300)
 	
 	-- gomb benyomas
 	p.runparallel(
@@ -80,10 +81,14 @@ local status, err = pcall(function()
 			ResetActuators()
 		end,
 		function()
-			p.MoveToSafe(1825, 700 * Ori + Offset)
+			p.MoveToSafe(1795, 700 * Ori + Offset)
+			p.Go(30, 500, 200)
 		end
 	)
-	p.Go(-95)
+	p.sleep(1000)
+	x, y, phi = c.GetRobotPos()
+	p.Go(1700 - x);
+
 end);
 if (not status) then
 	c.print("Hiba", err);
