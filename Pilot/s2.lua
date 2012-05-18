@@ -7,7 +7,7 @@ p.Go(30)
 x, y, phi = c.GetRobotPos()
 p.TurnTo(x, 1500)
 p.Go(140)
-p.TurnToSafe(685, 2510 * Ori + Offset)
+p.TurnToSafe(510, 2190 * Ori + Offset)
 p.Go(-15)
 
 cd1 = true
@@ -27,7 +27,7 @@ until(c.GetStartButton())
 c.StartMatch(true); -- !!!!!!!!!!!!!!!!!!
 c.print("Meccs elkezdodott");
 
-if (c.GoTo(510, 2190 * Ori + Offset, 1000, 3000)) then -- finomitani
+if (c.GoTo(510, 2190 * Ori + Offset, 1000, 3000)) then -- finomitani, modositaskor a rafordulast is!!!
 	while (c.MotionInProgress() or c.MotionStopInProgress()) do
 		if (c.MotionInProgress()) then
 			for i = 1, OPPONENT_NUM do
@@ -67,7 +67,7 @@ while (true) do
 				ResetActuators()
 			end
 		end
-	
+
 		if (totem1map and totem2map) then
 			if (c.simulate(DoubleTotem, false)) then
 				deadpos = false
