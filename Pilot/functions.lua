@@ -196,8 +196,9 @@ function PushButton(farther)
 	if (math.abs(y - yposition * Ori + Offset) > 50) then
 		p.MoveToSafe(1700, yposition * Ori + Offset)
 	end
-	p.MoveToSafe(1795, yposition * Ori + Offset)
-	p.GoSafe(-50)
+	p.TurnTo(1795, yposition * Ori + Offset)
+	p.GoTo(1795, yposition * Ori + Offset)
+	p.Go(-50)
 	p.GoTo(1820, yposition * Ori + Offset, 100, 75)
 	--p.GripperMove(Right, 30)
 
@@ -208,7 +209,7 @@ function PushButton(farther)
 	end
 
 	--ResetActuators()
-	p.GoSafe(-220)
+	p.Go(-220)
 end
 
 -- kar, csapok, megfogok csukva vannak-e
