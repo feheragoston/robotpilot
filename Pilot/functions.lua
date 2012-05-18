@@ -63,18 +63,20 @@ end
 --
 function DoubleTotem(bottleside)
 	local xposition = 685
+	local ystart = 2510
 	local rightArmPos = 90
 	local leftArmPos = 130
 	local totemSide = Left
 
 	if (bottleside) then
 		xposition = 1315
+		ystart = 2410 -- palyahoz igazitani
 		rightArmPos = 130
 		leftArmPos = 90
 		totemSide = Right
 	end
 
-	p.GoToSafe(xposition, 2510 * Ori + Offset)
+	p.MoveToSafe(xposition, ystart * Ori + Offset)
 
 	p.TurnToSafe(xposition, 1500)
 	

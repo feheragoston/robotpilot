@@ -74,6 +74,13 @@ while (true) do
 			end
 		end
 		
+		if (totem1bottle and totem2bottle) then
+			if (c.simulate(DoubleTotem, true)) then
+				deadpos = false
+				DoubleTotem(true)
+			end
+		end
+		
 		if (button1) then
 			if (c.simulate(PushButton, false)) then
 				deadpos = false
