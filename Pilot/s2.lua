@@ -81,14 +81,14 @@ while (true) do
 			end
 		end
 		
-		if (button1) then
+		if (button1 and ActuatorsClosed()) then
 			if (c.simulate(PushButton, false)) then
 				deadpos = false
 				PushButton(false)
 			end
 		end
 		
-		if (button2) then
+		if (button2 and ActuatorsClosed()) then
 			if (c.simulate(PushButton, true)) then
 				deadpos = false
 				PushButton(true)
