@@ -1,8 +1,20 @@
 
 -- felszedes karral
 function PickUp(waitforit)
-	p.Compressor(true)
-	p.sleep(200)
+	p.runparallel(
+		function()
+			if (c.GetClawPos(Right) <  80) then
+				c.ClawMove(Right, 90)
+			end
+			if (c.GetClawPos(Left) < 80) then
+				clClawMove(Left, 90)
+			end
+		end,
+		function()
+			p.Compressor(true)
+			p.sleep(200)
+		end
+	)
 	p.ArmMove(105)
 	p.sleep(200)
 	p.ArmMove(10, 1000, 200)
