@@ -20,20 +20,6 @@ function PickUp(waitforit)
 	p.ArmMove(10, 1000, 200)
 	p.Valve(true)
 	p.sleep(150)
-	c.ArmMove(0)
-	c.Valve(false)
-	c.Compressor(false)
-	if (waitforit) then
-		while (control.CompressorInProgress()) do
-			process()
-		end
-		while (control.ValveInProgress()) do
-			process()
-		end
-		while (control.ArmMoveInProgress()) do
-			process()
-		end
-	end
 end
 
 -- urites
@@ -117,9 +103,11 @@ function DoubleTotem(bottleside)
 	p.GripperMove(totemSide, 100)
 	PickUp()
 	
-	
 	p.MoveToSafe(xposition, 2150 * Ori + Offset)
 	PickUp()
+	p.ArmMove(0)
+	p.Valve(false)
+	p.Compressor(false)
 	
 	p.MoveToSafe(xposition, 1700 * Ori + Offset)
 	
