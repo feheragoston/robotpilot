@@ -112,7 +112,7 @@ if (not status) then
 	p.MotionStop(MAX_DEC)
 end
 
-c.print(c.matchtime())
+c.print("Meccs ido elso gombig: ", c.matchtime() / 1000)
 
 while (true) do
 
@@ -124,7 +124,7 @@ while (true) do
 			if (c.simulate(PushButton, true)) then
 				deadpos = false
 				PushButton(true)
-				c.print(c.matchtime())
+				c.print("Meccs ido masodik gombig: ", c.matchtime() / 1000)
 			end
 		end
 
