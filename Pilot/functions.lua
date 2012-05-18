@@ -7,7 +7,7 @@ function PickUp(waitforit)
 				c.ClawMove(Left, 90)
 			end
 			if (c.GetClawPos(Right) < 80) then
-				clClawMove(Right, 90)
+				c.ClawMove(Right, 90)
 			end
 		end,
 		function()
@@ -40,8 +40,9 @@ end
 -- cel megkozelitese dist tavolsagba
 function GoToTarget(x, y, dist)
 	rx, ry, rphi = c.GetRobotPos()
-	dx = math.cos(rphi) * dist
-	dy = math.sin(rphi) * dist
+	tphi = math.atan2(y - ry, x - rx)
+	dx = math.cos(tphi) * dist
+	dy = math.sin(tphi) * dist
 	p.TurnToSafe(x - dx, y - dy)
 	p.GoToSafe(x - dx, y - dy)
 end
