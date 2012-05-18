@@ -5,7 +5,7 @@ dofile("Pilot/functions.lua")
 
 p.Go(150)
 x, y, phi = c.GetRobotPos()
-p.TurnTo(500, 1000)
+p.TurnTo(500, 1000 * Ori + Offset)
 
 cd1 = true
 cd2 = true
@@ -37,11 +37,11 @@ local status, err = pcall(function()
 			p.ClawMove(Left, 90)
 		end
 	)
-	p.ArmMove(89)
+	p.ArmMove(87)
 	
 	p.runparallel(
 		function()
-			p.Go(620) -- ???
+			p.Go(600) -- ???
 			p.TurnSafe(-1.5165 * Ori)
 		end,
 		function()
@@ -49,7 +49,7 @@ local status, err = pcall(function()
 			repeat
 				x, y, phi = c.GetRobotPos()
 				p.process()
-			until (y * Ori + Offset > 720) -- ???
+			until (y * Ori + Offset > 750) -- ???
 			p.ArmMove(100, 1000, 3000)
 			p.sleep(200)
 			p.ArmMove(10, 1000, 200)
@@ -67,14 +67,14 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.MoveToSafe(x, 350 * Ori + Offset)
+			p.MoveToSafe(x, 370 * Ori + Offset)
 		end,
 		function()
 			p.GripperMove(Left, 90)
 		end
 	)
 	Eject(false)
-	p.GoSafe(-350)
+	p.GoSafe(-330)
 	
 	-- gomb benyomas
 	p.runparallel(
@@ -82,7 +82,7 @@ local status, err = pcall(function()
 			ResetActuators()
 		end,
 		function()
-			p.MoveToSafe(1795, 700 * Ori + Offset)
+			p.MoveToSafe(1825, 700 * Ori + Offset)
 		end
 	)
 	p.Go(-95)
@@ -97,6 +97,8 @@ while (true) do
 	local status, err = pcall(function()
 
 		local deadpos = true;
+
+		
 
 		-- BERAGADAS FELOLDASA
 		if (deadpos) then
