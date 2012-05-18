@@ -685,7 +685,7 @@ bool Control::opponentTooClose() {
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
 
-	if (fabs(v) < 0.01) {
+	if (fabs(v) < 10) {
 		return false;
 	}
 
@@ -701,7 +701,8 @@ bool Control::opponentTooClose() {
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		validity = max(validity, refreshOpponent(i));
 	}
-	if (validity > SONAR_TIMEOUT) {
+	if (validity > SONAR_TIMEOUT && !mPrimitives->ArmMoveInProgress()
+			&& mPrimitives->GetPressure() < 2.7 && !mPrimitives->GetValve()) {
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
 			double distances[PROXIMITY_NUM];
