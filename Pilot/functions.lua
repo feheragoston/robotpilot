@@ -91,7 +91,11 @@ function DoubleTotem(bottleside)
 	
 	
 	-- felszedes
-	p.GoToSafe(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+	if (c.in_simulate()) then
+		p.GoTo(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+	else
+		p.GoToSafe(xposition, 2280 * Ori + Offset) -- Palyahoz igazitani
+	end
 	p.GripperMove(totemSide, 80, 500, 400)
 	if (totemSide == true) then
 		p.GripperMove(totemSide, 60, 500, 400) -- Beallitani
@@ -112,7 +116,11 @@ function DoubleTotem(bottleside)
 	end
 	
 	p.GripperMove(totemSide, 130)
-	p.GoToSafe(xposition, 1485 * Ori + Offset) -- Palyahoz igazitani
+	if (c.in_simulate()) then
+		p.GoTo(xposition, 1485 * Ori + Offset) -- Palyahoz igazitani
+	else
+		p.GoToSafe(xposition, 1485 * Ori + Offset) -- Palyahoz igazitani
+	end
 	p.GripperMove(totemSide, 100)
 	p.GoToSafe(xposition, 900 * Ori + Offset)
 	
