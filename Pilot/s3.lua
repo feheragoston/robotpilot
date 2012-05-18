@@ -132,18 +132,21 @@ while (true) do
 			if (c.simulate(PickUpFrom, 1700, 1400 * Ori + Offset, false)) then
 				p.runparallel(
 					function()
-						p.MoveToSafe(1700, 1300)
+						p.MoveToSafe(1700, 1000 * Ori + Offset)
 					end,
 					function()
 						p.ClawMove(Left, 90)
 						p.ClawMove(Right, 90)
-						p.ArmMove(80)
+						p.ArmMove(75)
 					end
 				)
 				local cddist = 100
 				PickUpFrom(1700, (1500 - cddist) * Ori + Offset, false)
+				c.Valve(false)
 				PickUpFrom(1700 + cddist, 1500 * Ori + Offset, false)
+				c.Valve(false)
 				PickUpFrom(1700 - cddist, 1500 * Ori + Offset, false)
+				c.Valve(false)
 				PickUpFrom(1700, (1500 + cddist) * Ori + Offset, false)
 				p.runparallel(
 					function()
