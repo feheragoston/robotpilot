@@ -267,6 +267,10 @@ function ResetActuators()
 				p.ConsoleMove(20, 400, 15)
 				p.CalibrateConsole()
 			end
+		end,
+		function()
+			c.Valve(false)
+			c.Compressor(false)
 		end
 	)
 end
