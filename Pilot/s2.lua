@@ -43,7 +43,7 @@ if (c.GoTo(510, 2190 * Ori + Offset, 1000, 3000)) then -- finomitani
 		elseif (cd2 and y * Ori + Offset > 1600) then
 			cd2 = false
 		end
-		process()
+		p.process()
 	end
 end
 
