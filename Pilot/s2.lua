@@ -91,14 +91,14 @@ while (true) do
 		if (deadpos) then
 			x, y, phi = c.GetRobotPos()
 			y = y * Ori + Offset
-			if ((x > 1000 or y > 1500) and c.simulate(p.GoToSafe, 355, 665 * Ori + Offset)) then
-				p.GoToSafe(355, 665 * Ori + Offset)
-			elseif ((x < 1000 or y > 1500) and c.simulate(p.GoToSafe, 1645, 715 * Ori + Offset)) then
-				p.GoToSafe(1645, 715 * Ori + Offset)
-			elseif ((x > 1000 or y < 1500) and c.simulate(p.GoToSafe, 580, 225 * Ori + Offset0)) then
-				p.GoToSafe(580, 2250 * Ori + Offset)
-			elseif ((x < 1000 or y < 1500) and c.simulate(p.GoToSafe, 1400, 2250 * Ori + Offset)) then
-				p.GoToSafe(1400, 2250 * Ori + Offset)
+			if ((x > 1000 or y > 1500) and c.simulate(p.MoveToSafe, 355, 665 * Ori + Offset)) then
+				p.MoveToSafe(355, 665 * Ori + Offset)
+			elseif ((x < 1000 or y > 1500) and c.simulate(p.MoveToSafe, 1645, 715 * Ori + Offset)) then
+				p.MoveToSafe(1645, 715 * Ori + Offset)
+			elseif ((x > 1000 or y < 1500) and c.simulate(p.MoveToSafe, 580, 2250 * Ori + Offset)) then
+				p.MoveToSafe(580, 2250 * Ori + Offset)
+			elseif ((x < 1000 or y < 1500) and c.simulate(p.MoveToSafe, 1400, 2250 * Ori + Offset)) then
+				p.MoveToSafe(1400, 2250 * Ori + Offset)
 			else
 
 				while (deadpos) do
