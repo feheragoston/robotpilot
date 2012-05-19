@@ -46,7 +46,7 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			p.Go(600) -- ???
-			p.TurnSafe(-1.5165 * Ori)
+			p.Turn(-1.5165 * Ori)
 		end,
 		function()
 			p.Compressor(true)
@@ -67,7 +67,7 @@ local status, err = pcall(function()
 	)
 	p.runparallel(
 		function()
-			p.GoSafe(500) -- ???
+			p.Go(500) -- ???
 		end,
 		function()
 			p.ClawMove(Right, 0)
@@ -77,7 +77,7 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.MoveToSafe(x, 400 * Ori + Offset)
+			p.MoveTo(x, 400 * Ori + Offset)
 		end,
 		function()
 			p.GripperMove(Left, 90)
@@ -86,7 +86,7 @@ local status, err = pcall(function()
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.GoToSafe(x, 350 * Ori + Offset, 500, 100)
+			p.GoTo(x, 350 * Ori + Offset, 500, 100)
 		end,
 		function()
 			p.GripperMove(Left, 130)
@@ -95,7 +95,7 @@ local status, err = pcall(function()
 	Eject(false)
 	p.runparallel(
 		function()
-			p.GoSafe(-350)
+			p.GoSafe(-350) -- LOOPOLNI
 		end,
 		function()
 			p.GripperMove(Left, 90)
@@ -108,7 +108,7 @@ local status, err = pcall(function()
 			ResetActuators()
 		end,
 		function()
-			p.MoveToSafe(1795, 700 * Ori + Offset)
+			p.MoveToSafe(1795, 700 * Ori + Offset)  -- LOOPOLNI
 			p.Go(-50)
 		end
 	)
