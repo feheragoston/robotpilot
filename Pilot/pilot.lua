@@ -142,6 +142,13 @@ function MoveToSafe(x, y)
 	return GoToSafe(x, y)
 end
 
+function MoveTo(x, y)
+	if (not TurnTo(x, y)) then
+		return false
+	end
+	return GoTo(x, y)
+end
+
 function MotionStop(...)
 	if (control.MotionStop(...)) then
 		while (control.MotionStopInProgress()) do
