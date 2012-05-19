@@ -273,11 +273,10 @@ while (true) do
 					if (c.GetMyColor() == PURPLE) then
 						p.Go(-300)
 						ResetActuators()
-						x, y, phi = c.GetRobotPos()
-						p.TurnTo(x, 1 * Ori + Offset)
-						x, y, phi = c.GetRobotPos()
-						p.GoTo(x, 300 * Ori + Offset)
+						p.Turn(-math.pi)
+						p.Go(-300)
 						p.ConsoleMove(140, 1000, 15)
+						p.Go(300)
 					else
 						p.runparallel(
 							function()
@@ -290,11 +289,11 @@ while (true) do
 								p.GripperMove(Right, 105)
 							end
 						)
+						p.Go(-300)
 					end
 
 					c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
 
-					p.Go(-300)
 					ResetActuators()
 				end
 			end
