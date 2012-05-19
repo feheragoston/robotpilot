@@ -181,81 +181,85 @@ while (true) do
 		
 		if (totem1bottle) then
 			x, y, phi = c.GetRobotPos()
+			local doit = true
 			if (math.abs(x - 1600) > 50 or math.abs(y - 1913) > 50) then
+				doit = false
 				if (c.simulate(p.MoveToSafe, 1600, 1913 * Ori + Offset)) then
 					p.MoveToSafe(1600, 1913 * Ori + Offset)
-				else
-					error("(s3) Nem tudunk odamenni a totem1 kezdoponthoz")
+					doit = true
 				end
 			end
-			totem1bottle = false
-			if (c.simulate(p.MoveToSafe, 1315, 1500)) then
-				p.runparallel(
-					function()
-						p.MoveToSafe(1315, 1500)
-					end,
-					function()
-						p.ClawMove(Left, 90)
-						p.ClawMove(Right, 90)
-					end,
-					function()
-						p.GripperMove(Left, 90)
-						p.GripperMove(Right, 90)
+			if (doit) then
+				deadpos = false
+				totem1bottle = false
+				if (c.simulate(p.MoveToSafe, 1315, 1520 * Ori + Offset)) then
+					p.runparallel(
+						function()
+							p.MoveToSafe(1315, 1520 * Ori + Offset)
+						end,
+						function()
+							p.ClawMove(Left, 90)
+							p.ClawMove(Right, 90)
+						end,
+						function()
+							p.GripperMove(Left, 90)
+							p.GripperMove(Right, 90)
+						end
+					)
+					p.runparallel(
+						function()
+							p.TurnToSafe(1315, 940 * Ori + Offset)
+						end,
+						function()
+							p.GripperMove(Right, 100)
+						end,
+						function()
+							p.ClawMove(Right, 130)
+						end
+					)
+					p.GoToSafe(1315, 940 * Ori + Offset)
+					
+					p.runparallel(
+						function()
+							p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
+						end,
+						function()
+							p.GripperMove(Left, 90)
+						end,
+						function()
+							p.GripperMove(Right, 90)
+						end,
+						function()
+							p.ClawMove(Left, 55)
+						end,
+						function()
+							p.ClawMove(Right, 55)
+						end
+					)
+	
+					-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
+					if (c.GetMyColor() == PURPLE) then
+						x, y, phi = c.GetRobotPos()
+						p.TurnTo(x, 1 * Ori + Offset)
 					end
-				)
-				p.runparallel(
-					function()
-						p.TurnToSafe(1315, 900 * Ori + Offset)
-					end,
-					function()
-						p.GripperMove(Right, 100)
-					end,
-					function()
-						p.ClawMove(Right, 130)
-					end
-				)
-				p.GoToSafe(1315, 900 * Ori + Offset)
-				
-				p.runparallel(
-					function()
-						p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
-					end,
-					function()
-						p.GripperMove(Left, 90)
-					end,
-					function()
-						p.GripperMove(Right, 90)
-					end,
-					function()
-						p.ClawMove(Left, 55)
-					end,
-					function()
-						p.ClawMove(Right, 55)
-					end
-				)
-
-				-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
-				if (c.GetMyColor() == PURPLE) then
-					x, y, phi = c.GetRobotPos()
-					p.TurnTo(x, 1 * Ori + Offset)
+	
+					p.runparallel(
+						function()
+							p.ConsoleMove(140, 1000, 15)
+						end,
+						function()
+							p.GripperMove(Left, 105)
+						end,
+						function()
+							p.GripperMove(Right, 105)
+						end
+					)
+	
+					c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
+	
+					p.GoSafe(-300)
+					ResetActuators()
 				end
-
-				p.runparallel(
-					function()
-						p.ConsoleMove(140, 1000, 15)
-					end,
-					function()
-						p.GripperMove(Left, 105)
-					end,
-					function()
-						p.GripperMove(Right, 105)
-					end
-				)
-
-				c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
-
-				p.GoSafe(-300)
-				ResetActuators()
 			end
 		end
 
