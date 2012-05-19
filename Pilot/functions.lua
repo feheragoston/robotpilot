@@ -189,7 +189,7 @@ function PushButton(farther)
 	p.TurnTo(1795, yposition * Ori + Offset)
 	p.GoTo(1795, yposition * Ori + Offset)
 	p.Go(-50)
-	p.GoTo(1815, yposition * Ori + Offset, 100, 75)
+	p.GoTo(1810, yposition * Ori + Offset, 100, 75)
 	--p.GripperMove(Right, 30)
 
 	if (farther) then
