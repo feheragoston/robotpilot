@@ -192,6 +192,11 @@ while (true) do
 						p.ClawMove(Left, 90)
 						p.ClawMove(Right, 90)
 						p.ArmMove(75)
+					end,
+					function()
+						p.sleep(500)
+						p.GripperMove(Left, 90)
+						p.GripperMove(Right, 90)
 					end
 				)
 				local cddist = 85
@@ -199,15 +204,14 @@ while (true) do
 				PickUpFrom(1700 + cddist, 1520 * Ori + Offset, false)
 				PickUpFrom(1700 - cddist, 1520 * Ori + Offset, false)
 				PickUpFrom(1700, (1520 + cddist) * Ori + Offset, false)
-				p.runparallel(
-					function()
-						p.MoveToSafe(1700, 1913 * Ori + Offset)
-					end,
-					function()
-						ResetActuators()
-					end
-				)
+				p.Go(-220)
+				ResetActuators()
 				c.print("Meccs ido rozsa vegeig: ", c.matchtime() / 1000)
+				p.MoveToSafe(1700, 1963 * Ori + Offset)
+				local x, y, phi = c.GetRobotPos()
+				y = y * Ori + Offset
+				p.Turn(math.pi / 2 * Ori - phi)
+				p.Go(1913 - y)
 			end
 		end
 
