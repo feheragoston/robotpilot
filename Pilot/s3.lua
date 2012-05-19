@@ -93,9 +93,22 @@ local status, err = pcall(function()
 		end
 	)
 	Eject(false)
+	c.print("Meccs ido ejectig: ", c.matchtime() / 1000)
 	p.runparallel(
 		function()
-			p.GoSafe(-350) -- LOOPOLNI
+			local loopStart = c.gettimeofday()
+			repeat
+				local x, y, phi = c.GetRobotPos()
+				local status, err = pcall(function()
+					p.GoSafe((y * Ori + Offset) - 700)
+				end);
+				if (not status) then
+					c.print("Hiba", err);
+					p.MotionStop(MAX_DEC)
+				end
+				x, y, phi = c.GetRobotPos()
+				y = y * Ori + Offset
+			until (y > 680 or c.getelapsedtime(loopStart) > 90000)
 		end,
 		function()
 			p.GripperMove(Left, 90)
@@ -108,23 +121,41 @@ local status, err = pcall(function()
 			ResetActuators()
 		end,
 		function()
-			p.MoveToSafe(1795, 700 * Ori + Offset)  -- LOOPOLNI
+			local loopStart = c.gettimeofday()
+			repeat
+				local x, y, phi = c.GetRobotPos()
+				local status, err = pcall(function()
+					p.MoveToSafe(1795, 700 * Ori + Offset)
+				end);
+				if (not status) then
+					c.print("Hiba", err);
+					p.MotionStop(MAX_DEC)
+				end
+				x, y, phi = c.GetRobotPos()
+				y = y * Ori + Offset
+			until (x > 1775 or c.getelapsedtime(loopStart) > 10000)
 			p.Go(-50)
 		end
 	)
-	p.runparallel(
-		function()
-			x, y, phi = c.GetRobotPos()
-			p.GoTo(1810, y, 100, 75)
-		end,
-		function()
-			p.sleep(1500)
-			p.MotionStop(MAX_DEC)
-		end
-	)
-	p.sleep(1000)
 	x, y, phi = c.GetRobotPos()
-	p.Go(1700 - x);
+	y = y * Ori + Offset
+	if (x > 1725) then
+		button1 = false
+		p.runparallel(
+			function()
+				x, y, phi = c.GetRobotPos()
+				p.GoTo(1810, y, 100, 75)
+			end,
+			function()
+				p.sleep(1500)
+				p.MotionStop(MAX_DEC)
+			end
+		)
+		p.sleep(1000)
+		x, y, phi = c.GetRobotPos()
+		p.Go(1700 - x);
+		c.print("Meccs ido elso gombig: ", c.matchtime() / 1000)
+	end
 
 end);
 if (not status) then
@@ -132,7 +163,7 @@ if (not status) then
 	p.MotionStop(MAX_DEC)
 end
 
-c.print("Meccs ido elso gombig: ", c.matchtime() / 1000)
+c.print("Meccs ido elso ciklusig: ", c.matchtime() / 1000)
 
 while (true) do
 
@@ -140,9 +171,18 @@ while (true) do
 
 		local deadpos = true;
 
+		if (button1 and ActuatorsClosed()) then
+			if (c.simulate(PushButton, false)) then
+				deadpos = false
+				PushButton(false)
+				c.print("Meccs ido elso gombig: ", c.matchtime() / 1000)
+			end
+		end
+
 		if (rose) then
 			rose = false
 			if (c.simulate(PickUpFrom, 1700, 1400 * Ori + Offset, false)) then
+				deadpos = false
 				p.runparallel(
 					function()
 						p.MoveToSafe(1700, 1000 * Ori + Offset)
@@ -178,13 +218,14 @@ while (true) do
 				c.print("Meccs ido masodik gombig: ", c.matchtime() / 1000)
 			end
 		end
-		
+
 		if (totem1bottle) then
 			x, y, phi = c.GetRobotPos()
 			local doit = true
 			if (math.abs(x - 1600) > 50 or math.abs(y - 1913) > 50) then
 				doit = false
 				if (c.simulate(p.MoveToSafe, 1600, 1913 * Ori + Offset)) then
+					deadpos = false
 					p.MoveToSafe(1600, 1913 * Ori + Offset)
 					doit = true
 				end
@@ -218,7 +259,7 @@ while (true) do
 						end
 					)
 					p.GoToSafe(1315, 940 * Ori + Offset)
-					
+
 					p.runparallel(
 						function()
 							p.MoveToSafe(1000, 400 * Ori + Offset) -- Palyahoz igazitani
@@ -236,13 +277,13 @@ while (true) do
 							p.ClawMove(Right, 55)
 						end
 					)
-	
+
 					-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
 					if (c.GetMyColor() == PURPLE) then
 						x, y, phi = c.GetRobotPos()
 						p.TurnTo(x, 1 * Ori + Offset)
 					end
-	
+
 					p.runparallel(
 						function()
 							p.ConsoleMove(140, 1000, 15)
@@ -254,9 +295,9 @@ while (true) do
 							p.GripperMove(Right, 105)
 						end
 					)
-	
+
 					c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
-	
+
 					p.GoSafe(-300)
 					ResetActuators()
 				end
