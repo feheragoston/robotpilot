@@ -108,7 +108,7 @@ local status, err = pcall(function()
 		end
 		x, y, phi = c.GetRobotPos()
 		y = y * Ori + Offset
-	until (y > 680 or c.getelapsedtime(loopStart) > 90000)
+	until (y > 680 or c.getelapsedtime(loopStart) > 90000000)
 	
 	-- gomb benyomas
 	ResetActuators()
@@ -125,7 +125,7 @@ local status, err = pcall(function()
 		end
 		x, y, phi = c.GetRobotPos()
 		y = y * Ori + Offset
-	until (x > 1775 or c.getelapsedtime(loopStart) > 10000)
+	until (x > 1775 or c.getelapsedtime(loopStart) > 10000000)
 	p.Go(-50)
 
 	x, y, phi = c.GetRobotPos()
