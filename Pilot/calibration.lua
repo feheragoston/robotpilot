@@ -57,8 +57,8 @@ if (CALIBRATED == nil) then
 
 		p.runparallel(
 			function()
-				p.GripperMove(true, 55)
-				p.GripperMove(false, 55)
+				p.GripperMove(true, 70)
+				p.GripperMove(false, 70)
 				p.GripperMove(true, 1)
 				p.GripperMove(false, 6)
 			end,
