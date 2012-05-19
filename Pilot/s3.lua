@@ -106,7 +106,16 @@ local status, err = pcall(function()
 		function()
 			p.MoveToSafe(1795, 700 * Ori + Offset)
 			p.Go(-50)
-			p.GoTo(1810, 700 * Ori + Offset, 100, 75)
+		end
+	)
+	p.runparallel(
+		function()
+			x, y, phi = c.GetRobotPos()
+			p.GoTo(1810, y, 100, 75)
+		end,
+		function()
+			p.sleep(1500)
+			p.MotionStop(MAX_DEC)
 		end
 	)
 	p.sleep(1000)
@@ -135,19 +144,17 @@ while (true) do
 						p.MoveToSafe(1700, 1000 * Ori + Offset)
 					end,
 					function()
+						p.sleep(500)
 						p.ClawMove(Left, 90)
 						p.ClawMove(Right, 90)
 						p.ArmMove(75)
 					end
 				)
 				local cddist = 85
-				PickUpFrom(1700, (1500 - cddist) * Ori + Offset, false)
-				c.Valve(false)
-				PickUpFrom(1700 + cddist, 1500 * Ori + Offset, false)
-				c.Valve(false)
-				PickUpFrom(1700 - cddist, 1500 * Ori + Offset, false)
-				c.Valve(false)
-				PickUpFrom(1700, (1500 + cddist) * Ori + Offset, false)
+				PickUpFrom(1700, (1530 - cddist) * Ori + Offset, false)
+				PickUpFrom(1700 + cddist, 1530 * Ori + Offset, false)
+				PickUpFrom(1700 - cddist, 1530 * Ori + Offset, false)
+				PickUpFrom(1700, (1530 + cddist) * Ori + Offset, false)
 				p.runparallel(
 					function()
 						p.MoveToSafe(1700, 1913 * Ori + Offset)
@@ -156,6 +163,7 @@ while (true) do
 						ResetActuators()
 					end
 				)
+				c.print("Meccs ido rozsa vegeig: ", c.matchtime() / 1000)
 			end
 		end
 
@@ -170,8 +178,8 @@ while (true) do
 		if (totem1bottle) then
 			x, y, phi = c.GetRobotPos()
 			if (math.abs(x - 1600) > 50 or math.abs(y - 1913) > 50) then
-				if (c.simulate(p.MoveToSafe, 1600, 1913)) then
-					p.MoveToSafe(1600, 1913)
+				if (c.simulate(p.MoveToSafe, 1600, 1913 * Ori + Offset)) then
+					p.MoveToSafe(1600, 1913 * Ori + Offset)
 				else
 					error("(s3) Nem tudunk odamenni a totem1 kezdoponthoz")
 				end
@@ -197,6 +205,9 @@ while (true) do
 					end,
 					function()
 						p.GripperMove(Right, 100)
+					end,
+					function()
+						p.ClawMove(Right, 130)
 					end
 				)
 				p.GoToSafe(1315, 900 * Ori + Offset)
@@ -220,6 +231,11 @@ while (true) do
 				)
 
 				-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
+				if (c.GetMyColor() == PURPLE) then
+					x, y, phi = c.GetRobotPos()
+					p.TurnTo(x, 1 * Ori + Offset)
+				end
+
 				p.runparallel(
 					function()
 						p.ConsoleMove(140, 1000, 15)
@@ -232,15 +248,10 @@ while (true) do
 					end
 				)
 
-				p.runparallel(
-					function()
-						p.GoSafe(-300)
-					end,
-					function()
-						ResetActuators()
-					end
-				)
+				c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
 
+				p.GoSafe(-300)
+				ResetActuators()
 			end
 		end
 

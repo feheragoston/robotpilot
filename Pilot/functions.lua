@@ -20,6 +20,12 @@ function PickUp(waitforit)
 	p.ArmMove(10, 1000, 200)
 	p.Valve(true)
 	p.sleep(150)
+	c.Valve(false)
+	if (waitforit) then
+		while (control.ValveInProgress()) do
+			process()
+		end
+	end
 end
 
 -- urites
@@ -51,7 +57,7 @@ end
 -- coin megkozelitese
 -- minimum tavolsag: karhossz + cd sugar: 343 + 60 ~= 400
 function GoToCoin(x, y)
-	GoToTarget(x, y, 280)
+	GoToTarget(x, y, 260)
 end
 
 -- coin felszedese
@@ -183,13 +189,24 @@ function PushButton(farther)
 		yposition = 1913
 	end
 	x, y, phi = c.GetRobotPos()
-	if (math.abs(y - yposition * Ori + Offset) > 50) then
+	if (math.abs(y - (yposition * Ori + Offset)) > 50) then
 		p.MoveToSafe(1700, yposition * Ori + Offset)
 	end
-	p.TurnTo(1795, yposition * Ori + Offset)
-	p.GoTo(1795, yposition * Ori + Offset)
+	x, y, phi = c.GetRobotPos()
+	p.TurnTo(1795, y)
+	x, y, phi = c.GetRobotPos()
+	p.GoTo(1795, y)
 	p.Go(-50)
-	p.GoTo(1810, yposition * Ori + Offset, 100, 75)
+	p.runparallel(
+		function()
+			x, y, phi = c.GetRobotPos()
+			p.GoTo(1810, y, 100, 75)
+		end,
+		function()
+			p.sleep(1500)
+			p.MotionStop(MAX_DEC)
+		end
+	)
 	--p.GripperMove(Right, 30)
 
 	if (farther) then
