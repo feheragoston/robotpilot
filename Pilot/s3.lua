@@ -271,25 +271,30 @@ while (true) do
 
 					-- TODO forgas uriteshez, ha lila es alul vagy ha piros es felul
 					if (c.GetMyColor() == PURPLE) then
+						p.Go(-300)
+						ResetActuators()
 						x, y, phi = c.GetRobotPos()
 						p.TurnTo(x, 1 * Ori + Offset)
+						x, y, phi = c.GetRobotPos()
+						p.GoTo(x, 300 * Ori + Offset)
+						p.ConsoleMove(140, 1000, 15)
+					else
+						p.runparallel(
+							function()
+								p.ConsoleMove(140, 1000, 15)
+							end,
+							function()
+								p.GripperMove(Left, 105)
+							end,
+							function()
+								p.GripperMove(Right, 105)
+							end
+						)
 					end
-
-					p.runparallel(
-						function()
-							p.ConsoleMove(140, 1000, 15)
-						end,
-						function()
-							p.GripperMove(Left, 105)
-						end,
-						function()
-							p.GripperMove(Right, 105)
-						end
-					)
 
 					c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
 
-					p.GoSafe(-300)
+					p.Go(-300)
 					ResetActuators()
 				end
 			end
