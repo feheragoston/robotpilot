@@ -247,9 +247,9 @@ bool Primitives::SetEyeColorInProgress() {
 }
 
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
-	robot.x = 153;
-	robot.y = 159;
-	robot.phi = 49.87 * M_PI / 180.;
+	robot.x = 59.9+290/2;
+	robot.y = 114.8+60/2;
+	robot.phi = 90.0 * M_PI / 180;
 
 	if (mRobotColor == 0) {
 		mRobotColor = -1;

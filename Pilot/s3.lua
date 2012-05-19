@@ -3,7 +3,11 @@ dofile("Pilot/calibration.lua")
 
 dofile("Pilot/functions.lua")
 
-p.Go(150)
+p.Go(50)
+p.TurnTo(250, 274 * Ori + Offset)
+p.sleep(500)
+p.GoTo(250, 274 * Ori + Offset)
+p.sleep(500)
 x, y, phi = c.GetRobotPos()
 p.sleep(1000)
 p.TurnTo(500, 1000 * Ori + Offset)
@@ -151,10 +155,10 @@ while (true) do
 					end
 				)
 				local cddist = 85
-				PickUpFrom(1700, (1530 - cddist) * Ori + Offset, false)
-				PickUpFrom(1700 + cddist, 1530 * Ori + Offset, false)
-				PickUpFrom(1700 - cddist, 1530 * Ori + Offset, false)
-				PickUpFrom(1700, (1530 + cddist) * Ori + Offset, false)
+				PickUpFrom(1700, (1520 - cddist) * Ori + Offset, false)
+				PickUpFrom(1700 + cddist, 1520 * Ori + Offset, false)
+				PickUpFrom(1700 - cddist, 1520 * Ori + Offset, false)
+				PickUpFrom(1700, (1520 + cddist) * Ori + Offset, false)
 				p.runparallel(
 					function()
 						p.MoveToSafe(1700, 1913 * Ori + Offset)
