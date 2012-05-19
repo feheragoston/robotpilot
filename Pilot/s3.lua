@@ -276,7 +276,6 @@ while (true) do
 						p.Turn(-math.pi)
 						p.Go(-300)
 						p.ConsoleMove(140, 1000, 15)
-						p.Go(300)
 					else
 						p.runparallel(
 							function()
@@ -289,8 +288,13 @@ while (true) do
 								p.GripperMove(Right, 105)
 							end
 						)
-						p.Go(-300)
 					end
+					if (totem1bottle == false and button1 == false and button2 == false and rose == false) then
+						while (true) do
+							p.process()
+						end
+					end
+					p.Go(300 * Ori)
 
 					c.print("Meccs ido totem1 uritesig: ", c.matchtime() / 1000)
 
