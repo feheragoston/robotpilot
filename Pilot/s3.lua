@@ -94,49 +94,40 @@ local status, err = pcall(function()
 	)
 	Eject(false)
 	c.print("Meccs ido ejectig: ", c.matchtime() / 1000)
-	p.runparallel(
-		function()
-			local loopStart = c.gettimeofday()
-			repeat
-				local x, y, phi = c.GetRobotPos()
-				local status, err = pcall(function()
-					p.GoSafe((y * Ori + Offset) - 700)
-				end);
-				if (not status) then
-					c.print("Hiba", err);
-					p.MotionStop(MAX_DEC)
-				end
-				x, y, phi = c.GetRobotPos()
-				y = y * Ori + Offset
-			until (y > 680 or c.getelapsedtime(loopStart) > 90000)
-		end,
-		function()
-			p.GripperMove(Left, 90)
+	c.GripperMove(Left, 90)
+
+	local loopStart = c.gettimeofday()
+	repeat
+		local x, y, phi = c.GetRobotPos()
+		local status, err = pcall(function()
+			p.GoSafe((y * Ori + Offset) - 700)
+		end);
+		if (not status) then
+			c.print("Hiba", err);
+			p.MotionStop(MAX_DEC)
 		end
-	)
+		x, y, phi = c.GetRobotPos()
+		y = y * Ori + Offset
+	until (y > 680 or c.getelapsedtime(loopStart) > 90000)
 	
 	-- gomb benyomas
-	p.runparallel(
-		function()
-			ResetActuators()
-		end,
-		function()
-			local loopStart = c.gettimeofday()
-			repeat
-				local x, y, phi = c.GetRobotPos()
-				local status, err = pcall(function()
-					p.MoveToSafe(1795, 700 * Ori + Offset)
-				end);
-				if (not status) then
-					c.print("Hiba", err);
-					p.MotionStop(MAX_DEC)
-				end
-				x, y, phi = c.GetRobotPos()
-				y = y * Ori + Offset
-			until (x > 1775 or c.getelapsedtime(loopStart) > 10000)
-			p.Go(-50)
+	ResetActuators()
+
+	local loopStart = c.gettimeofday()
+	repeat
+		local x, y, phi = c.GetRobotPos()
+		local status, err = pcall(function()
+			p.MoveToSafe(1795, 700 * Ori + Offset)
+		end);
+		if (not status) then
+			c.print("Hiba", err);
+			p.MotionStop(MAX_DEC)
 		end
-	)
+		x, y, phi = c.GetRobotPos()
+		y = y * Ori + Offset
+	until (x > 1775 or c.getelapsedtime(loopStart) > 10000)
+	p.Go(-50)
+
 	x, y, phi = c.GetRobotPos()
 	y = y * Ori + Offset
 	if (x > 1725) then
