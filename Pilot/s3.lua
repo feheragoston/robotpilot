@@ -135,10 +135,10 @@ local status, err = pcall(function()
 		p.runparallel(
 			function()
 				x, y, phi = c.GetRobotPos()
-				p.GoTo(1810, y, 100, 75)
+				p.GoTo(1840, y, 100, 75)
 			end,
 			function()
-				p.sleep(1500)
+				p.sleep(2000)
 				p.MotionStop(MAX_DEC)
 			end
 		)
@@ -290,7 +290,7 @@ while (true) do
 						)
 					end
 					if (totem1bottle == false and button1 == false and button2 == false and rose == false) then
-						while (true) do
+						while (not c.GetStopButton()) do
 							p.process()
 						end
 					end

@@ -200,10 +200,10 @@ function PushButton(farther)
 	p.runparallel(
 		function()
 			x, y, phi = c.GetRobotPos()
-			p.GoTo(1820, y, 100, 75)
+			p.GoTo(1860, y, 100, 75)
 		end,
 		function()
-			p.sleep(1500)
+			p.sleep(2000)
 			p.MotionStop(MAX_DEC)
 		end
 	)
