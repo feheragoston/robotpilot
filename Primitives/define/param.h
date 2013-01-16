@@ -378,7 +378,7 @@
 #define BDC_CONV_RADS2_TO_MOTORROTS2(rads2)			((double)(rads2) * BDC_WHEEL_DISTANCE / 2 / BDC_CONV_RPM_TO_MMS(1) / 60)
 
 #define BDC_CONV_ACC(acc)							((u16)BDC_CONV_MMS2_TO_MOTORROTS2(acc))
-#define BDC_CONV_SPEED(speed)						((u16)BDC_CONV_MMS_TO_RPM(speed))
+#define BDC_CONV_SPEED(speed)						((s16)BDC_CONV_MMS_TO_RPM(speed))
 //#define BDC_CONV_DIST(dist)							((s32)BDC_CONV_MM_TO_INCR(dist))
 
 #define BDC_CONV_BETA(beta)							((u16)BDC_CONV_RADS2_TO_MOTORROTS2(beta))

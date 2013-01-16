@@ -207,15 +207,15 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 	s16 vRight	= (s16)(v - w * BDC_WHEEL_DISTANCE / 2);
 
 	//bal motornak meg kell forditani a sebesseget
-	SET_S16(&(msg.data[0]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight));
-	SET_S16(&(msg.data[2]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft));
+	SET_S16(&(msg.data[0]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : -vRight));
+	SET_S16(&(msg.data[2]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? -vRight : vLeft));
 
 	UDPdriver::send(&msg);
 
 	AnySpeed.inProgress = true;
 	AnySpeed.finished = false;
 
-	cout << name << "\t___send SETSPEED___:\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
+	cout << name << "\t___send SETSPEED___:\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : -vRight)) << "\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? -vRight : vLeft)) << endl;
 
 }
 
@@ -229,15 +229,15 @@ void node_BDC::BDC_SET_WHEELSPEED(double vLeft, double vRight){
 	msg.length		= 4;
 
 	//bal motornak meg kell forditani a sebesseget
-	SET_S16(&(msg.data[0]), (s16)((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight));
-	SET_S16(&(msg.data[2]), (s16)((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft));
+	SET_S16(&(msg.data[0]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : -vRight));
+	SET_S16(&(msg.data[2]), BDC_CONV_SPEED((BDC_IS_LEFT_MOTOR1 != 0) ? -vRight : vLeft));
 
 	UDPdriver::send(&msg);
 
 	AnySpeed.inProgress = true;
 	AnySpeed.finished = false;
 
-	cout << name << "\t___send SETWHEELSPEED___:\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? -vLeft : vRight)) << "\t" << (s16)(((BDC_IS_LEFT_MOTOR1 != 0) ? vRight : -vLeft)) << endl;
+	cout << name << "\t___send SETWHEELSPEED___:\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? vLeft : -vRight)) << "\t" << BDC_CONV_SPEED(((BDC_IS_LEFT_MOTOR1 != 0) ? -vRight : vLeft)) << endl;
 
 }
 
