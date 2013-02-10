@@ -96,11 +96,6 @@
 #define MSG_INPUT_SET_OUTPUT_REPLY			0x00
 
 
-//VACUUM_ID
-#define CMD_VACUUM_SET						0x00
-#define MSG_VACUUM_SET_REPLY				0x00
-
-
 //SERVO_ID
 #define CMD_SERVO_SET_POS					0x00
 #define MSG_SERVO_SET_POS_REPLY				0x00

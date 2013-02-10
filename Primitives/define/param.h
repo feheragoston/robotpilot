@@ -14,8 +14,6 @@
 //----- konstans -----
 #define SERVO_COUNT							6
 
-#define VACUUM_COUNT						2
-
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 #define INPUT_DIGITAL_OUTPUT_COUNT			4
@@ -123,10 +121,6 @@
 #define INPUT_SEND_PERIOD_TO_PC_MS				100
 #define INPUT_SEND_PERIOD_TO_NODE_MS			0
 
-#define VACUUM_KEEP_ALIVE_MS					1000
-#define VACUUM_SEND_PERIOD_TO_PC_MS				100
-#define VACUUM_SEND_PERIOD_TO_NODE_MS			0
-
 #define SERVO_KEEP_ALIVE_MS						1000
 #define SERVO_SEND_PERIOD_TO_PC_MS				100
 #define SERVO_SEND_PERIOD_TO_NODE_MS			0
@@ -148,22 +142,9 @@
 #define DEADRECK_ON_CANB						1
 #define DCWHEEL_ON_CANB							1
 #define INPUT_ON_CANB							1
-#define VACUUM_ON_CANB							1
 #define SERVO_ON_CANB							1
 #define SONAR_ON_CANB							1
 #define POWER_ON_CANB							1
-
-
-
-
-
-//----- vacuum -----
-#define VACUUM_COMPRESSOR_INDEX				0
-#define VACUUM_VALVE_INDEX					1
-
-#define VACUUM_IS_COMPRESSOR_ON_M2				1
-#define VACUUM_IS_COMPRESSOR_POLARITY_PLUS		1
-#define VACUUM_IS_VALVE_POLARITY_PLUS			1
 
 
 

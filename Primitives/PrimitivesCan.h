@@ -20,7 +20,6 @@
 #include "nodes/include/node_Deadreck.h"
 #include "nodes/include/node_DCWheel.h"
 #include "nodes/include/node_Input.h"
-#include "nodes/include/node_Vacuum.h"
 #include "nodes/include/node_Servo.h"
 #include "nodes/include/node_Sonar.h"
 #include "nodes/include/node_Power.h"
@@ -154,7 +153,6 @@ private:
 	node_Deadreck*		deadreck;
 	node_DCWheel*		dcwheel;
 	node_Input*			input;
-	node_Vacuum*		vacuum;
 	node_Servo*			servo;
 	node_Sonar*			sonar;
 	node_Power*			power;

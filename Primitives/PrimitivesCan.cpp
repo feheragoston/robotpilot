@@ -92,7 +92,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
 	input		= new node_Input();
-	vacuum		= new node_Vacuum();
 	servo		= new node_Servo();
 	sonar		= new node_Sonar();
 	power		= new node_Power();
@@ -116,9 +115,6 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
-
-	if(!VACUUM_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(VACUUM_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(VACUUM_ID);
 
 	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
@@ -186,7 +182,6 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(vacuum)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(power)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	//SONAR-nak nem kuldunk semmit
@@ -1170,160 +1165,6 @@ double PrimitivesCan::GetConsolePos(void){
 }
 
 
-bool PrimitivesCan::Compressor(bool on){
-
-	EnterCritical();
-
-	bool ret;
-	u8 num = VACUUM_COMPRESSOR_INDEX;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(vacuum->Set[num].inProgress){
-		ret = ACT_START_ERROR;
-	}
-
-	//ha elindithatjuk
-	else{
-		vacuum->VACUUM_SET(num, on);
-		ret = ACT_STARTED;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::CompressorInProgress(void){
-
-	EnterCritical();
-
-	u8 num = VACUUM_COMPRESSOR_INDEX;
-	bool ret = vacuum->Set[num].inProgress;
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::GetCompressor(void){
-
-	EnterCritical();
-
-	u8 num = VACUUM_COMPRESSOR_INDEX;
-	bool ret = vacuum->GET_ON(num);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::Valve(bool open){
-
-	EnterCritical();
-
-	bool ret;
-	u8 num = VACUUM_VALVE_INDEX;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(vacuum->Set[num].inProgress){
-		ret = ACT_START_ERROR;
-	}
-
-	//ha elindithatjuk
-	else{
-		vacuum->VACUUM_SET(num, open);
-		ret = ACT_STARTED;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::ValveInProgress(void){
-
-	EnterCritical();
-
-	u8 num = VACUUM_VALVE_INDEX;
-	bool ret = vacuum->Set[num].inProgress;
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::GetValve(void){
-
-	EnterCritical();
-
-	u8 num = VACUUM_VALVE_INDEX;
-	bool ret = vacuum->GET_ON(num);
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-double PrimitivesCan::GetPressure(void){
-	return input->GET_PRESSURE(INPUT_ANALOG_PRESSURE_INDEX);
-}
-
-
-bool PrimitivesCan::ResetPressure(bool reset){
-
-	EnterCritical();
-
-	bool ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(input->SetOutput[INPUT_DIGITAL_RESET_PRESSURE_INDEX].inProgress){
-		ret = ACT_START_ERROR;
-	}
-
-	//ha elindithatjuk
-	else{
-		input->SET_DIGITAL(INPUT_DIGITAL_RESET_PRESSURE_INDEX, reset);
-		ret = ACT_STARTED;
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::ResetPressureInProgress(void){
-
-	EnterCritical();
-
-	bool ret = input->SetOutput[INPUT_DIGITAL_RESET_PRESSURE_INDEX].inProgress;
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
 void PrimitivesCan::detectActChange(void){
 
 	bool ActOn;
@@ -1356,7 +1197,6 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	input->evalMsg(msg);
-	vacuum->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
 	power->evalMsg(msg);
