@@ -111,8 +111,8 @@ void PrimitivesCan::addNodesToCan(void){
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
 
-	if(!BDC_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(BDC_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(BDC_ID);
+	if(!DCWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DCWHEEL_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(DCWHEEL_ID);
 
 	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
@@ -535,7 +535,7 @@ bool PrimitivesCan::SetSpeed(double v, double w){
 
 	//ha elindithatjuk
 	else{
-		dcwheel->BDC_SET_SPEED(v, w);
+		dcwheel->DCWHEEL_SET_SPEED(v, w);
 		ret = ACT_STARTED;
 	}
 
@@ -563,7 +563,7 @@ bool PrimitivesCan::SetWheelSpeed(double vLeft, double vRight){
 
 	//ha elindithatjuk
 	else{
-		dcwheel->BDC_SET_WHEELSPEED(vLeft, vRight);
+		dcwheel->DCWHEEL_SET_WHEELSPEED(vLeft, vRight);
 		ret = ACT_STARTED;
 	}
 
@@ -604,7 +604,7 @@ bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 	//ha elindithatjuk
 	else{
-		dcwheel->BDC_GO(distance, max_speed, max_acc);
+		dcwheel->DCWHEEL_GO(distance, max_speed, max_acc);
 		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		ret = ACT_STARTED;
 	}
@@ -636,7 +636,7 @@ bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	//ha elindithatjuk
 	else{
 		ConvWorldToRobot(x, y, 0, &xr, &yr, &phir);
-		dcwheel->BDC_GOTO(xr, yr, max_speed, max_acc);
+		dcwheel->DCWHEEL_GOTO(xr, yr, max_speed, max_acc);
 		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		GetRobotPos_Unsafe(&xw, &yw, &phiw);
 		ret = ACT_STARTED;
@@ -666,7 +666,7 @@ bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 	//ha elindithatjuk
 	else{
-		dcwheel->BDC_TURN(angle, max_speed, max_acc);
+		dcwheel->DCWHEEL_TURN(angle, max_speed, max_acc);
 		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		ret = ACT_STARTED;
 	}
@@ -732,8 +732,8 @@ bool PrimitivesCan::MotionStop(double dec){
 		//MotionStop hivasnal az osszes tobbi mozgast leallitjuk
 		dcwheel->AnyMotion.inProgress = false;
 
-		if(dec != 0)	dcwheel->BDC_STOP(dec);
-		else			dcwheel->BDC_HARD_STOP();
+		if(dec != 0)	dcwheel->DCWHEEL_STOP(dec);
+		else			dcwheel->DCWHEEL_HARD_STOP();
 
 		ret = ACT_STARTED;
 	}

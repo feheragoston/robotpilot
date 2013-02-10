@@ -34,13 +34,13 @@ public:
 	void INIT_PARAM(void);
 
 
-	void BDC_STOP(double acc);
-	void BDC_HARD_STOP(void);
-	void BDC_GO(double distance, double max_speed, double max_acc);
-	void BDC_GOTO(double x, double y, double max_speed, double max_acc);
-	void BDC_TURN(double angle, double max_speed, double max_acc);
-	void BDC_SET_SPEED(double v, double w);
-	void BDC_SET_WHEELSPEED(double vLeft, double vRight);
+	void DCWHEEL_STOP(double acc);
+	void DCWHEEL_HARD_STOP(void);
+	void DCWHEEL_GO(double distance, double max_speed, double max_acc);
+	void DCWHEEL_GOTO(double x, double y, double max_speed, double max_acc);
+	void DCWHEEL_TURN(double angle, double max_speed, double max_acc);
+	void DCWHEEL_SET_SPEED(double v, double w);
+	void DCWHEEL_SET_WHEELSPEED(double vLeft, double vRight);
 
 
 	progress_t AnyStop;

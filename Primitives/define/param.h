@@ -115,9 +115,9 @@
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
 #define DEADRECK_SEND_PERIOD_TO_NODE_MS			1
 
-#define BDC_KEEP_ALIVE_MS						1000
-#define BDC_SEND_PERIOD_TO_PC_MS				100
-#define BDC_SEND_PERIOD_TO_NODE_MS				0
+#define DCWHEEL_KEEP_ALIVE_MS					1000
+#define DCWHEEL_SEND_PERIOD_TO_PC_MS			100
+#define DCWHEEL_SEND_PERIOD_TO_NODE_MS			0
 
 #define INPUT_KEEP_ALIVE_MS						1000
 #define INPUT_SEND_PERIOD_TO_PC_MS				100
@@ -146,7 +146,7 @@
 //----- gateway -----
 #define CONSOLE_ON_CANB							1
 #define DEADRECK_ON_CANB						1
-#define BDC_ON_CANB								1
+#define DCWHEEL_ON_CANB							1
 #define INPUT_ON_CANB							1
 #define VACUUM_ON_CANB							1
 #define SERVO_ON_CANB							1
@@ -349,52 +349,52 @@
 
 
 //----- dcwheel -----
-#define BDC_GEARBOX									66
-#define BDC_INCR_PER_MOTORROT						3000
-#define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)
+#define DCWHEEL_GEARBOX								66
+#define DCWHEEL_INCR_PER_MOTORROT					3000
+#define DCWHEEL_INCR_PER_WHEELROT					(DCWHEEL_GEARBOX * DCWHEEL_INCR_PER_MOTORROT)
 
-#define BDC_INCR_PER_MM								((double)494317 / 400) //Odett, de most ugyanaz
-#define BDC_WHEEL_DISTRICT_MM						((double)BDC_INCR_PER_WHEELROT / BDC_INCR_PER_MM)
-#define BDC_WHEEL_DIAMETER_MM						((double)BDC_WHEEL_DISTRICT_MM / M_PI)
+#define DCWHEEL_INCR_PER_MM							((double)494317 / 400) //Odett, de most ugyanaz
+#define DCWHEEL_WHEEL_DISTRICT_MM					((double)DCWHEEL_INCR_PER_WHEELROT / DCWHEEL_INCR_PER_MM)
+#define DCWHEEL_WHEEL_DIAMETER_MM					((double)DCWHEEL_WHEEL_DISTRICT_MM / M_PI)
 
-#define BDC_INCR_TO_MM(incr)						((double)(incr) / BDC_INCR_PER_MM)
+#define DCWHEEL_INCR_TO_MM(incr)					((double)(incr) / DCWHEEL_INCR_PER_MM)
 
-#define BDC_INCR_PER_FULL_TURN						((double)6723500 / 10) // Odett, nincs hasznalva
-#define BDC_MM_PER_FULL_TURN						BDC_INCR_TO_MM(BDC_INCR_PER_FULL_TURN)
+#define DCWHEEL_INCR_PER_FULL_TURN					((double)6723500 / 10) // Odett, nincs hasznalva
+#define DCWHEEL_MM_PER_FULL_TURN					DCWHEEL_INCR_TO_MM(DCWHEEL_INCR_PER_FULL_TURN)
 
-#define BDC_WHEEL_DISTANCE							161.5 // kezzel mert ertek
+#define DCWHEEL_WHEEL_DISTANCE						161.5 // kezzel mert ertek
 
-#define BDC_SEC_PER_MIN								60
+#define DCWHEEL_SEC_PER_MIN							60
 
-#define BDC_CONV_INCR_TO_MM(incr)					((double)(incr) / BDC_INCR_PER_MM)
-#define BDC_CONV_RPM_TO_MMS(rpm)					((double)(rpm) / BDC_SEC_PER_MIN * BDC_INCR_PER_MOTORROT / BDC_INCR_PER_MM)
-#define BDC_CONV_MOTORROTS2_TO_MMS2(motorrots2)		((double)(motorrots2) * BDC_INCR_PER_MOTORROT / BDC_INCR_PER_MM)
+#define DCWHEEL_CONV_INCR_TO_MM(incr)				((double)(incr) / DCWHEEL_INCR_PER_MM)
+#define DCWHEEL_CONV_RPM_TO_MMS(rpm)				((double)(rpm) / DCWHEEL_SEC_PER_MIN * DCWHEEL_INCR_PER_MOTORROT / DCWHEEL_INCR_PER_MM)
+#define DCWHEEL_CONV_MOTORROTS2_TO_MMS2(motorrots2)	((double)(motorrots2) * DCWHEEL_INCR_PER_MOTORROT / DCWHEEL_INCR_PER_MM)
 
-#define BDC_CONV_MM_TO_INCR(mm)						((double)(mm) * BDC_INCR_PER_MM)
-#define BDC_CONV_MMS_TO_RPM(mms)					((double)(mms) * BDC_SEC_PER_MIN * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
-#define BDC_CONV_MMS2_TO_MOTORROTS2(mms2)			((double)(mms2) * BDC_INCR_PER_MM / BDC_INCR_PER_MOTORROT)
+#define DCWHEEL_CONV_MM_TO_INCR(mm)					((double)(mm) * DCWHEEL_INCR_PER_MM)
+#define DCWHEEL_CONV_MMS_TO_RPM(mms)				((double)(mms) * DCWHEEL_SEC_PER_MIN * DCWHEEL_INCR_PER_MM / DCWHEEL_INCR_PER_MOTORROT)
+#define DCWHEEL_CONV_MMS2_TO_MOTORROTS2(mms2)		((double)(mms2) * DCWHEEL_INCR_PER_MM / DCWHEEL_INCR_PER_MOTORROT)
 
-#define BDC_CONV_RADS_TO_RPM(rads)					((double)(rads) * BDC_WHEEL_DISTANCE / 2 / BDC_CONV_RPM_TO_MMS(1))
-#define BDC_CONV_RADS2_TO_MOTORROTS2(rads2)			((double)(rads2) * BDC_WHEEL_DISTANCE / 2 / BDC_CONV_RPM_TO_MMS(1) / 60)
+#define DCWHEEL_CONV_RADS_TO_RPM(rads)				((double)(rads) * DCWHEEL_WHEEL_DISTANCE / 2 / DCWHEEL_CONV_RPM_TO_MMS(1))
+#define DCWHEEL_CONV_RADS2_TO_MOTORROTS2(rads2)		((double)(rads2) * DCWHEEL_WHEEL_DISTANCE / 2 / DCWHEEL_CONV_RPM_TO_MMS(1) / 60)
 
-#define BDC_CONV_ACC(acc)							((u16)BDC_CONV_MMS2_TO_MOTORROTS2(acc))
-#define BDC_CONV_SPEED(speed)						((s16)BDC_CONV_MMS_TO_RPM(speed))
-//#define BDC_CONV_DIST(dist)							((s32)BDC_CONV_MM_TO_INCR(dist))
+#define DCWHEEL_CONV_ACC(acc)						((u16)DCWHEEL_CONV_MMS2_TO_MOTORROTS2(acc))
+#define DCWHEEL_CONV_SPEED(speed)					((s16)DCWHEEL_CONV_MMS_TO_RPM(speed))
+//#define DCWHEEL_CONV_DIST(dist)						((s32)DCWHEEL_CONV_MM_TO_INCR(dist))
 
-#define BDC_CONV_BETA(beta)							((u16)BDC_CONV_RADS2_TO_MOTORROTS2(beta))
-#define BDC_CONV_OMEGA(omega)						((u16)BDC_CONV_RADS_TO_RPM(omega))
+#define DCWHEEL_CONV_BETA(beta)						((u16)DCWHEEL_CONV_RADS2_TO_MOTORROTS2(beta))
+#define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
 
 
-#define BDC_IS_LEFT_MOTOR1							1
-#define BDC_IS_SERIAL_DRIVE							1
-//#define BDC_WHEEL_DISTANCE							lsd feljebb
-#define BDC_ROBOT_FULL_TURN_INCR					BDC_INCR_PER_FULL_TURN	//// nincs hasznalva
-#define BDC_RPM_TO_MMPS								BDC_CONV_RPM_TO_MMS(1)
-#define BDC_MM_TO_INCR								BDC_INCR_PER_MM
-#define BDC_PRE_BRAKE_TIME							0.3	//sec
-#define BDC_OE_CONTROL_P							0.0007
-#define BDC_OE_CONTROL_I							0.0
-#define BDC_OE_CONTROL_D							0.2
+#define DCWHEEL_IS_LEFT_MOTOR1						1
+#define DCWHEEL_IS_SERIAL_DRIVE						1
+//#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
+#define DCWHEEL_ROBOT_FULL_TURN_INCR				DCWHEEL_INCR_PER_FULL_TURN	//// nincs hasznalva
+#define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
+#define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
+#define DCWHEEL_PRE_BRAKE_TIME						0.3	//sec
+#define DCWHEEL_OE_CONTROL_P						0.0007
+#define DCWHEEL_OE_CONTROL_I						0.0
+#define DCWHEEL_OE_CONTROL_D						0.2
 
 
 

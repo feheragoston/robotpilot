@@ -71,24 +71,24 @@
 #define MSG_DEADRECK_RESET_POS_REPLY		0x00
 
 
-//BDC_ID
-#define CMD_BDC_STOP						0x00
-#define MSG_BDC_STOP_REPLY					0x00
+//DCWHEEL_ID
+#define CMD_DCWHEEL_STOP					0x00
+#define MSG_DCWHEEL_STOP_REPLY				0x00
 
-#define CMD_BDC_HARD_STOP					0x01
-#define MSG_BDC_HARD_STOP_REPLY				0x01
+#define CMD_DCWHEEL_HARD_STOP				0x01
+#define MSG_DCWHEEL_HARD_STOP_REPLY			0x01
 
-#define CMD_BDC_GO							0x02
-#define MSG_BDC_GO_REPLY					0x02
+#define CMD_DCWHEEL_GO						0x02
+#define MSG_DCWHEEL_GO_REPLY				0x02
 
-#define CMD_BDC_GOTO						0x03
-#define MSG_BDC_GOTO_REPLY					0x03
+#define CMD_DCWHEEL_GOTO					0x03
+#define MSG_DCWHEEL_GOTO_REPLY				0x03
 
-#define CMD_BDC_TURN						0x04
-#define MSG_BDC_TURN_REPLY					0x04
+#define CMD_DCWHEEL_TURN					0x04
+#define MSG_DCWHEEL_TURN_REPLY				0x04
 
-#define CMD_BDC_SET_SPEED					0x05
-#define MSG_BDC_SET_SPEED_REPLY				0x05
+#define CMD_DCWHEEL_SET_SPEED				0x05
+#define MSG_DCWHEEL_SET_SPEED_REPLY			0x05
 
 
 //INPUT_ID
