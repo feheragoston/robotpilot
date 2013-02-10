@@ -18,7 +18,7 @@
 #include "nodes/include/node_Gateway.h"
 #include "nodes/include/node_Console.h"
 #include "nodes/include/node_Deadreck.h"
-#include "nodes/include/node_BDC.h"
+#include "nodes/include/node_DCWheel.h"
 #include "nodes/include/node_Input.h"
 #include "nodes/include/node_Vacuum.h"
 #include "nodes/include/node_Servo.h"
@@ -152,7 +152,7 @@ private:
 	node_Gateway*		gateway;
 	node_Console*		console;
 	node_Deadreck*		deadreck;
-	node_BDC*			bdc;
+	node_DCWheel*		dcwheel;
 	node_Input*			input;
 	node_Vacuum*		vacuum;
 	node_Servo*			servo;
@@ -164,7 +164,7 @@ private:
 	//----- valtozo ELEJE -----
 	char CanIp[16];
 
-	bool bdcMotionError;
+	bool dcwheelMotionError;
 
 	double deadreckCheckXw;
 	double deadreckCheckYw;

@@ -348,7 +348,7 @@
 
 
 
-//----- bdc -----
+//----- dcwheel -----
 #define BDC_GEARBOX									66
 #define BDC_INCR_PER_MOTORROT						3000
 #define BDC_INCR_PER_WHEELROT						(BDC_GEARBOX * BDC_INCR_PER_MOTORROT)

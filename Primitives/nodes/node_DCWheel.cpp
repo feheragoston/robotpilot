@@ -1,5 +1,5 @@
 /*
- * node_BDC.cpp
+ * node_DCWheel.cpp
  *
  *  Created on: Feb 17, 2011
  *      Author: triszalo
@@ -9,12 +9,12 @@
 
 
 
-#include "include/node_BDC.h"
+#include "include/node_DCWheel.h"
 
 using namespace std;
 
 
-node_BDC::node_BDC(void) : node(BDC_ID, "node_BDC", BDC_KEEP_ALIVE_MS, BDC_SEND_PERIOD_TO_PC_MS, BDC_SEND_PERIOD_TO_NODE_MS){
+node_DCWheel::node_DCWheel(void) : node(BDC_ID, "node_DCWheel", BDC_KEEP_ALIVE_MS, BDC_SEND_PERIOD_TO_PC_MS, BDC_SEND_PERIOD_TO_NODE_MS){
 
 
 	//----- valtozo init ELEJE -----
@@ -24,12 +24,12 @@ node_BDC::node_BDC(void) : node(BDC_ID, "node_BDC", BDC_KEEP_ALIVE_MS, BDC_SEND_
 }
 
 
-node_BDC::~node_BDC(){
+node_DCWheel::~node_DCWheel(){
 
 }
 
 
-void node_BDC::evalMsg(UDPmsg* msg){
+void node_DCWheel::evalMsg(UDPmsg* msg){
 
 	//ha o a cimzett, csak akkor dolgozza fel
 	if(msg->node_id == id){
@@ -92,7 +92,7 @@ void node_BDC::evalMsg(UDPmsg* msg){
 }
 
 
-void node_BDC::BDC_STOP(double acc){
+void node_DCWheel::BDC_STOP(double acc){
 
 	UDPmsg msg;
 
@@ -111,7 +111,7 @@ void node_BDC::BDC_STOP(double acc){
 }
 
 
-void node_BDC::BDC_HARD_STOP(void){
+void node_DCWheel::BDC_HARD_STOP(void){
 
 	UDPmsg msg;
 
@@ -129,7 +129,7 @@ void node_BDC::BDC_HARD_STOP(void){
 }
 
 
-void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
+void node_DCWheel::BDC_GO(double distance, double max_speed, double max_acc){
 
 	UDPmsg msg;
 
@@ -150,7 +150,7 @@ void node_BDC::BDC_GO(double distance, double max_speed, double max_acc){
 }
 
 
-void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
+void node_DCWheel::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 
 	UDPmsg msg;
 
@@ -172,7 +172,7 @@ void node_BDC::BDC_GOTO(double x, double y, double max_speed, double max_acc){
 }
 
 
-void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
+void node_DCWheel::BDC_TURN(double angle, double max_speed, double max_acc){
 
 	UDPmsg msg;
 
@@ -193,7 +193,7 @@ void node_BDC::BDC_TURN(double angle, double max_speed, double max_acc){
 }
 
 
-void node_BDC::BDC_SET_SPEED(double v, double w){
+void node_DCWheel::BDC_SET_SPEED(double v, double w){
 
 	UDPmsg msg;
 
@@ -220,7 +220,7 @@ void node_BDC::BDC_SET_SPEED(double v, double w){
 }
 
 
-void node_BDC::BDC_SET_WHEELSPEED(double vLeft, double vRight){
+void node_DCWheel::BDC_SET_WHEELSPEED(double vLeft, double vRight){
 
 	UDPmsg msg;
 
@@ -242,7 +242,7 @@ void node_BDC::BDC_SET_WHEELSPEED(double vLeft, double vRight){
 }
 
 
-void node_BDC::INIT_PARAM(void){
+void node_DCWheel::INIT_PARAM(void){
 
 	UDPmsg msg;
 

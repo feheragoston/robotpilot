@@ -1,13 +1,13 @@
 /*
- * node_BDC.h
+ * node_DCWheel.h
  *
  *  Created on: Feb 17, 2011
  *      Author: triszalo
  */
 
 
-#ifndef NODE_BDC_H_
-#define NODE_BDC_H_
+#ifndef NODE_DCWHEEL_H_
+#define NODE_DCWHEEL_H_
 
 
 
@@ -21,13 +21,13 @@
 
 
 
-//------------------------------ node_BDC ELEJE ------------------------------
-class node_BDC : public node{
+//------------------------------ node_DCWheel ELEJE ------------------------------
+class node_DCWheel : public node{
 
 public:
 
-	node_BDC(void);
-	~node_BDC();
+	node_DCWheel(void);
+	~node_DCWheel();
 
 	void evalMsg(UDPmsg* msg);
 
@@ -49,10 +49,10 @@ public:
 
 
 };
-//------------------------------ node_BDC VEGE ------------------------------
+//------------------------------ node_DCWheel VEGE ------------------------------
 
 
 
 
 
-#endif /*NODE_BDC_H_*/
+#endif /*NODE_DCWHEEL_H_*/

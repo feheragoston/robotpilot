@@ -69,7 +69,7 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	//---------- valtozo ELEJE ----------
 	strcpy(CanIp, config->CanIp);
 
-	bdcMotionError		= false;
+	dcwheelMotionError	= false;
 
 	deadreckCheckXw		= 0;
 	deadreckCheckYw		= 0;
@@ -90,7 +90,7 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 
 	console		= new node_Console();
 	deadreck	= new node_Deadreck();
-	bdc			= new node_BDC();
+	dcwheel		= new node_DCWheel();
 	input		= new node_Input();
 	vacuum		= new node_Vacuum();
 	servo		= new node_Servo();
@@ -184,7 +184,7 @@ bool PrimitivesCan::Init(void){
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(bdc)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(vacuum)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
@@ -527,15 +527,15 @@ bool PrimitivesCan::SetSpeed(double v, double w){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->AnyMotion.inProgress ||
-		bdc->AnySpeed.inProgress){
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		bdc->BDC_SET_SPEED(v, w);
+		dcwheel->BDC_SET_SPEED(v, w);
 		ret = ACT_STARTED;
 	}
 
@@ -555,15 +555,15 @@ bool PrimitivesCan::SetWheelSpeed(double vLeft, double vRight){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->AnyMotion.inProgress ||
-		bdc->AnySpeed.inProgress){
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		bdc->BDC_SET_WHEELSPEED(vLeft, vRight);
+		dcwheel->BDC_SET_WHEELSPEED(vLeft, vRight);
 		ret = ACT_STARTED;
 	}
 
@@ -579,7 +579,7 @@ bool PrimitivesCan::SetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = bdc->AnySpeed.inProgress;
+	bool ret = dcwheel->AnySpeed.inProgress;
 
 	ExitCritical();
 
@@ -596,16 +596,16 @@ bool PrimitivesCan::Go(double distance, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->AnyMotion.inProgress ||
-		bdc->AnySpeed.inProgress){
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		bdc->BDC_GO(distance, max_speed, max_acc);
-		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		dcwheel->BDC_GO(distance, max_speed, max_acc);
+		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		ret = ACT_STARTED;
 	}
 
@@ -627,17 +627,17 @@ bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->AnyMotion.inProgress ||
-		bdc->AnySpeed.inProgress){
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
 		ConvWorldToRobot(x, y, 0, &xr, &yr, &phir);
-		bdc->BDC_GOTO(xr, yr, max_speed, max_acc);
-		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		dcwheel->BDC_GOTO(xr, yr, max_speed, max_acc);
+		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		GetRobotPos_Unsafe(&xw, &yw, &phiw);
 		ret = ACT_STARTED;
 	}
@@ -658,16 +658,16 @@ bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress ||
-		bdc->AnyMotion.inProgress ||
-		bdc->AnySpeed.inProgress){
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		bdc->BDC_TURN(angle, max_speed, max_acc);
-		bdcMotionError = MOTION_NO_ERROR;	//nincs hiba
+		dcwheel->BDC_TURN(angle, max_speed, max_acc);
+		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
 		ret = ACT_STARTED;
 	}
 
@@ -683,15 +683,15 @@ bool PrimitivesCan::MotionInProgress(void){
 
 	EnterCritical();
 
-	bool ret = bdc->AnyMotion.inProgress;
+	bool ret = dcwheel->AnyMotion.inProgress;
 
 	//ha utkozes kovetkezett be
 	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)))
-		bdcMotionError = MOTION_ERROR;
+		dcwheelMotionError = MOTION_ERROR;
 
-	if (!ret && bdc->AnyMotion.done == 0) {
-		bdcMotionError = MOTION_ERROR;
+	if (!ret && dcwheel->AnyMotion.done == 0) {
+		dcwheelMotionError = MOTION_ERROR;
 	}
 
 	ExitCritical();
@@ -705,7 +705,7 @@ int PrimitivesCan::GetMotionError(void){
 
 	EnterCritical();
 
-	int ret = (bdcMotionError ? MOTION_ERROR : MOTION_NO_ERROR);
+	int ret = (dcwheelMotionError ? MOTION_ERROR : MOTION_NO_ERROR);
 
 	ExitCritical();
 
@@ -722,7 +722,7 @@ bool PrimitivesCan::MotionStop(double dec){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(	bdc->AnyStop.inProgress){
+	if(	dcwheel->AnyStop.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -730,10 +730,10 @@ bool PrimitivesCan::MotionStop(double dec){
 	else{
 
 		//MotionStop hivasnal az osszes tobbi mozgast leallitjuk
-		bdc->AnyMotion.inProgress = false;
+		dcwheel->AnyMotion.inProgress = false;
 
-		if(dec != 0)	bdc->BDC_STOP(dec);
-		else			bdc->BDC_HARD_STOP();
+		if(dec != 0)	dcwheel->BDC_STOP(dec);
+		else			dcwheel->BDC_HARD_STOP();
 
 		ret = ACT_STARTED;
 	}
@@ -750,7 +750,7 @@ bool PrimitivesCan::MotionStopInProgress(void){
 
 	EnterCritical();
 
-	bool ret = bdc->AnyStop.inProgress;
+	bool ret = dcwheel->AnyStop.inProgress;
 
 	ExitCritical();
 
@@ -1354,7 +1354,7 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
 	deadreck->evalMsg(msg);
-	bdc->evalMsg(msg);
+	dcwheel->evalMsg(msg);
 	input->evalMsg(msg);
 	vacuum->evalMsg(msg);
 	servo->evalMsg(msg);
