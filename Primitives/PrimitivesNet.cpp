@@ -82,8 +82,6 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 		rightClawPos = data->rightClawPos;
 		armPos = data->armPos;
 		consolePos = data->consolePos;
-		compressor = data->compressor;
-		valve = data->valve;
 		for (int i = 0; i < PROXIMITY_NUM; i++) {
 			distances[i] = data->distances[i];
 		}
@@ -339,22 +337,4 @@ bool PrimitivesNet::ConsoleStop() {
 
 double PrimitivesNet::GetConsolePos() {
 	return 0.;
-}
-
-bool PrimitivesNet::Compressor(bool on) {
-	msgb1 message;
-	message.function = MSG_COMPRESSOR;
-	message.b1 = on;
-	netConnection->Send(&message, sizeof(msgb1));
-	compressor = on;
-	return true;
-}
-
-bool PrimitivesNet::Valve(bool open) {
-	msgb1 message;
-	message.function = MSG_VALVE;
-	message.b1 = open;
-	netConnection->Send(&message, sizeof(msgb1));
-	compressor = open;
-	return true;
 }

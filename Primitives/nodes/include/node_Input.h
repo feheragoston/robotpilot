@@ -37,8 +37,6 @@ public:
 	bool GET_DIGITAL(u8 digital_num);
 	void SET_DIGITAL(u8 digital_num, bool on);
 
-	double GET_PRESSURE(u8 analog_num);
-
 	progress_t SetOutput[INPUT_DIGITAL_COUNT];
 
 

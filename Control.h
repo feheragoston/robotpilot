@@ -176,18 +176,6 @@ protected:
 	static int l_ConsoleStop(lua_State *L);
 	static int l_ConsoleStopInProgress(lua_State *L);
 	static int l_GetConsolePos(lua_State *L);
-	static int l_Compressor(lua_State *L);
-	static int l_CompressorInProgress(lua_State *L);
-	static int l_Valve(lua_State *L);
-	static int l_ValveInProgress(lua_State *L);
-	/**
-	 * 2.696 alatt nincs cd
-	 * @param L
-	 * @return
-	 */
-	static int l_GetPressure(lua_State *L);
-	static int l_ResetPressure(lua_State *L);
-	static int l_ResetPressureInProgress(lua_State *L);
 
 	static int l_StartMatch(lua_State *L);
 

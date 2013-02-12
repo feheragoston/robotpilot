@@ -417,75 +417,6 @@ public:
 	 */
 	virtual double GetConsolePos();
 
-	///////////////////////////////////////////////////////////////////////
-	// COMPRESSOR
-	///////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Kompresszor kapcsolasa
-	 * @param on allapot
-	 * @return true: folyamat elindult, false: hiba tortent
-	 */
-	virtual bool Compressor(bool on);
-
-	/**
-	 * Kompresszor kapcsolas allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool CompressorInProgress();
-
-	/**
-	 * Kompresszor allapota
-	 * @return true: bekapcsolva, false: nincs bekapcsolva
-	 */
-	virtual bool GetCompressor();
-
-	///////////////////////////////////////////////////////////////////////
-	// VALVE
-	///////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Szelep kapcsolasa
-	 * @param open allapot
-	 * @return true: folyamat elindult, false: hiba tortent
-	 */
-	virtual bool Valve(bool open);
-
-	/**
-	 * Szelep kapcsolas allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool ValveInProgress();
-
-	/**
-	 * Szelep allapota
-	 * @return true: nyitva, false: zarva
-	 */
-	virtual bool GetValve();
-
-	///////////////////////////////////////////////////////////////////////
-	// PRESSURE
-	///////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Nyomaserzekelo allapotanak lekerdezese
-	 * @return relativ nyomas 0..5
-	 */
-	virtual double GetPressure();
-
-	/**
-	 * Nyomaserzekelo alaphelyzetbe allitasa
-	 * @param reset true: re, false: set
-	 * @return true: folyamat elindult, false: hiba tortent
-	 */
-	virtual bool ResetPressure(bool reset);
-
-	/**
-	 * Nyomaserzekelo reseteles allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool ResetPressureInProgress();
-
 protected:
 	/**
 	 * konfiguraciot tartalmazo objektum
@@ -529,8 +460,6 @@ protected:
 	double consolePos;
 	progress armMove;
 	double armPos;
-
-	bool compressor, valve;
 
 };
 

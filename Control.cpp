@@ -122,13 +122,6 @@ Control::Control(Config* config) {
 		{"ConsoleStop", l_ConsoleStop},
 		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
 		{"GetConsolePos", l_GetConsolePos},
-		{"Compressor", l_Compressor},
-		{"CompressorInProgress", l_CompressorInProgress},
-		{"Valve", l_Valve},
-		{"ValveInProgress", l_ValveInProgress},
-		{"GetPressure", l_GetPressure},
-		{"ResetPressure", l_ResetPressure},
-		{"ResetPressureInProgress", l_ResetPressureInProgress},
 
 		{"StartMatch", l_StartMatch},
 
@@ -384,8 +377,6 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.rightClawPos = mPrimitives->GetClawPos(false);
 		response.armPos = mPrimitives->GetArmPos();
 		response.consolePos = mPrimitives->GetConsolePos();
-		response.compressor = mPrimitives->GetCompressor();
-		response.valve = mPrimitives->GetValve();
 		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
 
@@ -521,8 +512,6 @@ void Control::log() {
 		status.rightClawPos = mPrimitives->GetClawPos(false);
 		status.armPos = mPrimitives->GetArmPos();
 		status.consolePos = mPrimitives->GetConsolePos();
-		status.compressor = mPrimitives->GetCompressor();
-		status.valve = mPrimitives->GetValve();
 		mPrimitives->GetDistances(status.distances);
 		size = sizeof(msgstatus);
 		write(logfile, &size, sizeof(msglen_t));
@@ -703,7 +692,6 @@ bool Control::opponentTooClose() {
 		validity = max(validity, refreshOpponent(i));
 	}
 	if (validity > SONAR_TIMEOUT && !mPrimitives->ArmMoveInProgress()
-			&& mPrimitives->GetPressure() < 2.7 && !mPrimitives->GetValve()
 			&& (x < 1600 || abs(phi) > M_PI / 2)) {
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
@@ -1615,44 +1603,6 @@ int Control::l_ConsoleStopInProgress(lua_State *L) {
 int Control::l_GetConsolePos(lua_State *L) {
 	double pos = mPrimitives->GetConsolePos();
 	lua_pushnumber(L, pos);
-	return 1;
-}
-
-int Control::l_Compressor(lua_State *L) {
-	bool on = optbool(L, 1, false);
-	lua_pushboolean(L, mPrimitives->Compressor(on));
-	return 1;
-}
-
-int Control::l_CompressorInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->CompressorInProgress());
-	return 1;
-}
-
-int Control::l_Valve(lua_State *L) {
-	bool on = optbool(L, 1, false);
-	lua_pushboolean(L, mPrimitives->Valve(on));
-	return 1;
-}
-
-int Control::l_ValveInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->ValveInProgress());
-	return 1;
-}
-
-int Control::l_GetPressure(lua_State *L) {
-	lua_pushnumber(L, mPrimitives->GetPressure());
-	return 1;
-}
-
-int Control::l_ResetPressure(lua_State *L) {
-	bool reset = optbool(L, 1, true);
-	lua_pushboolean(L, mPrimitives->ResetPressure(reset));
-	return 1;
-}
-
-int Control::l_ResetPressureInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->ResetPressureInProgress());
 	return 1;
 }
 

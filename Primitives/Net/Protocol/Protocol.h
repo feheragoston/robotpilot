@@ -34,8 +34,8 @@
 #define MSG_OBSTACLES 19
 //#define MSG_PAWNS_AT_START 20
 #define MSG_SERVOMOVE 21
-#define MSG_COMPRESSOR 22
-#define MSG_VALVE 23
+//#define MSG_COMPRESSOR 22
+//#define MSG_VALVE 23
 #define MSG_SHAPES 24
 
 typedef uint8_t msglen_t;
@@ -62,8 +62,6 @@ typedef struct msgstatus {
 	double rightClawPos;
 	double armPos;
 	double consolePos;
-	bool compressor;
-	bool valve;
 	double distances[PROXIMITY_NUM];
 } msgstatus;
 

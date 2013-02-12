@@ -20,9 +20,6 @@ Primitives::Primitives(Config* config) {
 	rightClawPos = 0;
 	consolePos = 0;
 	armPos = 0;
-
-	compressor = false;
-	valve = false;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -42,8 +39,6 @@ Primitives::Primitives(Primitives* source) {
 	rightClawPos = source->GetClawPos(false);
 	consolePos = source->GetConsolePos();
 	armPos = source->GetArmPos();
-	compressor = source->GetCompressor();
-	valve = source->GetValve();
 }
 
 Primitives::~Primitives() {
@@ -482,43 +477,4 @@ bool Primitives::ConsoleStopInProgress() {
 
 double Primitives::GetConsolePos() {
 	return consolePos;
-}
-
-bool Primitives::Compressor(bool on) {
-	compressor = on;
-	return true;
-}
-
-bool Primitives::CompressorInProgress() {
-	return false;
-}
-
-bool Primitives::GetCompressor() {
-	return compressor;
-}
-
-bool Primitives::Valve(bool open) {
-	valve = open;
-	return true;
-}
-
-bool Primitives::ValveInProgress() {
-	return false;
-}
-
-bool Primitives::GetValve() {
-	return valve;
-}
-
-
-double Primitives::GetPressure() {
-	return 3.5;
-}
-
-bool Primitives::ResetPressure(bool reset) {
-	return true;
-}
-
-bool Primitives::ResetPressureInProgress() {
-	return false;
 }

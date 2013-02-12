@@ -107,18 +107,6 @@ public:
 	bool ConsoleStop(void);
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
-
-	bool Compressor(bool on);
-	bool CompressorInProgress(void);
-	bool GetCompressor(void);
-
-	bool Valve(bool open);
-	bool ValveInProgress(void);
-	bool GetValve(void);
-
-	double GetPressure(void);
-	bool ResetPressure(bool reset);
-	bool ResetPressureInProgress(void);
 	//----- Primitives VEGE -----
 
 

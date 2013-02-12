@@ -42,8 +42,6 @@ public:
 	bool ConsoleMoveInProgress();
 	bool ConsoleStop();
 	double GetConsolePos();
-	bool Compressor(bool on);
-	bool Valve(bool open);
 
 protected:
 	// a halozatbol jovo uzenet feldolgozasa
