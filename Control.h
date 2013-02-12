@@ -141,8 +141,6 @@ protected:
 	static int l_GetMyColor(lua_State *L);
 	static int l_GetDistances(lua_State *L);
 	static int l_SetMotorSupply(lua_State *L);
-	static int l_SetEyeColor(lua_State *L);
-	static int l_SetEyeColorInProgress(lua_State *L);
 
 	static int l_CalibrateDeadreckoning(lua_State *L);
 	static int l_SetSpeed(lua_State *L);

@@ -56,9 +56,6 @@ public:
 	bool SetMotorSupplyInProgress(void);
 	bool GetMotorSupply(void);
 
-	bool SetEyeColor(int color);
-	bool SetEyeColorInProgress(void);
-
 	bool CalibrateDeadreckoning(bool simulate = false);
 	bool CalibrateDeadreckoningInProgress(void);
 

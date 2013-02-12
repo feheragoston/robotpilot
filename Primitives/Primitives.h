@@ -87,19 +87,6 @@ public:
 	 */
 	virtual bool GetMotorSupply();
 
-	/**
-	 * Szem szinenek beallitasa
-	 * @param color szin
-	 * @return folyamat elindult, false: hiba tortent
-	 */
-	virtual bool SetEyeColor(int color);
-
-	/**
-	 * Szemszinallitas allapota
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool SetEyeColorInProgress();
-
 	///////////////////////////////////////////////////////////////////////
 	// MOZGASOK, POZICIOK
 	///////////////////////////////////////////////////////////////////////

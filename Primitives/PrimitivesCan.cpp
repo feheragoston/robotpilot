@@ -363,49 +363,6 @@ bool PrimitivesCan::GetMotorSupply(void){
 }
 
 
-bool PrimitivesCan::SetEyeColor(int color){
-
-	EnterCritical();
-
-	bool ret;
-
-
-	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(input->SetOutput[INPUT_DIGITAL_EYE_COLOR_INDEX].inProgress){
-		ret = ACT_START_ERROR;
-	}
-
-	//ha elindithatjuk
-	else{
-
-		if(color)	input->SET_DIGITAL(INPUT_DIGITAL_EYE_COLOR_INDEX, 1);
-		else		input->SET_DIGITAL(INPUT_DIGITAL_EYE_COLOR_INDEX, 0);
-
-		ret = ACT_STARTED;
-
-	}
-
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
-bool PrimitivesCan::SetEyeColorInProgress(void){
-
-	EnterCritical();
-
-	bool ret = input->SetOutput[INPUT_DIGITAL_EYE_COLOR_INDEX].inProgress;
-
-	ExitCritical();
-
-	return ret;
-
-}
-
-
 bool PrimitivesCan::CalibrateDeadreckoning(bool simulate){
 
 	EnterCritical();

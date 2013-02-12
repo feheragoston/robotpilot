@@ -85,8 +85,6 @@ Control::Control(Config* config) {
 		{"GetMyColor", l_GetMyColor},
 		{"GetDistances", l_GetDistances},
 		{"SetMotorSupply", l_SetMotorSupply},
-		{"SetEyeColor", l_SetEyeColor},
-		{"SetEyeColorInProgress", l_SetEyeColorInProgress},
 
 		{"CalibrateDeadreckoning", l_CalibrateDeadreckoning},
 		{"SetSpeed", l_SetSpeed},
@@ -1283,17 +1281,6 @@ int Control::l_SetMotorSupply(lua_State *L) {
 		return 1;
 	}
 	lua_pushboolean(L, false);
-	return 1;
-}
-
-int Control::l_SetEyeColor(lua_State *L) {
-	int color = luaL_optinteger(L, 1, 1);
-	lua_pushboolean(L, mPrimitives->SetEyeColor(color));
-	return 1;
-}
-
-int Control::l_SetEyeColorInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->SetEyeColorInProgress());
 	return 1;
 }
 

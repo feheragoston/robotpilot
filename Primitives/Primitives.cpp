@@ -233,14 +233,6 @@ bool Primitives::GetMotorSupply() {
 	return true;
 }
 
-bool Primitives::SetEyeColor(int color) {
-	return true;
-}
-
-bool Primitives::SetEyeColorInProgress() {
-	return false;
-}
-
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 59.9+290/2;
 	robot.y = 114.8+60/2;
