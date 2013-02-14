@@ -773,6 +773,19 @@ void PrimitivesCan::SetOpponentPos(unsigned char n, double x, double y){
 }
 
 
+double PrimitivesCan::GetBallColorVoltage(void){
+
+	EnterCritical();
+
+	double voltage = input->GET_VOLTAGE(INPUT_ANALOG_BALL_COLOR_CNY70_INDEX);
+
+	ExitCritical();
+
+	return voltage;
+
+}
+
+
 void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();

@@ -247,6 +247,11 @@ public:
 	virtual void SetOpponentPos(unsigned char n, double x, double y);
 
 	/**
+	 * Visszaadja a labdaerzekelo CNY70 feszultsegerteket
+	 */
+	virtual double GetBallColorVoltage(void);
+
+	/**
 	 * Visszaadja a tavolsagerzekelok erteket
 	 * 0: jobb elso
 	 * 1: bal elso

@@ -78,6 +78,7 @@ public:
 	void SetRobotPos(double x, double y, double phi);
 	void SetOpponentPos(unsigned char n, double x, double y);
 
+	double GetBallColorVoltage(void);
 	void GetDistances(double distance[PROXIMITY_NUM]);
 
 	bool GripperMove(bool left, double pos, double max_speed, double max_acc);

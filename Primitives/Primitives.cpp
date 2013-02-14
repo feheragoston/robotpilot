@@ -370,6 +370,10 @@ void Primitives::SetOpponentPos(unsigned char n, double x, double y) {
 	}
 }
 
+double Primitives::GetBallColorVoltage(void){
+	return 0;
+}
+
 void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
 	for (int i = 0; i < PROXIMITY_NUM; i++) {
 		distance[i] = 400;
