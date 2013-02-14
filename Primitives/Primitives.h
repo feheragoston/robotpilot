@@ -268,105 +268,101 @@ public:
 	virtual void GetDistances(double distance[PROXIMITY_NUM]);
 
 	///////////////////////////////////////////////////////////////////////
-	// GRIPPER (hatulrol elore nezve bal oldali, jobb oldali)
+	// GRIPPER
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Also megfogo kar mozgatasa
-	 * @param left bal/jobb kar mozgatasa
+	 * Oldalso megfogo kar mozgatasa
+	 * @param front elso/hatso kar mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 zart
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool GripperMove(bool left, double pos, double max_speed, double max_acc);
+	virtual bool GripperMove(bool front, double pos, double max_speed, double max_acc);
 
 	/**
-	 * Also megfogo kar mozgatas allapota
-	 * @param left bal/jobb kar allapota
+	 * Oldalso megfogo kar mozgatas allapota
+	 * @param front elso/hatso kar allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool GripperMoveInProgress(bool left);
+	virtual bool GripperMoveInProgress(bool front);
 
 	/**
-	 * Legutobbi also megfogo mozgatas hibajanak lekerdezese
-	 * @param left bal/jobb kar
+	 * Legutobbi oldalso megfogo mozgatas hibajanak lekerdezese
+	 * @param front elso/hatso kar
 	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual bool GetGripperError(bool left);
+	virtual bool GetGripperError(bool front);
 
 	/**
-	 * Also megfogo kar szogenek lekerdezese
-	 * @param left bal/jobb kar allapota
+	 * Oldalso megfogo kar szogenek lekerdezese
+	 * @param front elso/hatso kar allapota
 	 * @return [deg], zart helyzet 0
 	 */
-	virtual double GetGripperPos(bool left);
+	virtual double GetGripperPos(bool front);
 
 	///////////////////////////////////////////////////////////////////////
-	// CLAW (hatulrol elore nezve bal oldali, jobb oldali)
+	// SELECTOR
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Felso terelo karok mozgatasa
-	 * @param left bal/jobb karok mozgatasa
+	 * Labda-szelektalo szervo mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 zart
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool ClawMove(bool left, double pos, double max_speed, double max_acc);
+	virtual bool SelectorMove(double pos, double max_speed, double max_acc);
 
 	/**
-	 * Felso terelo karok mozgatasanak allapota
-	 * @param left bal/jobb karok allapota
+	 * Labda-szelektalo szervo mozgatasanak allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool ClawMoveInProgress(bool left);
+	virtual bool SelectorMoveInProgress();
 
 	/**
-	 * Legutobbi felso terelo mozgatas hibajanak lekerdezese
-	 * @param left bal/jobb kar
+	 * Legutobbi labda-szelektalo szervo mozgatas hibajanak lekerdezese
 	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual bool GetClawError(bool left);
+	virtual bool GetSelectorError();
 
 	/**
-	 * Felso terelo karok szogenek lekerdezese
-	 * @param left bal/jobb kar allapota
+	 * Labda-szelektalo szervo szogenek lekerdezese
 	 * @return [deg], zart helyzet 0
 	 */
-	virtual double GetClawPos(bool left);
+	virtual double GetSelectorPos();
 
 	///////////////////////////////////////////////////////////////////////
-	// ARM
+	// FIRESTOPPER
 	///////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Kar mozgatasa
+	 * Kilovest megallito pocok mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool ArmMove(double pos, double max_speed, double max_acc);
+	virtual bool FireStopperMove(double pos, double max_speed, double max_acc);
 
 	/**
-	 * Kar mozgatas allapota
+	 * Kilovest megallito pocok mozgatas allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool ArmMoveInProgress();
+	virtual bool FireStopperMoveInProgress();
 
 	/**
-	 * Legutobbi kar mozgatas hibajanak lekerdezese
+	 * Legutobbi kilovest megallito pocok mozgatas hibajanak lekerdezese
 	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual bool GetArmError();
+	virtual bool GetFireStopperError();
 
 	/**
-	 * Kar poziciojanak lekerdezese
+	 * Kilovest megallito pocok poziciojanak lekerdezese
 	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 */
-	virtual double GetArmPos();
+	virtual double GetFireStopperPos();
 
 	///////////////////////////////////////////////////////////////////////
 	// CONSOLE
@@ -452,14 +448,14 @@ protected:
 	progress turn;
 	progress motionStop;
 
-	progress leftGripperMove, rightGripperMove;
-	double leftGripperPos, rightGripperPos;
-	progress leftClawMove, rightClawMove;
-	double leftClawPos, rightClawPos;
+	progress frontGripperMove, backGripperMove;
+	double frontGripperPos, backGripperPos;
+	progress selectorMove;
+	double selectorPos;
 	progress consoleMove;
 	double consolePos;
-	progress armMove;
-	double armPos;
+	progress fireStopperMove;
+	double fireStopperPos;
 
 };
 

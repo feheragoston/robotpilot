@@ -14,12 +14,11 @@ Primitives::Primitives(Config* config) {
 	mStopButton = false;
 	mRobotColor = 0;
 
-	leftGripperPos = 0;
-	rightGripperPos = 0;
-	leftClawPos = 0;
-	rightClawPos = 0;
+	frontGripperPos = 0;
+	backGripperPos = 0;
+	selectorPos = 0;
 	consolePos = 0;
-	armPos = 0;
+	fireStopperPos = 0;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -33,12 +32,11 @@ Primitives::Primitives(Primitives* source) {
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		source->GetOpponentPos(i, &opponent[i].x, &opponent[i].y);
 	}
-	leftGripperPos = source->GetGripperPos(true);
-	rightGripperPos = source->GetGripperPos(false);
-	leftClawPos = source->GetClawPos(true);
-	rightClawPos = source->GetClawPos(false);
+	frontGripperPos = source->GetGripperPos(true);
+	backGripperPos = source->GetGripperPos(false);
+	selectorPos = source->GetSelectorPos(false);
 	consolePos = source->GetConsolePos();
-	armPos = source->GetArmPos();
+	fireStopperPos = source->GetFireStopperPos();
 }
 
 Primitives::~Primitives() {
@@ -384,69 +382,62 @@ void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
 	}
 }
 
-bool Primitives::GripperMove(bool left, double pos, double max_speed, double max_acc) {
-	if (left) {
-		leftGripperPos = pos;
+bool Primitives::GripperMove(bool front, double pos, double max_speed, double max_acc) {
+	if (front) {
+		frontGripperPos = pos;
 	} else {
-		rightGripperPos = pos;
+		backGripperPos = pos;
 	}
 	return true;
 }
 
-bool Primitives::GripperMoveInProgress(bool left) {
+bool Primitives::GripperMoveInProgress(bool front) {
 	return false;
 }
 
-bool Primitives::GetGripperError(bool left) {
+bool Primitives::GetGripperError(bool front) {
 	return false;
 }
 
-double Primitives::GetGripperPos(bool left) {
-	if (left) {
-		return leftGripperPos;
+double Primitives::GetGripperPos(bool front) {
+	if (front) {
+		return frontGripperPos;
 	}
-	return rightGripperPos;
+	return backGripperPos;
 }
 
-bool Primitives::ClawMove(bool left, double pos, double max_speed, double max_acc) {
-	if (left) {
-		leftClawPos = pos;
-	} else {
-		rightClawPos = pos;
-	}
+bool Primitives::SelectorMove(double pos, double max_speed, double max_acc) {
+	selectorPos = pos;
 	return true;
 }
 
-bool Primitives::ClawMoveInProgress(bool left) {
+bool Primitives::SelectorMoveInProgress() {
 	return false;
 }
 
-bool Primitives::GetClawError(bool left) {
+bool Primitives::GetSelectorError() {
 	return false;
 }
 
-double Primitives::GetClawPos(bool left) {
-	if (left) {
-		return leftClawPos;
-	}
-	return rightClawPos;
+double Primitives::GetSelectorPos() {
+	return selectorPos;
 }
 
-bool Primitives::ArmMove(double pos, double max_speed, double max_acc) {
-	armPos = pos;
+bool Primitives::FireStopperMove(double pos, double max_speed, double max_acc) {
+	fireStopperPos = pos;
 	return true;
 }
 
-bool Primitives::ArmMoveInProgress() {
+bool Primitives::FireStopperMoveInProgress() {
 	return false;
 }
 
-bool Primitives::GetArmError() {
+bool Primitives::GetFireStopperError() {
 	return false;
 }
 
-double Primitives::GetArmPos() {
-	return armPos;
+double Primitives::GetFireStopperPos() {
+	return fireStopperPos;
 }
 
 bool Primitives::CalibrateConsole() {
