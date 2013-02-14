@@ -22,8 +22,10 @@
 #define SERVO_ID					8
 #define SONAR_ID					9
 #define POWER_ID					10
+#define CARACOLE_ID					11
+#define FIREWHEEL_ID				12
 
-#define MAX_NODE_ID					10
+#define MAX_NODE_ID					12
 #define MAX_NODE_COUNT				(MAX_NODE_ID+1)
 
 

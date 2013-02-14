@@ -89,6 +89,8 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	broadcast	= new node_Broadcast();
 
 	console		= new node_Console();
+	caracole	= new node_Caracole();
+	firewheel	= new node_Firewheel();
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
 	input		= new node_Input();
@@ -106,6 +108,12 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
+
+	if(!CARACOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CARACOLE_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(CARACOLE_ID);
+
+	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
 
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
@@ -179,6 +187,8 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
@@ -1150,6 +1160,110 @@ double PrimitivesCan::GetConsolePos(void){
 }
 
 
+bool PrimitivesCan::CaracoleSetSpeed(double speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(caracole->SetPos.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		caracole->CARACOLE_SET_SPEED(speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = caracole->SetPos.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetCaracolePos(void){
+
+	EnterCritical();
+
+	double ret = caracole->GET_SPEED();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FirewheelSetSpeed(double speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(firewheel->SetPos.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		firewheel->FIREWHEEL_SET_SPEED(speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = firewheel->SetPos.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetFirewheelPos(void){
+
+	EnterCritical();
+
+	double ret = firewheel->GET_SPEED();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 void PrimitivesCan::detectActChange(void){
 
 	bool ActOn;
@@ -1179,6 +1293,8 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
+	caracole->evalMsg(msg);
+	firewheel->evalMsg(msg);
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	input->evalMsg(msg);

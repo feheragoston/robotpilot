@@ -19,6 +19,9 @@ Primitives::Primitives(Config* config) {
 	selectorPos = 0;
 	consolePos = 0;
 	fireStopperPos = 0;
+
+	caracoleSpeed = 0;
+	firewheelSpeed = 0;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -37,6 +40,9 @@ Primitives::Primitives(Primitives* source) {
 	selectorPos = source->GetSelectorPos(false);
 	consolePos = source->GetConsolePos();
 	fireStopperPos = source->GetFireStopperPos();
+
+	caracoleSpeed = source->GetCaracoleSpeed();
+	firewheelSpeed = source->GetFirewheelSpeed();
 }
 
 Primitives::~Primitives() {
@@ -468,4 +474,30 @@ bool Primitives::ConsoleStopInProgress() {
 
 double Primitives::GetConsolePos() {
 	return consolePos;
+}
+
+bool Primitives::CaracoleSetSpeed(double speed, double max_acc) {
+	caracoleSpeed = speed;
+	return true;
+}
+
+bool Primitives::CaracoleSetSpeedInProgress() {
+	return false;
+}
+
+double Primitives::GetCaracoleSpeed() {
+	return caracoleSpeed;
+}
+
+bool Primitives::FirewheelSetSpeed(double speed, double max_acc) {
+	firewheelSpeed = speed;
+	return true;
+}
+
+bool Primitives::FirewheelSetSpeedInProgress() {
+	return false;
+}
+
+double Primitives::GetFirewheelSpeed() {
+	return firewheelSpeed;
 }

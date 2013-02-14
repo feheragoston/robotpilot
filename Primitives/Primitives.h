@@ -413,6 +413,54 @@ public:
 	 */
 	virtual double GetConsolePos();
 
+	///////////////////////////////////////////////////////////////////////
+	// CARACOLE
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Csiga sebesseg-beallitasa
+	 * @param speed [rad/s]
+	 * @param max_acc [rad/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool CaracoleSetSpeed(double speed, double max_acc);
+
+	/**
+	 * Csiga sebesseg-beallitas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool CaracoleSetSpeedInProgress();
+
+	/**
+	 * Csiga sebesseg lekerdezese
+	 * @return [rad]
+	 */
+	virtual double GetCaracoleSpeed();
+
+	///////////////////////////////////////////////////////////////////////
+	// FIREWHEEL
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Kilovo sebesseg-beallitasa
+	 * @param speed [rad/s]
+	 * @param max_acc [rad/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool FirewheelSetSpeed(double speed, double max_acc);
+
+	/**
+	 * Kilovo sebesseg-beallitas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool FirewheelSetSpeedInProgress();
+
+	/**
+	 * Kilovo sebesseg lekerdezese
+	 * @return [rad]
+	 */
+	virtual double GetFirewheelSpeed();
+
 protected:
 	/**
 	 * konfiguraciot tartalmazo objektum
@@ -454,6 +502,10 @@ protected:
 	double selectorPos;
 	progress consoleMove;
 	double consolePos;
+	progress caracoleSetSpeed;
+	double caracoleSpeed;
+	progress firewheelSetSpeed;
+	double firewheelSpeed;
 	progress fireStopperMove;
 	double fireStopperPos;
 

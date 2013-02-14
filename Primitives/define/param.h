@@ -109,6 +109,14 @@
 #define CONSOLE_SEND_PERIOD_TO_PC_MS			100
 #define CONSOLE_SEND_PERIOD_TO_NODE_MS			0
 
+#define CARACOLE_KEEP_ALIVE_MS					1000
+#define CARACOLE_SEND_PERIOD_TO_PC_MS			100
+#define CARACOLE_SEND_PERIOD_TO_NODE_MS			0
+
+#define FIREWHEEL_KEEP_ALIVE_MS					1000
+#define FIREWHEEL_SEND_PERIOD_TO_PC_MS			100
+#define FIREWHEEL_SEND_PERIOD_TO_NODE_MS		0
+
 #define DEADRECK_KEEP_ALIVE_MS					1000
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
 #define DEADRECK_SEND_PERIOD_TO_NODE_MS			1
@@ -145,6 +153,8 @@
 #define SERVO_ON_CANB							1
 #define SONAR_ON_CANB							1
 #define POWER_ON_CANB							1
+#define CARACOLE_ON_CANB						1
+#define FIREWHEEL_ON_CANB						1
 
 
 
@@ -403,6 +413,24 @@
 #define CONSOLE_IS_ENC_EQEP1						1
 #define CONSOLE_MOTOR_PLUS_UP						1
 #define CONSOLE_ENC_IS_ROTATE_DIR_A					1
+
+
+
+
+
+//----- caracole -----
+#define CARACOLE_CONV_INCRS_TO_RADS(incrs)				(incrs)	//??
+#define CARACOLE_CONV_RADS_TO_INCRS(rads)				(rads)	//??
+#define CARACOLE_CONV_RADS2_TO_INCRS2(rads2)			(rads2)	//??
+
+
+
+
+
+//----- firewheel -----
+#define FIREWHEEL_CONV_INCRS_TO_RADS(incrs)				(incrs)	//??
+#define FIREWHEEL_CONV_RADS_TO_INCRS(rads)				(rads)	//??
+#define FIREWHEEL_CONV_RADS2_TO_INCRS2(rads2)			(rads2)	//??
 
 
 
