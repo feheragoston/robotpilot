@@ -779,6 +779,8 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	distance[0] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX);
 	distance[1] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX);
+	distance[2] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX);
+	distance[3] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_REAR_SHARP_INDEX);
 
 	ExitCritical();
 

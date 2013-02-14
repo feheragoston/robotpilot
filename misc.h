@@ -37,7 +37,7 @@
 #define		PRIMITIVES_WAIT		50000	// alapertelmezett Primitives->Wait ido [us]
 
 #define		OPPONENT_NUM		2		// nyilvantartott ellenfelek szama
-#define		PROXIMITY_NUM		2		// tavolsagerzekelok szama
+#define		PROXIMITY_NUM		4		// tavolsagerzekelok szama
 
 #define		COLLISION_ALL		0		// utkozes barmivel
 #define		COLLISION_OBSTACLES	1		// utkozes akadalyokkal

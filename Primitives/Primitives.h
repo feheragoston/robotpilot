@@ -248,8 +248,10 @@ public:
 
 	/**
 	 * Visszaadja a tavolsagerzekelok erteket
-	 * 0: jobb
-	 * 1: bal
+	 * 0: jobb elso
+	 * 1: bal elso
+	 * 2: jobb hatso
+	 * 3: bal hatso
 	 * @param distance a PROXIMITY_NUM db tavolsagerzekelo erteke [mm]
 	 */
 	virtual void GetDistances(double distance[PROXIMITY_NUM]);
