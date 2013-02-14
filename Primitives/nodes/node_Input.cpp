@@ -41,9 +41,9 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_active_level[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
 	digital_active_level[INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)		? true : false);
 	digital_active_level[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
+	digital_active_level[INPUT_DIGITAL_BALL_PRESENT_INDEX]				= ((INPUT_DIGITAL_BALL_PRESENT_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_0_INDEX]					= ((INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_1_INDEX]					= ((INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL != 0)						? true : false);
-	digital_active_level[INPUT_DIGITAL_PLUS_2_INDEX]					= ((INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL != 0)						? true : false);
 
 	digital_is_output[INPUT_DIGITAL_START_BUTTON_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_START_BUTTON != 0)				? true : false);
 	digital_is_output[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]				= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_RED_BUTTON != 0)			? true : false);
@@ -54,7 +54,7 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_is_output[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_REAR_RIGHT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_0_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_0 != 0)					? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_1_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_1 != 0)					? true : false);
-	digital_is_output[INPUT_DIGITAL_PLUS_2_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_2 != 0)					? true : false);
+	digital_is_output[INPUT_DIGITAL_BALL_PRESENT_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_BALL_PRESENT != 0)				? true : false);
 
 	digital_output_init_state[INPUT_DIGITAL_START_BUTTON_INDEX]				= INPUT_DIGITAL_OUTPUT_START_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]			= INPUT_DIGITAL_OUTPUT_COLOR_RED_BUTTON_INIT_STATE;
@@ -65,7 +65,7 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	digital_output_init_state[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_REAR_RIGHT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_0_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_0_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_1_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_1_INIT_STATE;
-	digital_output_init_state[INPUT_DIGITAL_PLUS_2_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_2_INIT_STATE;
+	digital_output_init_state[INPUT_DIGITAL_BALL_PRESENT_INDEX]				= INPUT_DIGITAL_OUTPUT_BALL_PRESENT_INIT_STATE;
 	//----- valtozo init VEGE -----
 
 

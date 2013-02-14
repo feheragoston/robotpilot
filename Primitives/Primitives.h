@@ -69,6 +69,12 @@ public:
 	virtual int8_t GetMyColor();
 
 	/**
+	 * A labda jelenletenek lekerdezese
+	 * @return 1: labda, 0: ures
+	 */
+	virtual int8_t GetBallPresent();
+
+	/**
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
 	 * @return true: folyamat elindult, false: hiba tortent

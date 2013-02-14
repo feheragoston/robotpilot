@@ -51,6 +51,7 @@ public:
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	int8_t GetMyColor(void);
+	int8_t GetBallPresent(void);
 
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);

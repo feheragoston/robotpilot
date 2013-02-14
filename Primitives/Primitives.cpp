@@ -221,6 +221,10 @@ int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
+int8_t Primitives::GetBallPresent() {
+	return 0;
+}
+
 bool Primitives::SetMotorSupply(bool powered) {
 	return true;
 }

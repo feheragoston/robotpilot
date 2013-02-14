@@ -305,6 +305,19 @@ int8_t PrimitivesCan::GetMyColor(void){
 }
 
 
+bool PrimitivesCan::GetBallPresent(void){
+
+	EnterCritical();
+
+	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_BALL_PRESENT_INDEX);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::SetMotorSupply(bool powered){
 
 	EnterCritical();
