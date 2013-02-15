@@ -84,7 +84,14 @@ void node_Caracole::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 0;
+	msg.length		= 13;
+
+	SET_FLOAT(&(msg.data[0]), CARACOLE_CONTROLLER_PARAMETER_P);
+	SET_FLOAT(&(msg.data[4]), CARACOLE_CONTROLLER_PARAMETER_I);
+	SET_FLOAT(&(msg.data[8]), CARACOLE_CONTROLLER_PARAMETER_D);
+	SET_BOOL(&(msg.data[12]), 0, (CARACOLE_IS_ENC_EQEP1 != 0) ? true : false);
+	SET_BOOL(&(msg.data[12]), 1, (CARACOLE_MOTOR_PLUS_UP != 0) ? true : false);
+	SET_BOOL(&(msg.data[12]), 2, (CARACOLE_ENC_IS_ROTATE_DIR_A != 0) ? true : false);
 
 	UDPdriver::send(&msg);
 

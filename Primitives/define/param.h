@@ -405,18 +405,46 @@
 
 
 //----- caracole -----
-#define CARACOLE_CONV_INCRS_TO_RADS(incrs)				(incrs)	//??
-#define CARACOLE_CONV_RADS_TO_INCRS(rads)				(rads)	//??
-#define CARACOLE_CONV_RADS2_TO_INCRS2(rads2)			(rads2)	//??
+#define CARACOLE_INCR_RAD_X0					0		//??
+#define CARACOLE_INCR_RAD_Y0					0		//??
+#define CARACOLE_INCR_RAD_X1					4096	//??
+#define CARACOLE_INCR_RAD_Y1					M_PI	//??
+#define CARACOLE_INCR_RAD_GRAD				GET_GRAD(CARACOLE_INCR_MM_X0, CARACOLE_INCR_MM_Y0, CARACOLE_INCR_MM_X1, CARACOLE_INCR_MM_Y1)
+
+#define CARACOLE_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * CARACOLE_INCR_RAD_GRAD))	//??
+
+#define CARACOLE_CONV_RADS_TO_INCRS(rads)				((double)(rads) / CARACOLE_INCR_RAD_GRAD))	//??
+#define CARACOLE_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / CARACOLE_INCR_RAD_GRAD))	//??
+
+#define CARACOLE_CONTROLLER_PARAMETER_P					0.2				//??
+#define CARACOLE_CONTROLLER_PARAMETER_I					0.0				//??
+#define CARACOLE_CONTROLLER_PARAMETER_D					0.0				//??
+#define CARACOLE_IS_ENC_EQEP1							1				//??
+#define CARACOLE_MOTOR_PLUS_UP							1				//??
+#define CARACOLE_ENC_IS_ROTATE_DIR_A					1				//??
 
 
 
 
 
 //----- firewheel -----
-#define FIREWHEEL_CONV_INCRS_TO_RADS(incrs)				(incrs)	//??
-#define FIREWHEEL_CONV_RADS_TO_INCRS(rads)				(rads)	//??
-#define FIREWHEEL_CONV_RADS2_TO_INCRS2(rads2)			(rads2)	//??
+#define FIREWHEEL_INCR_RAD_X0					0		//??
+#define FIREWHEEL_INCR_RAD_Y0					0		//??
+#define FIREWHEEL_INCR_RAD_X1					4096	//??
+#define FIREWHEEL_INCR_RAD_Y1					M_PI	//??
+#define FIREWHEEL_INCR_RAD_GRAD				GET_GRAD(FIREWHEEL_INCR_MM_X0, FIREWHEEL_INCR_MM_Y0, FIREWHEEL_INCR_MM_X1, FIREWHEEL_INCR_MM_Y1)
+
+#define FIREWHEEL_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * FIREWHEEL_INCR_RAD_GRAD))	//??
+
+#define FIREWHEEL_CONV_RADS_TO_INCRS(rads)				((double)(rads) / FIREWHEEL_INCR_RAD_GRAD))		//??
+#define FIREWHEEL_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / FIREWHEEL_INCR_RAD_GRAD))	//??
+
+#define FIREWHEEL_CONTROLLER_PARAMETER_P				0.2				//??
+#define FIREWHEEL_CONTROLLER_PARAMETER_I				0.0				//??
+#define FIREWHEEL_CONTROLLER_PARAMETER_D				0.0				//??
+#define FIREWHEEL_IS_ENC_EQEP1							1				//??
+#define FIREWHEEL_MOTOR_PLUS_FIRE						1				//??
+#define FIREWHEEL_ENC_IS_ROTATE_DIR_A					1				//??
 
 
 
