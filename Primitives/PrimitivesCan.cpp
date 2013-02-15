@@ -1364,10 +1364,10 @@ void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* 
 
 void PrimitivesCan::Calibrate_Unsafe(void){
 
-	//purple
-	if(GetMyColor_Unsafe() == COLOR_PURPLE){
+	//blue
+	if(GetMyColor_Unsafe() == COLOR_BLUE){
 		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, DEADRECK_CALIB_PHI);
-		TM33Build(SONAR_TX_PURPLE, SONAR_TY_PURPLE, SONAR_ALPHA_PURPLE, T33WS);
+		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
 	}
 
 	//red
@@ -1431,10 +1431,10 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
-	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
+	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
 
 	if(red)			return COLOR_RED;
-	if(purple)		return COLOR_PURPLE;
+	if(blue)		return COLOR_BLUE;
 	return COLOR_UNKNOWN;	//ha nincs színünk
 
 }
@@ -1443,8 +1443,8 @@ int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 bool PrimitivesCan::HasColor_Unsafe(void){
 
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
-	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
+	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
 
-	return (red || purple);
+	return (red || blue);
 
 }
