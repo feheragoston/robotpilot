@@ -21,9 +21,9 @@
 
 #define		BUTTON_LENGTH	48	// palackposta gombjanak belogo resze
 
-#define		PURPLE_OFFSET		0				// poziciok eltolasa
+#define		BLUE_OFFSET			0				// poziciok eltolasa
 #define		RED_OFFSET			AREA_LENGTH		// poziciok eltolasa
-#define		PURPLE_ORIENTATION	1				// Y koordinatak iranya
+#define		BLUE_ORIENTATION	1				// Y koordinatak iranya
 #define		RED_ORIENTATION		-1				// koordinatak iranya
 
 #define		ROBOT_RADIUS		175		// a robot fordulasahoz szugseges sugar [mm]
@@ -45,7 +45,7 @@
 /////////////////
 // Robot szine
 
-#define	PURPLE	-1
+#define	BLUE	-1
 #define	RED		1
 
 /////////////////////////
@@ -66,9 +66,9 @@
 #define SONAR_TY_RED		3098.0
 #define SONAR_ALPHA_RED		M_PI
 
-#define SONAR_TX_PURPLE		-98.0
-#define SONAR_TY_PURPLE		-98.0
-#define SONAR_ALPHA_PURPLE	0.0
+#define SONAR_TX_BLUE		-98.0
+#define SONAR_TY_BLUE		-98.0
+#define SONAR_ALPHA_BLUE	0.0
 
 /////////////////////////////////////////////////////
 // Szonar meresi pont a robot koordinatarendszereben

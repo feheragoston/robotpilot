@@ -17,6 +17,8 @@
 #include "nodes/include/node_Broadcast.h"
 #include "nodes/include/node_Gateway.h"
 #include "nodes/include/node_Console.h"
+#include "nodes/include/node_Caracole.h"
+#include "nodes/include/node_Firewheel.h"
 #include "nodes/include/node_Deadreck.h"
 #include "nodes/include/node_DCWheel.h"
 #include "nodes/include/node_Input.h"
@@ -51,6 +53,7 @@ public:
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	int8_t GetMyColor(void);
+	int8_t GetBallPresent(void);
 
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);
@@ -78,22 +81,23 @@ public:
 	void SetRobotPos(double x, double y, double phi);
 	void SetOpponentPos(unsigned char n, double x, double y);
 
+	double GetBallColorVoltage(void);
 	void GetDistances(double distance[PROXIMITY_NUM]);
 
-	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
-	bool GripperMoveInProgress(bool left);
-	double GetGripperPos(bool left);
-	bool GetGripperError(bool left);
+	bool GripperMove(bool front, double pos, double max_speed, double max_acc);
+	bool GripperMoveInProgress(bool front);
+	double GetGripperPos(bool front);
+	bool GetGripperError(bool front);
 
-	bool ClawMove(bool left, double pos, double max_speed, double max_acc);
-	bool ClawMoveInProgress(bool left);
-	double GetClawPos(bool left);
-	bool GetClawError(bool left);
+	bool SelectorMove(, double pos, double max_speed, double max_acc);
+	bool SelectorMoveInProgress();
+	double GetSelectorPos();
+	bool GetSelectorError();
 
-	bool ArmMove(double pos, double max_speed, double max_acc);
-	bool ArmMoveInProgress();
-	double GetArmPos();
-	bool GetArmError();
+	bool FireStopperMove(double pos, double max_speed, double max_acc);
+	bool FireStopperMoveInProgress();
+	double GetFireStopperPos();
+	bool GetFireStopperError();
 
 	bool CalibrateConsole(void);
 	bool CalibrateConsoleInProgress(void);
@@ -104,6 +108,14 @@ public:
 	bool ConsoleStop(void);
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
+
+	bool CaracoleSetSpeed(double speed, double max_acc);
+	bool CaracoleSetSpeedInProgress(void);
+	double GetCaracoleSpeed(void);
+
+	bool FirewheelSetSpeed(double speed, double max_acc);
+	bool FirewheelSetSpeedInProgress(void);
+	double GetFirewheelSpeed(void);
 	//----- Primitives VEGE -----
 
 
@@ -135,6 +147,8 @@ private:
 	node_Broadcast*		broadcast;
 	node_Gateway*		gateway;
 	node_Console*		console;
+	node_Caracole*		caracole;
+	node_Firewheel*		firewheel;
 	node_Deadreck*		deadreck;
 	node_DCWheel*		dcwheel;
 	node_Input*			input;

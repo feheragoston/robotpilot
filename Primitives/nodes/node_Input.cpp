@@ -30,42 +30,42 @@ node_Input::node_Input(void) : node(INPUT_ID, "node_Input", INPUT_KEEP_ALIVE_MS,
 	analog_has_long_sharp[INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX]		= true;
 	analog_has_long_sharp[INPUT_ANALOG_LEFT_REAR_SHARP_INDEX]		= true;
 	analog_has_long_sharp[INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX]		= true;
+	analog_has_long_sharp[INPUT_ANALOG_BALL_COLOR_CNY70_INDEX]		= false;
 	analog_has_long_sharp[INPUT_ANALOG_PLUS_0_INDEX]				= false;
 	analog_has_long_sharp[INPUT_ANALOG_PLUS_1_INDEX]				= false;
-	analog_has_long_sharp[INPUT_ANALOG_PLUS_2_INDEX]				= false;
 
 	digital_active_level[INPUT_DIGITAL_START_BUTTON_INDEX]				= ((INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]			= ((INPUT_DIGITAL_COLOR_RED_BUTTON_ACTIVE_LEVEL != 0)			? true : false);
-	digital_active_level[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]		= ((INPUT_DIGITAL_COLOR_PURPLE_BUTTON_ACTIVE_LEVEL != 0)		? true : false);
+	digital_active_level[INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX]			= ((INPUT_DIGITAL_COLOR_BLUE_BUTTON_ACTIVE_LEVEL != 0)			? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
 	digital_active_level[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
 	digital_active_level[INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)		? true : false);
 	digital_active_level[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]	= ((INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL != 0)	? true : false);
+	digital_active_level[INPUT_DIGITAL_BALL_PRESENT_INDEX]				= ((INPUT_DIGITAL_BALL_PRESENT_ACTIVE_LEVEL != 0)				? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_0_INDEX]					= ((INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL != 0)						? true : false);
 	digital_active_level[INPUT_DIGITAL_PLUS_1_INDEX]					= ((INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL != 0)						? true : false);
-	digital_active_level[INPUT_DIGITAL_PLUS_2_INDEX]					= ((INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL != 0)						? true : false);
 
 	digital_is_output[INPUT_DIGITAL_START_BUTTON_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_START_BUTTON != 0)				? true : false);
 	digital_is_output[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]				= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_RED_BUTTON != 0)			? true : false);
-	digital_is_output[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]			= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_PURPLE_BUTTON != 0)		? true : false);
+	digital_is_output[INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX]			= ((INPUT_DIGITAL_IS_OUTPUT_COLOR_BLUE_BUTTON != 0)			? true : false);
 	digital_is_output[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_FRONT_LEFT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_FRONT_RIGHT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_REAR_LEFT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]		= ((INPUT_DIGITAL_IS_OUTPUT_REAR_RIGHT_LIMIT_SWITCH != 0)	? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_0_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_0 != 0)					? true : false);
 	digital_is_output[INPUT_DIGITAL_PLUS_1_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_1 != 0)					? true : false);
-	digital_is_output[INPUT_DIGITAL_PLUS_2_INDEX]						= ((INPUT_DIGITAL_IS_OUTPUT_PLUS_2 != 0)					? true : false);
+	digital_is_output[INPUT_DIGITAL_BALL_PRESENT_INDEX]					= ((INPUT_DIGITAL_IS_OUTPUT_BALL_PRESENT != 0)				? true : false);
 
 	digital_output_init_state[INPUT_DIGITAL_START_BUTTON_INDEX]				= INPUT_DIGITAL_OUTPUT_START_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX]			= INPUT_DIGITAL_OUTPUT_COLOR_RED_BUTTON_INIT_STATE;
-	digital_output_init_state[INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX]		= INPUT_DIGITAL_OUTPUT_COLOR_PURPLE_BUTTON_INIT_STATE;
+	digital_output_init_state[INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX]		= INPUT_DIGITAL_OUTPUT_COLOR_BLUE_BUTTON_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_FRONT_LEFT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_FRONT_RIGHT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_REAR_LEFT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX]	= INPUT_DIGITAL_OUTPUT_REAR_RIGHT_LIMIT_SWITCH_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_0_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_0_INIT_STATE;
 	digital_output_init_state[INPUT_DIGITAL_PLUS_1_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_1_INIT_STATE;
-	digital_output_init_state[INPUT_DIGITAL_PLUS_2_INDEX]					= INPUT_DIGITAL_OUTPUT_PLUS_2_INIT_STATE;
+	digital_output_init_state[INPUT_DIGITAL_BALL_PRESENT_INDEX]				= INPUT_DIGITAL_OUTPUT_BALL_PRESENT_INIT_STATE;
 	//----- valtozo init VEGE -----
 
 
@@ -190,6 +190,13 @@ double node_Input::GET_SHARP_MM(u16 analog_value, double table[][2], u8 size){
 		return table[i-1][0] + der * (voltage - table[i-1][1]);
 
 	}
+
+}
+
+
+double node_Input::GET_VOLTAGE(u8 num){
+
+	return INPUT_ANALOG_TO_V(analog[num]);
 
 }
 

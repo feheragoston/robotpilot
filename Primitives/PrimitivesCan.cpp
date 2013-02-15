@@ -89,6 +89,8 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	broadcast	= new node_Broadcast();
 
 	console		= new node_Console();
+	caracole	= new node_Caracole();
+	firewheel	= new node_Firewheel();
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
 	input		= new node_Input();
@@ -106,6 +108,12 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
+
+	if(!CARACOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CARACOLE_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(CARACOLE_ID);
+
+	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
 
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
@@ -179,6 +187,8 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
@@ -297,6 +307,19 @@ int8_t PrimitivesCan::GetMyColor(void){
 	EnterCritical();
 
 	int8_t ret = GetMyColor_Unsafe();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetBallPresent(void){
+
+	EnterCritical();
+
+	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_BALL_PRESENT_INDEX);
 
 	ExitCritical();
 
@@ -773,6 +796,19 @@ void PrimitivesCan::SetOpponentPos(unsigned char n, double x, double y){
 }
 
 
+double PrimitivesCan::GetBallColorVoltage(void){
+
+	EnterCritical();
+
+	double voltage = input->GET_VOLTAGE(INPUT_ANALOG_BALL_COLOR_CNY70_INDEX);
+
+	ExitCritical();
+
+	return voltage;
+
+}
+
+
 void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
@@ -787,12 +823,12 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 }
 
 
-bool PrimitivesCan::GripperMove(bool left, double pos, double max_speed, double max_acc){
+bool PrimitivesCan::GripperMove(bool front, double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
 
 	if(servo->Setpos[num].inProgress){
 		ret = ACT_START_ERROR;
@@ -812,11 +848,11 @@ bool PrimitivesCan::GripperMove(bool left, double pos, double max_speed, double 
 }
 
 
-bool PrimitivesCan::GripperMoveInProgress(bool left){
+bool PrimitivesCan::GripperMoveInProgress(bool front){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
 	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
@@ -826,11 +862,11 @@ bool PrimitivesCan::GripperMoveInProgress(bool left){
 }
 
 
-double PrimitivesCan::GetGripperPos(bool left){
+double PrimitivesCan::GetGripperPos(bool front){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -840,11 +876,11 @@ double PrimitivesCan::GetGripperPos(bool left){
 }
 
 
-bool PrimitivesCan::GetGripperError(bool left){
+bool PrimitivesCan::GetGripperError(bool front){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_GRIPPER_INDEX : SERVO_RIGHT_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -854,12 +890,12 @@ bool PrimitivesCan::GetGripperError(bool left){
 }
 
 
-bool PrimitivesCan::ClawMove(bool left, double pos, double max_speed, double max_acc){
+bool PrimitivesCan::SelectorMove(double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	u8 num = SERVO_SELECTOR_INDEX;
 
 	if(servo->Setpos[num].inProgress){
 		ret = ACT_START_ERROR;
@@ -879,11 +915,11 @@ bool PrimitivesCan::ClawMove(bool left, double pos, double max_speed, double max
 }
 
 
-bool PrimitivesCan::ClawMoveInProgress(bool left){
+bool PrimitivesCan::SelectorMoveInProgress(){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	u8 num = SERVO_SELECTOR_INDEX;
 	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
@@ -893,11 +929,11 @@ bool PrimitivesCan::ClawMoveInProgress(bool left){
 }
 
 
-double PrimitivesCan::GetClawPos(bool left){
+double PrimitivesCan::GetSelectorPos(){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	u8 num = SERVO_SELECTOR_INDEX;
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -907,11 +943,11 @@ double PrimitivesCan::GetClawPos(bool left){
 }
 
 
-bool PrimitivesCan::GetClawError(bool left){
+bool PrimitivesCan::GetSelectorError(){
 
 	EnterCritical();
 
-	u8 num = (left ? SERVO_LEFT_CLAW_INDEX : SERVO_RIGHT_CLAW_INDEX);
+	u8 num = SERVO_SELECTOR_INDEX;
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -921,12 +957,12 @@ bool PrimitivesCan::GetClawError(bool left){
 }
 
 
-bool PrimitivesCan::ArmMove(double pos, double max_speed, double max_acc){
+bool PrimitivesCan::FireStopperMove(double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = SERVO_ARM_INDEX;
+	u8 num = SERVO_FIRESTOPPER_INDEX;
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
@@ -948,11 +984,11 @@ bool PrimitivesCan::ArmMove(double pos, double max_speed, double max_acc){
 }
 
 
-bool PrimitivesCan::ArmMoveInProgress(){
+bool PrimitivesCan::FireStopperMoveInProgress(){
 
 	EnterCritical();
 
-	u8 num = SERVO_ARM_INDEX;
+	u8 num = SERVO_FIRESTOPPER_INDEX;
 	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
@@ -962,11 +998,11 @@ bool PrimitivesCan::ArmMoveInProgress(){
 }
 
 
-double PrimitivesCan::GetArmPos(){
+double PrimitivesCan::GetFireStopperPos(){
 
 	EnterCritical();
 
-	u8 num = SERVO_ARM_INDEX;
+	u8 num = SERVO_FIRESTOPPER_INDEX;
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -976,11 +1012,11 @@ double PrimitivesCan::GetArmPos(){
 }
 
 
-bool PrimitivesCan::GetArmError(void){
+bool PrimitivesCan::GetFireStopperError(void){
 
 	EnterCritical();
 
-	u8 num = SERVO_ARM_INDEX;
+	u8 num = SERVO_FIRESTOPPER_INDEX;
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -1124,6 +1160,110 @@ double PrimitivesCan::GetConsolePos(void){
 }
 
 
+bool PrimitivesCan::CaracoleSetSpeed(double speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(caracole->SetPos.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		caracole->CARACOLE_SET_SPEED(speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = caracole->SetPos.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetCaracolePos(void){
+
+	EnterCritical();
+
+	double ret = caracole->GET_SPEED();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FirewheelSetSpeed(double speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(firewheel->SetPos.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		firewheel->FIREWHEEL_SET_SPEED(speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
+
+	EnterCritical();
+
+	bool ret = firewheel->SetPos.inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetFirewheelPos(void){
+
+	EnterCritical();
+
+	double ret = firewheel->GET_SPEED();
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 void PrimitivesCan::detectActChange(void){
 
 	bool ActOn;
@@ -1153,6 +1293,8 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
+	caracole->evalMsg(msg);
+	firewheel->evalMsg(msg);
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	input->evalMsg(msg);
@@ -1222,10 +1364,10 @@ void PrimitivesCan::ConvWorldToRobot(double xw, double yw, double phiw, double* 
 
 void PrimitivesCan::Calibrate_Unsafe(void){
 
-	//purple
-	if(GetMyColor_Unsafe() == COLOR_PURPLE){
+	//blue
+	if(GetMyColor_Unsafe() == COLOR_BLUE){
 		SetRobotPos_Unsafe(DEADRECK_CALIB_DISTANCE_X, DEADRECK_CALIB_DISTANCE_Y, DEADRECK_CALIB_PHI);
-		TM33Build(SONAR_TX_PURPLE, SONAR_TY_PURPLE, SONAR_ALPHA_PURPLE, T33WS);
+		TM33Build(SONAR_TX_BLUE, SONAR_TY_BLUE, SONAR_ALPHA_BLUE, T33WS);
 	}
 
 	//red
@@ -1289,10 +1431,10 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
-	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
+	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
 
 	if(red)			return COLOR_RED;
-	if(purple)		return COLOR_PURPLE;
+	if(blue)		return COLOR_BLUE;
 	return COLOR_UNKNOWN;	//ha nincs színünk
 
 }
@@ -1301,8 +1443,8 @@ int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 bool PrimitivesCan::HasColor_Unsafe(void){
 
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
-	bool purple = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_PURPLE_BUTTON_INDEX);
+	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
 
-	return (red || purple);
+	return (red || blue);
 
 }

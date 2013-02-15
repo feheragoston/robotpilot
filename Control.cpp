@@ -131,7 +131,7 @@ Control::Control(Config* config) {
 
 	luaL_register(L, "control", controllib);
 
-	luaC_export(L, PURPLE);
+	luaC_export(L, BLUE);
 	luaC_export(L, RED);
 	luaC_export(L, ROBOT_RADIUS);
 	luaC_export(L, ROBOT_WIDTH);

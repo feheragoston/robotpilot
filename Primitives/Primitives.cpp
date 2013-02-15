@@ -14,12 +14,14 @@ Primitives::Primitives(Config* config) {
 	mStopButton = false;
 	mRobotColor = 0;
 
-	leftGripperPos = 0;
-	rightGripperPos = 0;
-	leftClawPos = 0;
-	rightClawPos = 0;
+	frontGripperPos = 0;
+	backGripperPos = 0;
+	selectorPos = 0;
 	consolePos = 0;
-	armPos = 0;
+	fireStopperPos = 0;
+
+	caracoleSpeed = 0;
+	firewheelSpeed = 0;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -33,12 +35,14 @@ Primitives::Primitives(Primitives* source) {
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		source->GetOpponentPos(i, &opponent[i].x, &opponent[i].y);
 	}
-	leftGripperPos = source->GetGripperPos(true);
-	rightGripperPos = source->GetGripperPos(false);
-	leftClawPos = source->GetClawPos(true);
-	rightClawPos = source->GetClawPos(false);
+	frontGripperPos = source->GetGripperPos(true);
+	backGripperPos = source->GetGripperPos(false);
+	selectorPos = source->GetSelectorPos(false);
 	consolePos = source->GetConsolePos();
-	armPos = source->GetArmPos();
+	fireStopperPos = source->GetFireStopperPos();
+
+	caracoleSpeed = source->GetCaracoleSpeed();
+	firewheelSpeed = source->GetFirewheelSpeed();
 }
 
 Primitives::~Primitives() {
@@ -221,6 +225,10 @@ int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
+int8_t Primitives::GetBallPresent() {
+	return 0;
+}
+
 bool Primitives::SetMotorSupply(bool powered) {
 	return true;
 }
@@ -370,75 +378,72 @@ void Primitives::SetOpponentPos(unsigned char n, double x, double y) {
 	}
 }
 
+double Primitives::GetBallColorVoltage(void){
+	return 0;
+}
+
 void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
 	for (int i = 0; i < PROXIMITY_NUM; i++) {
 		distance[i] = 400;
 	}
 }
 
-bool Primitives::GripperMove(bool left, double pos, double max_speed, double max_acc) {
-	if (left) {
-		leftGripperPos = pos;
+bool Primitives::GripperMove(bool front, double pos, double max_speed, double max_acc) {
+	if (front) {
+		frontGripperPos = pos;
 	} else {
-		rightGripperPos = pos;
+		backGripperPos = pos;
 	}
 	return true;
 }
 
-bool Primitives::GripperMoveInProgress(bool left) {
+bool Primitives::GripperMoveInProgress(bool front) {
 	return false;
 }
 
-bool Primitives::GetGripperError(bool left) {
+bool Primitives::GetGripperError(bool front) {
 	return false;
 }
 
-double Primitives::GetGripperPos(bool left) {
-	if (left) {
-		return leftGripperPos;
+double Primitives::GetGripperPos(bool front) {
+	if (front) {
+		return frontGripperPos;
 	}
-	return rightGripperPos;
+	return backGripperPos;
 }
 
-bool Primitives::ClawMove(bool left, double pos, double max_speed, double max_acc) {
-	if (left) {
-		leftClawPos = pos;
-	} else {
-		rightClawPos = pos;
-	}
+bool Primitives::SelectorMove(double pos, double max_speed, double max_acc) {
+	selectorPos = pos;
 	return true;
 }
 
-bool Primitives::ClawMoveInProgress(bool left) {
+bool Primitives::SelectorMoveInProgress() {
 	return false;
 }
 
-bool Primitives::GetClawError(bool left) {
+bool Primitives::GetSelectorError() {
 	return false;
 }
 
-double Primitives::GetClawPos(bool left) {
-	if (left) {
-		return leftClawPos;
-	}
-	return rightClawPos;
+double Primitives::GetSelectorPos() {
+	return selectorPos;
 }
 
-bool Primitives::ArmMove(double pos, double max_speed, double max_acc) {
-	armPos = pos;
+bool Primitives::FireStopperMove(double pos, double max_speed, double max_acc) {
+	fireStopperPos = pos;
 	return true;
 }
 
-bool Primitives::ArmMoveInProgress() {
+bool Primitives::FireStopperMoveInProgress() {
 	return false;
 }
 
-bool Primitives::GetArmError() {
+bool Primitives::GetFireStopperError() {
 	return false;
 }
 
-double Primitives::GetArmPos() {
-	return armPos;
+double Primitives::GetFireStopperPos() {
+	return fireStopperPos;
 }
 
 bool Primitives::CalibrateConsole() {
@@ -469,4 +474,30 @@ bool Primitives::ConsoleStopInProgress() {
 
 double Primitives::GetConsolePos() {
 	return consolePos;
+}
+
+bool Primitives::CaracoleSetSpeed(double speed, double max_acc) {
+	caracoleSpeed = speed;
+	return true;
+}
+
+bool Primitives::CaracoleSetSpeedInProgress() {
+	return false;
+}
+
+double Primitives::GetCaracoleSpeed() {
+	return caracoleSpeed;
+}
+
+bool Primitives::FirewheelSetSpeed(double speed, double max_acc) {
+	firewheelSpeed = speed;
+	return true;
+}
+
+bool Primitives::FirewheelSetSpeedInProgress() {
+	return false;
+}
+
+double Primitives::GetFirewheelSpeed() {
+	return firewheelSpeed;
 }

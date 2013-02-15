@@ -33,6 +33,7 @@ public:
 
 	void INIT_PARAM(void);
 
+	double GET_VOLTAGE(u8 num);
 	double GET_DISTANCE(u8 analog_num);
 	bool GET_DIGITAL(u8 digital_num);
 	void SET_DIGITAL(u8 digital_num, bool on);
