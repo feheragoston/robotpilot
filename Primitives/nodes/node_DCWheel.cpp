@@ -248,17 +248,19 @@ void node_DCWheel::INIT_PARAM(void){
 
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
-	msg.length		= 33;
-	SET_BOOL(&(msg.data[0]), 0, DCWHEEL_IS_LEFT_MOTOR1);
-	SET_BOOL(&(msg.data[0]), 1, DCWHEEL_IS_SERIAL_DRIVE);
-	SET_FLOAT(&(msg.data[1]), DCWHEEL_WHEEL_DISTANCE);
-	SET_FLOAT(&(msg.data[5]), DCWHEEL_ROBOT_FULL_TURN_INCR);
-	SET_FLOAT(&(msg.data[9]), DCWHEEL_RPM_TO_MMPS);
-	SET_FLOAT(&(msg.data[13]), DCWHEEL_MM_TO_INCR);
-	SET_FLOAT(&(msg.data[17]), DCWHEEL_PRE_BRAKE_TIME);
-	SET_FLOAT(&(msg.data[21]), DCWHEEL_OE_CONTROL_P);
-	SET_FLOAT(&(msg.data[25]), DCWHEEL_OE_CONTROL_I);
-	SET_FLOAT(&(msg.data[29]), DCWHEEL_OE_CONTROL_D);
+	msg.length		= 25;
+
+	SET_FLOAT(&(msg.data[0]), DCWHEEL_WHEEL_DISTANCE);
+	SET_FLOAT(&(msg.data[4]), DCWHEEL_RPM_TO_MMPS);
+	SET_FLOAT(&(msg.data[8]), DCWHEEL_MM_TO_INCR);
+	SET_BOOL(&(msg.data[12]), 0, DCWHEEL_LEFT_IS_ROTATE_DIR_A);
+	SET_BOOL(&(msg.data[12]), 0, DCWHEEL_RIGHT_IS_ROTATE_DIR_A);
+	SET_BOOL(&(msg.data[12]), 0, DCWHEEL_LEFT_PLUS_FORWARD);
+	SET_BOOL(&(msg.data[12]), 0, DCWHEEL_RIGHT_PLUS_FORWARD);
+	SET_BOOL(&(msg.data[12]), 0, DCWHEEL_IS_LEFT_EQEP1);
+	SET_FLOAT(&(msg.data[13]), DCWHEEL_OE_CONTROL_P);
+	SET_FLOAT(&(msg.data[17]), DCWHEEL_OE_CONTROL_I);
+	SET_FLOAT(&(msg.data[21]), DCWHEEL_OE_CONTROL_D);
 
 	UDPdriver::send(&msg);
 

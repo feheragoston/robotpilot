@@ -358,16 +358,17 @@
 #define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
 
 
-#define DCWHEEL_IS_LEFT_MOTOR1						1
-#define DCWHEEL_IS_SERIAL_DRIVE						1
 //#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
-#define DCWHEEL_ROBOT_FULL_TURN_INCR				DCWHEEL_INCR_PER_FULL_TURN	//// nincs hasznalva
 #define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
 #define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
-#define DCWHEEL_PRE_BRAKE_TIME						0.3	//sec
-#define DCWHEEL_OE_CONTROL_P						0.0007
-#define DCWHEEL_OE_CONTROL_I						0.0
-#define DCWHEEL_OE_CONTROL_D						0.2
+#define DCWHEEL_LEFT_IS_ROTATE_DIR_A				0		//??
+#define DCWHEEL_RIGHT_IS_ROTATE_DIR_A				1		//??
+#define DCWHEEL_LEFT_PLUS_FORWARD					1		//??
+#define DCWHEEL_RIGHT_PLUS_FORWARD					1		//??
+#define DCWHEEL_IS_LEFT_EQEP1						1		//??
+#define DCWHEEL_OE_CONTROL_P						0.0007	//??
+#define DCWHEEL_OE_CONTROL_I						0.0		//??
+#define DCWHEEL_OE_CONTROL_D						0.2		//??
 
 
 
