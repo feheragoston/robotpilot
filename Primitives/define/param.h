@@ -146,15 +146,15 @@
 
 
 //----- gateway -----
-#define CONSOLE_ON_CANB							1
-#define DEADRECK_ON_CANB						1
-#define DCWHEEL_ON_CANB							1
-#define INPUT_ON_CANB							1
-#define SERVO_ON_CANB							1
-#define SONAR_ON_CANB							1
-#define POWER_ON_CANB							1
-#define CARACOLE_ON_CANB						1
-#define FIREWHEEL_ON_CANB						1
+#define CONSOLE_ON_CANB							1	//??
+#define DEADRECK_ON_CANB						1	//??
+#define DCWHEEL_ON_CANB							1	//??
+#define INPUT_ON_CANB							1	//??
+#define SERVO_ON_CANB							1	//??
+#define SONAR_ON_CANB							1	//??
+#define POWER_ON_CANB							1	//??
+#define CARACOLE_ON_CANB						1	//??
+#define FIREWHEEL_ON_CANB						1	//??
 
 
 
@@ -169,8 +169,8 @@
 #define INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX			3	//??
 #define INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX			6	//??
 #define INPUT_DIGITAL_BALL_PRESENT_INDEX					0	//??
-#define INPUT_DIGITAL_PLUS_0_INDEX							4
-#define INPUT_DIGITAL_PLUS_1_INDEX							5
+#define INPUT_DIGITAL_PLUS_0_INDEX							4	//??
+#define INPUT_DIGITAL_PLUS_1_INDEX							5	//??
 
 
 #define INPUT_DIGITAL_IS_OUTPUT_START_BUTTON				0	//??
@@ -214,8 +214,8 @@
 #define INPUT_ANALOG_LEFT_REAR_SHARP_INDEX		2	//??
 #define INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX		3	//??
 #define INPUT_ANALOG_BALL_COLOR_CNY70_INDEX		5	//??
-#define INPUT_ANALOG_PLUS_0_INDEX				6
-#define INPUT_ANALOG_PLUS_1_INDEX				1
+#define INPUT_ANALOG_PLUS_0_INDEX				6	//??
+#define INPUT_ANALOG_PLUS_1_INDEX				1	//??
 
 
 
@@ -226,8 +226,8 @@
 #define SERVO_BACK_GRIPPER_INDEX						1	//??
 #define SERVO_SELECTOR_INDEX							5	//??
 #define SERVO_FIRESTOPPER_INDEX							3	//??
-#define SERVO_PLUS_0_INDEX								0
-#define SERVO_PLUS_1_INDEX								2
+#define SERVO_PLUS_0_INDEX								0	//??
+#define SERVO_PLUS_1_INDEX								2	//??
 
 
 #define SERVO_FRONT_GRIPPER_DEG_INCR_X0					0
@@ -236,7 +236,7 @@
 #define SERVO_FRONT_GRIPPER_DEG_INCR_Y1					2000	//??
 #define SERVO_FRONT_GRIPPER_LIMIT_LOW_POS_INCR			700		//??
 #define SERVO_FRONT_GRIPPER_LIMIT_HIGH_POS_INCR			2200	//??
-#define SERVO_FRONT_GRIPPER_LIMIT_CURRENT_MA			500		//??	//mA
+#define SERVO_FRONT_GRIPPER_LIMIT_CURRENT_MA			500		//??	//[mA]
 
 #define SERVO_BACK_GRIPPER_DEG_INCR_X0					0
 #define SERVO_BACK_GRIPPER_DEG_INCR_Y0					1000	//??
@@ -244,7 +244,7 @@
 #define SERVO_BACK_GRIPPER_DEG_INCR_Y1					2000	//??
 #define SERVO_BACK_GRIPPER_LIMIT_LOW_POS_INCR			700		//??
 #define SERVO_BACK_GRIPPER_LIMIT_HIGH_POS_INCR			2200	//??
-#define SERVO_BACK_GRIPPER_LIMIT_CURRENT_MA				500		//??	//mA
+#define SERVO_BACK_GRIPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
 
 #define SERVO_SELECTOR_DEG_INCR_X0						0
 #define SERVO_SELECTOR_DEG_INCR_Y0						1000	//??
@@ -252,7 +252,7 @@
 #define SERVO_SELECTOR_DEG_INCR_Y1						2000	//??
 #define SERVO_SELECTOR_LIMIT_LOW_POS_INCR				700		//??
 #define SERVO_SELECTOR_LIMIT_HIGH_POS_INCR				2200	//??
-#define SERVO_SELECTOR_LIMIT_CURRENT_MA					500		//??	//mA
+#define SERVO_SELECTOR_LIMIT_CURRENT_MA					500		//??	//[mA]
 
 #define SERVO_FIRESTOPPER_DEG_INCR_X0					0
 #define SERVO_FIRESTOPPER_DEG_INCR_Y0					1000	//??
@@ -260,7 +260,7 @@
 #define SERVO_FIRESTOPPER_DEG_INCR_Y1					2000	//??
 #define SERVO_FIRESTOPPER_LIMIT_LOW_POS_INCR			700		//??
 #define SERVO_FIRESTOPPER_LIMIT_HIGH_POS_INCR			2200	//??
-#define SERVO_FIRESTOPPER_LIMIT_CURRENT_MA				500		//??	//mA
+#define SERVO_FIRESTOPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
 
 #define SERVO_PLUS_0_DEG_INCR_X0						0
 #define SERVO_PLUS_0_DEG_INCR_Y0						1000
@@ -268,7 +268,7 @@
 #define SERVO_PLUS_0_DEG_INCR_Y1						2000
 #define SERVO_PLUS_0_LIMIT_LOW_POS_INCR					700
 #define SERVO_PLUS_0_LIMIT_HIGH_POS_INCR				2200
-#define SERVO_PLUS_0_LIMIT_CURRENT_MA					500		//??	//mA
+#define SERVO_PLUS_0_LIMIT_CURRENT_MA					500		//??	//[mA]
 
 #define SERVO_PLUS_1_DEG_INCR_X0						0
 #define SERVO_PLUS_1_DEG_INCR_Y0						1000
@@ -276,7 +276,7 @@
 #define SERVO_PLUS_1_DEG_INCR_Y1						2000
 #define SERVO_PLUS_1_LIMIT_LOW_POS_INCR					700
 #define SERVO_PLUS_1_LIMIT_HIGH_POS_INCR				2200
-#define SERVO_PLUS_1_LIMIT_CURRENT_MA					500		//??	//mA
+#define SERVO_PLUS_1_LIMIT_CURRENT_MA					500		//??	//[mA]
 
 
 
@@ -284,58 +284,44 @@
 
 
 //----- deadreck -----
-//ugy kell rasimitani, mintha menne a palyara, ket mesterdarabbal
-#define DEADRECK_CALIB_DISTANCE_X				((double)59.9+290/2)	//[mm]
-#define DEADRECK_CALIB_DISTANCE_Y				((double)114.8+60/2)	//[mm]
-#define DEADRECK_CALIB_PHI						((double)90.0 * M_PI / 180)	//[rad]
+//?? ugy kell rasimitani, mintha menne a palyara, ket mesterdarabbal
+#define DEADRECK_CALIB_DISTANCE_X				((double)59.9+290/2)	//[mm]				//??
+#define DEADRECK_CALIB_DISTANCE_Y				((double)114.8+60/2)	//[mm]				//??
+#define DEADRECK_CALIB_PHI						((double)90.0 * M_PI / 180)	//[rad]			//??
 
-//az Y falra kell rasimitani
-//#define DEADRECK_CALIB_DISTANCE_X				((double)153)	//[mm]
-//#define DEADRECK_CALIB_DISTANCE_Y				((double)159)	//[mm]
-//#define DEADRECK_CALIB_PHI						((double)49.87 * M_PI / 180)	//[rad]
-
-// originalt megoldasok
-//#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 261.274198830535)
-//#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
-//#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.517166666666)
-
-// elso kalibracio utan, még lehet, hogy pontosítani kell
-//saját menést beleszámítva:
-//#define DEADRECK_WHEEL_DISTANCE_REC				((double)1 / 267.294)
-//#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 66.78756)
-//#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.41111)
-//saját menésnélkül
-#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 266.4655)
-#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.3033)
-#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.310)
-#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0
-#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1
-#define DEADRECK_IS_LEFT_EQEP1						1
+//?? saját menés nélkül
+#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 266.4655)	//[1/mm]		//??
+#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.3033)	//[1/mm]		//??
+#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.310)	//[1/mm]		//??
+#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0										//??
+#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1										//??
+#define DEADRECK_IS_LEFT_EQEP1						1										//??
 
 
 
 
 
 //----- power -----
-#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							18
-#define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3
-#define POWER_MAIN_VOLTAGE_LOW_SHUTDOWN_TIME_MS						1000
+#define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							18		//??
+#define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3		//??
+#define POWER_MAIN_VOLTAGE_LOW_SHUTDOWN_TIME_MS						1000	//??
 
-#define POWER_MAIN_CURRENT_SHUTDOWN_LEVEL							4
-#define POWER_ACT_CURRENT_SHUTDOWN_LEVEL							8
-#define POWER_MAIN_HIGH_CURRENT_TIME_MS								5
-#define POWER_ACT_HIGH_CURRENT_TIME_MS								5
+#define POWER_MAIN_CURRENT_SHUTDOWN_LEVEL							4		//??
+#define POWER_ACT_CURRENT_SHUTDOWN_LEVEL							8		//??
+#define POWER_MAIN_HIGH_CURRENT_TIME_MS								5		//??
+#define POWER_ACT_HIGH_CURRENT_TIME_MS								5		//??
 
-#define POWER_ACCU_VOLTAGE_OK_LEVEL									23
+#define POWER_ACCU_VOLTAGE_OK_LEVEL									23		//??
 
-#define POWER_CHARGE_VOLTAGE_READY_LEVEL							26
-#define POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL						12
+#define POWER_CHARGE_VOLTAGE_READY_LEVEL							26		//??
+#define POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL						12		//??
 
 
 
 
 
 //----- dcwheel -----
+//????
 #define DCWHEEL_GEARBOX								66
 #define DCWHEEL_INCR_PER_MOTORROT					3000
 #define DCWHEEL_INCR_PER_WHEELROT					(DCWHEEL_GEARBOX * DCWHEEL_INCR_PER_MOTORROT)
@@ -388,10 +374,10 @@
 
 
 //----- console -----
-#define CONSOLE_INCR_MM_X0					0
-#define CONSOLE_INCR_MM_Y0					0
-#define CONSOLE_INCR_MM_X1					12967	//12967 incr = 100 mm
-#define CONSOLE_INCR_MM_Y1					100
+#define CONSOLE_INCR_MM_X0					0								//??
+#define CONSOLE_INCR_MM_Y0					0								//??
+#define CONSOLE_INCR_MM_X1					12967	//12967 incr = 100 mm	//??
+#define CONSOLE_INCR_MM_Y1					100								//??
 #define CONSOLE_INCR_MM_GRAD				GET_GRAD(CONSOLE_INCR_MM_X0, CONSOLE_INCR_MM_Y0, CONSOLE_INCR_MM_X1, CONSOLE_INCR_MM_Y1)
 
 #define CONSOLE_CONV_INCR_TO_MM(incr)				(((double)(incr) - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0)
@@ -401,18 +387,18 @@
 #define CONSOLE_CONV_MMS2_TO_INCRS2(mms2)			((u32)((double)(mms2) / CONSOLE_INCR_MM_GRAD))
 
 
-#define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220
-#define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600
-#define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			123		//1mm
-#define CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR		20600	//120mm
-#define CONSOLE_CONTROLLER_PARAMETER_P				0.2
-#define CONSOLE_CONTROLLER_PARAMETER_I				0.0
-#define CONSOLE_CONTROLLER_PARAMETER_D				0.0
-#define CONSOLE_PWM_MODE							3
-#define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			0
-#define CONSOLE_IS_ENC_EQEP1						1
-#define CONSOLE_MOTOR_PLUS_UP						1
-#define CONSOLE_ENC_IS_ROTATE_DIR_A					1
+#define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220				//??
+#define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600			//??
+#define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			123		//1mm	//??
+#define CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR		20600	//120mm	//??
+#define CONSOLE_CONTROLLER_PARAMETER_P				0.2				//??
+#define CONSOLE_CONTROLLER_PARAMETER_I				0.0				//??
+#define CONSOLE_CONTROLLER_PARAMETER_D				0.0				//??
+#define CONSOLE_PWM_MODE							3				//??
+#define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			0				//??
+#define CONSOLE_IS_ENC_EQEP1						1				//??
+#define CONSOLE_MOTOR_PLUS_UP						1				//??
+#define CONSOLE_ENC_IS_ROTATE_DIR_A					1				//??
 
 
 
