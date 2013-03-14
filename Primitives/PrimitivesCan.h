@@ -89,6 +89,11 @@ public:
 	double GetGripperPos(bool front);
 	bool GetGripperError(bool front);
 
+	bool FlipperMove(bool front, double pos, double max_speed, double max_acc);
+	bool FlipperMoveInProgress(bool front);
+	double GetFlipperPos(bool front);
+	bool GetFlipperError(bool front);
+
 	bool SelectorMove(, double pos, double max_speed, double max_acc);
 	bool SelectorMoveInProgress();
 	double GetSelectorPos();

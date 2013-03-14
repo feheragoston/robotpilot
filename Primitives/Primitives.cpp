@@ -16,6 +16,8 @@ Primitives::Primitives(Config* config) {
 
 	frontGripperPos = 0;
 	backGripperPos = 0;
+	frontFlipperPos = 0;
+	backFlipperPos = 0;
 	selectorPos = 0;
 	consolePos = 0;
 	fireStopperPos = 0;
@@ -37,6 +39,8 @@ Primitives::Primitives(Primitives* source) {
 	}
 	frontGripperPos = source->GetGripperPos(true);
 	backGripperPos = source->GetGripperPos(false);
+	frontFlipperPos = source->GetFlipperPos(true);
+	backFlipperPos = source->GetFlipperPos(false);
 	selectorPos = source->GetSelectorPos(false);
 	consolePos = source->GetConsolePos();
 	fireStopperPos = source->GetFireStopperPos();
@@ -410,6 +414,30 @@ double Primitives::GetGripperPos(bool front) {
 		return frontGripperPos;
 	}
 	return backGripperPos;
+}
+
+bool Primitives::FlipperMove(bool front, double pos, double max_speed, double max_acc) {
+	if (front) {
+		frontFlipperPos = pos;
+	} else {
+		backFlipperPos = pos;
+	}
+	return true;
+}
+
+bool Primitives::FlipperMoveInProgress(bool front) {
+	return false;
+}
+
+bool Primitives::GetFlipperError(bool front) {
+	return false;
+}
+
+double Primitives::GetFlipperPos(bool front) {
+	if (front) {
+		return frontFlipperPos;
+	}
+	return backFlipperPos;
 }
 
 bool Primitives::SelectorMove(double pos, double max_speed, double max_acc) {

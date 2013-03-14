@@ -890,6 +890,73 @@ bool PrimitivesCan::GetGripperError(bool front){
 }
 
 
+bool PrimitivesCan::FlipperMove(bool front, double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
+
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FlipperMoveInProgress(bool front){
+
+	EnterCritical();
+
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetFlipperPos(bool front){
+
+	EnterCritical();
+
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetFlipperError(bool front){
+
+	EnterCritical();
+
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	bool ret = servo->GET_ERROR(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
 bool PrimitivesCan::SelectorMove(double pos, double max_speed, double max_acc){
 
 	EnterCritical();

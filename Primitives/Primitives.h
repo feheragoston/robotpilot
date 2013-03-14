@@ -303,6 +303,41 @@ public:
 	virtual double GetGripperPos(bool front);
 
 	///////////////////////////////////////////////////////////////////////
+	// FLIPPER
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Oldalso megfogo kar mozgatasa
+	 * @param front elso/hatso kar mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 zart
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool FlipperMove(bool front, double pos, double max_speed, double max_acc);
+
+	/**
+	 * Oldalso megfogo kar mozgatas allapota
+	 * @param front elso/hatso kar allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool FlipperMoveInProgress(bool front);
+
+	/**
+	 * Legutobbi oldalso megfogo mozgatas hibajanak lekerdezese
+	 * @param front elso/hatso kar
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetFlipperError(bool front);
+
+	/**
+	 * Oldalso megfogo kar szogenek lekerdezese
+	 * @param front elso/hatso kar allapota
+	 * @return [deg], zart helyzet 0
+	 */
+	virtual double GetFlipperPos(bool front);
+
+	///////////////////////////////////////////////////////////////////////
 	// SELECTOR
 	///////////////////////////////////////////////////////////////////////
 
@@ -498,6 +533,8 @@ protected:
 
 	progress frontGripperMove, backGripperMove;
 	double frontGripperPos, backGripperPos;
+	progress frontFlipperMove, backFlipperMove;
+	double frontFlipperPos, backFlipperPos;
 	progress selectorMove;
 	double selectorPos;
 	progress consoleMove;
