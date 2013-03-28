@@ -56,21 +56,10 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 				double* val;
 
 				for(u8 n=0 ; n<SONAR_TRANSMITTER_COUNT ; n++){
-
-					val = &(SonarPosX[n]);
-					(*val) = 0;
-					for(u8 i=0 ; i<4 ; i++){
-						(*val) *= 10;
-						(*val) += GET_U8(&(msg->data[8*n + i])) - '0';
-					}
-
-					val = &(SonarPosY[n]);
-					(*val) = 0;
-					for(u8 i=0 ; i<4 ; i++){
-						(*val) *= 10;
-						(*val) += GET_U8(&(msg->data[8*n + i + 4])) - '0';
-					}
-
+					SonarPosX[n] = GET_FLOAT(&(msg->data[0 + 2*8*n]));
+					SonarPosY[n] = GET_FLOAT(&(msg->data[4 + 2*8*n]));
+					SonarVariance[n] = GET_FLOAT(&(msg->data[8 + 2*8*n]));
+					//SonarValami[n] = GET_FLOAT(&(msg->data[12 + 2*8*n]));
 				}
 
 				gettimeofday(&prevMsgTime, NULL);

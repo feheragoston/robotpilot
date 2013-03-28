@@ -40,6 +40,7 @@ private:
 
 	double SonarPosX[SONAR_TRANSMITTER_COUNT];
 	double SonarPosY[SONAR_TRANSMITTER_COUNT];
+	double SonarVariance[SONAR_TRANSMITTER_COUNT];
 	struct timeval prevMsgTime;
 
 
