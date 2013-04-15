@@ -84,15 +84,20 @@ public:
 	double GetBallColorVoltage(void);
 	void GetDistances(double distance[PROXIMITY_NUM]);
 
-	bool GripperMove(bool front, double pos, double max_speed, double max_acc);
-	bool GripperMoveInProgress(bool front);
-	double GetGripperPos(bool front);
-	bool GetGripperError(bool front);
+	bool ArmMove(bool front, double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress(bool front);
+	double GetArmPos(bool front);
+	bool GetArmError(bool front);
 
-	bool FlipperMove(bool front, double pos, double max_speed, double max_acc);
-	bool FlipperMoveInProgress(bool front);
-	double GetFlipperPos(bool front);
-	bool GetFlipperError(bool front);
+	bool ContractorMove(double pos, double max_speed, double max_acc);
+	bool ContractorMoveInProgress();
+	double GetContractorPos();
+	bool GetContractorError();
+
+	bool FlipperMove(double pos, double max_speed, double max_acc);
+	bool FlipperMoveInProgress();
+	double GetFlipperPos();
+	bool GetFlipperError();
 
 	bool SelectorMove(double pos, double max_speed, double max_acc);
 	bool SelectorMoveInProgress();

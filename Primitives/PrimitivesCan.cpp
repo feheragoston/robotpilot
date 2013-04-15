@@ -823,12 +823,12 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 }
 
 
-bool PrimitivesCan::GripperMove(bool front, double pos, double max_speed, double max_acc){
+bool PrimitivesCan::ArmMove(bool front, double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_ARM_INDEX : SERVO_REAR_ARM_INDEX);
 
 	if(servo->Setpos[num].inProgress){
 		ret = ACT_START_ERROR;
@@ -848,11 +848,11 @@ bool PrimitivesCan::GripperMove(bool front, double pos, double max_speed, double
 }
 
 
-bool PrimitivesCan::GripperMoveInProgress(bool front){
+bool PrimitivesCan::ArmMoveInProgress(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_ARM_INDEX : SERVO_REAR_ARM_INDEX);
 	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
@@ -862,11 +862,11 @@ bool PrimitivesCan::GripperMoveInProgress(bool front){
 }
 
 
-double PrimitivesCan::GetGripperPos(bool front){
+double PrimitivesCan::GetArmPos(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_ARM_INDEX : SERVO_REAR_ARM_INDEX);
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -876,11 +876,11 @@ double PrimitivesCan::GetGripperPos(bool front){
 }
 
 
-bool PrimitivesCan::GetGripperError(bool front){
+bool PrimitivesCan::GetArmError(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_ARM_INDEX : SERVO_REAR_ARM_INDEX);
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -890,12 +890,12 @@ bool PrimitivesCan::GetGripperError(bool front){
 }
 
 
-bool PrimitivesCan::FlipperMove(bool front, double pos, double max_speed, double max_acc){
+bool PrimitivesCan::ContractorMove(double pos, double max_speed, double max_acc){
 
 	EnterCritical();
 
 	bool ret;
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
+	u8 num = SERVO_CONTRACTOR_INDEX;
 
 	if(servo->Setpos[num].inProgress){
 		ret = ACT_START_ERROR;
@@ -915,11 +915,11 @@ bool PrimitivesCan::FlipperMove(bool front, double pos, double max_speed, double
 }
 
 
-bool PrimitivesCan::FlipperMoveInProgress(bool front){
+bool PrimitivesCan::ContractorMoveInProgress(){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
+	u8 num = SERVO_CONTRACTOR_INDEX;
 	bool ret = servo->Setpos[num].inProgress;
 
 	ExitCritical();
@@ -929,11 +929,11 @@ bool PrimitivesCan::FlipperMoveInProgress(bool front){
 }
 
 
-double PrimitivesCan::GetFlipperPos(bool front){
+double PrimitivesCan::GetContractorPos(){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	u8 num = SERVO_CONTRACTOR_INDEX;
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -943,11 +943,78 @@ double PrimitivesCan::GetFlipperPos(bool front){
 }
 
 
-bool PrimitivesCan::GetFlipperError(bool front){
+bool PrimitivesCan::GetContractorError(){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	u8 num = SERVO_CONTRACTOR_INDEX;
+	bool ret = servo->GET_ERROR(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FlipperMove(double pos, double max_speed, double max_acc){
+
+	EnterCritical();
+
+	bool ret;
+	u8 num = SERVO_FLIPPER_INDEX;
+
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::FlipperMoveInProgress(void){
+
+	EnterCritical();
+
+	u8 num = SERVO_FLIPPER_INDEX;
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetFlipperPos(void){
+
+	EnterCritical();
+
+	u8 num = SERVO_FLIPPER_INDEX;
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetFlipperError(){
+
+	EnterCritical();
+
+	u8 num = SERVO_FLIPPER_INDEX;
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
