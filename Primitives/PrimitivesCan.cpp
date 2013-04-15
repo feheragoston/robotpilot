@@ -89,14 +89,16 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	broadcast	= new node_Broadcast();
 
 	console		= new node_Console();
-	caracole	= new node_Caracole();
-	firewheel	= new node_Firewheel();
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
-	input		= new node_Input();
 	servo		= new node_Servo();
 	sonar		= new node_Sonar();
+	#ifdef NAGY_ROBOT
+	caracole	= new node_Caracole();
+	firewheel	= new node_Firewheel();
+	input		= new node_Input();
 	power		= new node_Power();
+	#endif
 	//---------- node VEGE ----------
 
 
@@ -109,20 +111,11 @@ void PrimitivesCan::addNodesToCan(void){
 	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
 
-	if(!CARACOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CARACOLE_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(CARACOLE_ID);
-
-	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
-
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
 
 	if(!DCWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DCWHEEL_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DCWHEEL_ID);
-
-	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!SERVO_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SERVO_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(SERVO_ID);
@@ -130,9 +123,22 @@ void PrimitivesCan::addNodesToCan(void){
 	//SONAR-nak nem kuldunk semmit, pontosabban GATEWAY-nek nem adunk senkit a CAN_B-re, így oda tuti nem kuld, de fogadni fog
 	//if(!SONAR_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(SONAR_ID);
 	//else					gateway->GATEWAY_ADD_NODE_CANB(SONAR_ID);
+	
+	#ifdef NAGY_ROBOT
+
+	if(!CARACOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CARACOLE_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(CARACOLE_ID);
+
+	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
+
+	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
+	
+	#endif
 
 
 }
@@ -187,13 +193,15 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	#ifdef NAGY_ROBOT
+	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(power)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	#endif
 	//SONAR-nak nem kuldunk semmit
 	//if(!initNode(sonar)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 

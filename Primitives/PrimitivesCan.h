@@ -164,14 +164,16 @@ private:
 	node_Broadcast*		broadcast;
 	node_Gateway*		gateway;
 	node_Console*		console;
-	node_Caracole*		caracole;
-	node_Firewheel*		firewheel;
 	node_Deadreck*		deadreck;
 	node_DCWheel*		dcwheel;
-	node_Input*			input;
 	node_Servo*			servo;
 	node_Sonar*			sonar;
+	#ifdef NAGY_ROBOT
+	node_Caracole*		caracole;
+	node_Firewheel*		firewheel;
+	node_Input*			input;
 	node_Power*			power;
+	#endif
 	//---------- node VEGE ----------
 
 
