@@ -12,6 +12,8 @@
 #include "include/node_Input.h"
 #include "../define/sharp_table.h"
 
+#ifdef NAGY_ROBOT
+
 
 using namespace std;
 
@@ -243,3 +245,5 @@ void node_Input::SET_DIGITAL(u8 num, bool on){
 	cout << name << "\t___send SETOUTPUT [" << (u32)num << "]___:\t" << (on ? "1" : "0") << endl;
 
 }
+
+#endif /*NAGY_ROBOT*/

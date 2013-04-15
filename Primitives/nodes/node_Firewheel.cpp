@@ -1,5 +1,7 @@
 #include "include/node_Firewheel.h"
 
+#ifdef NAGY_ROBOT
+
 using namespace std;
 
 
@@ -103,3 +105,5 @@ double node_Firewheel::GET_SPEED(void){
 	return FIREWHEEL_CONV_INCRS_TO_RADS(FirewheelSpeed);
 
 }
+
+#endif /*NAGY_ROBOT*/

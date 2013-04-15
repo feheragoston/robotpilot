@@ -1,5 +1,7 @@
 #include "include/node_Caracole.h"
 
+#ifdef NAGY_ROBOT
+
 using namespace std;
 
 
@@ -103,3 +105,5 @@ double node_Caracole::GET_SPEED(void){
 	return CARACOLE_CONV_INCRS_TO_RADS(CaracoleSpeed);
 
 }
+
+#endif /*NAGY_ROBOT*/

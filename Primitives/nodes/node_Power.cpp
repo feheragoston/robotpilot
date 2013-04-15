@@ -11,6 +11,8 @@
 
 #include "include/node_Power.h"
 
+#ifdef NAGY_ROBOT
+
 using namespace std;
 
 
@@ -197,3 +199,5 @@ bool node_Power::GET_ACT_ON(bool* ActOn){
 	return ret;
 
 }
+
+#endif /*NAGY_ROBOT*/
