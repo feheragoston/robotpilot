@@ -53,7 +53,9 @@ public:
 	bool GetStartButton(void);
 	bool GetStopButton(void);
 	int8_t GetMyColor(void);
+#ifdef NAGY_ROBOT
 	int8_t GetBallPresent(void);
+#endif
 
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);
@@ -81,8 +83,10 @@ public:
 	void SetRobotPos(double x, double y, double phi);
 	void SetOpponentPos(unsigned char n, double x, double y);
 
-	double GetBallColorVoltage(void);
 	void GetDistances(double distance[PROXIMITY_NUM]);
+
+#ifdef NAGY_ROBOT
+	double GetBallColorVoltage(void);
 
 	bool ArmMove(bool front, double pos, double max_speed, double max_acc);
 	bool ArmMoveInProgress(bool front);
@@ -108,6 +112,7 @@ public:
 	bool FireStopperMoveInProgress();
 	double GetFireStopperPos();
 	bool GetFireStopperError();
+#endif
 
 	bool CalibrateConsole(void);
 	bool CalibrateConsoleInProgress(void);
@@ -119,6 +124,7 @@ public:
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
 
+#ifdef NAGY_ROBOT
 	bool CaracoleSetSpeed(double speed, double max_acc);
 	bool CaracoleSetSpeedInProgress(void);
 	double GetCaracoleSpeed(void);
@@ -126,6 +132,7 @@ public:
 	bool FirewheelSetSpeed(double speed, double max_acc);
 	bool FirewheelSetSpeedInProgress(void);
 	double GetFirewheelSpeed(void);
+#endif
 	//----- Primitives VEGE -----
 
 

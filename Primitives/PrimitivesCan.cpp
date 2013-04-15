@@ -315,6 +315,7 @@ int8_t PrimitivesCan::GetMyColor(void){
 }
 
 
+#ifdef NAGY_ROBOT
 bool PrimitivesCan::GetBallPresent(void){
 
 	EnterCritical();
@@ -326,6 +327,7 @@ bool PrimitivesCan::GetBallPresent(void){
 	return ret;
 
 }
+#endif
 
 
 bool PrimitivesCan::SetMotorSupply(bool powered){
@@ -796,19 +798,6 @@ void PrimitivesCan::SetOpponentPos(unsigned char n, double x, double y){
 }
 
 
-double PrimitivesCan::GetBallColorVoltage(void){
-
-	EnterCritical();
-
-	double voltage = input->GET_VOLTAGE(INPUT_ANALOG_BALL_COLOR_CNY70_INDEX);
-
-	ExitCritical();
-
-	return voltage;
-
-}
-
-
 void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
@@ -819,6 +808,20 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 	distance[3] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_REAR_SHARP_INDEX);
 
 	ExitCritical();
+
+}
+
+
+#ifdef NAGY_ROBOT
+double PrimitivesCan::GetBallColorVoltage(void){
+
+	EnterCritical();
+
+	double voltage = input->GET_VOLTAGE(INPUT_ANALOG_BALL_COLOR_CNY70_INDEX);
+
+	ExitCritical();
+
+	return voltage;
 
 }
 
@@ -1158,6 +1161,7 @@ bool PrimitivesCan::GetFireStopperError(void){
 	return ret;
 
 }
+#endif
 
 
 bool PrimitivesCan::CalibrateConsole(void){
@@ -1294,6 +1298,7 @@ double PrimitivesCan::GetConsolePos(void){
 }
 
 
+#ifdef NAGY_ROBOT
 bool PrimitivesCan::CaracoleSetSpeed(double speed, double max_acc){
 
 	EnterCritical();
@@ -1396,6 +1401,7 @@ double PrimitivesCan::GetFirewheelPos(void){
 	return ret;
 
 }
+#endif
 
 
 void PrimitivesCan::detectActChange(void){
