@@ -121,6 +121,10 @@ Control::Control(Config* config) {
 		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
 		{"GetConsolePos", l_GetConsolePos},
 
+#ifdef NAGY_ROBOT
+		{"GetBallColorVoltage", l_GetBallColorVoltage},
+#endif
+
 		{"StartMatch", l_StartMatch},
 
 		{"AddTestObstacles", l_AddTestObstacles},
@@ -1623,3 +1627,12 @@ int Control::l_ClearDynObstacles(lua_State *L) {
 	}
 	return 0;
 }
+
+#ifdef NAGY_ROBOT
+int Control::l_GetBallColorVoltage(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());
+	return 1;
+}
+#endif
+

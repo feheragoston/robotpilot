@@ -175,6 +175,10 @@ protected:
 	static int l_ConsoleStopInProgress(lua_State *L);
 	static int l_GetConsolePos(lua_State *L);
 
+#ifdef NAGY_ROBOT
+	static int l_GetBallColorVoltage(lua_State *L);
+#endif
+
 	static int l_StartMatch(lua_State *L);
 
 	static int l_AddTestObstacles(lua_State *L);
