@@ -9,15 +9,20 @@
 
 
 
+#define NAGY_ROBOT
+// #define KIS_ROBOT
+
 
 
 //----- konstans -----
 #define SERVO_COUNT							6
 
+#ifdef NAGY_ROBOT
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 #define INPUT_DIGITAL_OUTPUT_COUNT			4
 #define INPUT_DIGITAL_OUTPUT_MIN_INDEX		6
+#endif
 
 #define SONAR_TRANSMITTER_COUNT				3
 
@@ -49,6 +54,7 @@
 
 
 //----- atszamitas -----
+#ifdef NAGY_ROBOT
 #define MESV_TO_ANALOG(mesv)					((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
 #define ANALOG_TO_MESV(analog)					((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
 
@@ -71,6 +77,7 @@
 
 #define INPUT_V_TO_ANALOG(v)					MESV_TO_ANALOG(INPUT_V_TO_MESV(v))
 #define INPUT_ANALOG_TO_V(analog)				INPUT_MESV_TO_V(ANALOG_TO_MESV(analog))
+#endif
 
 
 
@@ -109,13 +116,17 @@
 #define CONSOLE_SEND_PERIOD_TO_PC_MS			100
 #define CONSOLE_SEND_PERIOD_TO_NODE_MS			0
 
+#ifdef NAGY_ROBOT
 #define CARACOLE_KEEP_ALIVE_MS					1000
 #define CARACOLE_SEND_PERIOD_TO_PC_MS			100
 #define CARACOLE_SEND_PERIOD_TO_NODE_MS			0
+#endif
 
+#ifdef NAGY_ROBOT
 #define FIREWHEEL_KEEP_ALIVE_MS					1000
 #define FIREWHEEL_SEND_PERIOD_TO_PC_MS			100
 #define FIREWHEEL_SEND_PERIOD_TO_NODE_MS		0
+#endif
 
 #define DEADRECK_KEEP_ALIVE_MS					1000
 #define DEADRECK_SEND_PERIOD_TO_PC_MS			100
@@ -125,9 +136,11 @@
 #define DCWHEEL_SEND_PERIOD_TO_PC_MS			100
 #define DCWHEEL_SEND_PERIOD_TO_NODE_MS			0
 
+#ifdef NAGY_ROBOT
 #define INPUT_KEEP_ALIVE_MS						1000
 #define INPUT_SEND_PERIOD_TO_PC_MS				100
 #define INPUT_SEND_PERIOD_TO_NODE_MS			0
+#endif
 
 #define SERVO_KEEP_ALIVE_MS						1000
 #define SERVO_SEND_PERIOD_TO_PC_MS				100
@@ -137,15 +150,18 @@
 #define SONAR_SEND_PERIOD_TO_PC_MS				100
 #define SONAR_SEND_PERIOD_TO_NODE_MS			0
 
+#ifdef NAGY_ROBOT
 #define POWER_KEEP_ALIVE_MS						1000
 #define POWER_SEND_PERIOD_TO_PC_MS				100
 #define POWER_SEND_PERIOD_TO_NODE_MS			0
+#endif
 
 
 
 
 
 //----- gateway -----
+#ifdef NAGY_ROBOT
 #define CONSOLE_ON_CANB							1	//??
 #define DEADRECK_ON_CANB						1	//??
 #define DCWHEEL_ON_CANB							1	//??
@@ -155,12 +171,22 @@
 #define POWER_ON_CANB							1	//??
 #define CARACOLE_ON_CANB						1	//??
 #define FIREWHEEL_ON_CANB						1	//??
+#else	//KIS_ROBOT
+#define CONSOLE_ON_CANB							1	//??
+#define DEADRECK_ON_CANB						1	//??
+#define DCWHEEL_ON_CANB							1	//??
+#define SERVO_ON_CANB							1	//??
+#define SONAR_ON_CANB							1	//??
+#endif
 
 
 
 
 
 //----- input -----
+
+#ifdef NAGY_ROBOT
+
 #define INPUT_DIGITAL_START_BUTTON_INDEX					7	//??
 #define INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX				9	//??
 #define INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX				8	//??
@@ -217,11 +243,16 @@
 #define INPUT_ANALOG_PLUS_0_INDEX				6	//??
 #define INPUT_ANALOG_PLUS_1_INDEX				1	//??
 
+#endif
+
 
 
 
 
 //----- servo -----
+
+#ifdef NAGY_ROBOT
+
 #define SERVO_FRONT_GRIPPER_INDEX						4	//??
 #define SERVO_BACK_GRIPPER_INDEX						1	//??
 #define SERVO_SELECTOR_INDEX							5	//??
@@ -278,12 +309,75 @@
 #define SERVO_BACK_FLIPPER_LIMIT_HIGH_POS_INCR			2200
 #define SERVO_BACK_FLIPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
 
+#else	//KIS_ROBOT
+
+#define SERVO_FRONT_GRIPPER_INDEX						4	//??
+#define SERVO_BACK_GRIPPER_INDEX						1	//??
+#define SERVO_SELECTOR_INDEX							5	//??
+#define SERVO_FIRESTOPPER_INDEX							3	//??
+#define SERVO_FRONT_FLIPPER_INDEX						0	//??
+#define SERVO_BACK_FLIPPER_INDEX						2	//??
+
+
+#define SERVO_FRONT_GRIPPER_DEG_INCR_X0					0
+#define SERVO_FRONT_GRIPPER_DEG_INCR_Y0					1000	//??
+#define SERVO_FRONT_GRIPPER_DEG_INCR_X1					180
+#define SERVO_FRONT_GRIPPER_DEG_INCR_Y1					2000	//??
+#define SERVO_FRONT_GRIPPER_LIMIT_LOW_POS_INCR			700		//??
+#define SERVO_FRONT_GRIPPER_LIMIT_HIGH_POS_INCR			2200	//??
+#define SERVO_FRONT_GRIPPER_LIMIT_CURRENT_MA			500		//??	//[mA]
+
+#define SERVO_BACK_GRIPPER_DEG_INCR_X0					0
+#define SERVO_BACK_GRIPPER_DEG_INCR_Y0					1000	//??
+#define SERVO_BACK_GRIPPER_DEG_INCR_X1					180
+#define SERVO_BACK_GRIPPER_DEG_INCR_Y1					2000	//??
+#define SERVO_BACK_GRIPPER_LIMIT_LOW_POS_INCR			700		//??
+#define SERVO_BACK_GRIPPER_LIMIT_HIGH_POS_INCR			2200	//??
+#define SERVO_BACK_GRIPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
+
+#define SERVO_SELECTOR_DEG_INCR_X0						0
+#define SERVO_SELECTOR_DEG_INCR_Y0						1000	//??
+#define SERVO_SELECTOR_DEG_INCR_X1						180
+#define SERVO_SELECTOR_DEG_INCR_Y1						2000	//??
+#define SERVO_SELECTOR_LIMIT_LOW_POS_INCR				700		//??
+#define SERVO_SELECTOR_LIMIT_HIGH_POS_INCR				2200	//??
+#define SERVO_SELECTOR_LIMIT_CURRENT_MA					500		//??	//[mA]
+
+#define SERVO_FIRESTOPPER_DEG_INCR_X0					0
+#define SERVO_FIRESTOPPER_DEG_INCR_Y0					1000	//??
+#define SERVO_FIRESTOPPER_DEG_INCR_X1					180
+#define SERVO_FIRESTOPPER_DEG_INCR_Y1					2000	//??
+#define SERVO_FIRESTOPPER_LIMIT_LOW_POS_INCR			700		//??
+#define SERVO_FIRESTOPPER_LIMIT_HIGH_POS_INCR			2200	//??
+#define SERVO_FIRESTOPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
+
+#define SERVO_FRONT_FLIPPER_DEG_INCR_X0					0
+#define SERVO_FRONT_FLIPPER_DEG_INCR_Y0					1000
+#define SERVO_FRONT_FLIPPER_DEG_INCR_X1					180
+#define SERVO_FRONT_FLIPPER_DEG_INCR_Y1					2000
+#define SERVO_FRONT_FLIPPER_LIMIT_LOW_POS_INCR			700
+#define SERVO_FRONT_FLIPPER_LIMIT_HIGH_POS_INCR			2200
+#define SERVO_FRONT_FLIPPER_LIMIT_CURRENT_MA			500		//??	//[mA]
+
+#define SERVO_BACK_FLIPPER_DEG_INCR_X0					0
+#define SERVO_BACK_FLIPPER_DEG_INCR_Y0					1000
+#define SERVO_BACK_FLIPPER_DEG_INCR_X1					180
+#define SERVO_BACK_FLIPPER_DEG_INCR_Y1					2000
+#define SERVO_BACK_FLIPPER_LIMIT_LOW_POS_INCR			700
+#define SERVO_BACK_FLIPPER_LIMIT_HIGH_POS_INCR			2200
+#define SERVO_BACK_FLIPPER_LIMIT_CURRENT_MA				500		//??	//[mA]
+
+#endif
+
 
 
 
 
 
 //----- deadreck -----
+
+#ifdef NAGY_ROBOT
+
 //?? ugy kell rasimitani, mintha menne a palyara, ket mesterdarabbal
 #define DEADRECK_CALIB_DISTANCE_X				((double)59.9+290/2)	//[mm]				//??
 #define DEADRECK_CALIB_DISTANCE_Y				((double)114.8+60/2)	//[mm]				//??
@@ -297,11 +391,31 @@
 #define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1										//??
 #define DEADRECK_IS_LEFT_EQEP1						1										//??
 
+#else	//KIS_ROBOT
+
+//?? ugy kell rasimitani, mintha menne a palyara, ket mesterdarabbal
+#define DEADRECK_CALIB_DISTANCE_X				((double)59.9+290/2)	//[mm]				//??
+#define DEADRECK_CALIB_DISTANCE_Y				((double)114.8+60/2)	//[mm]				//??
+#define DEADRECK_CALIB_PHI						((double)90.0 * M_PI / 180)	//[rad]			//??
+
+//?? saját menés nélkül
+#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 266.4655)	//[1/mm]		//??
+#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.3033)	//[1/mm]		//??
+#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.310)	//[1/mm]		//??
+#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0										//??
+#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1										//??
+#define DEADRECK_IS_LEFT_EQEP1						1										//??
+
+#endif
+
 
 
 
 
 //----- power -----
+
+#ifdef NAGY_ROBOT
+
 #define POWER_MAIN_VOLTAGE_SHUTDOWN_LEVEL							18		//??
 #define POWER_MAIN_VOLTAGE_STOPBUTTON_LEVEL							3		//??
 #define POWER_MAIN_VOLTAGE_LOW_SHUTDOWN_TIME_MS						1000	//??
@@ -316,26 +430,38 @@
 #define POWER_CHARGE_VOLTAGE_READY_LEVEL							26		//??
 #define POWER_CHARGE_VOLTAGE_PLUGGED_IN_LEVEL						12		//??
 
+#endif
+
 
 
 
 
 //----- dcwheel -----
+
+#ifdef NAGY_ROBOT
 //????
 #define DCWHEEL_GEARBOX								66
 #define DCWHEEL_INCR_PER_MOTORROT					3000
+#define DCWHEEL_INCR_PER_MM							((double)494317 / 400) //Odett, de most ugyanaz
+#define DCWHEEL_INCR_PER_FULL_TURN					((double)6723500 / 10) // Odett, nincs hasznalva
+#define DCWHEEL_WHEEL_DISTANCE						161.5 // kezzel mert ertek
+#else	//KIS_ROBOT
+//????
+#define DCWHEEL_GEARBOX								66
+#define DCWHEEL_INCR_PER_MOTORROT					3000
+#define DCWHEEL_INCR_PER_MM							((double)494317 / 400) //Odett, de most ugyanaz
+#define DCWHEEL_INCR_PER_FULL_TURN					((double)6723500 / 10) // Odett, nincs hasznalva
+#define DCWHEEL_WHEEL_DISTANCE						161.5 // kezzel mert ertek
+#endif
+
 #define DCWHEEL_INCR_PER_WHEELROT					(DCWHEEL_GEARBOX * DCWHEEL_INCR_PER_MOTORROT)
 
-#define DCWHEEL_INCR_PER_MM							((double)494317 / 400) //Odett, de most ugyanaz
 #define DCWHEEL_WHEEL_DISTRICT_MM					((double)DCWHEEL_INCR_PER_WHEELROT / DCWHEEL_INCR_PER_MM)
 #define DCWHEEL_WHEEL_DIAMETER_MM					((double)DCWHEEL_WHEEL_DISTRICT_MM / M_PI)
 
 #define DCWHEEL_INCR_TO_MM(incr)					((double)(incr) / DCWHEEL_INCR_PER_MM)
 
-#define DCWHEEL_INCR_PER_FULL_TURN					((double)6723500 / 10) // Odett, nincs hasznalva
 #define DCWHEEL_MM_PER_FULL_TURN					DCWHEEL_INCR_TO_MM(DCWHEEL_INCR_PER_FULL_TURN)
-
-#define DCWHEEL_WHEEL_DISTANCE						161.5 // kezzel mert ertek
 
 #define DCWHEEL_SEC_PER_MIN							60
 
@@ -358,6 +484,7 @@
 #define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
 
 
+#ifdef NAGY_ROBOT
 //#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
 #define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
 #define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
@@ -369,16 +496,38 @@
 #define DCWHEEL_OE_CONTROL_P						0.0007	//??
 #define DCWHEEL_OE_CONTROL_I						0.0		//??
 #define DCWHEEL_OE_CONTROL_D						0.2		//??
+#else	//KIS_ROBOT
+//#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
+#define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
+#define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
+#define DCWHEEL_LEFT_IS_ROTATE_DIR_A				0		//??
+#define DCWHEEL_RIGHT_IS_ROTATE_DIR_A				1		//??
+#define DCWHEEL_LEFT_PLUS_FORWARD					1		//??
+#define DCWHEEL_RIGHT_PLUS_FORWARD					1		//??
+#define DCWHEEL_IS_LEFT_EQEP1						1		//??
+#define DCWHEEL_OE_CONTROL_P						0.0007	//??
+#define DCWHEEL_OE_CONTROL_I						0.0		//??
+#define DCWHEEL_OE_CONTROL_D						0.2		//??
+#endif
 
 
 
 
 
 //----- console -----
+
+#ifdef NAGY_ROBOT
 #define CONSOLE_INCR_MM_X0					0								//??
 #define CONSOLE_INCR_MM_Y0					0								//??
 #define CONSOLE_INCR_MM_X1					12967	//12967 incr = 100 mm	//??
 #define CONSOLE_INCR_MM_Y1					100								//??
+#else	//KIS_ROBOT
+#define CONSOLE_INCR_MM_X0					0								//??
+#define CONSOLE_INCR_MM_Y0					0								//??
+#define CONSOLE_INCR_MM_X1					12967	//12967 incr = 100 mm	//??
+#define CONSOLE_INCR_MM_Y1					100								//??
+#endif
+
 #define CONSOLE_INCR_MM_GRAD				GET_GRAD(CONSOLE_INCR_MM_X0, CONSOLE_INCR_MM_Y0, CONSOLE_INCR_MM_X1, CONSOLE_INCR_MM_Y1)
 
 #define CONSOLE_CONV_INCR_TO_MM(incr)				(((double)(incr) - CONSOLE_INCR_MM_X0) * CONSOLE_INCR_MM_GRAD + CONSOLE_INCR_MM_Y0)
@@ -388,6 +537,7 @@
 #define CONSOLE_CONV_MMS2_TO_INCRS2(mms2)			((u32)((double)(mms2) / CONSOLE_INCR_MM_GRAD))
 
 
+#ifdef NAGY_ROBOT
 #define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220				//??
 #define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600			//??
 #define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			123		//1mm	//??
@@ -400,12 +550,29 @@
 #define CONSOLE_IS_ENC_EQEP1						1				//??
 #define CONSOLE_MOTOR_PLUS_UP						1				//??
 #define CONSOLE_ENC_IS_ROTATE_DIR_A					1				//??
+#else	//KIS_ROBOT
+#define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220				//??
+#define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600			//??
+#define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			123		//1mm	//??
+#define CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR		20600	//120mm	//??
+#define CONSOLE_CONTROLLER_PARAMETER_P				0.2				//??
+#define CONSOLE_CONTROLLER_PARAMETER_I				0.0				//??
+#define CONSOLE_CONTROLLER_PARAMETER_D				0.0				//??
+#define CONSOLE_PWM_MODE							3				//??
+#define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			0				//??
+#define CONSOLE_IS_ENC_EQEP1						1				//??
+#define CONSOLE_MOTOR_PLUS_UP						1				//??
+#define CONSOLE_ENC_IS_ROTATE_DIR_A					1				//??
+#endif
 
 
 
 
 
 //----- caracole -----
+
+#ifdef NAGY_ROBOT
+
 #define CARACOLE_INCR_RAD_X0					0		//??
 #define CARACOLE_INCR_RAD_Y0					0		//??
 #define CARACOLE_INCR_RAD_X1					4096	//??
@@ -424,11 +591,16 @@
 #define CARACOLE_MOTOR_PLUS_UP							1				//??
 #define CARACOLE_ENC_IS_ROTATE_DIR_A					1				//??
 
+#endif
+
 
 
 
 
 //----- firewheel -----
+
+#ifdef NAGY_ROBOT
+
 #define FIREWHEEL_INCR_RAD_X0					0		//??
 #define FIREWHEEL_INCR_RAD_Y0					0		//??
 #define FIREWHEEL_INCR_RAD_X1					4096	//??
@@ -446,6 +618,8 @@
 #define FIREWHEEL_IS_ENC_EQEP1							1				//??
 #define FIREWHEEL_MOTOR_PLUS_FIRE						1				//??
 #define FIREWHEEL_ENC_IS_ROTATE_DIR_A					1				//??
+
+#endif
 
 
 
