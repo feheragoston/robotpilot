@@ -123,6 +123,7 @@ Control::Control(Config* config) {
 
 #ifdef NAGY_ROBOT
 		{"GetBallColorVoltage", l_GetBallColorVoltage},
+		{"GetBallPresent", l_GetBallPresent},
 #endif
 
 		{"StartMatch", l_StartMatch},
@@ -1634,5 +1635,41 @@ int Control::l_GetBallColorVoltage(lua_State *L)
 	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());
 	return 1;
 }
+
+int Control::l_GetBallPresent(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->GetBallPresent());
+	return 1;
+}
+
+int Control::l_FlipperMove(lua_State *L)
+{
+	double pos = luaL_optnumber(L, 1, 0);
+	double max_speed = luaL_optnumber(L, 2, 0);
+	double max_acc = luaL_optnumber(L, 3, 0);
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->FlipperMove(true,pos,max_speed,max_acc));
+	return 1;
+}
+int Control::l_FlipperMoveInProgress(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress(true));
+	return 1;
+}
+int Control::l_GetFlipperPos(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushnumber(L, mPrimitives->GetFlipperPos(true));
+	return 1;
+}
+int Control::l_GetFlipperError(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->GetFlipperError(true));
+	return 1;
+}
+
+
 #endif
 

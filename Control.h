@@ -177,6 +177,13 @@ protected:
 
 #ifdef NAGY_ROBOT
 	static int l_GetBallColorVoltage(lua_State *L);
+	static int l_GetBallPresent(lua_State *L);
+
+	static int l_FlipperMove(lua_State *L);
+	static int l_FlipperMoveInProgress(lua_State *L);
+	static int l_GetFlipperPos(lua_State *L);
+	static int l_GetFlipperError(lua_State *L);
+
 #endif
 
 	static int l_StartMatch(lua_State *L);
