@@ -161,12 +161,12 @@ protected:
 	static int l_GripperMove(lua_State *L);
 	static int l_GripperMoveInProgress(lua_State *L);
 	static int l_GetGripperPos(lua_State *L);
-	static int l_ClawMove(lua_State *L);
-	static int l_ClawMoveInProgress(lua_State *L);
-	static int l_GetClawPos(lua_State *L);
-	static int l_ArmMove(lua_State *L);
-	static int l_ArmMoveInProgress(lua_State *L);
-	static int l_GetArmPos(lua_State *L);
+	static int l_SelectorMove(lua_State *L);
+	static int l_SelectorMoveInProgress(lua_State *L);
+	static int l_GetSelectorPos(lua_State *L);
+	static int l_FireStopperMove(lua_State *L);
+	static int l_FireStopperMoveInProgress(lua_State *L);
+	static int l_GetFireStopperPos(lua_State *L);
 	static int l_CalibrateConsole(lua_State *L);
 	static int l_CalibrateConsoleInProgress(lua_State *L);
 	static int l_ConsoleMove(lua_State *L);
