@@ -41,7 +41,7 @@ Primitives::Primitives(Primitives* source) {
 	backGripperPos = source->GetGripperPos(false);
 	frontFlipperPos = source->GetFlipperPos(true);
 	backFlipperPos = source->GetFlipperPos(false);
-	selectorPos = source->GetSelectorPos(false);
+	selectorPos = source->GetSelectorPos();
 	consolePos = source->GetConsolePos();
 	fireStopperPos = source->GetFireStopperPos();
 

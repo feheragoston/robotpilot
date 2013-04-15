@@ -94,7 +94,7 @@ public:
 	double GetFlipperPos(bool front);
 	bool GetFlipperError(bool front);
 
-	bool SelectorMove(, double pos, double max_speed, double max_acc);
+	bool SelectorMove(double pos, double max_speed, double max_acc);
 	bool SelectorMoveInProgress();
 	double GetSelectorPos();
 	bool GetSelectorError();

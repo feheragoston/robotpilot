@@ -866,7 +866,7 @@ double PrimitivesCan::GetGripperPos(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -880,7 +880,7 @@ bool PrimitivesCan::GetGripperError(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_back_GRIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_GRIPPER_INDEX : SERVO_BACK_GRIPPER_INDEX);
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -933,7 +933,7 @@ double PrimitivesCan::GetFlipperPos(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
 	double ret = servo->GET_POS(num);
 
 	ExitCritical();
@@ -947,7 +947,7 @@ bool PrimitivesCan::GetFlipperError(bool front){
 
 	EnterCritical();
 
-	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_back_FLIPPER_INDEX);
+	u8 num = (front ? SERVO_FRONT_FLIPPER_INDEX : SERVO_BACK_FLIPPER_INDEX);
 	bool ret = servo->GET_ERROR(num);
 
 	ExitCritical();
@@ -1235,7 +1235,7 @@ bool PrimitivesCan::CaracoleSetSpeed(double speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(caracole->SetPos.inProgress){
+	if(caracole->SetSpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -1257,7 +1257,7 @@ bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = caracole->SetPos.inProgress;
+	bool ret = caracole->SetSpeed.inProgress;
 
 	ExitCritical();
 
@@ -1266,7 +1266,7 @@ bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
 }
 
 
-double PrimitivesCan::GetCaracolePos(void){
+double PrimitivesCan::GetCaracoleSpeed(void){
 
 	EnterCritical();
 
@@ -1287,7 +1287,7 @@ bool PrimitivesCan::FirewheelSetSpeed(double speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(firewheel->SetPos.inProgress){
+	if(firewheel->SetSpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -1309,7 +1309,7 @@ bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = firewheel->SetPos.inProgress;
+	bool ret = firewheel->SetSpeed.inProgress;
 
 	ExitCritical();
 
@@ -1318,7 +1318,7 @@ bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
 }
 
 
-double PrimitivesCan::GetFirewheelPos(void){
+double PrimitivesCan::GetFirewheelSpeed(void){
 
 	EnterCritical();
 
