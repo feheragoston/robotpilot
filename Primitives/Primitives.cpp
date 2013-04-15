@@ -229,7 +229,7 @@ int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
-int8_t Primitives::GetBallPresent() {
+bool Primitives::GetBallPresent() {
 	return 0;
 }
 

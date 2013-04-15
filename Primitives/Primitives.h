@@ -72,7 +72,7 @@ public:
 	 * A labda jelenletenek lekerdezese
 	 * @return 1: labda, 0: ures
 	 */
-	virtual int8_t GetBallPresent();
+	virtual bool GetBallPresent();
 
 	/**
 	 * motortap be/ki kapcsolasa
