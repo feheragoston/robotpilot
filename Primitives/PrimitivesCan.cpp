@@ -288,7 +288,11 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
+#ifdef NAGY_ROBOT
 	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_START_BUTTON_INDEX);
+#else	//KIS_ROBOT
+	bool ret = 1	//??
+#endif
 
 	ExitCritical();
 
@@ -301,7 +305,11 @@ bool PrimitivesCan::GetStopButton(void){
 
 	EnterCritical();
 
+#ifdef NAGY_ROBOT
 	bool ret = power->GET_STOP_BUTTON();
+#else	//KIS_ROBOT
+	bool ret = 1	//??
+#endif
 
 	ExitCritical();
 
