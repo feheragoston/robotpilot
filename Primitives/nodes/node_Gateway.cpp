@@ -98,20 +98,6 @@ void node_Gateway::GATEWAY_ADD_NODE_CANB(u8 node_id){
 }
 
 
-void node_Gateway::GATEWAY_ADD_BOOTLOADER_ID(u8 node_id){
-
-	UDPmsg msg;
-
-	msg.node_id		= id;
-	msg.function	= CMD_GATEWAY_ADD_BOOTLOADER_ID;
-	msg.length		= 1;
-	SET_U8(&(msg.data[0]), node_id);
-
-	UDPdriver::send(&msg);
-
-}
-
-
 void node_Gateway::INIT_PARAM(void){
 
 	UDPmsg msg;
