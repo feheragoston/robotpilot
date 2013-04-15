@@ -346,6 +346,7 @@ bool PrimitivesCan::GetBallPresent(void){
 #endif
 
 
+#ifdef NAGY_ROBOT
 bool PrimitivesCan::SetMotorSupply(bool powered){
 
 	EnterCritical();
@@ -402,6 +403,7 @@ bool PrimitivesCan::GetMotorSupply(void){
 	return ret;
 
 }
+#endif
 
 
 bool PrimitivesCan::CalibrateDeadreckoning(bool simulate){
