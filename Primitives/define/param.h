@@ -34,7 +34,8 @@
 #define AREA_LENGTH_X						2000
 #define AREA_LENGTH_Y						3000
 
-
+#define NAGY_ROBOT
+//#define KIS_ROBOT
 
 
 
