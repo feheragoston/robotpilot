@@ -359,6 +359,7 @@
 #define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
 
 
+#define DCWHEEL_IS_LEFT_MOTOR1						1		//??
 //#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
 #define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
 #define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
