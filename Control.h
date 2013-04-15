@@ -184,6 +184,13 @@ protected:
 	static int l_GetFlipperPos(lua_State *L);
 	static int l_GetFlipperError(lua_State *L);
 
+	static int l_CaracoleSetSpeed(lua_State *L);
+	static int l_CaracoleSetSpeedInProgress(lua_State *L);
+	static int l_GetCaracoleSpeed(lua_State *L);
+
+	static int l_FirewheelSetSpeed(lua_State *L);
+	static int l_FirewheelSetSpeedInProgress(lua_State *L);
+	static int l_GetFirewheelSpeed(lua_State *L);
 #endif
 
 	static int l_StartMatch(lua_State *L);

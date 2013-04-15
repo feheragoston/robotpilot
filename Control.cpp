@@ -124,6 +124,15 @@ Control::Control(Config* config) {
 #ifdef NAGY_ROBOT
 		{"GetBallColorVoltage", l_GetBallColorVoltage},
 		{"GetBallPresent", l_GetBallPresent},
+
+		{"CaracoleSetSpeed", l_CaracoleSetSpeed},
+		{"CaracoleSetSpeedInProgress", l_CaracoleSetSpeedInProgress},
+		{"GetCaracoleSpeed", l_GetCaracoleSpeed},
+
+		{"FirewheelSetSpeed", l_FirewheelSetSpeed},
+		{"FirewheelSetSpeedInProgress", l_FirewheelSetSpeedInProgress},
+		{"GetFirewheelSpeed", l_GetFirewheelSpeed},
+
 #endif
 
 		{"StartMatch", l_StartMatch},
@@ -659,6 +668,7 @@ long int Control::refreshOpponent(unsigned char n) {
 
 bool Control::opponentTooClose() {
 
+	//TODO: eztet ellenorizni, mit csinal????
 	bool theyStuck = true;
 
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
@@ -1666,6 +1676,44 @@ int Control::l_GetFlipperError(lua_State *L)
 {
 	//TODO: elso parameter folosleges, mindenhonnan kivenni
 	lua_pushboolean(L, mPrimitives->GetFlipperError(true));
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetCaracoleSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetCaracoleSpeed());
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetFirewheelSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetFirewheelSpeed());
 	return 1;
 }
 
