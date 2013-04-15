@@ -41,7 +41,7 @@ Primitives::Primitives(Primitives* source) {
 	backGripperPos = source->GetGripperPos(false);
 	frontFlipperPos = source->GetFlipperPos(true);
 	backFlipperPos = source->GetFlipperPos(false);
-	selectorPos = source->GetSelectorPos(false);
+	selectorPos = source->GetSelectorPos();
 	consolePos = source->GetConsolePos();
 	fireStopperPos = source->GetFireStopperPos();
 
@@ -229,7 +229,7 @@ int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
-int8_t Primitives::GetBallPresent() {
+bool Primitives::GetBallPresent() {
 	return 0;
 }
 

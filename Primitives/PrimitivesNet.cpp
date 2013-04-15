@@ -61,7 +61,7 @@ bool PrimitivesNet::Wait(long int useconds) {
 }
 
 bool PrimitivesNet::processMessage(const void* buffer, int size) {
-	function_t* function = (function_t*) buffer;
+	/*function_t* function = (function_t*) buffer;
 	if (*function == MSG_REFRESHSTATUS && size == sizeof(msgstatus)) {
 		msgstatus* data = (msgstatus*) buffer;
 		robot.x = data->x;
@@ -118,7 +118,7 @@ bool PrimitivesNet::processMessage(const void* buffer, int size) {
 	} else {
 		printf("Unknown or invalid function: %d size: %d\n", *function, size);
 		return false;
-	}
+	}*/
 	return true;
 }
 
@@ -191,7 +191,7 @@ bool PrimitivesNet::Turn(double angle, double max_speed, double max_acc) {
 }
 
 bool PrimitivesNet::MotionStop(double dec) {
-	if (motionStop.inprogress) {
+/*	if (motionStop.inprogress) {
 		return false;
 	}
 	msgd1 message;
@@ -203,18 +203,18 @@ bool PrimitivesNet::MotionStop(double dec) {
 	go.inprogress = false;
 	goTo.inprogress = false;
 	turn.inprogress = false;
-
+*/
 	return true;
 }
 
 void PrimitivesNet::GetDistances(double distance[6]) {
-	for (int i = 0; i < 6; i++) {
+	/*for (int i = 0; i < 6; i++) {
 		distance[i] = distances[i];
-	}
+	}*/
 }
 
 bool PrimitivesNet::GripperMove(bool left, double pos, double max_speed, double max_acc) {
-	progress* p;
+	/*progress* p;
 	uint8_t id;
 	if (left) {
 		p = &leftGripperMove;
@@ -233,22 +233,22 @@ bool PrimitivesNet::GripperMove(bool left, double pos, double max_speed, double 
 	message.speed = max_speed;
 	message.acc = max_acc;
 	netConnection->Send(&message, sizeof(msgservo));
-	p->inprogress = true;
+	p->inprogress = true;*/
 	return true;
 }
 
 bool PrimitivesNet::GripperMoveInProgress(bool left) {
 	progress* p;
-	if (left) {
+	/*if (left) {
 		p = &leftGripperMove;
 	} else {
 		p = &rightGripperMove;
-	}
+	}*/
 	return p->inprogress;
 }
 
 bool PrimitivesNet::ClawMove(bool left, double pos, double max_speed, double max_acc) {
-	progress* p;
+	/*progress* p;
 	uint8_t id;
 	if (left) {
 		p = &leftClawMove;
@@ -267,22 +267,22 @@ bool PrimitivesNet::ClawMove(bool left, double pos, double max_speed, double max
 	message.speed = max_speed;
 	message.acc = max_acc;
 	netConnection->Send(&message, sizeof(msgservo));
-	p->inprogress = true;
+	p->inprogress = true;*/
 	return true;
 }
 
 bool PrimitivesNet::ClawMoveInProgress(bool left) {
-	progress* p;
+	/*progress* p;
 	if (left) {
 		p = &leftClawMove;
 	} else {
 		p = &rightClawMove;
-	}
-	return p->inprogress;
+	}*/
+	return true;//p->inprogress;
 }
 
 bool PrimitivesNet::ArmMove(double pos, double max_speed, double max_acc) {
-	if (armMove.inprogress) {
+/*	if (armMove.inprogress) {
 		return false;
 	}
 	msgservo message;
@@ -292,12 +292,12 @@ bool PrimitivesNet::ArmMove(double pos, double max_speed, double max_acc) {
 	message.speed = max_speed;
 	message.acc = max_acc;
 	netConnection->Send(&message, sizeof(msgservo));
-	armMove.inprogress = true;
+	armMove.inprogress = true;*/
 	return true;
 }
 
 bool PrimitivesNet::ArmMoveInProgress() {
-	return armMove.inprogress;
+	return false;//armMove.inprogress;
 }
 
 bool PrimitivesNet::CalibrateConsole() {

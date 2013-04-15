@@ -1325,7 +1325,7 @@ bool PrimitivesCan::CaracoleSetSpeed(double speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(caracole->SetPos.inProgress){
+	if(caracole->SetSpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -1347,7 +1347,7 @@ bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = caracole->SetPos.inProgress;
+	bool ret = caracole->SetSpeed.inProgress;
 
 	ExitCritical();
 
@@ -1356,7 +1356,7 @@ bool PrimitivesCan::CaracoleSetSpeedInProgress(void){
 }
 
 
-double PrimitivesCan::GetCaracolePos(void){
+double PrimitivesCan::GetCaracoleSpeed(void){
 
 	EnterCritical();
 
@@ -1377,7 +1377,7 @@ bool PrimitivesCan::FirewheelSetSpeed(double speed, double max_acc){
 
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
-	if(firewheel->SetPos.inProgress){
+	if(firewheel->SetSpeed.inProgress){
 		ret = ACT_START_ERROR;
 	}
 
@@ -1399,7 +1399,7 @@ bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
 
 	EnterCritical();
 
-	bool ret = firewheel->SetPos.inProgress;
+	bool ret = firewheel->SetSpeed.inProgress;
 
 	ExitCritical();
 
@@ -1408,7 +1408,7 @@ bool PrimitivesCan::FirewheelSetSpeedInProgress(void){
 }
 
 
-double PrimitivesCan::GetFirewheelPos(void){
+double PrimitivesCan::GetFirewheelSpeed(void){
 
 	EnterCritical();
 

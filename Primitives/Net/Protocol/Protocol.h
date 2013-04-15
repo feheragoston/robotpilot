@@ -56,11 +56,11 @@ typedef struct msgstatus {
 	bool stopButton;
 	int8_t color;
 	bool motorSupply;
-	double leftGripperPos;
-	double rightGripperPos;
-	double leftClawPos;
-	double rightClawPos;
-	double armPos;
+	double frontGripperPos;
+	double rearGripperPos;
+	double selectorPos;
+	//double rightClawPos;
+	double firestopperPos;
 	double consolePos;
 	double distances[PROXIMITY_NUM];
 } msgstatus;

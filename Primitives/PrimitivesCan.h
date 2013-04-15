@@ -54,7 +54,7 @@ public:
 	bool GetStopButton(void);
 	int8_t GetMyColor(void);
 #ifdef NAGY_ROBOT
-	int8_t GetBallPresent(void);
+	bool GetBallPresent(void);
 #endif
 
 #ifdef NAGY_ROBOT

@@ -41,8 +41,6 @@
 
 
 
-
-
 //----- macro -----
 //kesobb:
 //AAA_BBB_CCC_X0:		AAA node-nal a BBB-CCC fuggveny X0, Y0, X1, Y1 pontjai, hogy egy egyenest ket ponttal adjunk meg
@@ -485,6 +483,7 @@
 
 
 #ifdef NAGY_ROBOT
+#define DCWHEEL_IS_LEFT_MOTOR1						1		//??
 //#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
 #define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
 #define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
@@ -497,6 +496,7 @@
 #define DCWHEEL_OE_CONTROL_I						0.0		//??
 #define DCWHEEL_OE_CONTROL_D						0.2		//??
 #else	//KIS_ROBOT
+#define DCWHEEL_IS_LEFT_MOTOR1						1		//??
 //#define DCWHEEL_WHEEL_DISTANCE						lsd feljebb
 #define DCWHEEL_RPM_TO_MMPS							DCWHEEL_CONV_RPM_TO_MMS(1)
 #define DCWHEEL_MM_TO_INCR							DCWHEEL_INCR_PER_MM
@@ -577,12 +577,12 @@
 #define CARACOLE_INCR_RAD_Y0					0		//??
 #define CARACOLE_INCR_RAD_X1					4096	//??
 #define CARACOLE_INCR_RAD_Y1					M_PI	//??
-#define CARACOLE_INCR_RAD_GRAD				GET_GRAD(CARACOLE_INCR_MM_X0, CARACOLE_INCR_MM_Y0, CARACOLE_INCR_MM_X1, CARACOLE_INCR_MM_Y1)
+#define CARACOLE_INCR_RAD_GRAD				GET_GRAD(CARACOLE_INCR_RAD_X0, CARACOLE_INCR_RAD_Y0, CARACOLE_INCR_RAD_X1, CARACOLE_INCR_RAD_Y1)
 
-#define CARACOLE_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * CARACOLE_INCR_RAD_GRAD))	//??
+#define CARACOLE_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * CARACOLE_INCR_RAD_GRAD)	//??
 
-#define CARACOLE_CONV_RADS_TO_INCRS(rads)				((double)(rads) / CARACOLE_INCR_RAD_GRAD))	//??
-#define CARACOLE_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / CARACOLE_INCR_RAD_GRAD))	//??
+#define CARACOLE_CONV_RADS_TO_INCRS(rads)				((double)(rads) / CARACOLE_INCR_RAD_GRAD)	//??
+#define CARACOLE_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / CARACOLE_INCR_RAD_GRAD)	//??
 
 #define CARACOLE_CONTROLLER_PARAMETER_P					0.2				//??
 #define CARACOLE_CONTROLLER_PARAMETER_I					0.0				//??
@@ -605,12 +605,12 @@
 #define FIREWHEEL_INCR_RAD_Y0					0		//??
 #define FIREWHEEL_INCR_RAD_X1					4096	//??
 #define FIREWHEEL_INCR_RAD_Y1					M_PI	//??
-#define FIREWHEEL_INCR_RAD_GRAD				GET_GRAD(FIREWHEEL_INCR_MM_X0, FIREWHEEL_INCR_MM_Y0, FIREWHEEL_INCR_MM_X1, FIREWHEEL_INCR_MM_Y1)
+#define FIREWHEEL_INCR_RAD_GRAD				GET_GRAD(FIREWHEEL_INCR_RAD_X0, FIREWHEEL_INCR_RAD_Y0, FIREWHEEL_INCR_RAD_X1, FIREWHEEL_INCR_RAD_Y1)
 
-#define FIREWHEEL_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * FIREWHEEL_INCR_RAD_GRAD))	//??
+#define FIREWHEEL_CONV_INCRS_TO_RADS(incrs)				((double)(incrs) * FIREWHEEL_INCR_RAD_GRAD)	//??
 
-#define FIREWHEEL_CONV_RADS_TO_INCRS(rads)				((double)(rads) / FIREWHEEL_INCR_RAD_GRAD))		//??
-#define FIREWHEEL_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / FIREWHEEL_INCR_RAD_GRAD))	//??
+#define FIREWHEEL_CONV_RADS_TO_INCRS(rads)				((double)(rads) / FIREWHEEL_INCR_RAD_GRAD)		//??
+#define FIREWHEEL_CONV_RADS2_TO_INCRS2(rads2)			((double)(rads2) / FIREWHEEL_INCR_RAD_GRAD)	//??
 
 #define FIREWHEEL_CONTROLLER_PARAMETER_P				0.2				//??
 #define FIREWHEEL_CONTROLLER_PARAMETER_I				0.0				//??

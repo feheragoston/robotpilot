@@ -107,12 +107,12 @@ Control::Control(Config* config) {
 		{"GripperMove", l_GripperMove},
 		{"GripperMoveInProgress", l_GripperMoveInProgress},
 		{"GetGripperPos", l_GetGripperPos},
-		{"ClawMove", l_ClawMove},
-		{"ClawMoveInProgress", l_ClawMoveInProgress},
-		{"GetClawPos", l_GetClawPos},
-		{"ArmMove", l_ArmMove},
-		{"ArmMoveInProgress", l_ArmMoveInProgress},
-		{"GetArmPos", l_GetArmPos},
+		{"SelectorMove", l_SelectorMove},
+		{"SelectorMoveInProgress", l_SelectorMoveInProgress},
+		{"GetSelectorPos", l_GetSelectorPos},
+		{"FireStopperMove", l_FireStopperMove},
+		{"FireStopperMoveInProgress", l_FireStopperMoveInProgress},
+		{"GetFireStopperPos", l_GetFireStopperPos},
 		{"CalibrateConsole", l_CalibrateConsole},
 		{"CalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
 		{"ConsoleMove", l_ConsoleMove},
@@ -120,6 +120,20 @@ Control::Control(Config* config) {
 		{"ConsoleStop", l_ConsoleStop},
 		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
 		{"GetConsolePos", l_GetConsolePos},
+
+#ifdef NAGY_ROBOT
+		{"GetBallColorVoltage", l_GetBallColorVoltage},
+		{"GetBallPresent", l_GetBallPresent},
+
+		{"CaracoleSetSpeed", l_CaracoleSetSpeed},
+		{"CaracoleSetSpeedInProgress", l_CaracoleSetSpeedInProgress},
+		{"GetCaracoleSpeed", l_GetCaracoleSpeed},
+
+		{"FirewheelSetSpeed", l_FirewheelSetSpeed},
+		{"FirewheelSetSpeedInProgress", l_FirewheelSetSpeedInProgress},
+		{"GetFirewheelSpeed", l_GetFirewheelSpeed},
+
+#endif
 
 		{"StartMatch", l_StartMatch},
 
@@ -369,11 +383,11 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		response.motorSupply = mPrimitives->GetMotorSupply();
-		response.leftGripperPos = mPrimitives->GetGripperPos(true);
-		response.rightGripperPos = mPrimitives->GetGripperPos(false);
-		response.leftClawPos = mPrimitives->GetClawPos(true);
-		response.rightClawPos = mPrimitives->GetClawPos(false);
-		response.armPos = mPrimitives->GetArmPos();
+		response.frontGripperPos = mPrimitives->GetGripperPos(true);
+		response.rearGripperPos = mPrimitives->GetGripperPos(false);
+		//response.leftClawPos = mPrimitives->GetClawPos(true);
+		//response.rightClawPos = mPrimitives->GetClawPos(false);
+		//response.armPos = mPrimitives->GetArmPos();
 		response.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
@@ -504,11 +518,10 @@ void Control::log() {
 		status.stopButton = mPrimitives->GetStopButton();
 		status.color = mPrimitives->GetMyColor();
 		status.motorSupply = mPrimitives->GetMotorSupply();
-		status.leftGripperPos = mPrimitives->GetGripperPos(true);
-		status.rightGripperPos = mPrimitives->GetGripperPos(false);
-		status.leftClawPos = mPrimitives->GetClawPos(true);
-		status.rightClawPos = mPrimitives->GetClawPos(false);
-		status.armPos = mPrimitives->GetArmPos();
+		status.frontGripperPos = mPrimitives->GetGripperPos(true);
+		status.rearGripperPos = mPrimitives->GetGripperPos(false);
+		status.selectorPos = mPrimitives->GetSelectorPos();
+		status.firestopperPos = mPrimitives->GetFireStopperPos();
 		status.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(status.distances);
 		size = sizeof(msgstatus);
@@ -655,6 +668,7 @@ long int Control::refreshOpponent(unsigned char n) {
 
 bool Control::opponentTooClose() {
 
+	//TODO: eztet ellenorizni, mit csinal????
 	bool theyStuck = true;
 
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
@@ -689,7 +703,7 @@ bool Control::opponentTooClose() {
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		validity = max(validity, refreshOpponent(i));
 	}
-	if (validity > SONAR_TIMEOUT && !mPrimitives->ArmMoveInProgress()
+	if (validity > SONAR_TIMEOUT/* && !mPrimitives->ArmMoveInProgress()*/
 			&& (x < 1600 || abs(phi) > M_PI / 2)) {
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
@@ -723,12 +737,15 @@ bool Control::opponentTooClose() {
 }
 
 bool Control::obstacleCollision() {
+	//TODO: eztet ellenorizni, mit csinal????
 	double x, y, phi, lg, rg, lc, rc;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	lg = mPrimitives->GetGripperPos(true);
 	rg = mPrimitives->GetGripperPos(false);
-	lc = mPrimitives->GetClawPos(true);
-	rc = mPrimitives->GetClawPos(false);
+//	lc = mPrimitives->GetClawPos(true);
+//	rc = mPrimitives->GetClawPos(false);
+	lc=0;
+	rc=0;
 
 	while (!robotObstacles.empty()) {
 		delete robotObstacles.front();
@@ -1515,42 +1532,39 @@ int Control::l_GetGripperPos(lua_State *L) {
 	return 1;
 }
 
-int Control::l_ClawMove(lua_State *L) {
-	bool left = lua_toboolean(L, 1);
-	double pos = luaL_optnumber(L, 2, 0);
-	double speed = luaL_optnumber(L, 3, 1000);
-	double acc = luaL_optnumber(L, 4, 850);
-	lua_pushboolean(L, mPrimitives->ClawMove(left, pos, speed, acc));
-	return 1;
-}
-
-int Control::l_ClawMoveInProgress(lua_State *L) {
-	bool left = lua_toboolean(L, 1);
-	lua_pushboolean(L, mPrimitives->ClawMoveInProgress(left));
-	return 1;
-}
-
-int Control::l_GetClawPos(lua_State *L) {
-	bool left = lua_toboolean(L, 1);
-	lua_pushnumber(L, mPrimitives->GetClawPos(left));
-	return 1;
-}
-
-int Control::l_ArmMove(lua_State *L) {
+int Control::l_SelectorMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
 	double speed = luaL_optnumber(L, 2, 1000);
 	double acc = luaL_optnumber(L, 3, 850);
-	lua_pushboolean(L, mPrimitives->ArmMove(pos, speed, acc));
+	lua_pushboolean(L, mPrimitives->SelectorMove(pos, speed, acc));
 	return 1;
 }
 
-int Control::l_ArmMoveInProgress(lua_State *L) {
-	lua_pushboolean(L, mPrimitives->ArmMoveInProgress());
+int Control::l_SelectorMoveInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->SelectorMoveInProgress());
 	return 1;
 }
 
-int Control::l_GetArmPos(lua_State *L) {
-	lua_pushnumber(L, mPrimitives->GetArmPos());
+int Control::l_GetSelectorPos(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetSelectorPos());
+	return 1;
+}
+
+int Control::l_FireStopperMove(lua_State *L) {
+	double pos = luaL_optnumber(L, 1, 0);
+	double speed = luaL_optnumber(L, 2, 1000);
+	double acc = luaL_optnumber(L, 3, 850);
+	lua_pushboolean(L, mPrimitives->FireStopperMove(pos, speed, acc));
+	return 1;
+}
+
+int Control::l_FireStopperMoveInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->FireStopperMoveInProgress());
+	return 1;
+}
+
+int Control::l_GetFireStopperPos(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetFireStopperPos());
 	return 1;
 }
 
@@ -1623,3 +1637,86 @@ int Control::l_ClearDynObstacles(lua_State *L) {
 	}
 	return 0;
 }
+
+#ifdef NAGY_ROBOT
+int Control::l_GetBallColorVoltage(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());
+	return 1;
+}
+
+int Control::l_GetBallPresent(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->GetBallPresent());
+	return 1;
+}
+
+int Control::l_FlipperMove(lua_State *L)
+{
+	double pos = luaL_optnumber(L, 1, 0);
+	double max_speed = luaL_optnumber(L, 2, 0);
+	double max_acc = luaL_optnumber(L, 3, 0);
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->FlipperMove(true,pos,max_speed,max_acc));
+	return 1;
+}
+int Control::l_FlipperMoveInProgress(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress(true));
+	return 1;
+}
+int Control::l_GetFlipperPos(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushnumber(L, mPrimitives->GetFlipperPos(true));
+	return 1;
+}
+int Control::l_GetFlipperError(lua_State *L)
+{
+	//TODO: elso parameter folosleges, mindenhonnan kivenni
+	lua_pushboolean(L, mPrimitives->GetFlipperError(true));
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetCaracoleSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetCaracoleSpeed());
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetFirewheelSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetFirewheelSpeed());
+	return 1;
+}
+
+
+#endif
+
