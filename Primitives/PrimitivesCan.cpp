@@ -458,8 +458,8 @@ bool PrimitivesCan::CalibrateDeadreckoningInProgress(void){
 
 #if 0	//ütközéskapcsoló
 			//ha megvan valamelyik utkozeskapcsolo
-			if(	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX))
+			if(	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
+				input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX))
 				deadreckCalibPhase = 2;
 #else	//színkapcsoló
 			//ha megvan a színkapcsoló
@@ -681,8 +681,8 @@ bool PrimitivesCan::MotionInProgress(void){
 	bool ret = dcwheel->AnyMotion.inProgress;
 
 	//ha utkozes kovetkezett be
-	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_FRONT_LEFT_LIMIT_SWITCH_INDEX) ||
-				input->GET_DIGITAL(INPUT_DIGITAL_FRONT_RIGHT_LIMIT_SWITCH_INDEX)))
+	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
+				input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX)))
 		dcwheelMotionError = MOTION_ERROR;
 
 	if (!ret && dcwheel->AnyMotion.done == 0) {
