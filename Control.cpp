@@ -104,22 +104,23 @@ Control::Control(Config* config) {
 		{"SetRobotPos", l_SetRobotPos},
 		{"GetOpponentPos", l_GetOpponentPos},
 
-		{"GripperMove", l_GripperMove},
-		{"GripperMoveInProgress", l_GripperMoveInProgress},
-		{"GetGripperPos", l_GetGripperPos},
+#ifdef NAGY_ROBOT
+		{"ArmMove", l_ArmMove},
+		{"ArmMoveInProgress", l_ArmMoveInProgress},
+		{"GetArmPos", l_GetArmPos},
 		{"SelectorMove", l_SelectorMove},
 		{"SelectorMoveInProgress", l_SelectorMoveInProgress},
 		{"GetSelectorPos", l_GetSelectorPos},
+		{"FlipperMove", l_FlipperMove},
+		{"FlipperMoveInProgress", l_FlipperMoveInProgress},
+		{"GetFlipperPos", l_GetFlipperPos},
+		{"ContractorMove", l_ContractorMove},
+		{"ContractorMoveInProgress", l_ContractorMoveInProgress},
+		{"GetContractorPos", l_GetContractorPos},
 		{"FireStopperMove", l_FireStopperMove},
 		{"FireStopperMoveInProgress", l_FireStopperMoveInProgress},
 		{"GetFireStopperPos", l_GetFireStopperPos},
-		{"CalibrateConsole", l_CalibrateConsole},
-		{"CalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
-		{"ConsoleMove", l_ConsoleMove},
-		{"ConsoleMoveInProgress", l_ConsoleMoveInProgress},
-		{"ConsoleStop", l_ConsoleStop},
-		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
-		{"GetConsolePos", l_GetConsolePos},
+#endif
 
 #ifdef NAGY_ROBOT
 		{"GetBallColorVoltage", l_GetBallColorVoltage},
@@ -134,6 +135,14 @@ Control::Control(Config* config) {
 		{"GetFirewheelSpeed", l_GetFirewheelSpeed},
 
 #endif
+
+		{"CalibrateConsole", l_CalibrateConsole},
+		{"CalibrateConsoleInProgress", l_CalibrateConsoleInProgress},
+		{"ConsoleMove", l_ConsoleMove},
+		{"ConsoleMoveInProgress", l_ConsoleMoveInProgress},
+		{"ConsoleStop", l_ConsoleStop},
+		{"ConsoleStopInProgress", l_ConsoleStopInProgress},
+		{"GetConsolePos", l_GetConsolePos},
 
 		{"StartMatch", l_StartMatch},
 
@@ -383,8 +392,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		response.motorSupply = mPrimitives->GetMotorSupply();
-		response.frontGripperPos = mPrimitives->GetArmPos(true);
-		response.rearGripperPos = mPrimitives->GetArmPos(false);
+		response.frontArmPos = mPrimitives->GetArmPos(true);
+		response.rearArmPos = mPrimitives->GetArmPos(false);
 		//response.leftClawPos = mPrimitives->GetClawPos(true);
 		//response.rightClawPos = mPrimitives->GetClawPos(false);
 		//response.armPos = mPrimitives->GetArmPos();
@@ -518,8 +527,8 @@ void Control::log() {
 		status.stopButton = mPrimitives->GetStopButton();
 		status.color = mPrimitives->GetMyColor();
 		status.motorSupply = mPrimitives->GetMotorSupply();
-		status.frontGripperPos = mPrimitives->GetArmPos(true);
-		status.rearGripperPos = mPrimitives->GetArmPos(false);
+		status.frontArmPos = mPrimitives->GetArmPos(true);
+		status.rearArmPos = mPrimitives->GetArmPos(false);
 		status.selectorPos = mPrimitives->GetSelectorPos();
 		status.firestopperPos = mPrimitives->GetFireStopperPos();
 		status.consolePos = mPrimitives->GetConsolePos();
@@ -1511,7 +1520,8 @@ int Control::l_GetOpponentPos(lua_State *L) {
 	return 3;
 }
 
-int Control::l_GripperMove(lua_State *L) {
+#ifdef NAGY_ROBOT
+int Control::l_ArmMove(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	double pos = luaL_optnumber(L, 2, 0);
 	double speed = luaL_optnumber(L, 3, 1000);
@@ -1520,13 +1530,13 @@ int Control::l_GripperMove(lua_State *L) {
 	return 1;
 }
 
-int Control::l_GripperMoveInProgress(lua_State *L) {
+int Control::l_ArmMoveInProgress(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	lua_pushboolean(L, mPrimitives->ArmMoveInProgress(left));
 	return 1;
 }
 
-int Control::l_GetGripperPos(lua_State *L) {
+int Control::l_GetArmPos(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
 	lua_pushnumber(L, mPrimitives->GetArmPos(left));
 	return 1;
@@ -1550,6 +1560,42 @@ int Control::l_GetSelectorPos(lua_State *L) {
 	return 1;
 }
 
+int Control::l_FlipperMove(lua_State *L) {
+	double pos = luaL_optnumber(L, 1, 0);
+	double speed = luaL_optnumber(L, 2, 1000);
+	double acc = luaL_optnumber(L, 3, 850);
+	lua_pushboolean(L, mPrimitives->FlipperMove(pos, speed, acc));
+	return 1;
+}
+
+int Control::l_FlipperMoveInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress());
+	return 1;
+}
+
+int Control::l_GetFlipperPos(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetFlipperPos());
+	return 1;
+}
+
+int Control::l_ContractorMove(lua_State *L) {
+	double pos = luaL_optnumber(L, 1, 0);
+	double speed = luaL_optnumber(L, 2, 1000);
+	double acc = luaL_optnumber(L, 3, 850);
+	lua_pushboolean(L, mPrimitives->ContractorMove(pos, speed, acc));
+	return 1;
+}
+
+int Control::l_ContractorMoveInProgress(lua_State *L) {
+	lua_pushboolean(L, mPrimitives->ContractorMoveInProgress());
+	return 1;
+}
+
+int Control::l_GetContractorPos(lua_State *L) {
+	lua_pushnumber(L, mPrimitives->GetContractorPos());
+	return 1;
+}
+
 int Control::l_FireStopperMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
 	double speed = luaL_optnumber(L, 2, 1000);
@@ -1567,6 +1613,7 @@ int Control::l_GetFireStopperPos(lua_State *L) {
 	lua_pushnumber(L, mPrimitives->GetFireStopperPos());
 	return 1;
 }
+#endif
 
 int Control::l_CalibrateConsole(lua_State *L) {
 	lua_pushboolean(L, mPrimitives->CalibrateConsole());
@@ -1648,30 +1695,6 @@ int Control::l_GetBallColorVoltage(lua_State *L)
 int Control::l_GetBallPresent(lua_State *L)
 {
 	lua_pushboolean(L, mPrimitives->GetBallPresent());
-	return 1;
-}
-
-int Control::l_FlipperMove(lua_State *L)
-{
-	double pos = luaL_optnumber(L, 1, 0);
-	double max_speed = luaL_optnumber(L, 2, 0);
-	double max_acc = luaL_optnumber(L, 3, 0);
-	lua_pushboolean(L, mPrimitives->FlipperMove(pos,max_speed,max_acc));
-	return 1;
-}
-int Control::l_FlipperMoveInProgress(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress());
-	return 1;
-}
-int Control::l_GetFlipperPos(lua_State *L)
-{
-	lua_pushnumber(L, mPrimitives->GetFlipperPos());
-	return 1;
-}
-int Control::l_GetFlipperError(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->GetFlipperError());
 	return 1;
 }
 
