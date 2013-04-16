@@ -493,6 +493,34 @@ bool Primitives::GetFireStopperError() {
 double Primitives::GetFireStopperPos() {
 	return fireStopperPos;
 }
+#else	//KIS_ROBOT
+bool Primitives::GripperMove(bool low, bool left, double pos, double max_speed, double max_acc){
+	if(low){
+		if(left)	leftLowGripperPos = pos;
+		else		rightLowGripperPos = pos;
+	}
+	else{
+		if(left)	leftHighGripperPos = pos;
+		else		rightHighGripperPos = pos;
+	}
+	return true;
+}
+bool Primitives::GripperMoveInProgress(bool low, bool left){
+	return false;
+}
+bool Primitives::GetGripperError(bool low, bool left){
+	return false;
+}
+double Primitives::GetGripperPos(bool low, bool left){
+	if(low){
+		if(left)	return leftLowGripperPos;
+		else		return rightLowGripperPos;
+	}
+	else{
+		if(left)	return leftHighGripperPos;
+		else		return rightHighGripperPos;
+	}
+}
 #endif
 
 bool Primitives::CalibrateConsole() {

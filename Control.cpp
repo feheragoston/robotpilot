@@ -120,6 +120,10 @@ Control::Control(Config* config) {
 		{"FireStopperMove", l_FireStopperMove},
 		{"FireStopperMoveInProgress", l_FireStopperMoveInProgress},
 		{"GetFireStopperPos", l_GetFireStopperPos},
+#else	//KIS_ROBOT
+		{"GripperMove", l_GripperMove},
+		{"GripperMoveInProgress", l_GripperMoveInProgress},
+		{"GetGripperPos", l_GetGripperPos},
 #endif
 
 #ifdef NAGY_ROBOT
@@ -398,6 +402,11 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.selectorPos = mPrimitives->GetSelectorPos();
 		response.flipperPos = mPrimitives->GetFlipperPos();
 		response.contractorPos = mPrimitives->GetContractorPos();
+#else	//KIS_ROBOT
+		response.lowLeftGripperPos = mPrimitives->GetGripperPos(true, true);
+		response.lowRightGripperPos = mPrimitives->GetGripperPos(true, false);
+		response.highLeftGripperPos = mPrimitives->GetGripperPos(false, true);
+		response.highRightGripperPos = mPrimitives->GetGripperPos(false, false);
 #endif
 		response.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(response.distances);
@@ -536,6 +545,11 @@ void Control::log() {
 		status.flipperPos = mPrimitives->GetFlipperPos();
 		status.contractorPos = mPrimitives->GetContractorPos();
 		status.firestopperPos = mPrimitives->GetFireStopperPos();
+#else	//KIS_ROBOT
+		status.lowLeftGripperPos = mPrimitives->GetGripperPos(true, true);
+		status.lowRightGripperPos = mPrimitives->GetGripperPos(true, false);
+		status.highLeftGripperPos = mPrimitives->GetGripperPos(false, true);
+		status.highRightGripperPos = mPrimitives->GetGripperPos(false, false);
 #endif
 		status.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(status.distances);
@@ -1619,6 +1633,30 @@ int Control::l_FireStopperMoveInProgress(lua_State *L) {
 
 int Control::l_GetFireStopperPos(lua_State *L) {
 	lua_pushnumber(L, mPrimitives->GetFireStopperPos());
+	return 1;
+}
+#else	//KIS_ROBOT
+int Control::l_GripperMove(lua_State *L) {
+	bool low = lua_toboolean(L, 1);
+	bool left = lua_toboolean(L, 2);
+	double pos = luaL_optnumber(L, 3, 0);
+	double speed = luaL_optnumber(L, 4, 1000);
+	double acc = luaL_optnumber(L, 5, 850);
+	lua_pushboolean(L, mPrimitives->GripperMove(low, left, pos, speed, acc));
+	return 1;
+}
+
+int Control::l_GripperMoveInProgress(lua_State *L) {
+	bool low = lua_toboolean(L, 1);
+	bool left = lua_toboolean(L, 2);
+	lua_pushboolean(L, mPrimitives->GripperMoveInProgress(low, left));
+	return 1;
+}
+
+int Control::l_GetGripperPos(lua_State *L) {
+	bool low = lua_toboolean(L, 1);
+	bool left = lua_toboolean(L, 2);
+	lua_pushnumber(L, mPrimitives->GetGripperPos(low, left));
 	return 1;
 }
 #endif

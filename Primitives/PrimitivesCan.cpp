@@ -1226,6 +1226,114 @@ bool PrimitivesCan::GetFireStopperError(void){
 	return ret;
 
 }
+#else	//KIS_ROBOT
+
+bool PrimitivesCan::GripperMove(bool low, bool left, double pos, double max_speed, double max_acc){
+
+	u8 num;
+
+	EnterCritical();
+
+	bool ret;
+
+	if(low){
+		if(left)	num = SERVO_LEFT_LOW_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+	else{
+		if(left)	num = SERVO_LEFT_HIGH_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+
+	if(servo->Setpos[num].inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		servo->SERVO_SET_POS(num, pos, max_speed, max_acc);
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GripperMoveInProgress(bool low, bool left){
+
+	u8 num;
+
+	EnterCritical();
+
+	if(low){
+		if(left)	num = SERVO_LEFT_LOW_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+	else{
+		if(left)	num = SERVO_LEFT_HIGH_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+
+	bool ret = servo->Setpos[num].inProgress;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+double PrimitivesCan::GetGripperPos(bool low, bool left){
+
+	u8 num;
+
+	EnterCritical();
+
+	if(low){
+		if(left)	num = SERVO_LEFT_LOW_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+	else{
+		if(left)	num = SERVO_LEFT_HIGH_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+
+	double ret = servo->GET_POS(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetGripperError(bool low, bool left){
+
+	u8 num;
+
+	EnterCritical();
+
+	if(low){
+		if(left)	num = SERVO_LEFT_LOW_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+	else{
+		if(left)	num = SERVO_LEFT_HIGH_GRIPPER_INDEX;
+		else		num = SERVO_RIGHT_HIGH_GRIPPER_INDEX;
+	}
+
+	bool ret = servo->GET_ERROR(num);
+
+	ExitCritical();
+
+	return ret;
+
+}
+
 #endif
 
 

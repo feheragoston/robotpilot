@@ -432,6 +432,47 @@ public:
 	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 */
 	virtual double GetFireStopperPos();
+
+#else	//KIS_ROBOT
+
+	///////////////////////////////////////////////////////////////////////
+	// GRIPPER
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Elulso megfogo kar mozgatasa
+	 * @param low also/felso kar mozgatasa
+	 * @param left bal/jobb kar mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 zart
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool GripperMove(bool low, bool left, double pos, double max_speed, double max_acc);
+
+	/**
+	 * Elulso megfogo kar mozgatas allapota
+	 * @param low also/felso kar allapota
+	 * @param left bal/jobb kar allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool GripperMoveInProgress(bool low, bool left);
+
+	/**
+	 * Legutobbi elulso megfogo mozgatas hibajanak lekerdezese
+	 * @param low also/felso kar
+	 * @param left bal/jobb kar
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetGripperError(bool low, bool left);
+
+	/**
+	 * Elulso megfogo kar szogenek lekerdezese
+	 * @param low also/felso kar
+	 * @param left bal/jobb kar
+	 * @return [deg], zart helyzet 0
+	 */
+	virtual double GetGripperPos(bool low, bool left);
 #endif
 
 	///////////////////////////////////////////////////////////////////////
@@ -583,6 +624,11 @@ protected:
 	double firewheelSpeed;
 	progress fireStopperMove;
 	double fireStopperPos;
+#else	//KIS_ROBOT
+	double leftLowGripperPos, rightLowGripperPos;
+	double leftHighGripperPos, rightHighGripperPos;
+	progress leftLowGripperMove, rightLowGripperMove;
+	progress leftHighGripperMove, rightHighGripperMove;
 #endif
 	progress consoleMove;
 	double consolePos;

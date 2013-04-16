@@ -112,6 +112,11 @@ public:
 	bool FireStopperMoveInProgress();
 	double GetFireStopperPos();
 	bool GetFireStopperError();
+#else	//KIS_ROBOT
+	bool GripperMove(bool low, bool left, double pos, double max_speed, double max_acc);
+	bool GripperMoveInProgress(bool low, bool left);
+	bool GetGripperError(bool low, bool left);
+	double GetGripperPos(bool low, bool left);
 #endif
 
 	bool CalibrateConsole(void);

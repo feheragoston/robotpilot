@@ -63,6 +63,11 @@ typedef struct msgstatus {
 	double flipperPos;
 	double contractorPos;
 	double firestopperPos;
+#else	//KIS_ROBOT
+	double lowLeftGripperPos;
+	double lowRightGripperPos;
+	double highLeftGripperPos;
+	double highRightGripperPos;
 #endif
 	double consolePos;
 	double distances[PROXIMITY_NUM];
