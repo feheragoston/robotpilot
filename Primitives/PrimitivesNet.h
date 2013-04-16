@@ -31,8 +31,8 @@ public:
 	bool MotionStop(double dec);
 	void GetDistances(double distance[PROXIMITY_NUM]);
 
-	bool GripperMove(bool left, double pos, double max_speed, double max_acc);
-	bool GripperMoveInProgress(bool left);
+	bool ArmMove(bool left, double pos, double max_speed, double max_acc);
+	bool ArmMoveInProgress(bool left);
 	bool ClawMove(bool left, double pos, double max_speed, double max_acc);
 	bool ClawMoveInProgress(bool left);
 	bool ArmMove(double pos, double max_speed, double max_acc);

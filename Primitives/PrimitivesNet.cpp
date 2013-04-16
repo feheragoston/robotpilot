@@ -213,7 +213,7 @@ void PrimitivesNet::GetDistances(double distance[6]) {
 	}*/
 }
 
-bool PrimitivesNet::GripperMove(bool left, double pos, double max_speed, double max_acc) {
+bool PrimitivesNet::ArmMove(bool left, double pos, double max_speed, double max_acc) {
 	/*progress* p;
 	uint8_t id;
 	if (left) {
@@ -237,7 +237,7 @@ bool PrimitivesNet::GripperMove(bool left, double pos, double max_speed, double 
 	return true;
 }
 
-bool PrimitivesNet::GripperMoveInProgress(bool left) {
+bool PrimitivesNet::ArmMoveInProgress(bool left) {
 	progress* p;
 	/*if (left) {
 		p = &leftGripperMove;

@@ -383,8 +383,8 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		response.motorSupply = mPrimitives->GetMotorSupply();
-		response.frontGripperPos = mPrimitives->GetGripperPos(true);
-		response.rearGripperPos = mPrimitives->GetGripperPos(false);
+		response.frontGripperPos = mPrimitives->GetArmPos(true);
+		response.rearGripperPos = mPrimitives->GetArmPos(false);
 		//response.leftClawPos = mPrimitives->GetClawPos(true);
 		//response.rightClawPos = mPrimitives->GetClawPos(false);
 		//response.armPos = mPrimitives->GetArmPos();
@@ -518,8 +518,8 @@ void Control::log() {
 		status.stopButton = mPrimitives->GetStopButton();
 		status.color = mPrimitives->GetMyColor();
 		status.motorSupply = mPrimitives->GetMotorSupply();
-		status.frontGripperPos = mPrimitives->GetGripperPos(true);
-		status.rearGripperPos = mPrimitives->GetGripperPos(false);
+		status.frontGripperPos = mPrimitives->GetArmPos(true);
+		status.rearGripperPos = mPrimitives->GetArmPos(false);
 		status.selectorPos = mPrimitives->GetSelectorPos();
 		status.firestopperPos = mPrimitives->GetFireStopperPos();
 		status.consolePos = mPrimitives->GetConsolePos();
@@ -740,8 +740,8 @@ bool Control::obstacleCollision() {
 	//TODO: eztet ellenorizni, mit csinal????
 	double x, y, phi, lg, rg, lc, rc;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	lg = mPrimitives->GetGripperPos(true);
-	rg = mPrimitives->GetGripperPos(false);
+	lg = mPrimitives->GetArmPos(true);
+	rg = mPrimitives->GetArmPos(false);
 //	lc = mPrimitives->GetClawPos(true);
 //	rc = mPrimitives->GetClawPos(false);
 	lc=0;
@@ -1516,19 +1516,19 @@ int Control::l_GripperMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 2, 0);
 	double speed = luaL_optnumber(L, 3, 1000);
 	double acc = luaL_optnumber(L, 4, 850);
-	lua_pushboolean(L, mPrimitives->GripperMove(left, pos, speed, acc));
+	lua_pushboolean(L, mPrimitives->ArmMove(left, pos, speed, acc));
 	return 1;
 }
 
 int Control::l_GripperMoveInProgress(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
-	lua_pushboolean(L, mPrimitives->GripperMoveInProgress(left));
+	lua_pushboolean(L, mPrimitives->ArmMoveInProgress(left));
 	return 1;
 }
 
 int Control::l_GetGripperPos(lua_State *L) {
 	bool left = lua_toboolean(L, 1);
-	lua_pushnumber(L, mPrimitives->GetGripperPos(left));
+	lua_pushnumber(L, mPrimitives->GetArmPos(left));
 	return 1;
 }
 
@@ -1656,26 +1656,22 @@ int Control::l_FlipperMove(lua_State *L)
 	double pos = luaL_optnumber(L, 1, 0);
 	double max_speed = luaL_optnumber(L, 2, 0);
 	double max_acc = luaL_optnumber(L, 3, 0);
-	//TODO: elso parameter folosleges, mindenhonnan kivenni
-	lua_pushboolean(L, mPrimitives->FlipperMove(true,pos,max_speed,max_acc));
+	lua_pushboolean(L, mPrimitives->FlipperMove(pos,max_speed,max_acc));
 	return 1;
 }
 int Control::l_FlipperMoveInProgress(lua_State *L)
 {
-	//TODO: elso parameter folosleges, mindenhonnan kivenni
-	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress(true));
+	lua_pushboolean(L, mPrimitives->FlipperMoveInProgress());
 	return 1;
 }
 int Control::l_GetFlipperPos(lua_State *L)
 {
-	//TODO: elso parameter folosleges, mindenhonnan kivenni
-	lua_pushnumber(L, mPrimitives->GetFlipperPos(true));
+	lua_pushnumber(L, mPrimitives->GetFlipperPos());
 	return 1;
 }
 int Control::l_GetFlipperError(lua_State *L)
 {
-	//TODO: elso parameter folosleges, mindenhonnan kivenni
-	lua_pushboolean(L, mPrimitives->GetFlipperError(true));
+	lua_pushboolean(L, mPrimitives->GetFlipperError());
 	return 1;
 }
 

@@ -15,6 +15,8 @@
 #include "../tools.h"
 #include "../geom.h"
 
+#include "define/param.h"
+
 typedef struct progress {
 	progress() : inprogress(false), finished(false) {}
 	bool inprogress;
@@ -68,12 +70,15 @@ public:
 	 */
 	virtual int8_t GetMyColor();
 
+#ifdef NAGY_ROBOT
 	/**
 	 * A labda jelenletenek lekerdezese
 	 * @return 1: labda, 0: ures
 	 */
 	virtual bool GetBallPresent();
+#endif
 
+#ifdef NAGY_ROBOT
 	/**
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
@@ -92,6 +97,7 @@ public:
 	 * @return be/ki
 	 */
 	virtual bool GetMotorSupply();
+#endif
 
 	///////////////////////////////////////////////////////////////////////
 	// MOZGASOK, POZICIOK
@@ -252,10 +258,12 @@ public:
 	 */
 	virtual void SetOpponentPos(unsigned char n, double x, double y);
 
+#ifdef NAGY_ROBOT
 	/**
 	 * Visszaadja a labdaerzekelo CNY70 feszultsegerteket
 	 */
 	virtual double GetBallColorVoltage(void);
+#endif
 
 	/**
 	 * Visszaadja a tavolsagerzekelok erteket
@@ -267,8 +275,9 @@ public:
 	 */
 	virtual void GetDistances(double distance[PROXIMITY_NUM]);
 
+#ifdef NAGY_ROBOT
 	///////////////////////////////////////////////////////////////////////
-	// GRIPPER
+	// ARM
 	///////////////////////////////////////////////////////////////////////
 
 	/**
@@ -279,28 +288,28 @@ public:
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool GripperMove(bool front, double pos, double max_speed, double max_acc);
+	virtual bool ArmMove(bool front, double pos, double max_speed, double max_acc);
 
 	/**
 	 * Oldalso megfogo kar mozgatas allapota
 	 * @param front elso/hatso kar allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool GripperMoveInProgress(bool front);
+	virtual bool ArmMoveInProgress(bool front);
 
 	/**
 	 * Legutobbi oldalso megfogo mozgatas hibajanak lekerdezese
 	 * @param front elso/hatso kar
 	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual bool GetGripperError(bool front);
+	virtual bool GetArmError(bool front);
 
 	/**
 	 * Oldalso megfogo kar szogenek lekerdezese
 	 * @param front elso/hatso kar allapota
 	 * @return [deg], zart helyzet 0
 	 */
-	virtual double GetGripperPos(bool front);
+	virtual double GetArmPos(bool front);
 
 	///////////////////////////////////////////////////////////////////////
 	// FLIPPER
@@ -308,34 +317,61 @@ public:
 
 	/**
 	 * Oldalso megfogo kar mozgatasa
-	 * @param front elso/hatso kar mozgatasa
 	 * @param pos abszolut pozicio [deg], 0 zart
 	 * @param max_speed [deg/s]
 	 * @param max_acc [deg/s^2]
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	virtual bool FlipperMove(bool front, double pos, double max_speed, double max_acc);
+	virtual bool FlipperMove(double pos, double max_speed, double max_acc);
 
 	/**
 	 * Oldalso megfogo kar mozgatas allapota
-	 * @param front elso/hatso kar allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	virtual bool FlipperMoveInProgress(bool front);
+	virtual bool FlipperMoveInProgress();
 
 	/**
 	 * Legutobbi oldalso megfogo mozgatas hibajanak lekerdezese
-	 * @param front elso/hatso kar
 	 * @return true: hiba volt, false: nem volt hiba
 	 */
-	virtual bool GetFlipperError(bool front);
+	virtual bool GetFlipperError();
 
 	/**
 	 * Oldalso megfogo kar szogenek lekerdezese
-	 * @param front elso/hatso kar allapota
 	 * @return [deg], zart helyzet 0
 	 */
-	virtual double GetFlipperPos(bool front);
+	virtual double GetFlipperPos();
+
+	///////////////////////////////////////////////////////////////////////
+	// CONTRACTOR
+	///////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Oldalso megfogo karokat egymashoz kozelito szervo mozgatasa
+	 * @param pos abszolut pozicio [deg], 0 zart
+	 * @param max_speed [deg/s]
+	 * @param max_acc [deg/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool ContractorMove(double pos, double max_speed, double max_acc);
+
+	/**
+	 * Oldalso megfogo karokat egymashoz kozelito szervo mozgatas allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool ContractorMoveInProgress();
+
+	/**
+	 * Legutobbi oldalso megfogo karokat egymashoz kozelito szervo mozgatas hibajanak lekerdezese
+	 * @return true: hiba volt, false: nem volt hiba
+	 */
+	virtual bool GetContractorError();
+
+	/**
+	 * Oldalso megfogo karokat egymashoz kozelito szervo mozgatas szogenek lekerdezese
+	 * @return [deg], zart helyzet 0
+	 */
+	virtual double GetContractorPos();
 
 	///////////////////////////////////////////////////////////////////////
 	// SELECTOR
@@ -398,6 +434,7 @@ public:
 	 * @return abszolut pozicio [deg], 0 alaphelyzet (fuggoleges), lefele no
 	 */
 	virtual double GetFireStopperPos();
+#endif
 
 	///////////////////////////////////////////////////////////////////////
 	// CONSOLE
@@ -448,6 +485,7 @@ public:
 	 */
 	virtual double GetConsolePos();
 
+#ifdef NAGY_ROBOT
 	///////////////////////////////////////////////////////////////////////
 	// CARACOLE
 	///////////////////////////////////////////////////////////////////////
@@ -495,6 +533,7 @@ public:
 	 * @return [rad]
 	 */
 	virtual double GetFirewheelSpeed();
+#endif
 
 protected:
 	/**
@@ -531,20 +570,24 @@ protected:
 	progress turn;
 	progress motionStop;
 
-	progress frontGripperMove, backGripperMove;
-	double frontGripperPos, backGripperPos;
-	progress frontFlipperMove, backFlipperMove;
-	double frontFlipperPos, backFlipperPos;
+#ifdef NAGY_ROBOT
+	progress frontArmMove, backArmMove;
+	double frontArmPos, rearArmPos;
+	progress flipperMove;
+	double flipperPos;
+	progress contractorMove;
+	double contractorPos;
 	progress selectorMove;
 	double selectorPos;
-	progress consoleMove;
-	double consolePos;
 	progress caracoleSetSpeed;
 	double caracoleSpeed;
 	progress firewheelSetSpeed;
 	double firewheelSpeed;
 	progress fireStopperMove;
 	double fireStopperPos;
+#endif
+	progress consoleMove;
+	double consolePos;
 
 };
 

@@ -13,17 +13,19 @@ Primitives::Primitives(Config* config) {
 	mStartButton = true;
 	mStopButton = false;
 	mRobotColor = 0;
-
-	frontGripperPos = 0;
-	backGripperPos = 0;
-	frontFlipperPos = 0;
-	backFlipperPos = 0;
+#ifdef NAGY_ROBOT
+	frontArmPos = 0;
+	rearArmPos = 0;
+	flipperPos = 0;
+	contractorPos = 0;
 	selectorPos = 0;
-	consolePos = 0;
 	fireStopperPos = 0;
 
 	caracoleSpeed = 0;
 	firewheelSpeed = 0;
+#endif
+
+	consolePos = 0;
 }
 
 Primitives::Primitives(Primitives* source) {
@@ -37,16 +39,19 @@ Primitives::Primitives(Primitives* source) {
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		source->GetOpponentPos(i, &opponent[i].x, &opponent[i].y);
 	}
-	frontGripperPos = source->GetGripperPos(true);
-	backGripperPos = source->GetGripperPos(false);
-	frontFlipperPos = source->GetFlipperPos(true);
-	backFlipperPos = source->GetFlipperPos(false);
+#ifdef NAGY_ROBOT
+	frontArmPos = source->GetArmPos(true);
+	rearArmPos = source->GetArmPos(false);
+	flipperPos = source->GetFlipperPos();
+	contractorPos = source->GetContractorPos();
 	selectorPos = source->GetSelectorPos();
-	consolePos = source->GetConsolePos();
 	fireStopperPos = source->GetFireStopperPos();
 
 	caracoleSpeed = source->GetCaracoleSpeed();
 	firewheelSpeed = source->GetFirewheelSpeed();
+#endif
+
+	consolePos = source->GetConsolePos();
 }
 
 Primitives::~Primitives() {
@@ -229,10 +234,13 @@ int8_t Primitives::GetMyColor() {
 	return mRobotColor;
 }
 
+#ifdef NAGY_ROBOT
 bool Primitives::GetBallPresent() {
 	return 0;
 }
+#endif
 
+#ifdef NAGY_ROBOT
 bool Primitives::SetMotorSupply(bool powered) {
 	return true;
 }
@@ -244,6 +252,7 @@ bool Primitives::SetMotorSupplyInProgress() {
 bool Primitives::GetMotorSupply() {
 	return true;
 }
+#endif
 
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 59.9+290/2;
@@ -382,9 +391,11 @@ void Primitives::SetOpponentPos(unsigned char n, double x, double y) {
 	}
 }
 
+#ifdef NAGY_ROBOT
 double Primitives::GetBallColorVoltage(void){
 	return 0;
 }
+#endif
 
 void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
 	for (int i = 0; i < PROXIMITY_NUM; i++) {
@@ -392,52 +403,63 @@ void Primitives::GetDistances(double distance[PROXIMITY_NUM]) {
 	}
 }
 
-bool Primitives::GripperMove(bool front, double pos, double max_speed, double max_acc) {
+#ifdef NAGY_ROBOT
+bool Primitives::ArmMove(bool front, double pos, double max_speed, double max_acc) {
 	if (front) {
-		frontGripperPos = pos;
+		frontArmPos = pos;
 	} else {
-		backGripperPos = pos;
+		rearArmPos = pos;
 	}
 	return true;
 }
 
-bool Primitives::GripperMoveInProgress(bool front) {
+bool Primitives::ArmMoveInProgress(bool front) {
 	return false;
 }
 
-bool Primitives::GetGripperError(bool front) {
+bool Primitives::GetArmError(bool front) {
 	return false;
 }
 
-double Primitives::GetGripperPos(bool front) {
+double Primitives::GetArmPos(bool front) {
 	if (front) {
-		return frontGripperPos;
+		return frontArmPos;
 	}
-	return backGripperPos;
+	return rearArmPos;
 }
 
-bool Primitives::FlipperMove(bool front, double pos, double max_speed, double max_acc) {
-	if (front) {
-		frontFlipperPos = pos;
-	} else {
-		backFlipperPos = pos;
-	}
+bool Primitives::FlipperMove(double pos, double max_speed, double max_acc) {
+	flipperPos = pos;
 	return true;
 }
 
-bool Primitives::FlipperMoveInProgress(bool front) {
+bool Primitives::FlipperMoveInProgress() {
 	return false;
 }
 
-bool Primitives::GetFlipperError(bool front) {
+bool Primitives::GetFlipperError() {
 	return false;
 }
 
-double Primitives::GetFlipperPos(bool front) {
-	if (front) {
-		return frontFlipperPos;
-	}
-	return backFlipperPos;
+double Primitives::GetFlipperPos() {
+	return flipperPos;
+}
+
+bool Primitives::ContractorMove(double pos, double max_speed, double max_acc) {
+	contractorPos = pos;
+	return true;
+}
+
+bool Primitives::ContractorMoveInProgress() {
+	return false;
+}
+
+bool Primitives::GetContractorError() {
+	return false;
+}
+
+double Primitives::GetContractorPos() {
+	return contractorPos;
 }
 
 bool Primitives::SelectorMove(double pos, double max_speed, double max_acc) {
@@ -473,6 +495,7 @@ bool Primitives::GetFireStopperError() {
 double Primitives::GetFireStopperPos() {
 	return fireStopperPos;
 }
+#endif
 
 bool Primitives::CalibrateConsole() {
 	consolePos = 0.;
@@ -504,6 +527,7 @@ double Primitives::GetConsolePos() {
 	return consolePos;
 }
 
+#ifdef NAGY_ROBOT
 bool Primitives::CaracoleSetSpeed(double speed, double max_acc) {
 	caracoleSpeed = speed;
 	return true;
@@ -529,3 +553,4 @@ bool Primitives::FirewheelSetSpeedInProgress() {
 double Primitives::GetFirewheelSpeed() {
 	return firewheelSpeed;
 }
+#endif
