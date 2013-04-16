@@ -31,7 +31,7 @@
 #include "Primitives.h"
 
 #ifdef KIS_ROBOT
-#include "FollowLine.h"
+#include "../FollowLine.h"
 #endif
 //------------------------------ include VEGE ------------------------------
 

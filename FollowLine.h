@@ -2,8 +2,9 @@
 #define LINEFOLLOW_H_
 
 #include "FollowLineDefines.h"
+#include "stdlib.h"
 #include "math.h"
-#include "Primitives.h"
+#include "Primitives/Primitives.h"
 #include <list>
 #include <fcntl.h>
 #include <termios.h>
@@ -11,7 +12,7 @@
 
 class FollowLine {
 public:
-	FollowLine(Primitives& pr);
+	FollowLine(Primitives* pr);
 
 	~FollowLine();
 
@@ -32,7 +33,7 @@ public:
 	int Follow_Status;
 private:
 
-	Primitives& primi;
+	Primitives* primi;
 
 	short FollowLine_CurState;
 	position Cur_Pos, Prev_Pos;
@@ -44,6 +45,7 @@ private:
 	unsigned int intersection_count;
 	int status_code;
 	int SerialPort;
+	int uart_try;
 
 	typedef struct Sens_Line
 	{

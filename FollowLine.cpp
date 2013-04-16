@@ -14,13 +14,15 @@
 //	return true;
 //}
 
-FollowLine::FollowLine(Primitives& pr)
+FollowLine::FollowLine(Primitives* pr)
 {
-	primi = 0;
+	primi = pr;
 	FollowLine_CurState = FOLLOW_STATE_START;
 	Cur_Pos = position();
 	Prev_Pos = position();
-	Follow_InProgress = false;
+	Follow_Status = 0;
+	uart_try = 0;
+	Calibrate_InProgress = false;
 	Turn_InProgress = false;
 	distance = 0;
 	intersection_count = 0;
@@ -34,6 +36,11 @@ FollowLine::FollowLine(Primitives& pr)
 	status_code = 0;
 	SerialPort = 0;
 };
+
+FollowLine::~FollowLine()
+{
+	delete primi;
+}
 
 int FollowLine::Open_SerialPort(char* portname, int speed, int parity)
 {
@@ -102,15 +109,15 @@ bool FollowLine::GoAhead(void)
 	if (IntersectionList.size() != 2)
 		return false;
 	//Egy kicsit elore megyunk, h mar ne legyen elagazas
-	primi.Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
-	while (primi.MotionInProgress())
-		primi.Wait(1);
+	primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
+	while (primi->MotionInProgress())
+		primi->Wait(1);
 	return true;
 }
 
 bool FollowLine::Turn(void)
 {
-	Sens_Line center, side;
+	Sens_Line_List::iterator center, side;
 	double angle;
 	//Csak 2 elem lehet az elágazás listában
 	if (IntersectionList.size() != 2)
@@ -119,22 +126,22 @@ bool FollowLine::Turn(void)
 	center = IntersectionList.begin();
 	side = IntersectionList.end();
 	//Kozeptol valo elteres, 0-> bal oldal, 280-> jobb oldal
-	if (abs(center.avg - 140) > abs(side.avg - 140))
+	if (abs(center->avg - 140) > abs(side->avg - 140))
 	{
 		center = IntersectionList.end();
 		side = IntersectionList.begin();
 	}
-	angle = (FOLLOW_LINE_TURN_CONST * double(abs(side.avg - 140)) / 140.0) * (M_PI/2);
+	angle = (FOLLOW_LINE_TURN_CONST * double(abs(side->avg - 140)) / 140.0) * (M_PI/2);
 	//+90° ha idoben csokken a ket elagazas tavolsaga
 	if (turn_back == true)
 		angle += M_PI/2;
-	primi.Turn(angle,FOLLOW_LINE_TURN_SPEED,FOLLOW_LINE_TURN_ACCEL);
-	while (primi.MotionInProgress())
-		primi.Wait(1);
+	primi->Turn(angle,FOLLOW_LINE_TURN_SPEED,FOLLOW_LINE_TURN_ACCEL);
+	while (primi->MotionInProgress())
+		primi->Wait(1);
 	//Egy kicsit elore megyunk, h mar ne legyen elagazas
-	primi.Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
-	while (primi.MotionInProgress())
-		primi.Wait(1);
+	primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
+	while (primi->MotionInProgress())
+		primi->Wait(1);
 	return true;
 }
 
@@ -143,7 +150,7 @@ void FollowLine::FSM_Run(double dist)
 	switch (FollowLine_CurState)
 	{
 		case FOLLOW_STATE_START:
-			primi.GetRobotPos(&Prev_Pos.x,&Prev_Pos.y,&Prev_Pos.phi);
+			primi->GetRobotPos(&Prev_Pos.x,&Prev_Pos.y,&Prev_Pos.phi);
 			Cur_Pos = Prev_Pos;
 			distance = 0;
 			intersection_count = 0;
@@ -154,7 +161,7 @@ void FollowLine::FSM_Run(double dist)
 			FollowLine_CurState = FOLLOW_STATE_CHECK;
 			break;
 		case FOLLOW_STATE_CHECK:
-			int uart_try = 0;
+			uart_try = 0;
 			char read[6];
 			int num;
 			unsigned int Sens_Pos, Sens_Pos_Temp;
@@ -163,12 +170,12 @@ void FollowLine::FSM_Run(double dist)
 			FollowLine_CurState = FOLLOW_STATE_PID;
 			//Tavolsag vizsgalat***************************
 			Prev_Pos = Cur_Pos;
-			primi.GetRobotPos(&Cur_Pos.x,&Cur_Pos.y,&Cur_Pos.phi);
-			distance += sqrt((Cur_Pos.x-Prev_Pos.x)^2 + (Cur_Pos.y-Prev_Pos.y)^2);
+			primi->GetRobotPos(&Cur_Pos.x,&Cur_Pos.y,&Cur_Pos.phi);
+			distance += sqrt(pow((Cur_Pos.x-Prev_Pos.x),2) + pow((Cur_Pos.y-Prev_Pos.y),2));
 			if (distance >= dist)
 			{
 				//Elertuk a kivant tavolsagot
-				primi.SetWheelSpeed(0,0);
+				primi->SetWheelSpeed(0,0);
 				status_code = FOLLOW_STATE_DISTANCE_STOP;
 				FollowLine_CurState = FOLLOW_STATE_STOP;
 			}
@@ -182,7 +189,7 @@ void FollowLine::FSM_Run(double dist)
 				num = ReceiveByte_SerialPort(read);
 				if (num < 6 || read[0] != DEV_ID  || read[1] != PARANCS_LEKERDEZES_ID)
 				{
-					primi.SetWheelSpeed(0,0);
+					primi->SetWheelSpeed(0,0);
 					//ReceiveByte_SerialPort-ban levo timeout miatt itt kevesebb byte-ot nem kaphatunk, csak 0-t, v 6-ot
 					status_code = FOLLOW_STATE_UART_ERROR;
 					FollowLine_CurState = FOLLOW_STATE_STOP;
@@ -236,12 +243,12 @@ void FollowLine::FSM_Run(double dist)
 				//Akkor tekintjuk elagazasnak, ha FOLLOW_INTERSECTION_LIMIT-szer talalunk 1-nel tobb elemet a listaban
 				//TODO:Lehet-e tobb, mint 2 elagazas?
 				unsigned short IntersectionAvgList[FOLLOW_INTERSECTION_LIMIT];
-				Sens_Line path1, path2;
+				Sens_Line_List::iterator path1, path2;
 				if (IntersectionList.size() == 2)
 				{
 					path1 = IntersectionList.begin();
 					path2 = IntersectionList.end();
-					IntersectionAvgList[intersection_count] = abs(path1.avg - path2.avg);
+					IntersectionAvgList[intersection_count] = abs(path1->avg - path2->avg);
 					intersection_count++;
 				}
 				//TODO:Amig nem allitjuk le, de mar elagazast eszlelunk vmit kene csinalni az ertekekkel, mert a szab. igy nem lesz jo
@@ -253,7 +260,7 @@ void FollowLine::FSM_Run(double dist)
 						if (IntersectionAvgList[i] > IntersectionAvgList[i+1])
 							turn_back = true;
 					}
-					primi.SetWheelSpeed(0,0);
+					primi->SetWheelSpeed(0,0);
 					status_code = FOLLOW_STATE_INTERSECTION_STOP;
 					FollowLine_CurState = FOLLOW_STATE_STOP;
 				}
@@ -277,11 +284,12 @@ void FollowLine::FSM_Run(double dist)
 			//TODO:Hol lesz a szenzor, bal-jobb rendben van-e igy, ellenorizni
 			//TODO:Jelezni kene, h a robot mozog, ahogy goto-nal is
 			if (Motor_Control > 0)
-				primi.SetWheelSpeed(FOLLOW_MAX_SPEED, FOLLOW_MAX_SPEED-(double)Motor_Control);
+				primi->SetWheelSpeed(FOLLOW_MAX_SPEED, FOLLOW_MAX_SPEED-(double)Motor_Control);
 			else
-				primi.SetWheelSpeed(FOLLOW_MAX_SPEED+Motor_Control, FOLLOW_MAX_SPEED);
+				primi->SetWheelSpeed(FOLLOW_MAX_SPEED+Motor_Control, FOLLOW_MAX_SPEED);
 			FollowLine_CurState = FOLLOW_STATE_CHECK;
 			break;
 		case FOLLOW_STATE_STOP:
 			break;
 	}
+}
