@@ -28,11 +28,14 @@
 
 #include <math.h>
 
+#include <errno.h>
+
 #include "Primitives.h"
 
 #ifdef KIS_ROBOT
 #include "../FollowLine.h"
 #endif
+
 //------------------------------ include VEGE ------------------------------
 
 
@@ -142,13 +145,13 @@ public:
 	 * Vonalkovetes kalibralas
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	bool CalibrateFollowLine();
+	bool FollowLine_Calibrate();
 
 	/**
 	 * CalibrateFollowLine allapota
 	 * @return true: folyamatban van, false: nincs folyamatban
 	 */
-	bool CalibrateFollowLineInProgress();
+	bool FollowLine_CalibrateInProgress();
 #endif
 	//----- Primitives VEGE -----
 
@@ -193,6 +196,10 @@ private:
 	FollowLine* mFollowLine;
 
 	bool Follow_InProgress;
+	double Follow_dist;
+	timespec Follow_next_ts;
+	bool Follow_ts_valid;
+
 #endif
 
 	//----- valtozo ELEJE -----

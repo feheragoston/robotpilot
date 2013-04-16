@@ -14,6 +14,7 @@
 #include "../Config.h"
 #include "../tools.h"
 #include "../geom.h"
+#include "define/param.h"
 
 typedef struct progress {
 	progress() : inprogress(false), finished(false) {}
@@ -405,7 +406,47 @@ public:
 	 * @return [mm], also pozicio 0
 	 */
 	virtual double GetConsolePos();
+#ifdef KIS_ROBOT
+	/**
+	 * Vonalkovetes kovetes inditasa
+	 * @param dist [mm]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool FollowLine_Follow(double dist);
 
+	/**
+	 * Vonalkovetes kovetes allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool FollowLine_FollowInProgress();
+	/**
+	 * legutobbi kovetes leallasanak oka
+	 * @return 0: nem allt le a vonalkovetes, 1: elerte a tavolsagot, 2: elagazasba utkozott, 3: egyeb hiba
+	 */
+	virtual int FollowLine_GetFollowError();
+	/**
+	 * Vonalkovetes elagazas-fordulas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	 virtual bool FollowLine_Turn();
+
+	/**
+	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool FollowLine_TurnInProgress();
+	/**
+	 * Vonalkovetes kalibralas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool FollowLine_Calibrate();
+
+	/**
+	 * CalibrateFollowLine allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	virtual bool FollowLine_CalibrateInProgress();
+#endif
 protected:
 	/**
 	 * konfiguraciot tartalmazo objektum

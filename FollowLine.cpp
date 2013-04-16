@@ -20,7 +20,7 @@ FollowLine::FollowLine(Primitives* pr)
 	FollowLine_CurState = FOLLOW_STATE_START;
 	Cur_Pos = position();
 	Prev_Pos = position();
-	Follow_Status = 0;
+	Follow_Status = FOLLOW_STATE_OTHER_STOP;
 	uart_try = 0;
 	Calibrate_InProgress = false;
 	Turn_InProgress = false;
@@ -33,7 +33,6 @@ FollowLine::FollowLine(Primitives* pr)
 	Motor_Control = 0;
 	Lin_Sens_Pos = 0;
 	Prev_Lin_Sens_Pos = 0;
-	status_code = 0;
 	SerialPort = 0;
 };
 
@@ -142,6 +141,7 @@ bool FollowLine::Turn(void)
 	primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
 	while (primi->MotionInProgress())
 		primi->Wait(1);
+	Turn_InProgress = false;
 	return true;
 }
 
@@ -153,6 +153,7 @@ void FollowLine::FSM_Run(double dist)
 			primi->GetRobotPos(&Prev_Pos.x,&Prev_Pos.y,&Prev_Pos.phi);
 			Cur_Pos = Prev_Pos;
 			distance = 0;
+			Follow_Status = FOLLOW_STATE_FOLLOW_RUNNING;
 			intersection_count = 0;
 			turn_back = false;
 			P = 0;
@@ -166,7 +167,6 @@ void FollowLine::FSM_Run(double dist)
 			int num;
 			unsigned int Sens_Pos, Sens_Pos_Temp;
 			//Alapbol a kovetkezo allapot a PID es nincs hiba
-			status_code = FOLLOW_STATE_NO_ERROR;
 			FollowLine_CurState = FOLLOW_STATE_PID;
 			//Tavolsag vizsgalat***************************
 			Prev_Pos = Cur_Pos;
@@ -176,7 +176,7 @@ void FollowLine::FSM_Run(double dist)
 			{
 				//Elertuk a kivant tavolsagot
 				primi->SetWheelSpeed(0,0);
-				status_code = FOLLOW_STATE_DISTANCE_STOP;
+				Follow_Status = FOLLOW_STATE_DISTANCE_STOP;
 				FollowLine_CurState = FOLLOW_STATE_STOP;
 			}
 			//Szenzorok beolvasasa UART-on*****************
@@ -191,7 +191,7 @@ void FollowLine::FSM_Run(double dist)
 				{
 					primi->SetWheelSpeed(0,0);
 					//ReceiveByte_SerialPort-ban levo timeout miatt itt kevesebb byte-ot nem kaphatunk, csak 0-t, v 6-ot
-					status_code = FOLLOW_STATE_UART_ERROR;
+					Follow_Status = FOLLOW_STATE_OTHER_STOP;
 					FollowLine_CurState = FOLLOW_STATE_STOP;
 				}
 				else
@@ -206,7 +206,7 @@ void FollowLine::FSM_Run(double dist)
 					break;
 				}
 			}
-			if (status_code == FOLLOW_STATE_NO_ERROR)
+			if (Follow_Status == FOLLOW_STATE_FOLLOW_RUNNING)
 			{
 				//TODO:Hibas elemek kiszurese
 				//Elagazas vizsgalat***************************
@@ -261,7 +261,7 @@ void FollowLine::FSM_Run(double dist)
 							turn_back = true;
 					}
 					primi->SetWheelSpeed(0,0);
-					status_code = FOLLOW_STATE_INTERSECTION_STOP;
+					Follow_Status = FOLLOW_STATE_INTERSECTION_STOP;
 					FollowLine_CurState = FOLLOW_STATE_STOP;
 				}
 				//Linearizalas: alapbol Sens_Pos: 15*2^28 <-> 15*2^0 --> Sens_Pos: 0 <-> 280

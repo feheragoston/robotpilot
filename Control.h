@@ -179,6 +179,16 @@ protected:
 
 	static int l_AddTestObstacles(lua_State *L);
 	static int l_ClearDynObstacles(lua_State *L);
+
+#ifdef KIS_ROBOT
+	static int l_FollowLine_Follow(lua_State *L);
+	static int l_FollowLine_FollowInProgress(lua_State *L);
+	static int l_FollowLine_GetFollowError(lua_State *L);
+	static int l_FollowLine_Turn(lua_State *L);
+	static int l_FollowLine_TurnInProgress(lua_State *L);
+	static int l_FollowLine_Calibrate(lua_State *L);
+	static int l_FollowLine_CalibrateInProgress(lua_State *L);
+#endif
 };
 
 #endif /* CONTROL_H_ */

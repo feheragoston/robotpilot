@@ -16,8 +16,6 @@ public:
 
 	~FollowLine();
 
-	bool Follow(double dist);
-
 	bool Turn(void);
 
 	bool Calibrate();
@@ -43,7 +41,6 @@ private:
 	bool turn_back;
 	int Lin_Sens_Pos, Prev_Lin_Sens_Pos;
 	unsigned int intersection_count;
-	int status_code;
 	int SerialPort;
 	int uart_try;
 
