@@ -71,6 +71,11 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 
 	dcwheelMotionError	= false;
 
+#ifdef KIS_ROBOT
+	mFollowLine = new FollowLine(this);
+	Follow_InProgress = false;
+#endif
+
 	deadreckCheckXw		= 0;
 	deadreckCheckYw		= 0;
 	deadreckCheckPhiw	= 0;
@@ -1306,3 +1311,118 @@ bool PrimitivesCan::HasColor_Unsafe(void){
 	return (red || purple);
 
 }
+
+#ifdef KIS_ROBOT
+bool PrimitivesCan::FollowLine_Follow(double dist)
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		Follow_InProgress = true;
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_FollowInProgress()
+{
+	return Follow_InProgress;
+}
+
+int PrimitivesCan::FollowLine_GetFollowError()
+{
+	EnterCritical();
+
+	int error = mFollowLine->Follow_Status;
+
+	ExitCritical();
+
+	return error;
+}
+
+bool PrimitivesCan::FollowLine_Turn()
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		mFollowLine->Turn();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_TurnInProgress()
+{
+	EnterCritical();
+
+	bool ret = mFollowLine->Turn_InProgress;
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::CalibrateFollowLine()
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		mFollowLine->Calibrate();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::CalibrateFollowLineInProgress()
+{
+	EnterCritical();
+
+	bool ret = mFollowLine->Calibrate_InProgress;
+
+	ExitCritical();
+
+	return ret;
+}
+#endif

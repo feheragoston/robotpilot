@@ -29,6 +29,10 @@
 #include <math.h>
 
 #include "Primitives.h"
+
+#ifdef KIS_ROBOT
+#include "FollowLine.h"
+#endif
 //------------------------------ include VEGE ------------------------------
 
 
@@ -104,6 +108,48 @@ public:
 	bool ConsoleStop(void);
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
+
+#ifdef KIS_ROBOT
+	/**
+	 * Vonalkovetes kovetes inditasa
+	 * @param dist [mm]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	bool FollowLine_Follow(double dist);
+
+	/**
+	 * Vonalkovetes kovetes allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool FollowLine_FollowInProgress();
+	/**
+	 * legutobbi kovetes leallasanak oka
+	 * @return 0: nem allt le a vonalkovetes, 1: elerte a tavolsagot, 2: elagazasba utkozott, 3: egyeb hiba
+	 */
+	int FollowLine_GetFollowError();
+	/**
+	 * Vonalkovetes elagazas-fordulas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	 bool FollowLine_Turn();
+
+	/**
+	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool FollowLine_TurnInProgress();
+	/**
+	 * Vonalkovetes kalibralas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	bool CalibrateFollowLine();
+
+	/**
+	 * CalibrateFollowLine allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool CalibrateFollowLineInProgress();
+#endif
 	//----- Primitives VEGE -----
 
 
@@ -143,6 +189,11 @@ private:
 	node_Power*			power;
 	//---------- node VEGE ----------
 
+#ifdef KIS_ROBOT
+	FollowLine* mFollowLine;
+
+	bool Follow_InProgress;
+#endif
 
 	//----- valtozo ELEJE -----
 	char CanIp[16];
@@ -178,7 +229,6 @@ private:
 	void GetRobotPos_Unsafe(double* x, double* y, double* phi);
 	long int GetOpponentPos_Unsafe(u8 num, double* x, double* y);
 	void SetRobotPos_Unsafe(double x, double y, double phi);
-
 
 };
 //------------------------------ PrimitivesCan VEGE ------------------------------
