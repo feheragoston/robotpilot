@@ -392,11 +392,13 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 		response.stopButton = mPrimitives->GetStopButton();
 		response.color = mPrimitives->GetMyColor();
 		response.motorSupply = mPrimitives->GetMotorSupply();
+#ifdef NAGY_ROBOT
 		response.frontArmPos = mPrimitives->GetArmPos(true);
 		response.rearArmPos = mPrimitives->GetArmPos(false);
-		//response.leftClawPos = mPrimitives->GetClawPos(true);
-		//response.rightClawPos = mPrimitives->GetClawPos(false);
-		//response.armPos = mPrimitives->GetArmPos();
+		response.selectorPos = mPrimitives->GetSelectorPos();
+		response.flipperPos = mPrimitives->GetFlipperPos();
+		response.contractorPos = mPrimitives->GetContractorPos();
+#endif
 		response.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(response.distances);
 		mServer->Send(n, &response, sizeof(msgstatus));
@@ -527,10 +529,14 @@ void Control::log() {
 		status.stopButton = mPrimitives->GetStopButton();
 		status.color = mPrimitives->GetMyColor();
 		status.motorSupply = mPrimitives->GetMotorSupply();
+#ifdef NAGY_ROBOT
 		status.frontArmPos = mPrimitives->GetArmPos(true);
 		status.rearArmPos = mPrimitives->GetArmPos(false);
 		status.selectorPos = mPrimitives->GetSelectorPos();
+		status.flipperPos = mPrimitives->GetFlipperPos();
+		status.contractorPos = mPrimitives->GetContractorPos();
 		status.firestopperPos = mPrimitives->GetFireStopperPos();
+#endif
 		status.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(status.distances);
 		size = sizeof(msgstatus);
@@ -749,10 +755,12 @@ bool Control::obstacleCollision() {
 	//TODO: eztet ellenorizni, mit csinal????
 	double x, y, phi, lg, rg, lc, rc;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-	lg = mPrimitives->GetArmPos(true);
-	rg = mPrimitives->GetArmPos(false);
+//	lg = mPrimitives->GetArmPos(true);
+//	rg = mPrimitives->GetArmPos(false);
 //	lc = mPrimitives->GetClawPos(true);
 //	rc = mPrimitives->GetClawPos(false);
+	lg=0;
+	rg=0;
 	lc=0;
 	rc=0;
 

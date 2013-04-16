@@ -238,13 +238,13 @@ bool PrimitivesNet::ArmMove(bool left, double pos, double max_speed, double max_
 }
 
 bool PrimitivesNet::ArmMoveInProgress(bool left) {
-	progress* p;
-	/*if (left) {
+	/*progress* p;
+	if (left) {
 		p = &leftGripperMove;
 	} else {
 		p = &rightGripperMove;
 	}*/
-	return p->inprogress;
+	return true;//return p->inprogress;
 }
 
 bool PrimitivesNet::ClawMove(bool left, double pos, double max_speed, double max_acc) {

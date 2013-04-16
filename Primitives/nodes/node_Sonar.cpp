@@ -52,9 +52,6 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 
 			case MSG_PERIODIC_TO_PC:
 
-				//ASCII-ban kuldi
-				double* val;
-
 				for(u8 n=0 ; n<SONAR_TRANSMITTER_COUNT ; n++){
 					SonarPosX[n] = GET_FLOAT(&(msg->data[0 + 2*8*n]));
 					SonarPosY[n] = GET_FLOAT(&(msg->data[4 + 2*8*n]));

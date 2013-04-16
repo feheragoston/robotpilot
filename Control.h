@@ -158,15 +158,26 @@ protected:
 	static void SetOpponentPos(unsigned char n, double ox, double oy);
 	static int l_GetOpponentPos(lua_State *L);
 
-	static int l_GripperMove(lua_State *L);
-	static int l_GripperMoveInProgress(lua_State *L);
-	static int l_GetGripperPos(lua_State *L);
+#ifdef NAGY_ROBOT
+	static int l_ArmMove(lua_State *L);
+	static int l_ArmMoveInProgress(lua_State *L);
+	static int l_GetArmPos(lua_State *L);
 	static int l_SelectorMove(lua_State *L);
 	static int l_SelectorMoveInProgress(lua_State *L);
 	static int l_GetSelectorPos(lua_State *L);
+	static int l_FlipperMove(lua_State *L);
+	static int l_FlipperMoveInProgress(lua_State *L);
+	static int l_GetFlipperPos(lua_State *L);
+	static int l_GetFlipperError(lua_State *L);
+	static int l_ContractorMove(lua_State *L);
+	static int l_ContractorMoveInProgress(lua_State *L);
+	static int l_GetContractorPos(lua_State *L);
+	static int l_GetContractorError(lua_State *L);
 	static int l_FireStopperMove(lua_State *L);
 	static int l_FireStopperMoveInProgress(lua_State *L);
 	static int l_GetFireStopperPos(lua_State *L);
+#endif
+
 	static int l_CalibrateConsole(lua_State *L);
 	static int l_CalibrateConsoleInProgress(lua_State *L);
 	static int l_ConsoleMove(lua_State *L);
@@ -178,11 +189,6 @@ protected:
 #ifdef NAGY_ROBOT
 	static int l_GetBallColorVoltage(lua_State *L);
 	static int l_GetBallPresent(lua_State *L);
-
-	static int l_FlipperMove(lua_State *L);
-	static int l_FlipperMoveInProgress(lua_State *L);
-	static int l_GetFlipperPos(lua_State *L);
-	static int l_GetFlipperError(lua_State *L);
 
 	static int l_CaracoleSetSpeed(lua_State *L);
 	static int l_CaracoleSetSpeedInProgress(lua_State *L);

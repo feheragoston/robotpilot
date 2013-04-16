@@ -240,7 +240,6 @@ bool Primitives::GetBallPresent() {
 }
 #endif
 
-#ifdef NAGY_ROBOT
 bool Primitives::SetMotorSupply(bool powered) {
 	return true;
 }
@@ -252,7 +251,6 @@ bool Primitives::SetMotorSupplyInProgress() {
 bool Primitives::GetMotorSupply() {
 	return true;
 }
-#endif
 
 bool Primitives::CalibrateDeadreckoning(bool simulate) {
 	robot.x = 59.9+290/2;

@@ -56,11 +56,14 @@ typedef struct msgstatus {
 	bool stopButton;
 	int8_t color;
 	bool motorSupply;
-	double frontGripperPos;
-	double rearGripperPos;
+#ifdef NAGY_ROBOT
+	double frontArmPos;
+	double rearArmPos;
 	double selectorPos;
-	//double rightClawPos;
+	double flipperPos;
+	double contractorPos;
 	double firestopperPos;
+#endif
 	double consolePos;
 	double distances[PROXIMITY_NUM];
 } msgstatus;

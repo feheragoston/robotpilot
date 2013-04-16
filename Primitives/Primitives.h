@@ -78,7 +78,6 @@ public:
 	virtual bool GetBallPresent();
 #endif
 
-#ifdef NAGY_ROBOT
 	/**
 	 * motortap be/ki kapcsolasa
 	 * @param powered be/ki
@@ -97,7 +96,6 @@ public:
 	 * @return be/ki
 	 */
 	virtual bool GetMotorSupply();
-#endif
 
 	///////////////////////////////////////////////////////////////////////
 	// MOZGASOK, POZICIOK

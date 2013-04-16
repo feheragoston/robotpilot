@@ -291,7 +291,7 @@ bool PrimitivesCan::GetStartButton(void){
 #ifdef NAGY_ROBOT
 	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_START_BUTTON_INDEX);
 #else	//KIS_ROBOT
-	bool ret = 1	//??
+	bool ret = 1;	//??
 #endif
 
 	ExitCritical();
@@ -308,7 +308,7 @@ bool PrimitivesCan::GetStopButton(void){
 #ifdef NAGY_ROBOT
 	bool ret = power->GET_STOP_BUTTON();
 #else	//KIS_ROBOT
-	bool ret = 1	//??
+	bool ret = 1;	//??
 #endif
 
 	ExitCritical();
@@ -397,6 +397,47 @@ bool PrimitivesCan::GetMotorSupply(void){
 	bool ret;
 
 	power->GET_ACT_ON(&ret);
+
+	ExitCritical();
+
+	return ret;
+
+}
+#else	//KIS_ROBOT
+bool PrimitivesCan::SetMotorSupply(bool powered){
+
+	EnterCritical();
+
+	//TODO: megírni
+	bool ret = true;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::SetMotorSupplyInProgress(void){
+
+	EnterCritical();
+
+	//TODO: megírni
+	bool ret = false;
+
+	ExitCritical();
+
+	return ret;
+
+}
+
+
+bool PrimitivesCan::GetMotorSupply(void){
+
+	EnterCritical();
+
+	//TODO: megírni
+	bool ret = false;
 
 	ExitCritical();
 
@@ -680,10 +721,12 @@ bool PrimitivesCan::MotionInProgress(void){
 
 	bool ret = dcwheel->AnyMotion.inProgress;
 
+#ifdef NAGY_ROBOT
 	//ha utkozes kovetkezett be
 	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX)))
 		dcwheelMotionError = MOTION_ERROR;
+#endif
 
 	if (!ret && dcwheel->AnyMotion.done == 0) {
 		dcwheelMotionError = MOTION_ERROR;
@@ -820,10 +863,14 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
 
+#ifdef NAGY_ROBOT
 	distance[0] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX);
 	distance[1] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX);
 	distance[2] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX);
 	distance[3] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_REAR_SHARP_INDEX);
+#else	//KIS_ROBOT
+	//TODO: megírni
+#endif
 
 	ExitCritical();
 
@@ -1426,8 +1473,15 @@ void PrimitivesCan::detectActChange(void){
 
 	bool ActOn;
 
+#ifdef NAGY_ROBOT
+	bool change = power->GET_ACT_ON(&ActOn);
+#else	//KIS_ROBOT
+	bool change = false;
+	ActOn = true;
+#endif
+
 	//ha valtozott az aktuatortap allapota
-	if(power->GET_ACT_ON(&ActOn)){
+	if(change){
 
 		//ha felkapcsolodott
 		if(ActOn)
@@ -1451,14 +1505,16 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
-	caracole->evalMsg(msg);
-	firewheel->evalMsg(msg);
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
-	input->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
+#ifdef NAGY_ROBOT
+	caracole->evalMsg(msg);
+	firewheel->evalMsg(msg);
+	input->evalMsg(msg);
 	power->evalMsg(msg);
+#endif
 
 	//figyeljuk az aktuatortap valtozasat
 	detectActChange();
@@ -1588,8 +1644,14 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
+#ifdef NAGY_ROBOT
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
 	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
+#else	//KIS_ROBOT
+	//TODO: megírni
+	bool red = true;
+	bool blue = false;
+#endif
 
 	if(red)			return COLOR_RED;
 	if(blue)		return COLOR_BLUE;
@@ -1600,8 +1662,14 @@ int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
 bool PrimitivesCan::HasColor_Unsafe(void){
 
+	#ifdef NAGY_ROBOT
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
 	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
+#else	//KIS_ROBOT
+	//TODO: megírni
+	bool red = true;
+	bool blue = false;
+#endif
 
 	return (red || blue);
 

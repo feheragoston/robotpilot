@@ -57,11 +57,9 @@ public:
 	bool GetBallPresent(void);
 #endif
 
-#ifdef NAGY_ROBOT
 	bool SetMotorSupply(bool powered);
 	bool SetMotorSupplyInProgress(void);
 	bool GetMotorSupply(void);
-#endif
 
 	bool CalibrateDeadreckoning(bool simulate = false);
 	bool CalibrateDeadreckoningInProgress(void);
