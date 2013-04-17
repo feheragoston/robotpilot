@@ -9,8 +9,8 @@
 
 
 
-#define NAGY_ROBOT
-// #define KIS_ROBOT
+// #define NAGY_ROBOT
+#define KIS_ROBOT
 
 
 
