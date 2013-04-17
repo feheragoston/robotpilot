@@ -553,7 +553,42 @@ double Primitives::GetConsolePos() {
 	return consolePos;
 }
 
-#ifdef NAGY_ROBOT
+#ifdef KIS_ROBOT
+bool Primitives::FollowLine_Follow(double dist)
+{
+	return false;
+}
+
+bool Primitives::FollowLine_FollowInProgress()
+{
+	return false;
+}
+
+int Primitives::FollowLine_GetFollowError()
+{
+	return false;
+}
+
+bool Primitives::FollowLine_Turn()
+{
+	return false;
+}
+
+bool Primitives::FollowLine_TurnInProgress()
+{
+	return false;
+}
+
+bool Primitives::FollowLine_Calibrate()
+{
+	return false;
+}
+
+bool Primitives::FollowLine_CalibrateInProgress()
+{
+	return false;
+}
+#else //NAGY_ROBOT
 bool Primitives::CaracoleSetSpeed(double speed, double max_acc) {
 	caracoleSpeed = speed;
 	return true;

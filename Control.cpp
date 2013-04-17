@@ -153,6 +153,15 @@ Control::Control(Config* config) {
 		{"AddTestObstacles", l_AddTestObstacles},
 		{"ClearDynObstacles", l_ClearDynObstacles},
 
+#ifdef KIS_ROBOT
+		{"FollowLine_Follow", l_FollowLine_Follow},
+		{"FollowLine_FollowInProgress", l_FollowLine_FollowInProgress},
+		{"FollowLine_GetFollowError", l_FollowLine_GetFollowError},
+		{"FollowLine_Turn", l_FollowLine_Turn},
+		{"FollowLine_TurnInProgress", l_FollowLine_TurnInProgress},
+		{"FollowLine_Calibrate", l_FollowLine_Calibrate},
+		{"FollowLine_CalibrateInProgress", l_FollowLine_CalibrateInProgress},
+#endif
 		{NULL, NULL}
 	};
 
@@ -1731,7 +1740,62 @@ int Control::l_ClearDynObstacles(lua_State *L) {
 	return 0;
 }
 
-#ifdef NAGY_ROBOT
+#ifdef KIS_ROBOT
+int Control::l_FollowLine_Follow(lua_State *L)
+{
+	double dist = lua_tonumber(L, 1);
+
+	if (isnan(dist)) {
+		cout << "(Control) FollowLine_Follow(nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	if (mPrimitives->FollowLine_Follow(dist)) {
+		setSafeMotion(L);
+		lua_pushboolean(L, true);
+		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+int Control::l_FollowLine_FollowInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FollowLine_FollowInProgress());
+	return 1;
+}
+int Control::l_FollowLine_GetFollowError(lua_State *L)
+{
+	lua_pushinteger(L, mPrimitives->FollowLine_GetFollowError());
+	return 1;
+}
+int Control::l_FollowLine_Turn(lua_State *L)
+{
+	if (mPrimitives->FollowLine_Turn())
+	{
+		setSafeMotion(L);
+		lua_pushboolean(L, true);
+		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+int Control::l_FollowLine_TurnInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FollowLine_TurnInProgress());
+	return 1;
+}
+int Control::l_FollowLine_Calibrate(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FollowLine_Calibrate());
+	return 1;
+}
+int Control::l_FollowLine_CalibrateInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FollowLine_CalibrateInProgress());
+	return 1;
+}
+#else //NAGY_ROBOT
 int Control::l_GetBallColorVoltage(lua_State *L)
 {
 	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());

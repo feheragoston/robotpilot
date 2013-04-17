@@ -30,7 +30,14 @@
 
 #include <math.h>
 
+#include <errno.h>
+
 #include "Primitives.h"
+
+#ifdef KIS_ROBOT
+#include "../FollowLine.h"
+#endif
+
 //------------------------------ include VEGE ------------------------------
 
 
@@ -129,7 +136,47 @@ public:
 	bool ConsoleStopInProgress(void);
 	double GetConsolePos(void);
 
-#ifdef NAGY_ROBOT
+#ifdef KIS_ROBOT
+	/**
+	 * Vonalkovetes kovetes inditasa
+	 * @param dist [mm]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	bool FollowLine_Follow(double dist);
+
+	/**
+	 * Vonalkovetes kovetes allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool FollowLine_FollowInProgress();
+	/**
+	 * legutobbi kovetes leallasanak oka
+	 * @return 0: nem allt le a vonalkovetes, 1: elerte a tavolsagot, 2: elagazasba utkozott, 3: egyeb hiba
+	 */
+	int FollowLine_GetFollowError();
+	/**
+	 * Vonalkovetes elagazas-fordulas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	 bool FollowLine_Turn();
+
+	/**
+	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool FollowLine_TurnInProgress();
+	/**
+	 * Vonalkovetes kalibralas
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	bool FollowLine_Calibrate();
+
+	/**
+	 * CalibrateFollowLine allapota
+	 * @return true: folyamatban van, false: nincs folyamatban
+	 */
+	bool FollowLine_CalibrateInProgress();
+#else //NAGY_ROBOT
 	bool CaracoleSetSpeed(double speed, double max_acc);
 	bool CaracoleSetSpeedInProgress(void);
 	double GetCaracoleSpeed(void);
@@ -181,6 +228,15 @@ private:
 	#endif
 	//---------- node VEGE ----------
 
+#ifdef KIS_ROBOT
+	FollowLine* mFollowLine;
+
+	bool Follow_InProgress;
+	double Follow_dist;
+	timespec Follow_next_ts;
+	bool Follow_ts_valid;
+
+#endif
 
 	//----- valtozo ELEJE -----
 	char CanIp[16];

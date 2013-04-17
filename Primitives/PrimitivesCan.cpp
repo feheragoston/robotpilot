@@ -71,6 +71,13 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 
 	dcwheelMotionError	= false;
 
+#ifdef KIS_ROBOT
+	mFollowLine = new FollowLine(this);
+	Follow_InProgress = false;
+	Follow_ts_valid = false;
+	Follow_dist = 0;
+#endif
+
 	deadreckCheckXw		= 0;
 	deadreckCheckYw		= 0;
 	deadreckCheckPhiw	= 0;
@@ -240,7 +247,7 @@ PrimitivesCan::~PrimitivesCan(){
 
 }
 
-
+#ifdef NAGY_ROBOT
 bool PrimitivesCan::Wait(long int useconds){
 
 	timespec ts;
@@ -266,7 +273,78 @@ bool PrimitivesCan::Wait(long int useconds){
 	return true;
 
 }
+#endif
 
+#ifdef KIS_ROBOT
+bool PrimitivesCan::Wait(long int useconds){
+
+	timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	int error;
+
+	if (Follow_InProgress)
+	{
+		if (!Follow_ts_valid)
+		{
+			long int wait_nsec = (FOLLOW_PERIOD_US % 1000000) * 1000;
+			long int wait_sec = FOLLOW_PERIOD_US / 1000000;
+
+			Follow_ts_valid = true;
+			//ha nincs tulcsordulas nanosec-ben
+			if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec){
+				Follow_next_ts.tv_nsec += wait_nsec;
+				Follow_next_ts.tv_sec += wait_sec;
+			}
+
+			//ha tulcsordulas van a nanosec-ben
+			else{
+				Follow_next_ts.tv_nsec = (Follow_next_ts.tv_nsec + wait_nsec) - 1000000000;
+				Follow_next_ts.tv_sec += wait_sec + 1;
+			}
+		}
+	}
+
+	long int wait_nsec = (useconds % 1000000) * 1000;
+	long int wait_sec = useconds / 1000000;
+
+	//ha nincs tulcsordulas nanosec-ben
+	if(1000000000 - wait_nsec > ts.tv_nsec){
+		ts.tv_nsec += wait_nsec;
+		ts.tv_sec += wait_sec;
+	}
+
+	//ha tulcsordulas van a nanosec-ben
+	else{
+		ts.tv_nsec = (ts.tv_nsec + wait_nsec) - 1000000000;
+		ts.tv_sec += wait_sec + 1;
+	}
+
+	if (Follow_InProgress && Follow_ts_valid)
+	{
+		//Ha Follow_next_ts ideje kisebb, akkor o idejeig fogunk varni
+		if ((Follow_next_ts.tv_sec < ts.tv_sec) || ((Follow_next_ts.tv_sec == ts.tv_sec) && (Follow_next_ts.tv_nsec < ts.tv_nsec)))
+			ts = Follow_next_ts;
+	}
+
+	error = sem_timedwait(&newMessageSemaphore, &ts);
+
+	if (Follow_InProgress)
+	{
+		//Ha Follow_next_ts ideje kisebb (ebben az esetben egyenloek) es a szemafor-nal timeout volt
+		if ((error == ETIMEDOUT) && ((ts.tv_nsec == Follow_next_ts.tv_nsec) && (ts.tv_sec == Follow_next_ts.tv_sec)))
+		{
+			//TODO:Esetleg most kene uj ts-t csinalni, igy pontosabb lenne!
+			mFollowLine->FSM_Run(Follow_dist);
+			if (mFollowLine->Follow_Status != 0)
+				Follow_InProgress = false;
+			Follow_ts_valid = false;
+		}
+	}
+
+	return true;
+
+}
+#endif
 
 void PrimitivesCan::EnterCritical(void){
 
@@ -1782,3 +1860,118 @@ bool PrimitivesCan::HasColor_Unsafe(void){
 	return (red || blue);
 
 }
+
+#ifdef KIS_ROBOT
+bool PrimitivesCan::FollowLine_Follow(double dist)
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		Follow_InProgress = true;
+		Follow_dist = dist;
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_FollowInProgress()
+{
+	return Follow_InProgress;
+}
+
+int PrimitivesCan::FollowLine_GetFollowError()
+{
+	EnterCritical();
+	int error = mFollowLine->Follow_Status;
+
+	ExitCritical();
+
+	return error;
+}
+
+bool PrimitivesCan::FollowLine_Turn()
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		mFollowLine->Turn();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_TurnInProgress()
+{
+	EnterCritical();
+
+	bool ret = mFollowLine->Turn_InProgress;
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_Calibrate()
+{
+	EnterCritical();
+
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	Follow_InProgress ||
+		mFollowLine->Turn_InProgress ||
+		mFollowLine->Calibrate_InProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		mFollowLine->Calibrate();
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
+
+bool PrimitivesCan::FollowLine_CalibrateInProgress()
+{
+	EnterCritical();
+
+	bool ret = mFollowLine->Calibrate_InProgress;
+
+	ExitCritical();
+
+	return ret;
+}
+#endif
