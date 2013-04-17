@@ -278,7 +278,7 @@ bool PrimitivesCan::Wait(long int useconds){
 #ifdef KIS_ROBOT
 bool PrimitivesCan::Wait(long int useconds){
 
-	timespec ts;
+	timespec ts, ts_temp;
 	clock_gettime(CLOCK_REALTIME, &ts);
 	int error;
 
@@ -289,18 +289,18 @@ bool PrimitivesCan::Wait(long int useconds){
 			long int wait_nsec = (FOLLOW_PERIOD_US % 1000000) * 1000;
 			long int wait_sec = FOLLOW_PERIOD_US / 1000000;
 
-			Follow_ts_valid = true;
 			//ha nincs tulcsordulas nanosec-ben
-			if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec){
+			if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec)
+			{
 				Follow_next_ts.tv_nsec += wait_nsec;
 				Follow_next_ts.tv_sec += wait_sec;
 			}
-
-			//ha tulcsordulas van a nanosec-ben
-			else{
+			else //ha tulcsordulas van a nanosec-ben
+			{
 				Follow_next_ts.tv_nsec = (Follow_next_ts.tv_nsec + wait_nsec) - 1000000000;
 				Follow_next_ts.tv_sec += wait_sec + 1;
 			}
+			Follow_ts_valid = true;
 		}
 	}
 
@@ -319,26 +319,48 @@ bool PrimitivesCan::Wait(long int useconds){
 		ts.tv_sec += wait_sec + 1;
 	}
 
-	if (Follow_InProgress && Follow_ts_valid)
-	{
-		//Ha Follow_next_ts ideje kisebb, akkor o idejeig fogunk varni
-		if ((Follow_next_ts.tv_sec < ts.tv_sec) || ((Follow_next_ts.tv_sec == ts.tv_sec) && (Follow_next_ts.tv_nsec < ts.tv_nsec)))
-			ts = Follow_next_ts;
-	}
-
-	error = sem_timedwait(&newMessageSemaphore, &ts);
-
 	if (Follow_InProgress)
 	{
-		//Ha Follow_next_ts ideje kisebb (ebben az esetben egyenloek) es a szemafor-nal timeout volt
-		if ((error == ETIMEDOUT) && ((ts.tv_nsec == Follow_next_ts.tv_nsec) && (ts.tv_sec == Follow_next_ts.tv_sec)))
+		//Ha Follow_next_ts ideje kisebb, akkor az o idejeig fogunk varni
+		if ((Follow_next_ts.tv_sec < ts.tv_sec) || ((Follow_next_ts.tv_sec == ts.tv_sec) && (Follow_next_ts.tv_nsec < ts.tv_nsec)))
 		{
-			//TODO:Esetleg most kene uj ts-t csinalni, igy pontosabb lenne!
-			mFollowLine->FSM_Run(Follow_dist);
-			if (mFollowLine->Follow_Status != 0)
-				Follow_InProgress = false;
-			Follow_ts_valid = false;
+			//Hatha bantja az idot a szemafor
+			ts_temp = Follow_next_ts;
+			error = sem_timedwait(&newMessageSemaphore, &Follow_next_ts);
+			//Ha a szemafor-nal timeout volt, futtatjuk az FSM-et
+			if (error == ETIMEDOUT)
+			{
+				mFollowLine->FSM_Run(Follow_dist);
+				//Ha leallt az FSM
+				if (mFollowLine->Follow_Status != 0)
+				{
+					Follow_InProgress = false;
+					Follow_ts_valid = false;
+				}
+				else //FSM-et meg futtatni kell
+				{
+					long int wait_nsec = (FOLLOW_PERIOD_US % 1000000) * 1000;
+					long int wait_sec = FOLLOW_PERIOD_US / 1000000;
+
+					//ha nincs tulcsordulas nanosec-ben
+					if(1000000000 - wait_nsec > ts_temp.tv_nsec)
+					{
+						ts_temp.tv_nsec += wait_nsec;
+						ts_temp.tv_sec += wait_sec;
+					}
+
+					//ha tulcsordulas van a nanosec-ben
+					else
+					{
+						ts_temp.tv_nsec = (ts_temp.tv_nsec + wait_nsec) - 1000000000;
+						ts_temp.tv_sec += wait_sec + 1;
+					}
+				}
+			}
+			Follow_next_ts = ts_temp;
 		}
+		else
+			error = sem_timedwait(&newMessageSemaphore, &ts);
 	}
 
 	return true;
