@@ -1852,16 +1852,7 @@ int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
 bool PrimitivesCan::HasColor_Unsafe(void){
 
-	#ifdef NAGY_ROBOT
-	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
-	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
-#else	//KIS_ROBOT
-	//TODO: megírni
-	bool red = true;
-	bool blue = false;
-#endif
-
-	return (red || blue);
+	return (GetMyColor_Unsafe() != COLOR_UNKNOWN);
 
 }
 
