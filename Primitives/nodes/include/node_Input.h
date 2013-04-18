@@ -17,8 +17,6 @@
 #include "node.h"
 //------------------------------ include VEGE ------------------------------
 
-#ifdef NAGY_ROBOT
-
 
 
 
@@ -63,7 +61,5 @@ private:
 
 
 
-
-#endif /*NAGY_ROBOT*/
 
 #endif /*NODE_INPUT_H_*/

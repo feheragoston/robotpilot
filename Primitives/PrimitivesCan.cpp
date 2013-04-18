@@ -96,6 +96,7 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	broadcast	= new node_Broadcast();
 
 	console		= new node_Console();
+	input		= new node_Input();
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
 	servo		= new node_Servo();
@@ -103,7 +104,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	#ifdef NAGY_ROBOT
 	caracole	= new node_Caracole();
 	firewheel	= new node_Firewheel();
-	input		= new node_Input();
 	power		= new node_Power();
 	#endif
 	//---------- node VEGE ----------
@@ -117,6 +117,9 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
+
+	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
@@ -138,9 +141,6 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
-
-	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
@@ -200,13 +200,13 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	#ifdef NAGY_ROBOT
 	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(power)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	#endif
 	//SONAR-nak nem kuldunk semmit
@@ -388,11 +388,7 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
-#ifdef NAGY_ROBOT
 	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_START_BUTTON_INDEX);
-#else	//KIS_ROBOT
-	bool ret = 1;	//??
-#endif
 
 	ExitCritical();
 
@@ -821,12 +817,10 @@ bool PrimitivesCan::MotionInProgress(void){
 
 	bool ret = dcwheel->AnyMotion.inProgress;
 
-#ifdef NAGY_ROBOT
 	//ha utkozes kovetkezett be
 	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX)))
 		dcwheelMotionError = MOTION_ERROR;
-#endif
 
 	if (!ret && dcwheel->AnyMotion.done == 0) {
 		dcwheelMotionError = MOTION_ERROR;
@@ -963,14 +957,10 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
 
-#ifdef NAGY_ROBOT
 	distance[0] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX);
 	distance[1] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX);
 	distance[2] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX);
 	distance[3] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_REAR_SHARP_INDEX);
-#else	//KIS_ROBOT
-	//TODO: megírni
-#endif
 
 	ExitCritical();
 
@@ -1713,6 +1703,7 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
+	input->evalMsg(msg);
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	servo->evalMsg(msg);
@@ -1720,7 +1711,6 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 #ifdef NAGY_ROBOT
 	caracole->evalMsg(msg);
 	firewheel->evalMsg(msg);
-	input->evalMsg(msg);
 	power->evalMsg(msg);
 #endif
 
@@ -1852,14 +1842,8 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
-#ifdef NAGY_ROBOT
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
 	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
-#else	//KIS_ROBOT
-	//TODO: megírni
-	bool red = true;
-	bool blue = false;
-#endif
 
 	if(red)			return COLOR_RED;
 	if(blue)		return COLOR_BLUE;
