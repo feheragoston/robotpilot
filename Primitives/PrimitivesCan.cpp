@@ -404,6 +404,7 @@ bool PrimitivesCan::GetStopButton(void){
 #ifdef NAGY_ROBOT
 	bool ret = power->GET_STOP_BUTTON();
 #else	//KIS_ROBOT
+	//TODO: megírni
 	bool ret = 1;	//??
 #endif
 
