@@ -94,6 +94,7 @@ void node_Firewheel::INIT_PARAM(void){
 	SET_BOOL(&(msg.data[12]), 0, (FIREWHEEL_IS_ENC_EQEP1 != 0) ? true : false);
 	SET_BOOL(&(msg.data[12]), 1, (FIREWHEEL_MOTOR_PLUS_FIRE != 0) ? true : false);
 	SET_BOOL(&(msg.data[12]), 2, (FIREWHEEL_ENC_IS_ROTATE_DIR_A != 0) ? true : false);
+	SET_BOOL(&(msg.data[12]), 3, (FIREWHEEL_IS_MOTOR_OUTPUT1 != 0) ? true : false);
 
 	UDPdriver::send(&msg);
 

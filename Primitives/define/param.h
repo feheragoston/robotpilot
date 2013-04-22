@@ -590,6 +590,7 @@
 #define CARACOLE_IS_ENC_EQEP1							1				//??
 #define CARACOLE_MOTOR_PLUS_UP							1				//??
 #define CARACOLE_ENC_IS_ROTATE_DIR_A					1				//??
+#define CARACOLE_IS_MOTOR_OUTPUT1						1				//??
 
 #endif
 
@@ -618,6 +619,7 @@
 #define FIREWHEEL_IS_ENC_EQEP1							1				//??
 #define FIREWHEEL_MOTOR_PLUS_FIRE						1				//??
 #define FIREWHEEL_ENC_IS_ROTATE_DIR_A					1				//??
+#define FIREWHEEL_IS_MOTOR_OUTPUT1						1				//??
 
 #endif
 
