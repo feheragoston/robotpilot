@@ -21,12 +21,12 @@ FollowLine::FollowLine(Primitives* pr)
 	Cur_Pos = position();
 	Prev_Pos = position();
 	Follow_Status = FOLLOW_STATE_OTHER_STOP;
-	uart_try = 0;
 	Calibrate_InProgress = false;
 	Turn_InProgress = false;
 	distance = 0;
 	intersection_count = 0;
 	turn_back = false;
+	Follow_Distance = 0;
 	P = 0;
 	D = 0;
 	I = 0;
@@ -41,7 +41,7 @@ FollowLine::~FollowLine()
 	delete primi;
 }
 
-int FollowLine::Open_SerialPort(char* portname, int speed, int parity)
+int FollowLine::Open_SerialPort(char* portname, int speed)
 {
     struct termios tty;
 
@@ -56,7 +56,6 @@ int FollowLine::Open_SerialPort(char* portname, int speed, int parity)
     cfsetospeed (&tty, speed);
     cfsetispeed (&tty, speed);
 
-    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
     // disable IGNBRK for mismatched speed tests; otherwise receive break
     // as \000 chars
     tty.c_iflag &= ~IGNBRK;         // ignore break signal
@@ -65,15 +64,15 @@ int FollowLine::Open_SerialPort(char* portname, int speed, int parity)
     tty.c_oflag = 0;                // no remapping, no delays
     tty.c_cc[VMIN]  = 0;            // read doesn't block
     tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 
-    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
-                                    // enable reading
-    tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
-    tty.c_cflag |= parity;
+    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls, enable reading
+    //8N1 flags
+    tty.c_cflag &= ~PARENB;
     tty.c_cflag &= ~CSTOPB;
     tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8;
 
     if (tcsetattr (SerialPort, TCSANOW, &tty) != 0)
     	return -1;
@@ -84,68 +83,74 @@ void FollowLine::Close_SerialPort()
 {
 	close(SerialPort);
 }
+
 int FollowLine::SendByte_SerialPort(char data)
 {
-	int ret;
-    ret = write(SerialPort, &data, 1);
+	int ret = write(SerialPort, &data, 1);
     return ret;
 }
+
 int FollowLine::ReceiveByte_SerialPort(char* data)
 {
-	int n = read (SerialPort, data, sizeof data);
+	int n = read(SerialPort, data, sizeof(data));
 	return n;
+}
 
+void FollowLine::Follow_Init(double dist)
+{
+	Follow_Distance = dist;
+	FollowLine_CurState = FOLLOW_STATE_START;
 }
 
 bool FollowLine::Calibrate(void)
 {
+	//TODO: megirni: 0 Tresholdnal vannak-e hibas szenzorok, teljes tresholdnal is megnezni, majd a megfelelo sav kozepere beloni a tresholdot
 	return false;
 }
 
-bool FollowLine::GoAhead(void)
+bool FollowLine::Turn(bool turn)
 {
-	//Csak 2 elem lehet az elágazás listában
-	if (IntersectionList.size() != 2)
-		return false;
-	//Egy kicsit elore megyunk, h mar ne legyen elagazas
-	primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
-	while (primi->MotionInProgress())
-		primi->Wait(1);
-	return true;
-}
-
-bool FollowLine::Turn(void)
-{
+	//TODO: Egeszet atgondolni, nemcsak 2 elem lesz, legszelsot kovetni, kozepsot kovetni
 	Sens_Line_List::iterator center, side;
 	double angle;
 	//Csak 2 elem lehet az elágazás listában
 	if (IntersectionList.size() != 2)
 		return false;
 	Turn_InProgress = true;
-	center = IntersectionList.begin();
-	side = IntersectionList.end();
-	//Kozeptol valo elteres, 0-> bal oldal, 280-> jobb oldal
-	if (abs(center->avg - 140) > abs(side->avg - 140))
-	{
-		center = IntersectionList.end();
-		side = IntersectionList.begin();
+	if (!turn)
+	{	//Elore
+		//Egy kicsit elore megyunk, h mar ne legyen elagazas
+		primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
+		while (primi->MotionInProgress())
+			primi->Wait(1);
 	}
-	angle = (FOLLOW_LINE_TURN_CONST * double(abs(side->avg - 140)) / 140.0) * (M_PI/2);
-	//+90° ha idoben csokken a ket elagazas tavolsaga
-	if (turn_back == true)
-		angle += M_PI/2;
-	primi->Turn(angle,FOLLOW_LINE_TURN_SPEED,FOLLOW_LINE_TURN_ACCEL);
-	while (primi->MotionInProgress())
-		primi->Wait(1);
-	//Egy kicsit elore megyunk, h mar ne legyen elagazas
-	primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
-	while (primi->MotionInProgress())
-		primi->Wait(1);
+	else
+	{	//Kanyarodas
+		center = IntersectionList.begin();
+		side = IntersectionList.end();
+		//Kozeptol valo elteres, 0-> bal oldal, 280-> jobb oldal
+		if (abs(center->avg - 140) > abs(side->avg - 140))
+		{
+			center = IntersectionList.end();
+			side = IntersectionList.begin();
+		}
+		angle = (FOLLOW_LINE_TURN_CONST * double(abs(side->avg - 140)) / 140.0) * (M_PI/2);
+		//+90° ha idoben csokken a ket elagazas tavolsaga
+		if (turn_back == true)
+			angle += M_PI/2;
+		primi->Turn(angle,FOLLOW_LINE_TURN_SPEED,FOLLOW_LINE_TURN_ACCEL);
+		while (primi->MotionInProgress())
+			primi->Wait(1);
+		//Egy kicsit elore megyunk, h mar ne legyen elagazas
+		primi->Go(FOLLOW_LINE_GO_DIST,FOLLOW_LINE_GO_SPEED, FOLLOW_LINE_GO_ACCEL);
+		while (primi->MotionInProgress())
+			primi->Wait(1);
+	}
 	Turn_InProgress = false;
 	return true;
 }
 
-void FollowLine::FSM_Run(double dist)
+void FollowLine::FSM_Run()
 {
 	switch (FollowLine_CurState)
 	{
@@ -162,17 +167,18 @@ void FollowLine::FSM_Run(double dist)
 			FollowLine_CurState = FOLLOW_STATE_CHECK;
 			break;
 		case FOLLOW_STATE_CHECK:
-			uart_try = 0;
+			int uart_try;
 			char read[6];
 			int num;
 			unsigned int Sens_Pos, Sens_Pos_Temp;
+			uart_try = 0;
 			//Alapbol a kovetkezo allapot a PID es nincs hiba
 			FollowLine_CurState = FOLLOW_STATE_PID;
 			//Tavolsag vizsgalat***************************
 			Prev_Pos = Cur_Pos;
 			primi->GetRobotPos(&Cur_Pos.x,&Cur_Pos.y,&Cur_Pos.phi);
 			distance += sqrt(pow((Cur_Pos.x-Prev_Pos.x),2) + pow((Cur_Pos.y-Prev_Pos.y),2));
-			if (distance >= dist)
+			if (distance >= Follow_Distance)
 			{
 				//Elertuk a kivant tavolsagot
 				primi->SetWheelSpeed(0,0);

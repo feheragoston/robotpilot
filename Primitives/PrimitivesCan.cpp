@@ -75,7 +75,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	mFollowLine = new FollowLine(this);
 	Follow_InProgress = false;
 	Follow_ts_valid = false;
-	Follow_dist = 0;
 #endif
 
 	deadreckCheckXw		= 0;
@@ -326,11 +325,11 @@ bool PrimitivesCan::Wait(long int useconds){
 		{
 			//Hatha bantja az idot a szemafor
 			ts_temp = Follow_next_ts;
-			error = sem_timedwait(&newMessageSemaphore, &Follow_next_ts);
+			error = sem_timedwait(&newMessageSemaphore, &ts_temp);
 			//Ha a szemafor-nal timeout volt, futtatjuk az FSM-et
 			if (error == ETIMEDOUT)
 			{
-				mFollowLine->FSM_Run(Follow_dist);
+				mFollowLine->FSM_Run();
 				//Ha leallt az FSM
 				if (mFollowLine->Follow_Status != 0)
 				{
@@ -343,21 +342,20 @@ bool PrimitivesCan::Wait(long int useconds){
 					long int wait_sec = FOLLOW_PERIOD_US / 1000000;
 
 					//ha nincs tulcsordulas nanosec-ben
-					if(1000000000 - wait_nsec > ts_temp.tv_nsec)
+					if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec)
 					{
-						ts_temp.tv_nsec += wait_nsec;
-						ts_temp.tv_sec += wait_sec;
+						Follow_next_ts.tv_nsec += wait_nsec;
+						Follow_next_ts.tv_sec += wait_sec;
 					}
 
 					//ha tulcsordulas van a nanosec-ben
 					else
 					{
-						ts_temp.tv_nsec = (ts_temp.tv_nsec + wait_nsec) - 1000000000;
-						ts_temp.tv_sec += wait_sec + 1;
+						Follow_next_ts.tv_nsec = (Follow_next_ts.tv_nsec + wait_nsec) - 1000000000;
+						Follow_next_ts.tv_sec += wait_sec + 1;
 					}
 				}
 			}
-			Follow_next_ts = ts_temp;
 		}
 		else
 			error = sem_timedwait(&newMessageSemaphore, &ts);
@@ -1885,7 +1883,7 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 	//ha elindithatjuk
 	else{
 		Follow_InProgress = true;
-		Follow_dist = dist;
+		mFollowLine->Follow_Init(dist);
 		ret = ACT_STARTED;
 	}
 
@@ -1897,7 +1895,13 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 
 bool PrimitivesCan::FollowLine_FollowInProgress()
 {
-	return Follow_InProgress;
+	EnterCritical();
+
+	int ret = Follow_InProgress;
+
+	ExitCritical();
+
+	return ret;
 }
 
 int PrimitivesCan::FollowLine_GetFollowError()
@@ -1910,7 +1914,7 @@ int PrimitivesCan::FollowLine_GetFollowError()
 	return error;
 }
 
-bool PrimitivesCan::FollowLine_Turn()
+bool PrimitivesCan::FollowLine_Turn(bool turn)
 {
 	EnterCritical();
 
@@ -1925,7 +1929,7 @@ bool PrimitivesCan::FollowLine_Turn()
 
 	//ha elindithatjuk
 	else{
-		mFollowLine->Turn();
+		mFollowLine->Turn(turn);
 		ret = ACT_STARTED;
 	}
 

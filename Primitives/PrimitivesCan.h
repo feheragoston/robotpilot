@@ -156,9 +156,10 @@ public:
 	int FollowLine_GetFollowError();
 	/**
 	 * Vonalkovetes elagazas-fordulas
+	 * turn: true kanyarodik, false elore megy
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	 bool FollowLine_Turn();
+	 bool FollowLine_Turn(bool turn);
 
 	/**
 	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
@@ -232,7 +233,6 @@ private:
 	FollowLine* mFollowLine;
 
 	bool Follow_InProgress;
-	double Follow_dist;
 	timespec Follow_next_ts;
 	bool Follow_ts_valid;
 

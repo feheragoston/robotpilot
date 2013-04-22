@@ -569,7 +569,7 @@ int Primitives::FollowLine_GetFollowError()
 	return false;
 }
 
-bool Primitives::FollowLine_Turn()
+bool Primitives::FollowLine_Turn(bool turn)
 {
 	return false;
 }

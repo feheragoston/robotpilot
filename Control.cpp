@@ -1771,7 +1771,8 @@ int Control::l_FollowLine_GetFollowError(lua_State *L)
 }
 int Control::l_FollowLine_Turn(lua_State *L)
 {
-	if (mPrimitives->FollowLine_Turn())
+	bool turn = lua_toboolean(L, 1);
+	if (mPrimitives->FollowLine_Turn(turn))
 	{
 		setSafeMotion(L);
 		lua_pushboolean(L, true);

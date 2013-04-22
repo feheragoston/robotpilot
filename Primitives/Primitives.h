@@ -543,9 +543,10 @@ public:
 	virtual int FollowLine_GetFollowError();
 	/**
 	 * Vonalkovetes elagazas-fordulas
+	 * turn: true kanyarodik, false elore megy
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
-	 virtual bool FollowLine_Turn();
+	 virtual bool FollowLine_Turn(bool turn);
 	/**
 	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
 	 * @return true: folyamatban van, false: nincs folyamatban
