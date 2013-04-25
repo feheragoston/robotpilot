@@ -1691,16 +1691,12 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
+
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
-#ifdef NAGY_ROBOT
-	caracole->evalMsg(msg);
-	firewheel->evalMsg(msg);
-	input->evalMsg(msg);
 	power->evalMsg(msg);
-#endif
 
 	//figyeljuk az aktuatortap valtozasat
 	detectActChange();

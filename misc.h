@@ -15,7 +15,7 @@
 
 ///////////////////////
 // Palya adatai (mm)
-
+//TODO: update
 #define		AREA_WIDTH	2000	// palya szelessege [mm]
 #define		AREA_LENGTH	3000	// palya hosszusaga [mm]
 

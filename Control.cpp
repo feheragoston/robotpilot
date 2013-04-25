@@ -126,6 +126,7 @@ Control::Control(Config* config) {
 		{"GetGripperPos", l_GetGripperPos},
 #endif
 
+
 #ifdef NAGY_ROBOT
 		{"GetBallColorVoltage", l_GetBallColorVoltage},
 		{"GetBallPresent", l_GetBallPresent},
@@ -137,6 +138,10 @@ Control::Control(Config* config) {
 		{"FirewheelSetSpeed", l_FirewheelSetSpeed},
 		{"FirewheelSetSpeedInProgress", l_FirewheelSetSpeedInProgress},
 		{"GetFirewheelSpeed", l_GetFirewheelSpeed},
+
+		{"FireStopperMove", l_FireStopperMove},
+		{"FireStopperMoveInProgress", l_FireStopperMoveInProgress},
+		{"GetFireStopperPos", l_GetFireStopperPos},
 
 #endif
 
