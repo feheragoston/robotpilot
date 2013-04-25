@@ -192,6 +192,7 @@ Control::Control(Config* config) {
 	exitControl = false;
 
 	if (obstacles.empty()) {
+		//TODO: Peti: ezek aktualizalasa az uj palyahoz
 		// Akadalyok definialasa
 		// start vedo falak
 		obstacles.push_back(new Line(500, 0, 500, 400));
@@ -297,6 +298,8 @@ bool Control::Init() {
 	gettimeofday(&initStart, NULL);
 	gettimeofday(&matchStart, NULL);
 
+	//TODO: mi ez a Net? Server? NokiaServer?
+
 	if (mConfig->PrimitivesCan) {
 		mPrimitives = new PrimitivesCan(mConfig);
 	} else if (mConfig->PrimitivesNet) {
@@ -336,6 +339,8 @@ void Control::Run() {
 
 			std::cout << "(Control) Finished running " << mConfig->LuaFile << std::endl;
 		}
+
+		//TODO: ez itt mi?
 
 		fd_set rfd;
 		char buf[2048];
@@ -389,6 +394,7 @@ void Control::Run() {
 	}
 }
 
+//TODO: ez mi, update a mostani adatokra
 void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 	if (size == 0) {
 		sendObstacles[n] = true;
@@ -531,6 +537,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 	}
 }
 
+//TODO: update az uj robotra
 void Control::log() {
 	if (logfile) {
 		unsigned int time = InitTime();
@@ -684,6 +691,7 @@ void Control::log() {
 	}
 }
 
+//TODO: ez van meg hasznalva? az egesz stack-ben keres, ez igy jo lesz?
 void Control::setSafeMotion(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
@@ -699,6 +707,7 @@ void Control::setSafeMotion(lua_State *L) {
 	}
 }
 
+//TODO: opponent-re fix ROBOT_RADIUS-t hasznal, ez kis/nagy robotra azonos??
 long int Control::refreshOpponent(unsigned char n) {
 	if (n < OPPONENT_NUM) {
 		double ox, oy;
@@ -709,9 +718,13 @@ long int Control::refreshOpponent(unsigned char n) {
 	return 0;
 }
 
+//TODO: eztet ellenorizni, mit csinal????
+//ezt a motionInProgress hasznalja, eldonti hogy van e a mozgasunkhoz kepest ellenfel akivel utkoznenk
 bool Control::opponentTooClose() {
 
-	//TODO: eztet ellenorizni, mit csinal????
+
+	//elosszor ellenorizzuk, hogy az ellenfel meg a helyen van-e. ha igen, biztos nem utkozunk
+	//TODO: update az idei szabalyra, hol van a kiindulo terulet?
 	bool theyStuck = true;
 
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
@@ -726,14 +739,18 @@ bool Control::opponentTooClose() {
 		return false;
 	}
 
+	//ide jututnk ha az ellenfel mar nincs a helyen
 	double x, y, phi, v, w;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
 	mPrimitives->GetSpeed(&v, &w);
 
+	//ha mar nagyon lassan megyunk, nem lehet gond
+	//TODO: ez biztos jo lesz igy?
 	if (fabs(v) < 10) {
 		return false;
 	}
 
+	//distance> mostani sebesseggel milyen tavolsagra tud megallni, negativ ha hatrafele
 	double distance = v * v / (2 * MAX_DEC);
 	if (v < 0.) {
 		distance += ROBOT_BACK;
@@ -742,12 +759,16 @@ bool Control::opponentTooClose() {
 		distance += ROBOT_FRONT;
 	}
 
+	//megnezzuk, hogy minden sonar meres ervenyes-e. ha nem, tavolsagmeroket hasznaljuk
 	long int validity = 0;
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		validity = max(validity, refreshOpponent(i));
 	}
+	//TODO: ezt valahogy jelezni. iden is elofordulhat?
+	//TODO: iden beloghat valami a tavolsagmerok ele? update pozicioja kozephez kepest
+
 	if (validity > SONAR_TIMEOUT/* && !mPrimitives->ArmMoveInProgress()*/
-			&& (x < 1600 || abs(phi) > M_PI / 2)) {
+			&& (x < 1600 || abs(phi) > M_PI / 2)) {  //TODO: mi ez a hely/irany fugges? szimmetria?
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
 			double distances[PROXIMITY_NUM];
@@ -761,9 +782,11 @@ bool Control::opponentTooClose() {
 				return true;
 			}
 		}
+		//TODO: ugyan ezt hatra
 		return false;
 	}
 
+	//mukodik a meres, ellenorizzuk az ellenfeleket
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
 		if (opponent[i]->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi))) {
 			if (angry[i] < ROBOT_RADIUS) {

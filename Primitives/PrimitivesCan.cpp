@@ -1696,7 +1696,15 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	dcwheel->evalMsg(msg);
 	servo->evalMsg(msg);
 	sonar->evalMsg(msg);
+
+	//TODO: David ez mit csinal? ezek nem voltak ifdef-elve
+
+#ifdef NAGY_ROBOT
+	caracole->evalMsg(msg);
+	firewheel->evalMsg(msg);
+	input->evalMsg(msg);
 	power->evalMsg(msg);
+#endif
 
 	//figyeljuk az aktuatortap valtozasat
 	detectActChange();
