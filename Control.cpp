@@ -1661,6 +1661,57 @@ int Control::l_GetFireStopperPos(lua_State *L) {
 	lua_pushnumber(L, mPrimitives->GetFireStopperPos());
 	return 1;
 }
+
+int Control::l_GetBallColorVoltage(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());
+	return 1;
+}
+
+int Control::l_GetBallPresent(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->GetBallPresent());
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_CaracoleSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->CaracoleSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetCaracoleSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetCaracoleSpeed());
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeed(lua_State *L)
+{
+	double speed = luaL_optnumber(L, 1, 0);
+	double max_acc = luaL_optnumber(L, 2, 0);
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeed(speed, max_acc));
+	return 1;
+}
+
+int Control::l_FirewheelSetSpeedInProgress(lua_State *L)
+{
+	lua_pushboolean(L, mPrimitives->FirewheelSetSpeedInProgress());
+	return 1;
+}
+int Control::l_GetFirewheelSpeed(lua_State *L)
+{
+	lua_pushnumber(L, mPrimitives->GetFirewheelSpeed());
+	return 1;
+}
+
 #else	//KIS_ROBOT
 int Control::l_GripperMove(lua_State *L) {
 	bool low = lua_toboolean(L, 1);
@@ -1812,57 +1863,5 @@ int Control::l_FollowLine_CalibrateInProgress(lua_State *L)
 	lua_pushboolean(L, mPrimitives->FollowLine_CalibrateInProgress());
 	return 1;
 }
-#else //NAGY_ROBOT
-int Control::l_GetBallColorVoltage(lua_State *L)
-{
-	lua_pushnumber(L, mPrimitives->GetBallColorVoltage());
-	return 1;
-}
 
-int Control::l_GetBallPresent(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->GetBallPresent());
-	return 1;
-}
-
-int Control::l_CaracoleSetSpeed(lua_State *L)
-{
-	double speed = luaL_optnumber(L, 1, 0);
-	double max_acc = luaL_optnumber(L, 2, 0);
-	lua_pushboolean(L, mPrimitives->CaracoleSetSpeed(speed, max_acc));
-	return 1;
-}
-
-int Control::l_CaracoleSetSpeedInProgress(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->CaracoleSetSpeedInProgress());
-	return 1;
-}
-int Control::l_GetCaracoleSpeed(lua_State *L)
-{
-	lua_pushnumber(L, mPrimitives->GetCaracoleSpeed());
-	return 1;
-}
-
-int Control::l_FirewheelSetSpeed(lua_State *L)
-{
-	double speed = luaL_optnumber(L, 1, 0);
-	double max_acc = luaL_optnumber(L, 2, 0);
-	lua_pushboolean(L, mPrimitives->FirewheelSetSpeed(speed, max_acc));
-	return 1;
-}
-
-int Control::l_FirewheelSetSpeedInProgress(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->FirewheelSetSpeedInProgress());
-	return 1;
-}
-int Control::l_GetFirewheelSpeed(lua_State *L)
-{
-	lua_pushnumber(L, mPrimitives->GetFirewheelSpeed());
-	return 1;
-}
-
-
-#endif
 
