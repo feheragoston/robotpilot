@@ -5,13 +5,14 @@
  *      Author: agoston
  */
 
+//TODO: simulate nem valtoztat semmi olyat ami globalisan hasznalt?
+
 #include "Control.h"
 
 using namespace std;
 
 Config* Control::mConfig = NULL;
 Primitives* Control::mPrimitives = NULL;
-PrimitivesNet* Control::mCamera = NULL;
 Server* Control::mServer = NULL;
 nokia_server* Control::ns = NULL;
 unsigned int Control::nokia_sent = 0;
@@ -691,7 +692,7 @@ void Control::log() {
 	}
 }
 
-//TODO: ez van meg hasznalva? az egesz stack-ben keres, ez igy jo lesz?
+//TODO: az egesz stack-ben keres, ez igy jo lesz?
 void Control::setSafeMotion(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
@@ -718,7 +719,6 @@ long int Control::refreshOpponent(unsigned char n) {
 	return 0;
 }
 
-//TODO: eztet ellenorizni, mit csinal????
 //ezt a motionInProgress hasznalja, eldonti hogy van e a mozgasunkhoz kepest ellenfel akivel utkoznenk
 bool Control::opponentTooClose() {
 
@@ -788,8 +788,9 @@ bool Control::opponentTooClose() {
 
 	//mukodik a meres, ellenorizzuk az ellenfeleket
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
+		//TODO: ez csak az utat nezi az ellenfel sugaraval? honnan tudja az en sugaramat?
 		if (opponent[i]->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi))) {
-			if (angry[i] < ROBOT_RADIUS) {
+			if (!simulate && angry[i] < ROBOT_RADIUS) {
 				angry[i] += 5.;
 			}
 			//std::cout << "(Control) Opponent " << i << " too close! angry: " << angry[i] << std::endl;
@@ -802,18 +803,19 @@ bool Control::opponentTooClose() {
 	return false;
 }
 
+//obstacleCollision: megmondja hogy epp osszeutkozunk-e valamivel, mechanikai elemek allasatol fuggoen
+//frissiti a robotObstacles es robotHighObstacles-t, simulate mode-ban hasznaljuk
 bool Control::obstacleCollision() {
-	//TODO: eztet ellenorizni, mit csinal????
 	double x, y, phi, lg, rg, lc, rc;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
-//	lg = mPrimitives->GetArmPos(true);
-//	rg = mPrimitives->GetArmPos(false);
-//	lc = mPrimitives->GetClawPos(true);
-//	rc = mPrimitives->GetClawPos(false);
-	lg=0;
-	rg=0;
-	lc=0;
-	rc=0;
+
+	//TODO: ezt a mostani mechanikara frissiteni
+
+	/*
+	lg = mPrimitives->GetArmPos(true);
+	rg = mPrimitives->GetArmPos(false);
+	lc = mPrimitives->GetClawPos(true);
+	rc = mPrimitives->GetClawPos(false);
 
 	while (!robotObstacles.empty()) {
 		delete robotObstacles.front();
@@ -899,14 +901,12 @@ bool Control::obstacleCollision() {
 		double rx2 = robotBody[j2][0];
 		double ry2 = robotBody[j2][1];
 
-		/*
 		if (j == 0 || j == ROBOT_POINT_NUM) {
 			rx1 += sin(gripperPos) * 105;
 		}
 		if (j2 == 0 || j2 == ROBOT_POINT_NUM) {
 			rx2 += sin(gripperPos) * 105;
 		}
-		*/
 
 		double x1 = cos(phi) * rx1 - sin(phi) * ry1 + x;
 		double y1 = sin(phi) * rx1 + cos(phi) * ry1 + y;
@@ -986,10 +986,12 @@ bool Control::obstacleCollision() {
 			return true;
 		}
 	}
-
+	*/
 	return false;
 }
 
+
+//TODO: ez mire volt hasznalva? nem hivja semmi
 void Control::addDynamicObstacle(Obstacle* obstacle) {
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1076,6 +1078,8 @@ bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
 				return true;
 			}
 		}
+
+		//TODO: ezeket hasznaljuk most??
 		for (obstacleIterator i = dynObstacles.begin(); i != dynObstacles.end(); i++) {
 			if ((*i)->Intersect(x1, y1, x2, y2)) {
 				clearCollisionObstacles();
@@ -1084,6 +1088,8 @@ bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
 			}
 		}
 	}
+
+	//TODO: ezt csak ha HIGH_OBSTACLES modban hivjuk
 
 	for (obstacleIterator i = highObstacles.begin(); i != highObstacles.end(); i++) {
 		if ((*i)->Intersect(x1, y1, x2, y2)) {
@@ -1096,6 +1102,7 @@ bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
 	return false;
 }
 
+//TODO: ez hogy mukodik?
 void Control::report_errors(lua_State *L, int status) {
 	if (status != 0) {
 		//std::cerr << "-- " << lua_tostring(L, -1) << std::endl;
@@ -1110,6 +1117,7 @@ void Control::report_errors(lua_State *L, int status) {
 	}
 }
 
+//lua-bol adott indexu parametert bool-la konvertal, ha nem bool volt default d ertek lesz
 bool Control::optbool(lua_State *L, int narg, bool d) {
 	if (lua_isboolean(L, narg)) {
 		return lua_toboolean(L, narg);
@@ -1184,7 +1192,9 @@ int Control::c_wait(lua_State *L) {
 
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */
 	log();
+	//TODO: server hogy mukodik?
 	mServer->Process();
+	//TODO: nokiat ideire update
 	if (mConfig->NokiaServer && (InitTime() > nokia_sent)) {
 		double x, y, phi;
 		ns->pause_sending();
@@ -1242,6 +1252,7 @@ int Control::c_simulate(lua_State *L) {
 	}
 
 	// meghivjuk a parameterul kapott fuggvenyt
+	//TODO: szimulacio hogy mukodik
 	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
 	if (s != 0) {
 		// nem sikerult a szimulacio
@@ -1319,6 +1330,7 @@ int Control::c_print(lua_State *L) {
 	return 0;
 }
 
+//music most csak a playlist file-ba irja a kapott string-et
 int Control::c_music(lua_State *L) {
 	if (lua_isstring(L, 1)) {
 		const char* s = lua_tostring(L, 1);
@@ -1346,6 +1358,7 @@ int Control::l_GetMyColor(lua_State *L) {
 	return 1;
 }
 
+//4 tavolsagmero szenzor adatot adja lua-nak
 int Control::l_GetDistances(lua_State *L) {
 	double dist[PROXIMITY_NUM];
 	mPrimitives->GetDistances(dist);
