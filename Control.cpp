@@ -254,9 +254,6 @@ Control::~Control() {
 	if (mPrimitives) {
 		delete mPrimitives;
 	}
-	if (mCamera) {
-		delete mCamera;
-	}
 	if (mServer) {
 		delete mServer;
 	}
@@ -1125,20 +1122,6 @@ bool Control::optbool(lua_State *L, int narg, bool d) {
 	return d;
 }
 
-bool Control::connectCamera() {
-	if (!mCamera) {
-		mCamera = new PrimitivesNet(mConfig);
-		if (mCamera->CameraInit()) {
-			cout << "(Control) Connected to camera" << endl;
-		} else {
-			cout << "(Control) Error connecting to camera" << endl;
-			delete mCamera;
-			mCamera = NULL;
-			return false;
-		}
-	}
-	return true;
-}
 
 int Control::c_gettimeofday(lua_State *L) {
 	gettimeofday((struct timeval*)lua_newuserdata(L, sizeof(struct timeval)), NULL);
@@ -1181,13 +1164,6 @@ int Control::c_wait(lua_State *L) {
 	if (!mPrimitives->Wait(useconds)) {
 		exitControl = true;
 		return luaL_error(L, "(Control) Primitives->Wait failed, exiting");
-	}
-	if (mCamera) {
-		if (!mCamera->Wait(0)) {
-			cout << "(Control) Camera disconnected" << endl;
-			delete mCamera;
-			mCamera = NULL;
-		}
 	}
 
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */

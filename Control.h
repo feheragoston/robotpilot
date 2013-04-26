@@ -51,7 +51,6 @@ public:
 protected:
 	static Config* mConfig;
 	static Primitives* mPrimitives;
-	static PrimitivesNet* mCamera;
 	static Server* mServer;
 	static nokia_server* ns;
 	static unsigned int nokia_sent;
@@ -122,8 +121,6 @@ protected:
 
 	static void report_errors(lua_State *L, int status);
 	static bool optbool(lua_State *L, int narg, bool d);
-
-	static bool connectCamera();
 
 	static int c_gettimeofday(lua_State *L);
 	static int c_getelapsedtime(lua_State *L);
