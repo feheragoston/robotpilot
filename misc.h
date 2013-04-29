@@ -48,6 +48,16 @@
 #define	BLUE	-1
 #define	RED		1
 
+////////////////
+// Ertelmezest segito valtozok, beavatkozokhoz
+
+//bool-ok vajon mukodnek lua-ban?
+#define FRONT true
+#define REAR false
+
+#define LEFT true
+#define RIGHT false
+
 /////////////////////////
 // Robot kezdopozicioja
 
