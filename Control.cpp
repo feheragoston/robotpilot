@@ -1863,5 +1863,5 @@ int Control::l_FollowLine_CalibrateInProgress(lua_State *L)
 	lua_pushboolean(L, mPrimitives->FollowLine_CalibrateInProgress());
 	return 1;
 }
-
+#endif
 
