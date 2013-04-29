@@ -159,17 +159,19 @@ protected:
 	static int l_ArmMove(lua_State *L);
 	static int l_ArmMoveInProgress(lua_State *L);
 	static int l_GetArmPos(lua_State *L);
+
 	static int l_SelectorMove(lua_State *L);
 	static int l_SelectorMoveInProgress(lua_State *L);
 	static int l_GetSelectorPos(lua_State *L);
+
 	static int l_FlipperMove(lua_State *L);
 	static int l_FlipperMoveInProgress(lua_State *L);
 	static int l_GetFlipperPos(lua_State *L);
-	static int l_GetFlipperError(lua_State *L);
+
 	static int l_ContractorMove(lua_State *L);
 	static int l_ContractorMoveInProgress(lua_State *L);
 	static int l_GetContractorPos(lua_State *L);
-	static int l_GetContractorError(lua_State *L);
+
 	static int l_FireStopperMove(lua_State *L);
 	static int l_FireStopperMoveInProgress(lua_State *L);
 	static int l_GetFireStopperPos(lua_State *L);
