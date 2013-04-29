@@ -5,7 +5,8 @@
  *      Author: agoston
  */
 
-//TODO: simulate nem valtoztat semmi olyat ami globalisan hasznalt?
+//TODO: szimulacio kiszedheto
+// Java
 
 #include "Control.h"
 
@@ -21,7 +22,7 @@ bool Control::matchStarted = false;
 bool Control::exitControl = false;
 obstacleList Control::obstacles = obstacleList();
 obstacleList Control::highObstacles = obstacleList();
-obstacleList Control::dynObstacles = obstacleList();
+obstacleList Control::dynObstacles = obstacleList(); // nem is kell
 obstacleList Control::robotObstacles = obstacleList();
 obstacleList Control::robotHighObstacles = obstacleList();
 obstacleList Control::collisionObstacles = obstacleList();
@@ -300,11 +301,9 @@ bool Control::Init() {
 	gettimeofday(&initStart, NULL);
 	gettimeofday(&matchStart, NULL);
 
-	//TODO: mi ez a Net? Server? NokiaServer?
-
 	if (mConfig->PrimitivesCan) {
 		mPrimitives = new PrimitivesCan(mConfig);
-	} else if (mConfig->PrimitivesNet) {
+	} else if (mConfig->PrimitivesNet) {//ez a szim, nem kell
 		mPrimitives = new PrimitivesNet(mConfig);
 	} else {
 		mPrimitives = new Primitives(mConfig);
@@ -342,7 +341,7 @@ void Control::Run() {
 			std::cout << "(Control) Finished running " << mConfig->LuaFile << std::endl;
 		}
 
-		//TODO: ez itt mi?
+		//ez az interaktiv parancs mod
 
 		fd_set rfd;
 		char buf[2048];
@@ -396,7 +395,7 @@ void Control::Run() {
 	}
 }
 
-//TODO: ez mi, update a mostani adatokra
+//ez kuldi a java programnak mit rajzoljon
 void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 	if (size == 0) {
 		sendObstacles[n] = true;
@@ -539,7 +538,7 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 	}
 }
 
-//TODO: update az uj robotra
+//update az uj robotra, struktura java-val egyezen
 void Control::log() {
 	if (logfile) {
 		unsigned int time = InitTime();
@@ -693,7 +692,7 @@ void Control::log() {
 	}
 }
 
-//TODO: az egesz stack-ben keres, ez igy jo lesz?
+//ha a meghivott fuggveny neveben benne van a Safe, safeMotion true lesz
 void Control::setSafeMotion(lua_State *L) {
 	lua_Debug ar;
 	lua_getstack(L, 0, &ar);
@@ -714,7 +713,7 @@ long int Control::refreshOpponent(unsigned char n) {
 	if (n < OPPONENT_NUM) {
 		double ox, oy;
 		long int validity = Control::GetOpponentPos(n, &ox, &oy);
-		opponent[n]->Set(ox, oy, ROBOT_RADIUS * 2.5 - angry[n]);
+		opponent[n]->Set(ox, oy, ROBOT_RADIUS * 2.5 - angry[n]);	//sajat magunk is ebben van
 		return validity;
 	}
 	return 0;
@@ -769,7 +768,7 @@ bool Control::opponentTooClose() {
 	//TODO: iden beloghat valami a tavolsagmerok ele? update pozicioja kozephez kepest
 
 	if (validity > SONAR_TIMEOUT/* && !mPrimitives->ArmMoveInProgress()*/
-			&& (x < 1600 || abs(phi) > M_PI / 2)) {  //TODO: mi ez a hely/irany fugges? szimmetria?
+			&& (x < 1600 || abs(phi) > M_PI / 2)) {  //itt mar a falnal vagyunk, ne nezze
 		if (distance > 0) {
 			distance += 100; // a tavolsagerzekelok hatrebb vannak
 			double distances[PROXIMITY_NUM];
@@ -789,7 +788,6 @@ bool Control::opponentTooClose() {
 
 	//mukodik a meres, ellenorizzuk az ellenfeleket
 	for (unsigned char i = 0; i < OPPONENT_NUM; i++) {
-		//TODO: ez csak az utat nezi az ellenfel sugaraval? honnan tudja az en sugaramat?
 		if (opponent[i]->Intersect(x, y, x + distance * cos(phi), y + distance * sin(phi))) {
 			if (!simulate && angry[i] < ROBOT_RADIUS) {
 				angry[i] += 5.;
@@ -992,7 +990,7 @@ bool Control::obstacleCollision() {
 }
 
 
-//TODO: ez mire volt hasznalva? nem hivja semmi
+//letett tornyok, mar nem kell
 void Control::addDynamicObstacle(Obstacle* obstacle) {
 	double x, y, phi;
 	mPrimitives->GetRobotPos(&x, &y, &phi);
@@ -1103,7 +1101,7 @@ bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
 	return false;
 }
 
-//TODO: ez hogy mukodik?
+//control.print fuggvenyt hivja a lua error-al
 void Control::report_errors(lua_State *L, int status) {
 	if (status != 0) {
 		//std::cerr << "-- " << lua_tostring(L, -1) << std::endl;
@@ -1172,7 +1170,6 @@ int Control::c_wait(lua_State *L) {
 
 	/* logolunk es a csatlakozott klienseket feldolgozzuk */
 	log();
-	//TODO: server hogy mukodik?
 	mServer->Process();
 	//TODO: nokiat ideire update
 	if (mConfig->NokiaServer && (InitTime() > nokia_sent)) {
@@ -1232,7 +1229,6 @@ int Control::c_simulate(lua_State *L) {
 	}
 
 	// meghivjuk a parameterul kapott fuggvenyt
-	//TODO: szimulacio hogy mukodik
 	int s = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
 	if (s != 0) {
 		// nem sikerult a szimulacio
