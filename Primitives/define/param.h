@@ -254,8 +254,8 @@
 #define SERVO_FRONT_ARM_INDEX							4	//??
 #define SERVO_REAR_ARM_INDEX							1	//??
 #define SERVO_SELECTOR_INDEX							5	//??
-#define SERVO_FIRESTOPPER_INDEX							3	//??
-#define SERVO_FLIPPER_INDEX								0	//??
+#define SERVO_FIRESTOPPER_INDEX							0	//??
+#define SERVO_FLIPPER_INDEX								3	//??
 #define SERVO_CONTRACTOR_INDEX							2	//??
 
 
