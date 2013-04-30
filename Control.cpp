@@ -7,6 +7,7 @@
 
 //TODO: szimulacio kiszedheto
 // Java
+//TODO: minden aktuator lua kezelesben default seb/gyorsulasok
 
 #include "Control.h"
 
@@ -42,6 +43,8 @@ struct timeval Control::matchStart = {0, 0};
 bool Control::logObstacles = true;
 bool Control::logDynObstacles = true;
 
+//ezek a robot karjai, simulate hasznalja utkozesdetektalashoz.
+//TODO: update ha kell
 #define ROBOT_POINT_NUM 10
 double Control::robotBody[][2] = {
 		{ 155,  145},
@@ -199,6 +202,7 @@ Control::Control(Config* config) {
 
 	if (obstacles.empty()) {
 		//TODO: Peti: ezek aktualizalasa az uj palyahoz
+
 		// Akadalyok definialasa
 		// start vedo falak
 		obstacles.push_back(new Line(500, 0, 500, 400));
@@ -1306,7 +1310,7 @@ int Control::c_print(lua_State *L) {
 	return 0;
 }
 
-//music most csak a playlist file-ba irja a kapott string-et
+//music csak a playlist file-ba irja a kapott string-et, ezt valamilyen proginak kene lejatszani
 int Control::c_music(lua_State *L) {
 	if (lua_isstring(L, 1)) {
 		const char* s = lua_tostring(L, 1);
