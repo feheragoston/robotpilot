@@ -1596,8 +1596,8 @@ int Control::l_GetArmPos(lua_State *L) {
 
 int Control::l_SelectorMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
-	double speed = luaL_optnumber(L, 2, 1000);
-	double acc = luaL_optnumber(L, 3, 850);
+	double speed = luaL_optnumber(L, 2, 100);
+	double acc = luaL_optnumber(L, 3, 100);
 	lua_pushboolean(L, mPrimitives->SelectorMove(pos, speed, acc));
 	return 1;
 }
@@ -1650,8 +1650,8 @@ int Control::l_GetContractorPos(lua_State *L) {
 
 int Control::l_FireStopperMove(lua_State *L) {
 	double pos = luaL_optnumber(L, 1, 0);
-	double speed = luaL_optnumber(L, 2, 1000);
-	double acc = luaL_optnumber(L, 3, 850);
+	double speed = luaL_optnumber(L, 2, 700000);	//ez meg nem csordul tul
+	double acc = luaL_optnumber(L, 3, 700000);
 	lua_pushboolean(L, mPrimitives->FireStopperMove(pos, speed, acc));
 	return 1;
 }
