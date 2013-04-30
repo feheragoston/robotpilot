@@ -28,6 +28,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_FRONT_ARM_INDEX]				= SERVO_FRONT_ARM_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_FRONT_ARM_INDEX]			= SERVO_FRONT_ARM_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_FRONT_ARM_INDEX]				= SERVO_FRONT_ARM_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_FRONT_ARM_INDEX]					= SERVO_FRONT_ARM_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_REAR_ARM_INDEX]						= SERVO_REAR_ARM_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_REAR_ARM_INDEX]						= SERVO_REAR_ARM_DEG_INCR_Y0;
@@ -37,6 +38,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_REAR_ARM_INDEX]				= SERVO_REAR_ARM_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_REAR_ARM_INDEX]				= SERVO_REAR_ARM_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_REAR_ARM_INDEX]				= SERVO_REAR_ARM_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_REAR_ARM_INDEX]					= SERVO_REAR_ARM_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_SELECTOR_INDEX]						= SERVO_SELECTOR_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_SELECTOR_INDEX]						= SERVO_SELECTOR_DEG_INCR_Y0;
@@ -46,6 +48,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_SELECTOR_INDEX]				= SERVO_SELECTOR_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_SELECTOR_INDEX]				= SERVO_SELECTOR_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_SELECTOR_INDEX]				= SERVO_SELECTOR_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_SELECTOR_INDEX]					= SERVO_SELECTOR_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_FIRESTOPPER_INDEX]					= SERVO_FIRESTOPPER_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_FIRESTOPPER_INDEX]					= SERVO_FIRESTOPPER_DEG_INCR_Y0;
@@ -55,6 +58,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_FIRESTOPPER_INDEX]			= SERVO_FIRESTOPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_FIRESTOPPER_INDEX]			= SERVO_FIRESTOPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_FIRESTOPPER_INDEX]				= SERVO_FIRESTOPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_FIRESTOPPER_INDEX]				= SERVO_FIRESTOPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_FLIPPER_INDEX]						= SERVO_FLIPPER_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_FLIPPER_INDEX]						= SERVO_FLIPPER_DEG_INCR_Y0;
@@ -64,6 +68,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_FLIPPER_INDEX]				= SERVO_FLIPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_FLIPPER_INDEX]				= SERVO_FLIPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_FLIPPER_INDEX]					= SERVO_FLIPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_FLIPPER_INDEX]					= SERVO_FLIPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_CONTRACTOR_INDEX]					= SERVO_CONTRACTOR_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_CONTRACTOR_INDEX]					= SERVO_CONTRACTOR_DEG_INCR_Y0;
@@ -73,6 +78,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_CONTRACTOR_INDEX]			= SERVO_CONTRACTOR_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_CONTRACTOR_INDEX]			= SERVO_CONTRACTOR_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_CONTRACTOR_INDEX]				= SERVO_CONTRACTOR_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_CONTRACTOR_INDEX]					= SERVO_CONTRACTOR_START_POS_DEG;
 
 #else	//KIS_ROBOT
 
@@ -85,6 +91,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_LEFT_LOW_GRIPPER_INDEX]		= SERVO_LEFT_LOW_GRIPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_LEFT_LOW_GRIPPER_INDEX]		= SERVO_LEFT_LOW_GRIPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_LEFT_LOW_GRIPPER_INDEX]		= SERVO_LEFT_LOW_GRIPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_LEFT_LOW_GRIPPER_INDEX]			= SERVO_LEFT_LOW_GRIPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_RIGHT_LOW_GRIPPER_INDEX]			= SERVO_RIGHT_LOW_GRIPPER_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_RIGHT_LOW_GRIPPER_INDEX]			= SERVO_RIGHT_LOW_GRIPPER_DEG_INCR_Y0;
@@ -94,6 +101,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_RIGHT_LOW_GRIPPER_INDEX]		= SERVO_RIGHT_LOW_GRIPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_RIGHT_LOW_GRIPPER_INDEX]	= SERVO_RIGHT_LOW_GRIPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_RIGHT_LOW_GRIPPER_INDEX]		= SERVO_RIGHT_LOW_GRIPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_RIGHT_LOW_GRIPPER_INDEX]			= SERVO_RIGHT_LOW_GRIPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_LEFT_HIGH_GRIPPER_INDEX]			= SERVO_LEFT_HIGH_GRIPPER_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_LEFT_HIGH_GRIPPER_INDEX]			= SERVO_LEFT_HIGH_GRIPPER_DEG_INCR_Y0;
@@ -103,6 +111,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_LEFT_HIGH_GRIPPER_INDEX]		= SERVO_LEFT_HIGH_GRIPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_LEFT_HIGH_GRIPPER_INDEX]	= SERVO_LEFT_HIGH_GRIPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_LEFT_HIGH_GRIPPER_INDEX]		= SERVO_LEFT_HIGH_GRIPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_LEFT_HIGH_GRIPPER_INDEX]			= SERVO_LEFT_HIGH_GRIPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_RIGHT_HIGH_GRIPPER_INDEX]			= SERVO_RIGHT_HIGH_GRIPPER_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_RIGHT_HIGH_GRIPPER_INDEX]			= SERVO_RIGHT_HIGH_GRIPPER_DEG_INCR_Y0;
@@ -112,6 +121,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_RIGHT_HIGH_GRIPPER_INDEX]	= SERVO_RIGHT_HIGH_GRIPPER_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_RIGHT_HIGH_GRIPPER_INDEX]	= SERVO_RIGHT_HIGH_GRIPPER_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_RIGHT_HIGH_GRIPPER_INDEX]		= SERVO_RIGHT_HIGH_GRIPPER_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_RIGHT_HIGH_GRIPPER_INDEX]			= SERVO_RIGHT_HIGH_GRIPPER_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_PLUS_0_INDEX]						= SERVO_PLUS_0_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_PLUS_0_INDEX]						= SERVO_PLUS_0_DEG_INCR_Y0;
@@ -121,6 +131,7 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_PLUS_0_INDEX]				= SERVO_PLUS_0_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_PLUS_0_INDEX]				= SERVO_PLUS_0_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_PLUS_0_INDEX]					= SERVO_PLUS_0_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_PLUS_0_INDEX]						= SERVO_PLUS_0_START_POS_DEG;
 
 	Servo_Deg_Incr_x0[SERVO_PLUS_1_INDEX]						= SERVO_PLUS_1_DEG_INCR_X0;
 	Servo_Deg_Incr_y0[SERVO_PLUS_1_INDEX]						= SERVO_PLUS_1_DEG_INCR_Y0;
@@ -130,12 +141,14 @@ node_Servo::node_Servo(void) : node(SERVO_ID, "node_Servo", SERVO_KEEP_ALIVE_MS,
 	Servo_Limit_Low_Pos_Incr[SERVO_PLUS_1_INDEX]				= SERVO_PLUS_1_LIMIT_LOW_POS_INCR;
 	Servo_Limit_High_Pos_Incr[SERVO_PLUS_1_INDEX]				= SERVO_PLUS_1_LIMIT_HIGH_POS_INCR;
 	Servo_Limit_Current_Ma[SERVO_PLUS_1_INDEX]					= SERVO_PLUS_1_LIMIT_CURRENT_MA;
+	Servo_Start_Pos_Deg[SERVO_PLUS_1_INDEX]						= SERVO_PLUS_1_START_POS_DEG;
 
 #endif
 
 	for(u8 i=0 ; i<SERVO_COUNT ; i++){
-		Servo_Pos_Incr[i]		= 1500;
-		Servo_CmdPos_Incr[i]	= 1500;
+		Servo_Start_Pos_Incr[i]	= SERVO_CONV_POS(i, Servo_Start_Pos_Deg[i]);
+		Servo_Pos_Incr[i]		= Servo_Start_Pos_Incr[i];
+		Servo_CmdPos_Incr[i]	= Servo_Start_Pos_Incr[i];
 	}
 	//----- valtozo init VEGE -----
 
@@ -221,31 +234,14 @@ void node_Servo::INIT_PARAM(void){
 	msg.node_id		= id;
 	msg.function	= CMD_INIT_PARAM;
 
-	msg.length		= 36;
+	msg.length		= 6*4*2;
 
-	SET_U16(&(msg.data[0]), Servo_Limit_Low_Pos_Incr[0]);
-	SET_U16(&(msg.data[2]), Servo_Limit_High_Pos_Incr[0]);
-	SET_U16(&(msg.data[4]), Servo_Limit_Current_Ma[0]);
-
-	SET_U16(&(msg.data[6]), Servo_Limit_Low_Pos_Incr[1]);
-	SET_U16(&(msg.data[8]), Servo_Limit_High_Pos_Incr[1]);
-	SET_U16(&(msg.data[10]), Servo_Limit_Current_Ma[1]);
-
-	SET_U16(&(msg.data[12]), Servo_Limit_Low_Pos_Incr[2]);
-	SET_U16(&(msg.data[14]), Servo_Limit_High_Pos_Incr[2]);
-	SET_U16(&(msg.data[16]), Servo_Limit_Current_Ma[2]);
-
-	SET_U16(&(msg.data[18]), Servo_Limit_Low_Pos_Incr[3]);
-	SET_U16(&(msg.data[20]), Servo_Limit_High_Pos_Incr[3]);
-	SET_U16(&(msg.data[22]), Servo_Limit_Current_Ma[3]);
-
-	SET_U16(&(msg.data[24]), Servo_Limit_Low_Pos_Incr[4]);
-	SET_U16(&(msg.data[26]), Servo_Limit_High_Pos_Incr[4]);
-	SET_U16(&(msg.data[28]), Servo_Limit_Current_Ma[4]);
-
-	SET_U16(&(msg.data[30]), Servo_Limit_Low_Pos_Incr[5]);
-	SET_U16(&(msg.data[32]), Servo_Limit_High_Pos_Incr[5]);
-	SET_U16(&(msg.data[34]), Servo_Limit_Current_Ma[5]);
+	for(i=0 ; i<6 ; i++){
+		SET_U16(&(msg.data[0 + 3*2*i]), Servo_Limit_Low_Pos_Incr[i]);
+		SET_U16(&(msg.data[2 + 3*2*i]), Servo_Limit_High_Pos_Incr[i]);
+		SET_U16(&(msg.data[4 + 3*2*i]), Servo_Limit_Current_Ma[i]);
+		SET_U16(&(msg.data[6 + 3*2*i]), Servo_Start_Pos_Incr[i]);
+	}
 
 	UDPdriver::send(&msg);
 

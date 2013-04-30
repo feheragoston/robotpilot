@@ -53,6 +53,8 @@ private:
 	u16 Servo_Limit_Low_Pos_Incr[SERVO_COUNT];
 	u16 Servo_Limit_High_Pos_Incr[SERVO_COUNT];
 	u16 Servo_Limit_Current_Ma[SERVO_COUNT];
+	u16 Servo_Start_Pos_Deg[SERVO_COUNT];
+	u16 Servo_Start_Pos_Incr[SERVO_COUNT];
 
 	u16 Servo_Pos_Incr[SERVO_COUNT];
 	u16 Servo_CmdPos_Incr[SERVO_COUNT];
