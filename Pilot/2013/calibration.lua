@@ -2,7 +2,7 @@
 if (CALIBRATED == nil) then
 	CALIBRATED = true;
 	
-	dofile("Pilot/defines.lua")	
+	dofile("Pilot/2013/defines.lua")	
 
 	p.sleep(1000)
 	
@@ -16,16 +16,35 @@ if (CALIBRATED == nil) then
 	c.print("Motortap bekapcsolva");
 	
 	p.sleep(2000)
-	
-	p.ArmMove(0)
-	p.GripperMove(false, 1)
-	p.GripperMove(true, 6)
-	p.ClawMove(false, 0)
-	p.ClawMove(true, 2)
-	
+
 	p.CalibrateConsole();
+
 	
-	p.Valve(false)
+	p.ArmMove(LEFT,0)
+	p.ArmMove(RIGHT,0)
+
+	p.SelectorMove(0)
+	p.SelectorMove(90)
+
+	p.FlipperMove(0)
+	p.FlipperMove(90)
+
+	p.ContractorMove(0)
+	p.ContractorMove(90)
+
+	p.FireStopperMove(0)
+	p.FireStopperMove(90)
+
+	p.SetFireWheelOn()
+	p.SetCaracoleOn()
+
+	p.sleep(2000)
+
+	p.SetFireWheelOff()
+	p.SetCaracoleOff()
+
+
+	
 	
 	while (c.GetMyColor() ~= 0) do
 		p.process()
