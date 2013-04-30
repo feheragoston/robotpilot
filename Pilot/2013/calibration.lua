@@ -19,21 +19,25 @@ if (CALIBRATED == nil) then
 
 	p.CalibrateConsole();
 
-	
-	p.ArmMove(LEFT,0)
-	p.ArmMove(RIGHT,0)
+	--rear: 90 fuggoleges, 0 vizszint	
+	p.ArmMove(FRONT,90)
+	p.ArmMove(REAR,90)
 
-	p.SelectorMove(0)
-	p.SelectorMove(90)
+	-- benn -40,100000,100000 (innen kozepre 22,100,100) labda rajta 22, kinn 
+	p.SelectorMove(-40)
+	p.SelectorMove(60)
+	p.SelectorMove(22)
 
 	p.FlipperMove(0)
 	p.FlipperMove(90)
 
-	p.ContractorMove(0)
-	p.ContractorMove(90)
+	--164 / 204 belseje milyen tav
+	p.ContractorMove(164)
+	p.ContractorMove(204)
 
-	p.FireStopperMove(0)
+	-- 0 megakaszt, 90 atenged
 	p.FireStopperMove(90)
+	p.FireStopperMove(0)
 
 	p.SetFireWheelOn()
 	p.SetCaracoleOn()
@@ -44,8 +48,6 @@ if (CALIBRATED == nil) then
 	p.SetCaracoleOff()
 
 
-	
-	
 	while (c.GetMyColor() ~= 0) do
 		p.process()
 		c.music("caliberror")
@@ -53,7 +55,7 @@ if (CALIBRATED == nil) then
 
 	c.music("calibrate")
 	
-	c.CalibrateDeadreckoning()
+	c.CalibrateDeadreckoning()		--ez mit csinal?
 	c.print("Deadreckoning beallitva");
 	p.sleep(1000)
 	
