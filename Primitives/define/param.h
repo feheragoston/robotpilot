@@ -530,9 +530,9 @@
 
 #ifdef NAGY_ROBOT
 #define CONSOLE_INCR_MM_X0					0								//ok
-#define CONSOLE_INCR_MM_Y0					0								//ok
-#define CONSOLE_INCR_MM_X1					(36219-29890)					//ok
-#define CONSOLE_INCR_MM_Y1					193								//ok
+#define CONSOLE_INCR_MM_Y0					258.5							//ok
+#define CONSOLE_INCR_MM_X1					8200							//ok
+#define CONSOLE_INCR_MM_Y1					0								//ok
 #else	//KIS_ROBOT
 #define CONSOLE_INCR_MM_X0					0								//??
 #define CONSOLE_INCR_MM_Y0					0								//??
@@ -550,10 +550,10 @@
 
 
 #ifdef NAGY_ROBOT
-#define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220				//??
-#define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600			//??
-#define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			123		//1mm	//??
-#define CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR		20600	//120mm	//??
+#define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		200				//ok
+#define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		8200	//0mm	//ok
+#define CONSOLE_HARDWARE_LIMIT_LOW_POS_INCR			100		//?mm	//ok
+#define CONSOLE_HARDWARE_LIMIT_HIGH_POS_INCR		8248			//ok
 #define CONSOLE_CONTROLLER_PARAMETER_P				0.2				//??
 #define CONSOLE_CONTROLLER_PARAMETER_I				0.0				//??
 #define CONSOLE_CONTROLLER_PARAMETER_D				0.0				//??
@@ -561,7 +561,7 @@
 #define CONSOLE_LIMIT_SWITCH_IS_ACTIVE_HIGH			0				//??
 #define CONSOLE_IS_ENC_EQEP1						1				//??
 #define CONSOLE_MOTOR_PLUS_UP						1				//??
-#define CONSOLE_ENC_IS_ROTATE_DIR_A					1				//??
+#define CONSOLE_ENC_IS_ROTATE_DIR_A					0				//??
 #else	//KIS_ROBOT
 #define CONSOLE_CONTOLLER_LIMIT_LOW_POS_INCR		220				//??
 #define CONSOLE_CONTOLLER_LIMIT_HIGH_POS_INCR		20600			//??
