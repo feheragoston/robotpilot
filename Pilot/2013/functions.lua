@@ -1,46 +1,139 @@
 
 -- felszedes karral
 function PickUp(waitforit)
+
+	-- console felszedo helyzetbe
 	p.runparallel(
 		function()
-			if (c.GetClawPos(Left) <  80) then
-				c.ClawMove(Left, 90)
-			end
-			if (c.GetClawPos(Right) < 80) then
-				c.ClawMove(Right, 90)
-			end
+			p.ConsoleMove(0)
 		end,
 		function()
-			p.Compressor(true)
-			p.sleep(200)
+			p.ContractorMove(CONTRACTOR_OPEN)
+		end,
+		function()
+			p.ArmMove(FRONT, FRONT_ARM_OPEN)
+		end,
+		function()
+			p.ArmMove(REAR, REAR_ARM_OPEN)
 		end
-	)
-	p.ArmMove(107)
-	p.sleep(400)
-	p.ArmMove(10, 1000, 200)
-	p.Valve(true)
-	p.sleep(150)
-	c.Valve(false)
+	end
+
+	-- megfog, megemel
+	p.ContractorMove(CONTRACTOR_CLOSED)
+
+	c.ConsoleMove(50)
 	if (waitforit) then
-		while (control.ValveInProgress()) do
+		while (control.ConsoleMoveInProgress()) do
 			process()
 		end
 	end
 end
 
--- urites
-function Eject(waitforit)
-	-- Urites
-	p.ConsoleMove(140, 1000, 15)
+-- a labdak bedontese
+function StartEating(waitforit)
+
+	--caracole be, firestopper lezarva
+	c.SetCaracoleSpeed(caracoleSpeed)
+	c.FireStopperMove(FIRESTOPPER_CLOSED)
 	
-	-- Vissza
-	p.ConsoleMove(20, 400, 15)
-	c.CalibrateConsole()
+	p.runparallel(
+		function()
+			p.ConsoleMove(120)	--alul nem esik ki
+		end,
+		function()
+			p.SelectorMove(SELECTOR_CENTER,100000,100000)
+		end
+	end
+	p.runparallel(
+		function()
+			p.ArmMove(FRONT, 20, 200)
+		end,
+		function()
+			p.ArmMove(REAR, 70, 200)
+		end
+	end
+end
+
+-- a labdak szelektalasa
+function EatingProcess(waitforit)
+	FlipperProcess(ON)
+	
+	if(c.GetBallPresent()) then
+		p.sleep(500)
+		if(c.GetBallPresent() and c.GetBallColor() ~= BALL_NOT_PRESENT) then
+
+			--itt egy labda, ha feher egyuk meg
+			if(c.GetBallColor() == BALL_WHITE) then
+			
+				p.SelectorMove(SELECTOR_OUT)
+				p.sleep(100)
+				p.SelectorMove(SELECTOR_CENTER)
+
+			else	--ha piros, kikopjuk
+			
+				p.SelectorMove(SELECTOR_IN)
+				p.sleep(100)
+				p.SelectorMove(SELECTOR_CENTER)
+			
+			end
+
+			return true
+		end
+	end
+	
+	return false
+	
+end
+
+-- talca letevese
+function DropPlate(waitforit)
+	--karokat leviszi
+	p.runparallel(
+		function()
+			p.ArmMove(FRONT, FRONT_ARM_OPEN)
+		end,
+		function()
+			p.ArmMove(REAR, REAR_ARM_OPEN)
+		end,
+		function()
+			p.ConsoleMove(50)	
+		end
+	end
+	
+	--kinyit
+	p.ContractorMove(CONTRACTOR_OPEN)
+	
+	--karokat, konzolt felemeli
+	c.ArmMove(FRONT, FRONT_ARM_CLOSED)
+	c.ArmMove(REAR, REAR_ARM_CLOSED)
+	c.ConsoleMove(50)
+	
 	if (waitforit) then
-		while (control.CalibrateConsoleInProgress()) do
+		while (control.ArmMoveInProgress() or control.ConsoleMoveInProgress()) do
 			process()
 		end
 	end
+	
+end
+
+-- lovi a labdakat
+function FireBalls()
+
+	--celoz
+	p.MoveToSafe(510, 1055*Ori + Offset)
+	p.TurnTo(60,1410*Ori + Offset)
+	
+	-- lo
+	p.SetCaracoleSpeed(caracoleSpeed)
+	p.FireStopperMove(FIRESTOPPER_OPEN)
+
+end
+
+-- push candle
+function PushCandle(isHigh)
+	
+	p.MoveToSafe()
+	
 end
 
 -- cel megkozelitese dist tavolsagba

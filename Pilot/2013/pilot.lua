@@ -4,6 +4,11 @@ local coroutine = coroutine
 local type = type
 local error = error
 
+last_flipper_change = control.gettimeofday();
+flipper_state = 1
+flipper_on = false
+
+
 module(...)
 
 function sleep(milliseconds)
@@ -204,7 +209,35 @@ function FlipperMove(...)
 	return true
 end
 
---TODO: toggle flipper
+-- flipper handler, parhuzamosan hivando minden massal, soha nem ter vissza
+function FlipperMove(...)
+	if (control.FlipperMove(...)) then
+		while (control.FlipperMoveInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) FlipperMove hiba")
+		return false
+	end
+	return true
+end
+
+-- valt ha ON, es eleg ido eltelt. periodikusan hivni kell
+function FlipperProcess(bool is_on)
+	flipper_on = is_on
+	if (flipper_on) then
+		if(control.getelapsedtime(last_flipper_change) > 1000 * 1000) then
+		`	last_flipper_change = control.gettimeofday()
+			if(flipper_state == 1) then
+				flipper_state = 0
+				c.FlipperMove(0)
+			else
+				flipper_state = 1
+				c.FlipperMove(30) 
+			end
+		end
+	end
+end
 
 --Contractor
 function ContractorMove(...)
@@ -217,14 +250,6 @@ function ContractorMove(...)
 		return false
 	end
 	return true
-end
-
-function SetContractorOpen()
-	return ContractorMove(90) --update to open deg
-end
-
-function SetContractorClosed()
-	return ContractorMove(0) --update to closed deg
 end
 
 --FireStopper
@@ -278,11 +303,11 @@ function CaracoleSetSpeed(...)
 end
 
 function SetCaracoleOn()
-	return FireWheelSetSpeed(fireWheelSpeed)
+	return CaracoleSetSpeed(fireWheelSpeed)
 end
 
 function SetCaracoleOff()
-	return FireWheelSetSpeed(0)
+	return CaracoleSetSpeed(0)
 end
 
 --Console
