@@ -16,7 +16,8 @@ function PickUp(waitforit)
 		function()
 			p.ArmMove(REAR, REAR_ARM_OPEN)
 		end
-	end
+		
+	)
 
 	-- megfog, megemel
 	p.ContractorMove(CONTRACTOR_CLOSED)
@@ -43,7 +44,7 @@ function StartEating(waitforit)
 		function()
 			p.SelectorMove(SELECTOR_CENTER,100000,100000)
 		end
-	end
+	)
 	p.runparallel(
 		function()
 			p.ArmMove(FRONT, 20, 200)
@@ -51,7 +52,7 @@ function StartEating(waitforit)
 		function()
 			p.ArmMove(REAR, 70, 200)
 		end
-	end
+	)
 end
 
 -- a labdak szelektalasa
@@ -98,7 +99,7 @@ function DropPlate(waitforit)
 		function()
 			p.ConsoleMove(50)	
 		end
-	end
+	)
 	
 	--kinyit
 	p.ContractorMove(CONTRACTOR_OPEN)
