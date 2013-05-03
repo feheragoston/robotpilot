@@ -48,6 +48,11 @@
 #define	BLUE	-1
 #define	RED		1
 
+// Labda szinek
+#define BALL_WHITE -1
+#define BALL_RED 1
+#define BALL_NOT_PRESENT 0
+
 ////////////////
 // Ertelmezest segito valtozok, beavatkozokhoz
 

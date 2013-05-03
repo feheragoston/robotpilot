@@ -192,6 +192,7 @@ protected:
 #ifdef NAGY_ROBOT
 	static int l_GetBallColorVoltage(lua_State *L);
 	static int l_GetBallPresent(lua_State *L);
+	static int l_GetBallColor(lua_State *L);
 
 	static int l_CaracoleSetSpeed(lua_State *L);
 	static int l_CaracoleSetSpeedInProgress(lua_State *L);

@@ -135,6 +135,7 @@ Control::Control(Config* config) {
 #ifdef NAGY_ROBOT
 		{"GetBallColorVoltage", l_GetBallColorVoltage},
 		{"GetBallPresent", l_GetBallPresent},
+		{"GetBallColor", l_GetBallColor},
 
 		{"CaracoleSetSpeed", l_CaracoleSetSpeed},
 		{"CaracoleSetSpeedInProgress", l_CaracoleSetSpeedInProgress},
@@ -179,6 +180,9 @@ Control::Control(Config* config) {
 
 	luaC_export(L, BLUE);
 	luaC_export(L, RED);
+	luaC_export(L, BALL_NOT_PRESENT);
+	luaC_export(L, BALL_WHITE);
+	luaC_export(L, BALL_RED);
 	luaC_export(L, ROBOT_RADIUS);
 	luaC_export(L, ROBOT_WIDTH);
 	luaC_export(L, ROBOT_FRONT);
@@ -1671,6 +1675,19 @@ int Control::l_GetBallColorVoltage(lua_State *L)
 int Control::l_GetBallPresent(lua_State *L)
 {
 	lua_pushboolean(L, mPrimitives->GetBallPresent());
+	return 1;
+}
+int Control::l_GetBallColor(lua_State *L)
+{
+	//TODO: update valos ertekekre
+	double voltage = mPrimitives->GetBallColorVoltage();
+	if( voltage < 0.5)
+		lua_pushnumber(L, BALL_NOT_PRESENT);
+	else if( voltage >= 0.5 && voltage < 1.2)
+		lua_pushnumber(L, BALL_RED);
+	else
+		lua_pushnumber(L, BALL_WHITE);
+
 	return 1;
 }
 
