@@ -236,11 +236,11 @@ void node_Servo::INIT_PARAM(void){
 
 	msg.length		= 6*4*2;
 
-	for(i=0 ; i<6 ; i++){
-		SET_U16(&(msg.data[0 + 3*2*i]), Servo_Limit_Low_Pos_Incr[i]);
-		SET_U16(&(msg.data[2 + 3*2*i]), Servo_Limit_High_Pos_Incr[i]);
-		SET_U16(&(msg.data[4 + 3*2*i]), Servo_Limit_Current_Ma[i]);
-		SET_U16(&(msg.data[6 + 3*2*i]), Servo_Start_Pos_Incr[i]);
+	for(int i=0 ; i<6 ; i++){
+		SET_U16(&(msg.data[0 + 4*2*i]), Servo_Limit_Low_Pos_Incr[i]);
+		SET_U16(&(msg.data[2 + 4*2*i]), Servo_Limit_High_Pos_Incr[i]);
+		SET_U16(&(msg.data[4 + 4*2*i]), Servo_Limit_Current_Ma[i]);
+		SET_U16(&(msg.data[6 + 4*2*i]), Servo_Start_Pos_Incr[i]);
 	}
 
 	UDPdriver::send(&msg);
