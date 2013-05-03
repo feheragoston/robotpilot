@@ -179,10 +179,6 @@ Control::Control(Config* config) {
 
 	luaC_export(L, BLUE);
 	luaC_export(L, RED);
-	luaC_export(L, FRONT);
-	luaC_export(L, REAR);
-	luaC_export(L, LEFT);
-	luaC_export(L, RIGHT);
 	luaC_export(L, ROBOT_RADIUS);
 	luaC_export(L, ROBOT_WIDTH);
 	luaC_export(L, ROBOT_FRONT);
