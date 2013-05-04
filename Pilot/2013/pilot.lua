@@ -8,7 +8,6 @@ last_flipper_change = control.gettimeofday();
 flipper_state = 1
 flipper_on = false
 
-
 module(...)
 
 function sleep(milliseconds)
@@ -68,6 +67,23 @@ function runparallel(...)
 	end
 end
 
+--megprobalja vegrehajtani, ujra probalja timeout idei [ms]
+local function Try(timeout, func)
+	local loopstart = c.gettimeofday()
+	
+	repeat
+		local status, err = pcall(func)
+		
+		if (not status) then
+			c.print("Hiba", err);
+			p.MotionStop(MAX_DEC)
+		end
+		
+	until (not status and c.getelapsedtime(loopstart) < timeout * 1000)
+	
+	return status
+end
+
 local function MotionInProgress()
 	while (control.MotionInProgress()) do
 		process()
@@ -123,6 +139,14 @@ function TurnTo(...)
 end
 
 function TurnToSafe(...)
+	return MotionSafe(control.TurnToSafe, ...)
+end
+
+function TurnToOri(...)
+	return Motion(control.TurnTo, ...)
+end
+
+function TurnToOriSafe(...)
 	return MotionSafe(control.TurnToSafe, ...)
 end
 

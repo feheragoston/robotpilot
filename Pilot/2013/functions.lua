@@ -137,6 +137,53 @@ function PushCandle(isHigh)
 	
 end
 
+-- adott indexu gyertyahoz odamegy, es befordul iranyba
+function MoveToCandle(isIn, index)
+
+	candleAngle = if(isIn) then CANDLE_ANGLES_IN[index]	else CANDLE_ANGLES_OUT[index] end
+	if(not candleAngle) reutrn false;
+	candleAngle *= math.M_PI / 180	--convert to rad
+	
+	r = if(isIn) then CANDLE_R_IN	else  CANDLE_R_OUT  end
+	
+	--kozeprol a gyertyaba mutato vektor
+	vx, vy =  RotateVect(0, -r, candleAngle)
+	
+	--erinto irany, mindig bal oldala van a kor fele
+	tangx, tangy = RotateVect(vx,vy, Ori*math.M_PI2)	
+	
+	--gyertya pozicio
+	candlePosx = vx
+	candlePosy = Ori*(vy + 1500) + Offset
+	
+	MoveToSafe(candlePosx, candlePosy)
+	TurnToSafe(candlePosx+tangx, candlePosy+tangy)
+
+end
+
+-- gyertya leutese
+function HitCandle(isIn)
+	p.ConsoleMove( if (isIn) then CAKE_CONSOLE_IN else CAKE_CONSOLE_OUT )
+	--megprobalja lenyomni, nem biztos hogy sikerul
+	local status, err = pcall(function()
+		p.ArmMove( if(isIn) then CAKE_ARM_DOWN_IN else CAKE_ARM_DOWN_OUT )
+	end);
+	p.ArmMove( if(isIn) then CAKE_ARM_UP_IN else CAKE_ARM_UP_OUT )
+	
+	return status
+end
+
+--vektor forgatasa phi szoggel [rad]
+function RotateVect(x,y,phi)
+	cphi = math.cos(phi)
+	sphi = math.sin(phi)
+	
+	nx = cphi*x + sphi*y
+	ny = -sphi*x + cphi*y
+	
+	return nx,ny
+end
+
 -- cel megkozelitese dist tavolsagba
 function GoToTarget(x, y, dist)
 	rx, ry, rphi = c.GetRobotPos()
