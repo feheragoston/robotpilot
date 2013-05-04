@@ -1394,8 +1394,8 @@ int Control::l_SetSpeed(lua_State *L) {
 
 int Control::l_Go(lua_State *L) {
 	double distance = luaL_optnumber(L, 1, 1000);
-	double speed = luaL_optnumber(L, 2, 500);
-	double acc = luaL_optnumber(L, 3, 500);
+	double speed = luaL_optnumber(L, 2, 100);
+	double acc = luaL_optnumber(L, 3, 100);
 
 	if (isnan(distance)) {
 		cout << "(Control) Go(nan)" << endl;
@@ -1415,8 +1415,8 @@ int Control::l_Go(lua_State *L) {
 int Control::l_GoTo(lua_State *L) {
 	double x = lua_tonumber(L, 1);
 	double y = lua_tonumber(L, 2);
-	double speed = luaL_optnumber(L, 3, 500);
-	double acc = luaL_optnumber(L, 4, 500);
+	double speed = luaL_optnumber(L, 3, 100);
+	double acc = luaL_optnumber(L, 4, 100);
 
 	if (isnan(x) || isnan(y)) {
 		cout << "(Control) GoTo(nan, nan)" << endl;
