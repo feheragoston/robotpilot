@@ -5,7 +5,7 @@ function PickUp(waitforit)
 	-- console felszedo helyzetbe
 	p.runparallel(
 		function()
-			p.ConsoleMove(0)
+			p.ConsoleMove(100)
 		end,
 		function()
 			p.ContractorMove(CONTRACTOR_OPEN)
@@ -22,7 +22,7 @@ function PickUp(waitforit)
 	-- megfog, megemel
 	p.ContractorMove(CONTRACTOR_CLOSED)
 
-	c.ConsoleMove(50)
+	c.ConsoleMove(150)
 	if (waitforit) then
 		while (control.ConsoleMoveInProgress()) do
 			process()
@@ -34,30 +34,34 @@ end
 function StartEating(waitforit)
 
 	--caracole be, firestopper lezarva
-	c.SetCaracoleSpeed(caracoleSpeed)
+	c.CaracoleSetSpeed(caracoleSpeed)
 	c.FireStopperMove(FIRESTOPPER_CLOSED)
 	
 	p.runparallel(
 		function()
-			p.ConsoleMove(120)	--alul nem esik ki
+			p.ConsoleMove(90)	--alul nem esik ki
 		end,
 		function()
 			p.SelectorMove(SELECTOR_CENTER,100000,100000)
 		end
 	)
+print("itt most jo helyen a konzol..")
+	p.sleep(5000)
 	p.runparallel(
 		function()
-			p.ArmMove(FRONT, 20, 200)
+			p.ArmMove(FRONT, 90, 200)
 		end,
 		function()
-			p.ArmMove(REAR, 70, 200)
+			p.ArmMove(REAR, 90, 200)
 		end
 	)
 end
 
 -- a labdak szelektalasa
 function EatingProcess(waitforit)
-	FlipperProcess(ON)
+	print("start eating")
+
+	p.FlipperProcess(ON)
 	
 	if(c.GetBallPresent()) then
 		p.sleep(500)
@@ -84,6 +88,43 @@ function EatingProcess(waitforit)
 	
 	return false
 	
+end
+
+-- a labdakat bedonti 10 mp-ig
+function EatingProcessStupid(waitforit)
+	p.FlipperProcess(ON)
+
+	p.SelectorMove(SELECTOR_OUT)
+	p.sleep(18000)
+	p.SelectorMove(SELECTOR_CENTER)
+
+	return true
+end
+
+-- teljes kajalas es kiloves
+function TestEat()
+
+PickUp()
+p.sleep(1500)
+StartEating()
+p.sleep(1500)
+EatingProcessStupid()
+
+c.FirewheelSetSpeed(firewheelSpeed)
+c.CaracoleSetSpeed(caracoleSpeed)
+
+p.sleep(5000)
+
+p.FireStopperMove(FIRESTOPPER_OPEN)
+
+p.sleep(8000)
+
+c.FireStopperMove(FIRESTOPPER_CLOSED)
+c.FirewheelSetSpeed(0)
+c.CaracoleSetSpeed(0)
+
+DropPlate()
+
 end
 
 -- talca letevese
@@ -120,12 +161,15 @@ end
 -- lovi a labdakat
 function FireBalls()
 
+	c.FirewheelSetSpeed(firewheelSpeed)
+	c.CaracoleSetSpeed(caracoleSpeed)
+
+
 	--celoz
 	p.MoveToSafe(510, 1055*Ori + Offset)
 	p.TurnTo(60,1410*Ori + Offset)
 	
 	-- lo
-	p.SetCaracoleSpeed(caracoleSpeed)
 	p.FireStopperMove(FIRESTOPPER_OPEN)
 
 end
@@ -140,11 +184,11 @@ end
 -- adott indexu gyertyahoz odamegy, es befordul iranyba
 function MoveToCandle(isIn, index)
 
-	candleAngle = if(isIn) then CANDLE_ANGLES_IN[index]	else CANDLE_ANGLES_OUT[index] end
-	if(not candleAngle) reutrn false;
-	candleAngle *= math.M_PI / 180	--convert to rad
+	--candleAngle = if (isIn) then CANDLE_ANGLES_IN[index] else CANDLE_ANGLES_OUT[index] end
+	--if (not candleAngle) then reutrn false end
+	candleAngle = candleAngle * math.M_PI / 180	--convert to rad
 	
-	r = if(isIn) then CANDLE_R_IN	else  CANDLE_R_OUT  end
+	--r = if(isIn) then CANDLE_R_IN	else  CANDLE_R_OUT  end
 	
 	--kozeprol a gyertyaba mutato vektor
 	vx, vy =  RotateVect(0, -r, candleAngle)
@@ -163,12 +207,12 @@ end
 
 -- gyertya leutese
 function HitCandle(isIn)
-	p.ConsoleMove( if (isIn) then CAKE_CONSOLE_IN else CAKE_CONSOLE_OUT )
+	--p.ConsoleMove( if (isIn) then CAKE_CONSOLE_IN else CAKE_CONSOLE_OUT )
 	--megprobalja lenyomni, nem biztos hogy sikerul
 	local status, err = pcall(function()
-		p.ArmMove( if(isIn) then CAKE_ARM_DOWN_IN else CAKE_ARM_DOWN_OUT )
+	--	p.ArmMove( if(isIn) then CAKE_ARM_DOWN_IN else CAKE_ARM_DOWN_OUT )
 	end);
-	p.ArmMove( if(isIn) then CAKE_ARM_UP_IN else CAKE_ARM_UP_OUT )
+	--p.ArmMove( if(isIn) then CAKE_ARM_UP_IN else CAKE_ARM_UP_OUT )
 	
 	return status
 end
@@ -178,8 +222,8 @@ function RotateVect(x,y,phi)
 	cphi = math.cos(phi)
 	sphi = math.sin(phi)
 	
-	nx = cphi*x + sphi*y
-	ny = -sphi*x + cphi*y
+	nx = cphi*x - sphi*y
+	ny = sphi*x + cphi*y
 	
 	return nx,ny
 end

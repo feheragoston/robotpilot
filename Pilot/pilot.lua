@@ -4,11 +4,13 @@ local coroutine = coroutine
 local type = type
 local error = error
 
-last_flipper_change = control.gettimeofday();
+
 flipper_state = 1
 flipper_on = false
 
 module(...)
+
+last_flipper_change = control.gettimeofday();
 
 function sleep(milliseconds)
 	if (control.in_simulate()) then
@@ -247,17 +249,17 @@ function FlipperMove(...)
 end
 
 -- valt ha ON, es eleg ido eltelt. periodikusan hivni kell
-function FlipperProcess(bool is_on)
+function FlipperProcess(is_on)
 	flipper_on = is_on
 	if (flipper_on) then
 		if(control.getelapsedtime(last_flipper_change) > 1000 * 1000) then
-		`	last_flipper_change = control.gettimeofday()
+		 	last_flippecr_change = control.gettimeofday()
 			if(flipper_state == 1) then
 				flipper_state = 0
-				c.FlipperMove(0)
+				FlipperMove(0)
 			else
 				flipper_state = 1
-				c.FlipperMove(30) 
+				FlipperMove(30) 
 			end
 		end
 	end
