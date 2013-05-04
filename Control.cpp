@@ -100,6 +100,7 @@ Control::Control(Config* config) {
 		{"Turn", l_Turn},
 		{"TurnSafe", l_Turn},
 		{"TurnTo", l_TurnTo},
+		{"TurnToOri", l_TurnToOri},
 		{"TurnToSafe", l_TurnTo},
 		{"MotionInProgress", l_MotionInProgress},
 		{"GetMotionError", l_GetMotionError},
@@ -1468,6 +1469,38 @@ int Control::l_TurnTo(lua_State *L) {
 	mPrimitives->GetRobotPos(&mx, &my, &mphi);
 
 	double angle = atan2(y - my, x - mx) - mphi;
+
+	while (angle > M_PI) {
+		angle -= M_PI * 2;
+	}
+	while (angle < -M_PI) {
+		angle += M_PI * 2;
+	}
+	if (mPrimitives->Turn(angle, speed, acc)) {
+		setSafeMotion(L);
+		lua_pushboolean(L, true);
+		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+int Control::l_TurnToOri(lua_State *L) {
+	double angle = lua_tonumber(L, 1);
+	double speed = luaL_optnumber(L, 2, 2);
+	double acc = luaL_optnumber(L, 3, 2);
+
+	if (isnan(angle)) {
+		cout << "(Control) TurnToOri(nan)" << endl;
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	double mx, my, mphi;
+	mPrimitives->GetRobotPos(&mx, &my, &mphi);
+
+	//kulonbseg a mostani orientaciotol
+	angle = angle - mphi;
 
 	while (angle > M_PI) {
 		angle -= M_PI * 2;

@@ -145,6 +145,7 @@ protected:
 	static int l_GoTo(lua_State *L);
 	static int l_Turn(lua_State *L);
 	static int l_TurnTo(lua_State *L);
+	static int l_TurnToOri(lua_State *L);
 	static int l_MotionInProgress(lua_State *L);
 	static int l_GetMotionError(lua_State *L);
 	static int l_MotionStop(lua_State *L);
