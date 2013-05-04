@@ -313,6 +313,20 @@ bool Primitives::GoTo(double x, double y, double max_speed, double max_acc) {
 	return true;
 }
 
+bool Primitives::GoArc(double x, double y, double r, double phi, double max_w, double max_acc) {
+	if (MotionInProgress() || MotionStopInProgress()) {
+		return false;
+	}
+	target.x = x;
+	target.y = y;
+	target.r = r;
+	target.phi = phi;
+	target.w = max_w;
+	target.a = max_acc;
+	goArc.inprogress = true;
+	return true;
+}
+
 bool Primitives::Turn(double angle, double max_speed, double max_acc) {
 	if (MotionInProgress() || MotionStopInProgress()) {
 		return false;

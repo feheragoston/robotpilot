@@ -24,10 +24,11 @@ typedef struct progress {
 } progress;
 
 typedef struct position {
-	position() : x(0.), y(0.), phi(0.), v(0.), w(0.), a(0.) {}
+	position() : x(0.), y(0.), phi(0.), r(0.), v(0.), w(0.), a(0.) {}
 	double x; // x pozicio
 	double y; // y pozicio
 	double phi; // elfordulas szoge
+	double r; //sugar, ha van
 	double v; // sebesseg
 	double w; // szogsebesseg
 	double a; // gyorsulas
@@ -154,6 +155,19 @@ public:
 	 * @return true: folyamat elindult, false: hiba tortent
 	 */
 	virtual bool GoTo(double x, double y, double max_speed, double max_acc);
+
+	/**
+	 * haladas koriven x,y kozeppontu, r sugaru koron, phi fokot
+	 * @param x a kozeppont x koordinataja [mm]
+	 * @param y a kozeppont y koordinataja [mm]
+	 * @param r a kor sugara [mm]
+	 * @param phi a kivant koriv szoge [rad]
+	 * @param max_w [rad/s]
+	 * @param max_acc [rad/s^2]
+	 * @return true: folyamat elindult, false: hiba tortent
+	 */
+	virtual bool GoArc(double x, double y, double r, double phi, double max_w, double max_acc);
+
 
 	/**
 	 * helyben fordulas
@@ -644,6 +658,7 @@ protected:
 	progress calibrateDeadreckoning;
 	progress go;
 	progress goTo;
+	progress goArc;
 	progress turn;
 	progress motionStop;
 

@@ -762,7 +762,30 @@ bool PrimitivesCan::GoTo(double x, double y, double max_speed, double max_acc){
 	return ret;
 
 }
+bool PrimitivesCan::GoArc(double x, double y, double r, double phi, double max_w, double max_acc){
+	EnterCritical();
 
+	bool ret;
+
+	//ha folyamatban van valami, amire ezt nem indithatjuk el
+	if(	dcwheel->AnyStop.inProgress ||
+		dcwheel->AnyMotion.inProgress ||
+		dcwheel->AnySpeed.inProgress){
+		ret = ACT_START_ERROR;
+	}
+
+	//ha elindithatjuk
+	else{
+		dcwheel->DCWHEEL_SET_SPEED(0.,0.);	//eloszor nullaval megy, kezzel lesz novelve
+		dcwheelMotionError = MOTION_NO_ERROR;	//nincs hiba
+		ret = ACT_STARTED;
+	}
+
+
+	ExitCritical();
+
+	return ret;
+}
 
 bool PrimitivesCan::Turn(double angle, double max_speed, double max_acc){
 

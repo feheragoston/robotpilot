@@ -77,6 +77,7 @@ public:
 
 	bool Go(double distance, double max_speed, double max_acc);
 	bool GoTo(double x, double y, double max_speed, double max_acc);
+	bool GoArc(double x, double y, double r, double phi, double max_w, double max_acc);
 	bool Turn(double angle, double max_speed, double max_acc);
 	bool MotionInProgress(void);
 	int GetMotionError(void);
