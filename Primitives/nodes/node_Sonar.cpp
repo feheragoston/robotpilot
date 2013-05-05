@@ -39,6 +39,7 @@ void node_Sonar::evalMsg(UDPmsg* msg){
 	//ha o a cimzett, csak akkor dolgozza fel
 	if(msg->node_id == id){
 
+		std::cout<<"sonar uzenet " <<msg->function<<std::endl ;
 		switch(msg->function){
 
 			case MSG_PING_REPLY:
