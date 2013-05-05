@@ -80,7 +80,11 @@
 
 
 //----- valtoztathato -----
+#ifdef NAGY_ROBOT
 #define START_ACTUATOR_IN_INIT					0
+#else	//KIS_ROBOT
+#define START_ACTUATOR_IN_INIT					1
+#endif
 
 #define INIT_RETURN_FALSE_IF_ERROR				false
 
