@@ -67,6 +67,7 @@ bool Server::Listen(int portno) {
 		return false;
 	}
 	listening = true;
+	std::cout << "listening" << std::endl;
 	return true;
 }
 

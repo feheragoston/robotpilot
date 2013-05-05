@@ -318,6 +318,7 @@ bool Control::Init() {
 		mServer = new Server();
 		mServer->SetMessageCallback(serverMessageCallback);
 		mServer->Listen(13001);
+		std::cout<<"Java server on port 13001"<<std::endl;
 
 		if (mConfig->NokiaServer) {
 			ns = new nokia_server();
@@ -402,6 +403,9 @@ void Control::Run() {
 
 //ez kuldi a java programnak mit rajzoljon
 void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
+
+	std::cout << "java server callback";
+
 	if (size == 0) {
 		sendObstacles[n] = true;
 		sendDynObstacles[n] = true;
