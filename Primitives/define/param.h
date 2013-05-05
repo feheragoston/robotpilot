@@ -451,8 +451,8 @@
 #ifdef NAGY_ROBOT
 //????
 #define DCWHEEL_GEARBOX								66
-#define DCWHEEL_INCR_PER_MOTORROT					3000
-#define DCWHEEL_INCR_PER_MM							((double)494317 / 400) //Odett, de most ugyanaz
+#define DCWHEEL_INCR_PER_MOTORROT					4096	//3000 volt	-- ezeket mostantol nem hasznaljuk
+#define DCWHEEL_INCR_PER_MM							((double)4096/100/M_PI) //frissitve 2013 /Odett, de most ugyanaz 0.000809197
 #define DCWHEEL_INCR_PER_FULL_TURN					((double)6723500 / 10) // Odett, nincs hasznalva
 #define DCWHEEL_WHEEL_DISTANCE						161.5 // kezzel mert ertek
 #else	//KIS_ROBOT
@@ -486,13 +486,18 @@
 #define DCWHEEL_CONV_RADS_TO_RPM(rads)				((double)(rads) * DCWHEEL_WHEEL_DISTANCE / 2 / DCWHEEL_CONV_RPM_TO_MMS(1))
 #define DCWHEEL_CONV_RADS2_TO_MOTORROTS2(rads2)		((double)(rads2) * DCWHEEL_WHEEL_DISTANCE / 2 / DCWHEEL_CONV_RPM_TO_MMS(1) / 60)
 
-#define DCWHEEL_CONV_ACC(acc)						((u16)DCWHEEL_CONV_MMS2_TO_MOTORROTS2(acc))
-#define DCWHEEL_CONV_SPEED(speed)					((s16)DCWHEEL_CONV_MMS_TO_RPM(speed))
+//#define DCWHEEL_CONV_ACC(acc)						((u16)DCWHEEL_CONV_MMS2_TO_MOTORROTS2(acc))
+//#define DCWHEEL_CONV_SPEED(speed)					((s16)DCWHEEL_CONV_MMS_TO_RPM(speed))
 //#define DCWHEEL_CONV_DIST(dist)						((s32)DCWHEEL_CONV_MM_TO_INCR(dist))
 
-#define DCWHEEL_CONV_BETA(beta)						((u16)DCWHEEL_CONV_RADS2_TO_MOTORROTS2(beta))
-#define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
+//#define DCWHEEL_CONV_BETA(beta)						((u16)DCWHEEL_CONV_RADS2_TO_MOTORROTS2(beta))
+//#define DCWHEEL_CONV_OMEGA(omega)					((u16)DCWHEEL_CONV_RADS_TO_RPM(omega))
 
+//Peti hack: speed, acc mindenhol mm/s
+#define DCWHEEL_CONV_ACC(acc)						((u16)(acc))
+#define DCWHEEL_CONV_SPEED(speed)					((s16)(speed))
+#define DCWHEEL_CONV_BETA(beta)						((u16)(beta))	//ezt kereksebessegre
+#define DCWHEEL_CONV_OMEGA(omega)					((u16)(omega))
 
 #ifdef NAGY_ROBOT
 #define DCWHEEL_IS_LEFT_MOTOR1						1		//??
@@ -502,7 +507,7 @@
 #define DCWHEEL_LEFT_IS_ROTATE_DIR_A				0		//??
 #define DCWHEEL_RIGHT_IS_ROTATE_DIR_A				1		//??
 #define DCWHEEL_LEFT_PLUS_FORWARD					1		//??
-#define DCWHEEL_RIGHT_PLUS_FORWARD					1		//??
+#define DCWHEEL_RIGHT_PLUS_FORWARD					0		//??
 #define DCWHEEL_IS_LEFT_EQEP1						1		//??
 #define DCWHEEL_OE_CONTROL_P						0.0007	//??
 #define DCWHEEL_OE_CONTROL_I						0.0		//??
