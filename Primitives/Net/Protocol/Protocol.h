@@ -63,6 +63,8 @@ typedef struct msgstatus {
 	double flipperPos;
 	double contractorPos;
 	double firestopperPos;
+	double firewheelSpeed;
+	double caracoleSpeed;
 #else	//KIS_ROBOT
 	double lowLeftGripperPos;
 	double lowRightGripperPos;
