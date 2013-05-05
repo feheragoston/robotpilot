@@ -127,6 +127,22 @@ DropPlate()
 
 end
 
+function TestSonar()
+
+i = 0
+while(i<100) do
+	i = i+1
+	ox,oy,val = c.GetOpponentPos(0)
+	print ("Opp 0: ".. ox .. " ".. oy .. " val" .. val)
+	ox,oy,val = c.GetOpponentPos(1)
+	print ("Opp 1: ".. ox .. " ".. oy .. " val" .. val)
+	p.sleep(1000)
+end
+
+print("fin")
+
+end
+
 -- talca letevese
 function DropPlate(waitforit)
 	--karokat leviszi
