@@ -75,7 +75,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	mFollowLine = new FollowLine(this);
 	Follow_InProgress = false;
 	Follow_ts_valid = false;
-	Follow_dist = 0;
 #endif
 
 	deadreckCheckXw		= 0;
@@ -96,6 +95,7 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	broadcast	= new node_Broadcast();
 
 	console		= new node_Console();
+	input		= new node_Input();
 	deadreck	= new node_Deadreck();
 	dcwheel		= new node_DCWheel();
 	servo		= new node_Servo();
@@ -103,7 +103,6 @@ PrimitivesCan::PrimitivesCan(Config* config) : Primitives(config){
 	#ifdef NAGY_ROBOT
 	caracole	= new node_Caracole();
 	firewheel	= new node_Firewheel();
-	input		= new node_Input();
 	power		= new node_Power();
 	#endif
 	//---------- node VEGE ----------
@@ -117,6 +116,9 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!CONSOLE_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(CONSOLE_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(CONSOLE_ID);
+
+	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
+	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!DEADRECK_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(DEADRECK_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(DEADRECK_ID);
@@ -138,9 +140,6 @@ void PrimitivesCan::addNodesToCan(void){
 
 	if(!FIREWHEEL_ON_CANB)	gateway->GATEWAY_ADD_NODE_CANA(FIREWHEEL_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(FIREWHEEL_ID);
-
-	if(!INPUT_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(INPUT_ID);
-	else					gateway->GATEWAY_ADD_NODE_CANB(INPUT_ID);
 
 	if(!POWER_ON_CANB)		gateway->GATEWAY_ADD_NODE_CANA(POWER_ID);
 	else					gateway->GATEWAY_ADD_NODE_CANB(POWER_ID);
@@ -200,13 +199,13 @@ bool PrimitivesCan::Init(void){
 	if(!initNode(gateway)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	addNodesToCan();
 	if(!initNode(console)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
+	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(deadreck)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(dcwheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(servo)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	#ifdef NAGY_ROBOT
 	if(!initNode(caracole)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(firewheel)	&& INIT_RETURN_FALSE_IF_ERROR)		return false;
-	if(!initNode(input)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	if(!initNode(power)		&& INIT_RETURN_FALSE_IF_ERROR)		return false;
 	#endif
 	//SONAR-nak nem kuldunk semmit
@@ -278,7 +277,7 @@ bool PrimitivesCan::Wait(long int useconds){
 #ifdef KIS_ROBOT
 bool PrimitivesCan::Wait(long int useconds){
 
-	timespec ts;
+	timespec ts, ts_temp;
 	clock_gettime(CLOCK_REALTIME, &ts);
 	int error;
 
@@ -289,18 +288,18 @@ bool PrimitivesCan::Wait(long int useconds){
 			long int wait_nsec = (FOLLOW_PERIOD_US % 1000000) * 1000;
 			long int wait_sec = FOLLOW_PERIOD_US / 1000000;
 
-			Follow_ts_valid = true;
 			//ha nincs tulcsordulas nanosec-ben
-			if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec){
+			if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec)
+			{
 				Follow_next_ts.tv_nsec += wait_nsec;
 				Follow_next_ts.tv_sec += wait_sec;
 			}
-
-			//ha tulcsordulas van a nanosec-ben
-			else{
+			else //ha tulcsordulas van a nanosec-ben
+			{
 				Follow_next_ts.tv_nsec = (Follow_next_ts.tv_nsec + wait_nsec) - 1000000000;
 				Follow_next_ts.tv_sec += wait_sec + 1;
 			}
+			Follow_ts_valid = true;
 		}
 	}
 
@@ -319,26 +318,47 @@ bool PrimitivesCan::Wait(long int useconds){
 		ts.tv_sec += wait_sec + 1;
 	}
 
-	if (Follow_InProgress && Follow_ts_valid)
-	{
-		//Ha Follow_next_ts ideje kisebb, akkor o idejeig fogunk varni
-		if ((Follow_next_ts.tv_sec < ts.tv_sec) || ((Follow_next_ts.tv_sec == ts.tv_sec) && (Follow_next_ts.tv_nsec < ts.tv_nsec)))
-			ts = Follow_next_ts;
-	}
-
-	error = sem_timedwait(&newMessageSemaphore, &ts);
-
 	if (Follow_InProgress)
 	{
-		//Ha Follow_next_ts ideje kisebb (ebben az esetben egyenloek) es a szemafor-nal timeout volt
-		if ((error == ETIMEDOUT) && ((ts.tv_nsec == Follow_next_ts.tv_nsec) && (ts.tv_sec == Follow_next_ts.tv_sec)))
+		//Ha Follow_next_ts ideje kisebb, akkor az o idejeig fogunk varni
+		if ((Follow_next_ts.tv_sec < ts.tv_sec) || ((Follow_next_ts.tv_sec == ts.tv_sec) && (Follow_next_ts.tv_nsec < ts.tv_nsec)))
 		{
-			//TODO:Esetleg most kene uj ts-t csinalni, igy pontosabb lenne!
-			mFollowLine->FSM_Run(Follow_dist);
-			if (mFollowLine->Follow_Status != 0)
-				Follow_InProgress = false;
-			Follow_ts_valid = false;
+			//Hatha bantja az idot a szemafor
+			ts_temp = Follow_next_ts;
+			error = sem_timedwait(&newMessageSemaphore, &ts_temp);
+			//Ha a szemafor-nal timeout volt, futtatjuk az FSM-et
+			if (error == ETIMEDOUT)
+			{
+				mFollowLine->FSM_Run();
+				//Ha leallt az FSM
+				if (mFollowLine->Follow_Status != 0)
+				{
+					Follow_InProgress = false;
+					Follow_ts_valid = false;
+				}
+				else //FSM-et meg futtatni kell
+				{
+					long int wait_nsec = (FOLLOW_PERIOD_US % 1000000) * 1000;
+					long int wait_sec = FOLLOW_PERIOD_US / 1000000;
+
+					//ha nincs tulcsordulas nanosec-ben
+					if(1000000000 - wait_nsec > Follow_next_ts.tv_nsec)
+					{
+						Follow_next_ts.tv_nsec += wait_nsec;
+						Follow_next_ts.tv_sec += wait_sec;
+					}
+
+					//ha tulcsordulas van a nanosec-ben
+					else
+					{
+						Follow_next_ts.tv_nsec = (Follow_next_ts.tv_nsec + wait_nsec) - 1000000000;
+						Follow_next_ts.tv_sec += wait_sec + 1;
+					}
+				}
+			}
 		}
+		else
+			error = sem_timedwait(&newMessageSemaphore, &ts);
 	}
 
 	return true;
@@ -366,11 +386,7 @@ bool PrimitivesCan::GetStartButton(void){
 
 	EnterCritical();
 
-#ifdef NAGY_ROBOT
 	bool ret = input->GET_DIGITAL(INPUT_DIGITAL_START_BUTTON_INDEX);
-#else	//KIS_ROBOT
-	bool ret = 1;	//??
-#endif
 
 	ExitCritical();
 
@@ -386,7 +402,8 @@ bool PrimitivesCan::GetStopButton(void){
 #ifdef NAGY_ROBOT
 	bool ret = power->GET_STOP_BUTTON();
 #else	//KIS_ROBOT
-	bool ret = 1;	//??
+	//nincs külön aktuátortáp, soha nem lesz Vészstop benyomva, amit a szoftvernek érzékelnie kéne
+	bool ret = false;
 #endif
 
 	ExitCritical();
@@ -486,8 +503,8 @@ bool PrimitivesCan::SetMotorSupply(bool powered){
 
 	EnterCritical();
 
-	//TODO: megírni
-	bool ret = true;
+	//nincs külön aktuátortáp, azt mondjuk, hogy sikerült elindítani
+	bool ret = ACT_STARTED;
 
 	ExitCritical();
 
@@ -500,7 +517,7 @@ bool PrimitivesCan::SetMotorSupplyInProgress(void){
 
 	EnterCritical();
 
-	//TODO: megírni
+	//nincs külön aktuátortáp, azt mondjuk, hogy nincs folyamatban
 	bool ret = false;
 
 	ExitCritical();
@@ -514,8 +531,8 @@ bool PrimitivesCan::GetMotorSupply(void){
 
 	EnterCritical();
 
-	//TODO: megírni
-	bool ret = false;
+	//nincs külön aktuátortáp, azt mondjuk, hogy jelen van
+	bool ret = true;
 
 	ExitCritical();
 
@@ -822,12 +839,10 @@ bool PrimitivesCan::MotionInProgress(void){
 
 	bool ret = dcwheel->AnyMotion.inProgress;
 
-#ifdef NAGY_ROBOT
 	//ha utkozes kovetkezett be
 	if(ret && (	input->GET_DIGITAL(INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX) ||
 				input->GET_DIGITAL(INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX)))
 		dcwheelMotionError = MOTION_ERROR;
-#endif
 
 	if (!ret && dcwheel->AnyMotion.done == 0) {
 		dcwheelMotionError = MOTION_ERROR;
@@ -964,14 +979,10 @@ void PrimitivesCan::GetDistances(double distance[PROXIMITY_NUM]){
 
 	EnterCritical();
 
-#ifdef NAGY_ROBOT
 	distance[0] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX);
 	distance[1] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX);
 	distance[2] = input->GET_DISTANCE(INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX);
 	distance[3] = input->GET_DISTANCE(INPUT_ANALOG_LEFT_REAR_SHARP_INDEX);
-#else	//KIS_ROBOT
-	//TODO: megírni
-#endif
 
 	ExitCritical();
 
@@ -1714,7 +1725,7 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 	//ha egy node a valosagban tobb funkciot megvalosit, akkor annak az osszes osztajat meghivjuk kiertekelesre
 	gateway->evalMsg(msg);
 	console->evalMsg(msg);
-
+	input->evalMsg(msg);
 	deadreck->evalMsg(msg);
 	dcwheel->evalMsg(msg);
 	servo->evalMsg(msg);
@@ -1725,7 +1736,6 @@ void PrimitivesCan::evalMsg(UDPmsg* msg){
 #ifdef NAGY_ROBOT
 	caracole->evalMsg(msg);
 	firewheel->evalMsg(msg);
-	input->evalMsg(msg);
 	power->evalMsg(msg);
 #endif
 
@@ -1857,14 +1867,8 @@ void PrimitivesCan::SetRobotPos_Unsafe(double x, double y, double phi){
 
 int8_t PrimitivesCan::GetMyColor_Unsafe(void){
 
-#ifdef NAGY_ROBOT
 	bool red = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX);
 	bool blue = input->GET_DIGITAL(INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX);
-#else	//KIS_ROBOT
-	//TODO: megírni
-	bool red = true;
-	bool blue = false;
-#endif
 
 	if(red)			return COLOR_RED;
 	if(blue)		return COLOR_BLUE;
@@ -1888,7 +1892,6 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}
@@ -1896,7 +1899,7 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 	//ha elindithatjuk
 	else{
 		Follow_InProgress = true;
-		Follow_dist = dist;
+		mFollowLine->Follow_Init(dist);
 		ret = ACT_STARTED;
 	}
 
@@ -1908,7 +1911,13 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 
 bool PrimitivesCan::FollowLine_FollowInProgress()
 {
-	return Follow_InProgress;
+	EnterCritical();
+
+	int ret = Follow_InProgress;
+
+	ExitCritical();
+
+	return ret;
 }
 
 int PrimitivesCan::FollowLine_GetFollowError()
@@ -1921,7 +1930,7 @@ int PrimitivesCan::FollowLine_GetFollowError()
 	return error;
 }
 
-bool PrimitivesCan::FollowLine_Turn()
+bool PrimitivesCan::FollowLine_FixThreshold(uint16_t threshold)
 {
 	EnterCritical();
 
@@ -1929,28 +1938,15 @@ bool PrimitivesCan::FollowLine_Turn()
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		mFollowLine->Turn();
-		ret = ACT_STARTED;
+		ret = mFollowLine->FixThreshold(threshold);
 	}
 
-
-	ExitCritical();
-
-	return ret;
-}
-
-bool PrimitivesCan::FollowLine_TurnInProgress()
-{
-	EnterCritical();
-
-	bool ret = mFollowLine->Turn_InProgress;
 
 	ExitCritical();
 
@@ -1965,7 +1961,6 @@ bool PrimitivesCan::FollowLine_Calibrate()
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}

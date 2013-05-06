@@ -9,20 +9,18 @@
 
 
 
-#define NAGY_ROBOT
-// #define KIS_ROBOT
+// #define NAGY_ROBOT
+#define KIS_ROBOT
 
 
 
 //----- konstans -----
 #define SERVO_COUNT							6
 
-#ifdef NAGY_ROBOT
 #define INPUT_ANALOG_COUNT					7
 #define INPUT_DIGITAL_COUNT					10
 #define INPUT_DIGITAL_OUTPUT_COUNT			4
 #define INPUT_DIGITAL_OUTPUT_MIN_INDEX		6
-#endif
 
 #define SONAR_TRANSMITTER_COUNT				3
 
@@ -52,11 +50,11 @@
 
 
 //----- atszamitas -----
-#ifdef NAGY_ROBOT
 #define MESV_TO_ANALOG(mesv)					((u16)((float)(mesv) / 3 * 0x0FFF))			//3V-hoz a 12 bites ADC legnagyobb erteke
 #define ANALOG_TO_MESV(analog)					((float)(analog) / 0x0FFF * 3)				//12 bites ADC legnagyobb ertekehez 3V
 
 
+#ifdef NAGY_ROBOT
 #define POWER_V_TO_MESV(v)						((float)(v) * 10 / (10 + 100))				//feszultsegmeresekhez 10k-100k leosztas
 #define POWER_A_TO_MESV(a)						((float)(a) * (-2.5/30) + 2.5)				//0A -> 2.5V, 30A -> 0V
 
@@ -68,6 +66,7 @@
 
 #define POWER_ANALOG_TO_V(analog)				POWER_MESV_TO_V(ANALOG_TO_MESV(analog))
 #define POWER_ANALOG_TO_A(analog)				POWER_MESV_TO_A(ANALOG_TO_MESV(analog))
+#endif
 
 
 #define INPUT_MESV_TO_V(mesv)					((float)(mesv) * (22 + 22) / 22)			//feszultsegmeresekhez 22k-22k leosztas
@@ -75,14 +74,17 @@
 
 #define INPUT_V_TO_ANALOG(v)					MESV_TO_ANALOG(INPUT_V_TO_MESV(v))
 #define INPUT_ANALOG_TO_V(analog)				INPUT_MESV_TO_V(ANALOG_TO_MESV(analog))
-#endif
 
 
 
 
 
 //----- valtoztathato -----
+#ifdef NAGY_ROBOT
 #define START_ACTUATOR_IN_INIT					0
+#else	//KIS_ROBOT
+#define START_ACTUATOR_IN_INIT					1
+#endif
 
 #define INIT_RETURN_FALSE_IF_ERROR				false
 
@@ -134,11 +136,9 @@
 #define DCWHEEL_SEND_PERIOD_TO_PC_MS			100
 #define DCWHEEL_SEND_PERIOD_TO_NODE_MS			0
 
-#ifdef NAGY_ROBOT
 #define INPUT_KEEP_ALIVE_MS						1000
 #define INPUT_SEND_PERIOD_TO_PC_MS				100
 #define INPUT_SEND_PERIOD_TO_NODE_MS			0
-#endif
 
 #define SERVO_KEEP_ALIVE_MS						1000
 #define SERVO_SEND_PERIOD_TO_PC_MS				100
@@ -173,6 +173,7 @@
 #define CONSOLE_ON_CANB							1	//??
 #define DEADRECK_ON_CANB						1	//??
 #define DCWHEEL_ON_CANB							1	//??
+#define INPUT_ON_CANB							1	//??
 #define SERVO_ON_CANB							1	//??
 #define SONAR_ON_CANB							1	//??
 #endif
@@ -240,6 +241,64 @@
 #define INPUT_ANALOG_BALL_COLOR_CNY70_INDEX		6	//??
 #define INPUT_ANALOG_PLUS_0_INDEX				5
 #define INPUT_ANALOG_PLUS_1_INDEX				0
+
+#else	//KIS_ROBOT
+
+#define INPUT_DIGITAL_START_BUTTON_INDEX					7	//??
+#define INPUT_DIGITAL_COLOR_RED_BUTTON_INDEX				9	//??
+#define INPUT_DIGITAL_COLOR_BLUE_BUTTON_INDEX				8	//??
+#define INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_INDEX			3	//??
+#define INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_INDEX			6	//??
+#define INPUT_DIGITAL_PLUS_0_INDEX							4	//??
+#define INPUT_DIGITAL_PLUS_1_INDEX							5	//??
+#define INPUT_DIGITAL_PLUS_2_INDEX							1	//??
+#define INPUT_DIGITAL_PLUS_3_INDEX							2	//??
+#define INPUT_DIGITAL_PLUS_4_INDEX							0	//??
+
+
+#define INPUT_DIGITAL_IS_OUTPUT_START_BUTTON				0	//??
+#define INPUT_DIGITAL_IS_OUTPUT_COLOR_RED_BUTTON			0	//??
+#define INPUT_DIGITAL_IS_OUTPUT_COLOR_BLUE_BUTTON			0	//??
+#define INPUT_DIGITAL_IS_OUTPUT_REAR_LEFT_LIMIT_SWITCH		0	//??
+#define INPUT_DIGITAL_IS_OUTPUT_REAR_RIGHT_LIMIT_SWITCH		0	//??
+#define INPUT_DIGITAL_IS_OUTPUT_PLUS_0						0
+#define INPUT_DIGITAL_IS_OUTPUT_PLUS_1						0
+#define INPUT_DIGITAL_IS_OUTPUT_PLUS_2						0
+#define INPUT_DIGITAL_IS_OUTPUT_PLUS_3						0
+#define INPUT_DIGITAL_IS_OUTPUT_PLUS_4						0
+
+//aktív-e
+#define INPUT_DIGITAL_OUTPUT_START_BUTTON_INIT_STATE				0	//??
+#define INPUT_DIGITAL_OUTPUT_COLOR_RED_BUTTON_INIT_STATE			0	//??
+#define INPUT_DIGITAL_OUTPUT_COLOR_BLUE_BUTTON_INIT_STATE			0	//??
+#define INPUT_DIGITAL_OUTPUT_REAR_LEFT_LIMIT_SWITCH_INIT_STATE		0	//??
+#define INPUT_DIGITAL_OUTPUT_REAR_RIGHT_LIMIT_SWITCH_INIT_STATE		0	//??
+#define INPUT_DIGITAL_OUTPUT_PLUS_0_INIT_STATE						0
+#define INPUT_DIGITAL_OUTPUT_PLUS_1_INIT_STATE						0
+#define INPUT_DIGITAL_OUTPUT_PLUS_2_INIT_STATE						0
+#define INPUT_DIGITAL_OUTPUT_PLUS_3_INIT_STATE						0
+#define INPUT_DIGITAL_OUTPUT_PLUS_4_INIT_STATE						0
+
+//kimenetnél is aktív szintet jelent
+#define INPUT_DIGITAL_START_BUTTON_ACTIVE_LEVEL				1	//??
+#define INPUT_DIGITAL_COLOR_RED_BUTTON_ACTIVE_LEVEL			0	//??
+#define INPUT_DIGITAL_COLOR_BLUE_BUTTON_ACTIVE_LEVEL		0	//??
+#define INPUT_DIGITAL_REAR_LEFT_LIMIT_SWITCH_ACTIVE_LEVEL	0	//??
+#define INPUT_DIGITAL_REAR_RIGHT_LIMIT_SWITCH_ACTIVE_LEVEL	0	//??
+#define INPUT_DIGITAL_PLUS_0_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_1_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_2_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_3_ACTIVE_LEVEL					0
+#define INPUT_DIGITAL_PLUS_4_ACTIVE_LEVEL					0
+
+
+#define INPUT_ANALOG_LEFT_FRONT_SHARP_INDEX		0	//??
+#define INPUT_ANALOG_RIGHT_FRONT_SHARP_INDEX	4	//??
+#define INPUT_ANALOG_LEFT_REAR_SHARP_INDEX		2	//??
+#define INPUT_ANALOG_RIGHT_REAR_SHARP_INDEX		3	//??
+#define INPUT_ANALOG_PLUS_0_INDEX				6	//??
+#define INPUT_ANALOG_PLUS_1_INDEX				1	//??
+#define INPUT_ANALOG_PLUS_2_INDEX				5	//??
 
 #endif
 

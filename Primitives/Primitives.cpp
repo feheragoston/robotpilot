@@ -583,12 +583,7 @@ int Primitives::FollowLine_GetFollowError()
 	return false;
 }
 
-bool Primitives::FollowLine_Turn()
-{
-	return false;
-}
-
-bool Primitives::FollowLine_TurnInProgress()
+bool Primitives::FollowLine_FixThreshold(uint16_t threshold)
 {
 	return false;
 }

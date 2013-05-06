@@ -556,15 +556,10 @@ public:
 	 */
 	virtual int FollowLine_GetFollowError();
 	/**
-	 * Vonalkovetes elagazas-fordulas
-	 * @return true: folyamat elindult, false: hiba tortent
+	 * Vonalkovetes fix threshold beallitas
+	 * @return true: siker, false: hiba tortent
 	 */
-	 virtual bool FollowLine_Turn();
-	/**
-	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	virtual bool FollowLine_TurnInProgress();
+	virtual bool FollowLine_FixThreshold(uint16_t threshold);
 	/**
 	 * Vonalkovetes kalibralas
 	 * @return true: folyamat elindult, false: hiba tortent

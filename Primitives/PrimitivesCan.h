@@ -156,16 +156,10 @@ public:
 	 */
 	int FollowLine_GetFollowError();
 	/**
-	 * Vonalkovetes elagazas-fordulas
-	 * @return true: folyamat elindult, false: hiba tortent
+	 * Vonalkovetes fix threshold beallitas
+	 * @return true: siker, false: hiba tortent
 	 */
-	 bool FollowLine_Turn();
-
-	/**
-	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	bool FollowLine_TurnInProgress();
+	bool FollowLine_FixThreshold(uint16_t threshold);
 	/**
 	 * Vonalkovetes kalibralas
 	 * @return true: folyamat elindult, false: hiba tortent
@@ -217,6 +211,7 @@ private:
 	node_Broadcast*		broadcast;
 	node_Gateway*		gateway;
 	node_Console*		console;
+	node_Input*			input;
 	node_Deadreck*		deadreck;
 	node_DCWheel*		dcwheel;
 	node_Servo*			servo;
@@ -224,7 +219,6 @@ private:
 	#ifdef NAGY_ROBOT
 	node_Caracole*		caracole;
 	node_Firewheel*		firewheel;
-	node_Input*			input;
 	node_Power*			power;
 	#endif
 	//---------- node VEGE ----------
@@ -233,7 +227,6 @@ private:
 	FollowLine* mFollowLine;
 
 	bool Follow_InProgress;
-	double Follow_dist;
 	timespec Follow_next_ts;
 	bool Follow_ts_valid;
 

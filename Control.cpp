@@ -169,8 +169,7 @@ Control::Control(Config* config) {
 		{"FollowLine_Follow", l_FollowLine_Follow},
 		{"FollowLine_FollowInProgress", l_FollowLine_FollowInProgress},
 		{"FollowLine_GetFollowError", l_FollowLine_GetFollowError},
-		{"FollowLine_Turn", l_FollowLine_Turn},
-		{"FollowLine_TurnInProgress", l_FollowLine_TurnInProgress},
+		{"FollowLine_FixThreshold",l_FollowLine_FixThreshold},
 		{"FollowLine_Calibrate", l_FollowLine_Calibrate},
 		{"FollowLine_CalibrateInProgress", l_FollowLine_CalibrateInProgress},
 #endif
@@ -1891,20 +1890,11 @@ int Control::l_FollowLine_GetFollowError(lua_State *L)
 	lua_pushinteger(L, mPrimitives->FollowLine_GetFollowError());
 	return 1;
 }
-int Control::l_FollowLine_Turn(lua_State *L)
+int Control::l_FollowLine_FixThreshold(lua_State *L)
 {
-	if (mPrimitives->FollowLine_Turn())
-	{
-		setSafeMotion(L);
-		lua_pushboolean(L, true);
-		return 1;
-	}
-	lua_pushboolean(L, false);
-	return 1;
-}
-int Control::l_FollowLine_TurnInProgress(lua_State *L)
-{
-	lua_pushboolean(L, mPrimitives->FollowLine_TurnInProgress());
+	uint16_t threshold = lua_tonumber(L, 1);
+
+	lua_pushboolean(L, mPrimitives->FollowLine_FixThreshold(threshold));
 	return 1;
 }
 int Control::l_FollowLine_Calibrate(lua_State *L)
