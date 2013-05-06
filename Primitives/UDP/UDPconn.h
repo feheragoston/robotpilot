@@ -29,6 +29,7 @@
 
 
 //------------------------------ define ELEJE ------------------------------
+#define DefaultLocalIP				"192.168.131.121"	//nem használjuk, csak hogy tudjuk, hogy hova küld a remote
 #define DefaultTargetHost			"192.168.131.111"
 //#define DefaultTargetHost			"127.0.0.1"
 #define RemotePort					10001
