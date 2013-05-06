@@ -1875,7 +1875,6 @@ bool PrimitivesCan::FollowLine_Follow(double dist)
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}
@@ -1914,7 +1913,7 @@ int PrimitivesCan::FollowLine_GetFollowError()
 	return error;
 }
 
-bool PrimitivesCan::FollowLine_Turn(bool turn)
+bool PrimitivesCan::FollowLine_FixThreshold(uint16_t threshold)
 {
 	EnterCritical();
 
@@ -1922,28 +1921,15 @@ bool PrimitivesCan::FollowLine_Turn(bool turn)
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}
 
 	//ha elindithatjuk
 	else{
-		mFollowLine->Turn(turn);
-		ret = ACT_STARTED;
+		ret = mFollowLine->FixThreshold(threshold);
 	}
 
-
-	ExitCritical();
-
-	return ret;
-}
-
-bool PrimitivesCan::FollowLine_TurnInProgress()
-{
-	EnterCritical();
-
-	bool ret = mFollowLine->Turn_InProgress;
 
 	ExitCritical();
 
@@ -1958,7 +1944,6 @@ bool PrimitivesCan::FollowLine_Calibrate()
 
 	//ha folyamatban van valami, amire ezt nem indithatjuk el
 	if(	Follow_InProgress ||
-		mFollowLine->Turn_InProgress ||
 		mFollowLine->Calibrate_InProgress){
 		ret = ACT_START_ERROR;
 	}

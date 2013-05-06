@@ -155,17 +155,10 @@ public:
 	 */
 	int FollowLine_GetFollowError();
 	/**
-	 * Vonalkovetes elagazas-fordulas
-	 * turn: true kanyarodik, false elore megy
-	 * @return true: folyamat elindult, false: hiba tortent
+	 * Vonalkovetes fix threshold beallitas
+	 * @return true: siker, false: hiba tortent
 	 */
-	 bool FollowLine_Turn(bool turn);
-
-	/**
-	 * Vonalkovetes elagazas-fordulas allapotanak lekerdezese
-	 * @return true: folyamatban van, false: nincs folyamatban
-	 */
-	bool FollowLine_TurnInProgress();
+	bool FollowLine_FixThreshold(uint16_t threshold);
 	/**
 	 * Vonalkovetes kalibralas
 	 * @return true: folyamat elindult, false: hiba tortent
