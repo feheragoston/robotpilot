@@ -402,8 +402,8 @@ bool PrimitivesCan::GetStopButton(void){
 #ifdef NAGY_ROBOT
 	bool ret = power->GET_STOP_BUTTON();
 #else	//KIS_ROBOT
-	//TODO: megírni
-	bool ret = 1;	//??
+	//nincs külön aktuátortáp, soha nem lesz Vészstop benyomva, amit a szoftvernek érzékelnie kéne
+	bool ret = false;
 #endif
 
 	ExitCritical();
@@ -503,8 +503,8 @@ bool PrimitivesCan::SetMotorSupply(bool powered){
 
 	EnterCritical();
 
-	//TODO: megírni
-	bool ret = true;
+	//nincs külön aktuátortáp, azt mondjuk, hogy sikerült elindítani
+	bool ret = ACT_STARTED;
 
 	ExitCritical();
 
@@ -517,7 +517,7 @@ bool PrimitivesCan::SetMotorSupplyInProgress(void){
 
 	EnterCritical();
 
-	//TODO: megírni
+	//nincs külön aktuátortáp, azt mondjuk, hogy nincs folyamatban
 	bool ret = false;
 
 	ExitCritical();
@@ -531,8 +531,8 @@ bool PrimitivesCan::GetMotorSupply(void){
 
 	EnterCritical();
 
-	//TODO: megírni
-	bool ret = false;
+	//nincs külön aktuátortáp, azt mondjuk, hogy jelen van
+	bool ret = true;
 
 	ExitCritical();
 
