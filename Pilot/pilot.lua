@@ -178,7 +178,7 @@ function MotionStop(...)
 	return true
 end
 
--- aktuatorok kezeleses
+-- aktuatorok kezeleses-Nagyrobot
 
 -- arm
 -- selector
@@ -197,9 +197,9 @@ end
 
 
 --Arm
-function ArmMove(...)
-	if (control.ArmMove(...)) then
-		while (control.ArmMoveInProgress()) do
+function ArmMove(left,...)
+	if (control.ArmMove(left,...)) then
+		while (control.ArmMoveInProgress(left)) do
 			process()
 		end
 	else
@@ -223,19 +223,6 @@ function SelectorMove(...)
 end
 
 --Flipper
-function FlipperMove(...)
-	if (control.FlipperMove(...)) then
-		while (control.FlipperMoveInProgress()) do
-			process()
-		end
-	else
-		control.print("(pilot) FlipperMove hiba")
-		return false
-	end
-	return true
-end
-
--- flipper handler, parhuzamosan hivando minden massal, soha nem ter vissza
 function FlipperMove(...)
 	if (control.FlipperMove(...)) then
 		while (control.FlipperMoveInProgress()) do
@@ -368,6 +355,90 @@ function ConsoleStop(...)
 		end
 	else
 		control.print("(pilot) ConsoleStop hiba")
+		return false
+	end
+	return true
+end
+
+-- aktuatorok kezeleses-Kisrobot
+
+-- gripper
+-- console
+
+-- followline
+-------------------------------------------------
+
+--Gripper
+function GripperMove(low,left,...)
+	if (control.GripperMove(low,left,...)) then
+		while (control.GripperMoveInProgress(low,left)) do
+			process()
+		end
+	else
+		control.print("(pilot) GripperMove hiba", left)
+		return false
+	end
+	return true
+end
+
+--Console
+function CalibrateConsole(...)
+	if (control.CalibrateConsole(...)) then
+		while (control.CalibrateConsoleInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) CalibrateConsole hiba")
+		return false
+	end
+	return true
+end
+
+function ConsoleMove(...)
+	if (control.ConsoleMove(...)) then
+		while (control.ConsoleMoveInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) ConsoleMove hiba")
+		return false
+	end
+	return true
+end
+
+function ConsoleStop(...)
+	if (control.ConsoleStop(...)) then
+		while (control.ConsoleStopInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) ConsoleStop hiba")
+		return false
+	end
+	return true
+end
+
+--FollowLine-Follow: adott tavolsagig, elagazasig koveti a vonalat
+function FollowLine_Follow(...)
+	if (control.FollowLine_Follow(...)) then
+		while (control.FollowLine_FollowInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) FollowLine_Follow hiba")
+		return false
+	end
+	return true
+end
+
+--FollowLine-Calibrate: mask-ot csinal a hibas szenzorokrol, kicsit bizonytalan, elesben inkabb NE hasznaljuk, csak szenzorok ellenorzesere!!!
+function FollowLine_Calibrate(...)
+	if (control.FollowLine_Follow(...)) then
+		while (control.FollowLine_CalibrateInProgress()) do
+			process()
+		end
+	else
+		control.print("(pilot) FollowLine_Calibrate hiba")
 		return false
 	end
 	return true
