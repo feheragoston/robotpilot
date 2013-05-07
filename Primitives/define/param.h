@@ -468,12 +468,12 @@
 #define DEADRECK_CALIB_PHI						((double)90.0 * M_PI / 180)	//[rad]			//??
 
 //?? saját menés nélkül
-#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 266.4655)	//[1/mm]		//??
-#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)1 / 67.3033)	//[1/mm]		//??
-#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)1 / 67.310)	//[1/mm]		//??
-#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0										//??
-#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1										//??
-#define DEADRECK_IS_LEFT_EQEP1						1										//??
+#define DEADRECK_WHEEL_DISTANCE_REC					((double)1 / 190)	//[1/mm]			//ok
+#define DEADRECK_LEFT_ONE_INCREMENT_DISTANCE		((double)60.0*M_PI / 360)	//[1/mm]	//ok
+#define DEADRECK_RIGHT_ONE_INCREMENT_DISTANCE		((double)60.0*M_PI / 360)	//[1/mm]	//ok
+#define DEADRECK_LEFT_IS_ROTATE_DIR_A				0										//ok
+#define DEADRECK_RIGHT_IS_ROTATE_DIR_A				1										//ok
+#define DEADRECK_IS_LEFT_EQEP1						0										//ok
 
 #endif
 
