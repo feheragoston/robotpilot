@@ -84,6 +84,7 @@ protected:
 	static bool logObstacles;
 	static bool logDynObstacles;
 	static void log();
+	static void music(const char* str);
 
 	static void setSafeMotion(lua_State *L);
 	static long int refreshOpponent(unsigned char n);

@@ -1191,6 +1191,14 @@ bool Control::checkLine(double x1, double y1, double x2, double y2, int mode) {
 	return false;
 }
 
+void Control::music(const char* str) {
+	int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+	if (write(fp, str, strlen(str)) < 0) {
+		//TODO error
+	}
+	close(fp);
+}
+
 //control.print fuggvenyt hivja a lua error-al
 void Control::report_errors(lua_State *L, int status) {
 	if (status != 0) {
@@ -1282,9 +1290,7 @@ int Control::c_wait(lua_State *L) {
 		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
-			int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
-			write(fp, "stop", 4);
-			close(fp);
+			music("stop");
 		}
 		return luaL_error(L, "(Control) Stop button, exiting");
 	} else if (MatchTime() > 90000) {
@@ -1293,9 +1299,7 @@ int Control::c_wait(lua_State *L) {
 		}
 		if (!mPrimitives->SetMotorSupplyInProgress()) {
 			exitControl = true;
-			int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
-			write(fp, "matchover", 9);
-			close(fp);
+			music("matchover");
 		}
 		cout << "(Control) Meccs ido letelt, kilepunk" << endl;
 		return luaL_error(L, "(Control) Match over, exiting");
@@ -1400,9 +1404,7 @@ int Control::c_print(lua_State *L) {
 int Control::c_music(lua_State *L) {
 	if (lua_isstring(L, 1)) {
 		const char* s = lua_tostring(L, 1);
-		int fp = open("/tmp/playlist", O_WRONLY | O_CREAT | O_TRUNC, 0664);
-		write(fp, s, strlen(s));
-		close(fp);
+		music(s);
 	}
 	return 0;
 }
