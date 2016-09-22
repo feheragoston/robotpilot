@@ -550,9 +550,19 @@ void Control::serverMessageCallback(int n, const void* message, msglen_t size) {
 void Control::log() {
 	if (logfile) {
 		unsigned int time = InitTime();
-		write(logfile, &time, sizeof(unsigned int));
+		if (write(logfile, &time, sizeof(unsigned int))) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
 		time = MatchTime();
-		write(logfile, &time, sizeof(unsigned int));
+		if (write(logfile, &time, sizeof(unsigned int))) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
 
 		msglen_t size;
 
@@ -584,8 +594,18 @@ void Control::log() {
 		status.consolePos = mPrimitives->GetConsolePos();
 		mPrimitives->GetDistances(status.distances);
 		size = sizeof(msgstatus);
-		write(logfile, &size, sizeof(msglen_t));
-		write(logfile, &status, size);
+		if (write(logfile, &size, sizeof(msglen_t))) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
+		if (write(logfile, &status, size)) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
 
 		msgshapes rob;
 		rob.function = MSG_SHAPES;
@@ -601,8 +621,18 @@ void Control::log() {
 			o++;
 		}
 		size = sizeof(msgshapes);
-		write(logfile, &size, sizeof(msglen_t));
-		write(logfile, &rob, size);
+		if (write(logfile, &size, sizeof(msglen_t))) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
+		if (write(logfile, &rob, size)) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
 
 		rob.num = min(robotHighObstacles.size(), 14);
 		rob.id = 1;
@@ -616,8 +646,18 @@ void Control::log() {
 			o++;
 		}
 		size = sizeof(msgshapes);
-		write(logfile, &size, sizeof(msglen_t));
-		write(logfile, &rob, size);
+		if (write(logfile, &size, sizeof(msglen_t))) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
+		if (write(logfile, &rob, size)) {
+			cerr << "Error writing log, closing log" << endl;
+			close(logfile);
+			logfile = 0;
+			return;
+		}
 
 		if (logObstacles) {
 			logObstacles = false;
@@ -636,8 +676,18 @@ void Control::log() {
 				o++;
 			}
 			size = sizeof(msgshapes);
-			write(logfile, &size, sizeof(msglen_t));
-			write(logfile, &obs, size);
+			if (write(logfile, &size, sizeof(msglen_t))) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
+			if (write(logfile, &obs, size)) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
 
 			obs.id = 3;
 			obs.num = highObstacles.size();
@@ -651,8 +701,18 @@ void Control::log() {
 				o++;
 			}
 			size = sizeof(msgshapes);
-			write(logfile, &size, sizeof(msglen_t));
-			write(logfile, &obs, size);
+			if (write(logfile, &size, sizeof(msglen_t))) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
+			if (write(logfile, &obs, size)) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
 		}
 		if (logDynObstacles) {
 			logDynObstacles = false;
@@ -670,8 +730,18 @@ void Control::log() {
 				o++;
 			}
 			size = sizeof(msgshapes);
-			write(logfile, &size, sizeof(msglen_t));
-			write(logfile, &obs, size);
+			if (write(logfile, &size, sizeof(msglen_t))) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
+			if (write(logfile, &obs, size)) {
+				cerr << "Error writing log, closing log" << endl;
+				close(logfile);
+				logfile = 0;
+				return;
+			}
 
 			if (collisionObstacles.size() > 0) {
 				obs.id = 5;
@@ -686,8 +756,18 @@ void Control::log() {
 					o++;
 				}
 				size = sizeof(msgshapes);
-				write(logfile, &size, sizeof(msglen_t));
-				write(logfile, &obs, size);
+				if (write(logfile, &size, sizeof(msglen_t))) {
+					cerr << "Error writing log, closing log" << endl;
+					close(logfile);
+					logfile = 0;
+					return;
+				}
+				if (write(logfile, &obs, size)) {
+					cerr << "Error writing log, closing log" << endl;
+					close(logfile);
+					logfile = 0;
+					return;
+				}
 			}
 		}
 
