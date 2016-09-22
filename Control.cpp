@@ -813,10 +813,12 @@ bool Control::opponentTooClose() {
 //obstacleCollision: megmondja hogy epp osszeutkozunk-e valamivel, mechanikai elemek allasatol fuggoen
 //frissiti a robotObstacles es robotHighObstacles-t, simulate mode-ban hasznaljuk
 bool Control::obstacleCollision() {
-	double x, y, phi, lg, rg, lc, rc;
-	mPrimitives->GetRobotPos(&x, &y, &phi);
-
 	//TODO: ezt a mostani mechanikara frissiteni
+
+	double x, y, phi;
+	//double lg, rg, lc, rc;
+
+	mPrimitives->GetRobotPos(&x, &y, &phi);
 
 	/*
 	lg = mPrimitives->GetArmPos(true);

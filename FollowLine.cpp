@@ -222,7 +222,7 @@ void FollowLine::MaskRawSensData(uint32_t* Sens_Pos)
 bool FollowLine::ControlSensor(uint8_t max_try, uint32_t* Sens_Pos, char command, char dataL, char dataH)
 {
 	uint32_t Sens_Pos_Temp;
-	int32_t uart_try, num, ret;
+	int32_t uart_try, num = 0, ret;
 	char read[6];
 	struct pollfd fd[1];
 	fd->fd = SerialPort;
@@ -240,7 +240,9 @@ bool FollowLine::ControlSensor(uint8_t max_try, uint32_t* Sens_Pos, char command
 		SendByte_SerialPort(0);
 		ret = poll(fd,1,500);	//500ms wait
 		if (ret > 0)
+		{
 			num = ReceiveByte_SerialPort(read);
+		}
 		if (num < 6)
 		{
 			ret = poll(fd,1,500);	//500ms wait
